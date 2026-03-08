@@ -41,12 +41,17 @@ export default function Messages() {
   const [editTemplate, setEditTemplate] = useState<MessageTemplate | null>(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [previewMsg, setPreviewMsg] = useState<ScheduledMessage | null>(null);
+  const [automationOpen, setAutomationOpen] = useState(false);
+  const [editRule, setEditRule] = useState<AutomationRule | null>(null);
 
   const { data: templates, isLoading: loadingT } = useMessageTemplates();
   const deleteTemplate = useDeleteTemplate();
   const { data: pendingMsgs, isLoading: loadingP } = useScheduledMessages("pending");
   const { data: sentMsgs, isLoading: loadingS } = useScheduledMessages();
   const cancelMsg = useCancelScheduledMessage();
+  const { data: rules, isLoading: loadingR } = useAutomationRules();
+  const deleteRule = useDeleteAutomationRule();
+  const toggleRule = useUpdateAutomationRule();
 
   const sentAndFailed = sentMsgs?.filter((m) => m.status === "sent" || m.status === "failed") || [];
 
