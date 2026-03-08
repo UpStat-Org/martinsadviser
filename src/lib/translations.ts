@@ -150,6 +150,9 @@ const translations: Record<Language, Record<string, string>> = {
     "messages.preview": "Pré-visualização da Mensagem",
     "messages.sendComplete": "Envio concluído",
     "messages.sendError": "Erro ao enviar",
+    "messages.sendNow": "Enviar agora",
+    "messages.sendNowDesc": "Enviar imediatamente em vez de agendar",
+    "messages.scheduleFor": "Agendar para",
 
     // Calendar
     "calendar.title": "Calendário",
