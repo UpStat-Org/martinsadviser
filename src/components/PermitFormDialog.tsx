@@ -17,9 +17,10 @@ import { useCreatePermit, useUpdatePermit, PERMIT_TYPES, type Permit } from "@/h
 import { useClients } from "@/hooks/useClients";
 import { useTrucks } from "@/hooks/useTrucks";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Upload, FileText, X, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const formSchema = z.object({
   client_id: z.string().min(1, "Cliente é obrigatório"),
