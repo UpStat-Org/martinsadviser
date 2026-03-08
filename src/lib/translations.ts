@@ -438,6 +438,13 @@ const translations: Record<Language, Record<string, string>> = {
     "map.expired": "Vencidos",
     "map.noCoverage": "Sem cobertura",
     "map.statesCovered": "estados cobertos",
+
+    // Docs
+    "nav.docs": "Documentação",
+    "docs.title": "Documentação",
+    "docs.subtitle": "Tutorial completo do sistema — aprenda a usar cada funcionalidade",
+    "docs.welcomeTitle": "Bem-vindo à Documentação",
+    "docs.welcomeDesc": "Aqui você encontra tutoriais detalhados de todas as páginas e funcionalidades do sistema. Clique em cada seção para expandir e ver o passo a passo.",
   },
   en: {
     "nav.dashboard": "Dashboard",
