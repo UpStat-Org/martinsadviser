@@ -246,6 +246,7 @@ export default function ClientDetail() {
           title={viewDocTitle}
         />
       )}
+      <InvitePortalDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={client.id} clientName={client.company_name} />
     </div>
   );
 }
