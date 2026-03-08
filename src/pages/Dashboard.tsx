@@ -334,6 +334,18 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-display text-lg flex items-center gap-2">
+            <Map className="w-5 h-5 text-muted-foreground" />
+            {t("map.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PermitCoverageMap permits={permits} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

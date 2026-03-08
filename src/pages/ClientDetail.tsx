@@ -303,6 +303,7 @@ export default function ClientDetail() {
         />
       )}
       <InvitePortalDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={client.id} clientName={client.company_name} />
+      <SignatureDialog open={signatureOpen} onOpenChange={setSignatureOpen} clientId={client.id} />
 
       {/* AI Report Dialog */}
       <Dialog open={aiReportOpen} onOpenChange={setAiReportOpen}>
