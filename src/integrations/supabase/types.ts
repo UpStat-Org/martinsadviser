@@ -14,6 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
+      automation_log: {
+        Row: {
+          created_at: string
+          id: string
+          permit_id: string
+          rule_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permit_id: string
+          rule_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permit_id?: string
+          rule_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_log_permit_id_fkey"
+            columns: ["permit_id"]
+            isOneToOne: false
+            referencedRelation: "permits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_log_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "automation_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_rules: {
+        Row: {
+          body: string
+          channel: string
+          created_at: string
+          days_before: number
+          enabled: boolean
+          id: string
+          name: string
+          subject: string | null
+          template_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          channel?: string
+          created_at?: string
+          days_before?: number
+          enabled?: boolean
+          id?: string
+          name: string
+          subject?: string | null
+          template_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          channel?: string
+          created_at?: string
+          days_before?: number
+          enabled?: boolean
+          id?: string
+          name?: string
+          subject?: string | null
+          template_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_rules_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "message_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           address: string | null
