@@ -62,6 +62,7 @@ const App = () => (
               <Route path="/permits" element={<Permits />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/tasks" element={<KanbanPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/admin/users" element={<AdminUsers />} />
