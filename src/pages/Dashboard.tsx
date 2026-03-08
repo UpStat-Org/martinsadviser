@@ -112,7 +112,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl font-bold text-foreground">{t("dashboard.title")}</h1>
+        <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">{t("dashboard.title")}</h1>
         <p className="text-muted-foreground mt-1">{t("dashboard.subtitle")}</p>
       </div>
 
