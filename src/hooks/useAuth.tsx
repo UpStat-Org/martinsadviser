@@ -15,6 +15,7 @@ export function useAuth() {
     user: null,
     loading: true,
     isAdmin: false,
+    role: null,
     approvalStatus: null,
   });
 
