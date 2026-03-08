@@ -81,6 +81,7 @@ export default function ClientDetail() {
             <Badge className={status.className}>{status.label}</Badge>
           </div>
         </div>
+        <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}><UserPlus className="w-4 h-4 mr-2" />{t("portal.inviteClient")}</Button>
         <Button variant="outline" onClick={() => setEditOpen(true)}><Pencil className="w-4 h-4 mr-2" />{t("common.edit")}</Button>
         <AlertDialog>
           <AlertDialogTrigger asChild><Button variant="destructive" size="icon"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>
