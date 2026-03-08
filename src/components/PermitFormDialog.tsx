@@ -16,6 +16,10 @@ import {
 import { useCreatePermit, useUpdatePermit, PERMIT_TYPES, type Permit } from "@/hooks/usePermits";
 import { useClients } from "@/hooks/useClients";
 import { useTrucks } from "@/hooks/useTrucks";
+import { supabase } from "@/integrations/supabase/client";
+import { useState, useRef } from "react";
+import { Upload, FileText, X, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   client_id: z.string().min(1, "Cliente é obrigatório"),
@@ -41,6 +45,10 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
   const createPermit = useCreatePermit();
   const updatePermit = useUpdatePermit();
   const { data: clients } = useClients();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const isEditing = !!permit;
 
@@ -72,31 +80,77 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
   const selectedClientId = form.watch("client_id");
   const { data: trucks } = useTrucks(undefined, selectedClientId || undefined);
 
-  const onSubmit = async (values: FormValues) => {
-    const payload = {
-      client_id: values.client_id,
-      truck_id: values.truck_id || null,
-      permit_type: values.permit_type,
-      permit_number: values.permit_number || null,
-      state: values.state || null,
-      expiration_date: values.expiration_date || null,
-      status: values.status,
-      notes: values.notes || null,
-    };
+  const uploadFile = async (permitId: string): Promise<string | null> => {
+    if (!selectedFile) return permit?.document_url || null;
 
-    if (isEditing) {
-      await updatePermit.mutateAsync({ id: permit.id, ...payload });
-    } else {
-      await createPermit.mutateAsync(payload);
+    const fileExt = selectedFile.name.split(".").pop();
+    const filePath = `${permitId}/${Date.now()}.${fileExt}`;
+
+    const { error } = await supabase.storage
+      .from("permit-documents")
+      .upload(filePath, selectedFile, { upsert: true });
+
+    if (error) {
+      toast({ title: "Erro ao enviar arquivo", description: error.message, variant: "destructive" });
+      return permit?.document_url || null;
     }
-    onOpenChange(false);
-    form.reset();
+
+    const { data: urlData } = supabase.storage
+      .from("permit-documents")
+      .getPublicUrl(filePath);
+
+    return urlData.publicUrl;
   };
 
-  const isPending = createPermit.isPending || updatePermit.isPending;
+  const onSubmit = async (values: FormValues) => {
+    setUploading(true);
+    try {
+      const payload = {
+        client_id: values.client_id,
+        truck_id: values.truck_id || null,
+        permit_type: values.permit_type,
+        permit_number: values.permit_number || null,
+        state: values.state || null,
+        expiration_date: values.expiration_date || null,
+        status: values.status,
+        notes: values.notes || null,
+      };
+
+      let savedPermit: Permit;
+      if (isEditing) {
+        savedPermit = await updatePermit.mutateAsync({ id: permit.id, ...payload });
+      } else {
+        savedPermit = await createPermit.mutateAsync(payload);
+      }
+
+      // Upload file and update document_url
+      const documentUrl = await uploadFile(savedPermit.id);
+      if (documentUrl && documentUrl !== savedPermit.document_url) {
+        await updatePermit.mutateAsync({ id: savedPermit.id, document_url: documentUrl });
+      }
+
+      onOpenChange(false);
+      form.reset();
+      setSelectedFile(null);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 20 * 1024 * 1024) {
+      toast({ title: "Arquivo muito grande", description: "Máximo de 20MB", variant: "destructive" });
+      return;
+    }
+    setSelectedFile(file);
+  };
+
+  const isPending = createPermit.isPending || updatePermit.isPending || uploading;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setSelectedFile(null); }}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
@@ -229,6 +283,40 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
               )}
             />
 
+            {/* File upload */}
+            <div className="space-y-2">
+              <FormLabel>Documento (PDF)</FormLabel>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              {selectedFile ? (
+                <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/50">
+                  <FileText className="w-5 h-5 text-primary shrink-0" />
+                  <span className="text-sm truncate flex-1">{selectedFile.name}</span>
+                  <Button type="button" variant="ghost" size="icon" className="shrink-0" onClick={() => setSelectedFile(null)}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : permit?.document_url ? (
+                <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/50">
+                  <FileText className="w-5 h-5 text-primary shrink-0" />
+                  <span className="text-sm text-muted-foreground flex-1">Documento já anexado</span>
+                  <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                    Substituir
+                  </Button>
+                </div>
+              ) : (
+                <Button type="button" variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
+                  <Upload className="w-4 h-4 mr-2" />
+                  Selecionar arquivo
+                </Button>
+              )}
+            </div>
+
             <FormField
               control={form.control}
               name="notes"
@@ -244,7 +332,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
             <div className="flex justify-end gap-3">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Salvando..." : isEditing ? "Salvar" : "Cadastrar"}
+                {isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Salvando...</> : isEditing ? "Salvar" : "Cadastrar"}
               </Button>
             </div>
           </form>
