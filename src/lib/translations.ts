@@ -249,6 +249,18 @@ const translations: Record<Language, Record<string, string>> = {
     "compliance.expired": "Vencidos",
     "compliance.total": "Total de Permits",
     "compliance.noPermits": "Nenhum permit cadastrado para avaliar compliance.",
+
+    // Documents
+    "documents.dragDrop": "Arraste e solte o arquivo aqui ou clique para selecionar",
+    "documents.maxSize": "Máximo 20MB • PDF, JPG, PNG",
+    "documents.attached": "Documento anexado",
+    "documents.replace": "Substituir",
+    "documents.viewer": "Visualizar Documento",
+    "documents.download": "Baixar",
+    "documents.close": "Fechar",
+    "documents.noPreview": "Pré-visualização não disponível para este tipo de arquivo.",
+    "documents.uploadError": "Erro ao enviar arquivo",
+    "documents.tooLarge": "Arquivo muito grande",
   },
   en: {
     "nav.dashboard": "Dashboard",
