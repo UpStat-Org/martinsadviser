@@ -306,9 +306,9 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
               )}
             />
 
-            {/* File upload */}
+            {/* File upload with drag-and-drop */}
             <div className="space-y-2">
-              <FormLabel>Documento (PDF)</FormLabel>
+              <FormLabel>{t("common.doc")} (PDF)</FormLabel>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -327,16 +327,27 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
               ) : permit?.document_url ? (
                 <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/50">
                   <FileText className="w-5 h-5 text-primary shrink-0" />
-                  <span className="text-sm text-muted-foreground flex-1">Documento já anexado</span>
+                  <span className="text-sm text-muted-foreground flex-1">{t("documents.attached")}</span>
                   <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-                    Substituir
+                    {t("documents.replace")}
                   </Button>
                 </div>
               ) : (
-                <Button type="button" variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Selecionar arquivo
-                </Button>
+                <div
+                  className={`flex flex-col items-center justify-center gap-2 p-6 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${
+                    isDragging
+                      ? "border-primary bg-primary/5"
+                      : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30"
+                  }`}
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <Upload className={`w-6 h-6 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
+                  <p className="text-sm text-muted-foreground text-center">{t("documents.dragDrop")}</p>
+                  <p className="text-xs text-muted-foreground/70">{t("documents.maxSize")}</p>
+                </div>
               )}
             </div>
 
