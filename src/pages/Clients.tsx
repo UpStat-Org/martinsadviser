@@ -26,9 +26,12 @@ const serviceLabels = [
 export default function Clients() {
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const { data: clients, isLoading } = useClients(search);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { role } = useAuth();
+  const isViewer = role === "viewer";
 
   const statusMap: Record<string, { label: string; className: string }> = {
     active: { label: t("common.active"), className: "bg-success text-success-foreground" },
