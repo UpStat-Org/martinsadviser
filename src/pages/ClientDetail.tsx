@@ -79,6 +79,23 @@ export default function ClientDetail() {
   const handleEditPermit = (permit: Permit) => { setEditingPermit(permit); setPermitDialogOpen(true); };
   const handleNewPermit = () => { setEditingPermit(null); setPermitDialogOpen(true); };
 
+  const handleGenerateReport = async () => {
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-report", {
+        body: { client_id: id, language },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiReport(data.report);
+      setAiReportOpen(true);
+    } catch (e: any) {
+      console.error(e);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
