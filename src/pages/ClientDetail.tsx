@@ -198,6 +198,13 @@ export default function ClientDetail() {
                           <TableCell>{permit.expiration_date ? format(new Date(permit.expiration_date), "dd/MM/yyyy") : "—"}</TableCell>
                           <TableCell><Badge className={expStatus.color}>{expStatus.label}</Badge></TableCell>
                           <TableCell>
+                            {permit.document_url ? (
+                              <Button variant="ghost" size="icon" onClick={() => { setViewDocUrl(permit.document_url!); setViewDocTitle(`${permit.permit_type} - ${permit.permit_number || ""}`); }}>
+                                <FileText className="w-4 h-4 text-primary" />
+                              </Button>
+                            ) : <span className="text-muted-foreground text-xs">—</span>}
+                          </TableCell>
+                          <TableCell>
                             <div className="flex gap-1">
                               <Button variant="ghost" size="icon" onClick={() => handleEditPermit(permit)}><Pencil className="w-4 h-4" /></Button>
                               <AlertDialog>
