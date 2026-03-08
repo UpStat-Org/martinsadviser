@@ -1214,6 +1214,48 @@ const translations: Record<Language, Record<string, string>> = {
     "import.errorsCount": "errores",
     "import.row": "Fila",
     "import.missingName": "Nombre de la empresa es obligatorio",
+
+    // Search
+    "search.placeholder": "Buscar clientes, camiones, permisos...",
+    "search.noResults": "Ningún resultado encontrado.",
+
+    // Audit
+    "nav.audit": "Auditoría",
+    "audit.title": "Auditoría",
+    "audit.subtitle": "Historial completo de acciones del sistema",
+    "audit.allEntities": "Todas las entidades",
+    "audit.allActions": "Todas las acciones",
+    "audit.date": "Fecha",
+    "audit.user": "Usuario",
+    "audit.entity": "Entidad",
+    "audit.action": "Acción",
+    "audit.details": "Detalles",
+    "audit.empty": "Ningún registro de auditoría.",
+    "activity.entity.invoice": "Factura",
+    "activity.entity.task": "Tarea",
+
+    // Signatures
+    "signature.title": "Firma Digital",
+    "signature.tab": "Firmas",
+    "signature.new": "Nueva Firma",
+    "signature.signerName": "Nombre del firmante",
+    "signature.signerEmail": "Email del firmante",
+    "signature.documentName": "Nombre del documento",
+    "signature.documentPlaceholder": "Ej: Autorización IFTA 2026",
+    "signature.draw": "Dibuje su firma",
+    "signature.clear": "Limpiar",
+    "signature.confirm": "Confirmar Firma",
+    "signature.saved": "¡Firma guardada exitosamente!",
+    "signature.error": "Error al guardar firma",
+    "signature.empty": "Ninguna firma registrada.",
+
+    // Map
+    "map.title": "Cobertura por Estado",
+    "map.active": "Activos",
+    "map.expiring": "Por vencer",
+    "map.expired": "Vencidos",
+    "map.noCoverage": "Sin cobertura",
+    "map.statesCovered": "estados cubiertos",
   },
 };
 
