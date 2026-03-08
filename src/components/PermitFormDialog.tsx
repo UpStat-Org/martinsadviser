@@ -107,7 +107,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
     try {
       const payload = {
         client_id: values.client_id,
-        truck_id: values.truck_id || null,
+        truck_id: values.truck_id && values.truck_id !== "none" ? values.truck_id : null,
         permit_type: values.permit_type,
         permit_number: values.permit_number || null,
         state: values.state || null,
@@ -192,7 +192,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
                       <SelectTrigger><SelectValue placeholder="Selecione o caminhão" /></SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Nenhum</SelectItem>
+                      <SelectItem value="none">Nenhum</SelectItem>
                       {trucks?.map((t) => (
                         <SelectItem key={t.id} value={t.id}>{t.plate} {t.make ? `- ${t.make} ${t.model || ""}` : ""}</SelectItem>
                       ))}
