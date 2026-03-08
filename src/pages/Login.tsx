@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Truck } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -14,13 +15,14 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
+      toast({ title: t("login.error"), description: error.message, variant: "destructive" });
     } else {
       navigate("/");
     }
@@ -37,41 +39,27 @@ export default function Login() {
             </div>
             <h1 className="font-display text-2xl font-bold text-foreground">MartinsAdviser</h1>
           </div>
-          <CardTitle className="font-display text-xl">Bem-vindo de volta</CardTitle>
-          <CardDescription>Entre com suas credenciais para acessar o sistema</CardDescription>
+          <CardTitle className="font-display text-xl">{t("login.welcome")}</CardTitle>
+          <CardDescription>{t("login.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
-                required
-              />
+              <Label htmlFor="email">{t("login.email")}</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
+              <Label htmlFor="password">{t("login.password")}</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Entrando..." : "Entrar"}
+              {loading ? t("login.submitting") : t("login.submit")}
             </Button>
           </form>
           <p className="text-center text-sm text-muted-foreground mt-4">
-            Não tem conta?{" "}
+            {t("login.noAccount")}{" "}
             <Link to="/signup" className="text-primary hover:underline font-medium">
-              Solicitar acesso
+              {t("login.requestAccess")}
             </Link>
           </p>
         </CardContent>

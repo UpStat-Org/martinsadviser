@@ -10,8 +10,11 @@ import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { format } from "date-fns";
-import { pt } from "date-fns/locale";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from "recharts";
+import { pt, enUS, es } from "date-fns/locale";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { useLanguage } from "@/contexts/LanguageContext";
+
+const dateLocales = { pt, en: enUS, es };
 
 export default function Dashboard() {
   const { data: clients, isLoading: loadingClients } = useClients();
@@ -19,6 +22,7 @@ export default function Dashboard() {
   const { data: permits, isLoading: loadingPermits } = usePermits();
   const { data: allMessages, isLoading: loadingMsgs } = useScheduledMessages();
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
 
   const metrics = useMemo(() => {
     if (!permits) return { expired: 0, in30: 0, in60: 0, in90: 0, active: 0, total: 0 };
@@ -59,12 +63,12 @@ export default function Dashboard() {
 
   const msgChartData = useMemo(() => {
     return [
-      { name: "Enviadas", value: msgStats.sent, fill: "hsl(152, 60%, 40%)" },
-      { name: "Pendentes", value: msgStats.pending, fill: "hsl(38, 92%, 50%)" },
-      { name: "Falhas", value: msgStats.failed, fill: "hsl(0, 72%, 51%)" },
-      { name: "Canceladas", value: msgStats.cancelled, fill: "hsl(220, 16%, 60%)" },
+      { name: t("common.sent"), value: msgStats.sent, fill: "hsl(152, 60%, 40%)" },
+      { name: t("common.pending"), value: msgStats.pending, fill: "hsl(38, 92%, 50%)" },
+      { name: t("common.failed"), value: msgStats.failed, fill: "hsl(0, 72%, 51%)" },
+      { name: t("common.cancelled"), value: msgStats.cancelled, fill: "hsl(220, 16%, 60%)" },
     ].filter(d => d.value > 0);
-  }, [msgStats]);
+  }, [msgStats, t]);
 
   const urgentPermits = useMemo(() => {
     if (!permits) return [];
@@ -80,12 +84,12 @@ export default function Dashboard() {
   }, [permits]);
 
   const expirationChartData = useMemo(() => [
-    { name: "Vencidos", count: metrics.expired, fill: "hsl(0, 72%, 51%)" },
+    { name: t("dashboard.expired"), count: metrics.expired, fill: "hsl(0, 72%, 51%)" },
     { name: "≤30d", count: metrics.in30, fill: "hsl(38, 92%, 50%)" },
     { name: "≤60d", count: metrics.in60, fill: "hsl(38, 70%, 60%)" },
     { name: "≤90d", count: metrics.in90, fill: "hsl(220, 16%, 60%)" },
     { name: ">90d", count: metrics.active, fill: "hsl(152, 60%, 40%)" },
-  ], [metrics]);
+  ], [metrics, t]);
 
   const PIE_COLORS = [
     "hsl(215, 80%, 48%)", "hsl(152, 60%, 40%)", "hsl(38, 92%, 50%)",
@@ -96,22 +100,21 @@ export default function Dashboard() {
   const isLoading = loadingClients || loadingTrucks || loadingPermits;
 
   const stats = [
-    { label: "Clientes", value: clients?.length ?? 0, icon: Users, color: "text-primary", onClick: () => navigate("/clients") },
-    { label: "Caminhões", value: trucks?.length ?? 0, icon: Truck, color: "text-primary", onClick: () => navigate("/trucks") },
-    { label: "Permits Ativos", value: metrics.active + metrics.in90 + metrics.in60, icon: FileCheck, color: "text-success", onClick: () => navigate("/permits") },
-    { label: "Vencendo em 30d", value: metrics.in30, icon: AlertTriangle, color: "text-warning", onClick: () => navigate("/permits") },
-    { label: "Emails Enviados", value: msgStats.sent, icon: Send, color: "text-primary", onClick: () => navigate("/messages") },
-    { label: "Msgs Pendentes", value: msgStats.pending, icon: Mail, color: "text-accent-foreground", onClick: () => navigate("/messages") },
+    { label: t("dashboard.clients"), value: clients?.length ?? 0, icon: Users, color: "text-primary", onClick: () => navigate("/clients") },
+    { label: t("dashboard.trucks"), value: trucks?.length ?? 0, icon: Truck, color: "text-primary", onClick: () => navigate("/trucks") },
+    { label: t("dashboard.activePermits"), value: metrics.active + metrics.in90 + metrics.in60, icon: FileCheck, color: "text-success", onClick: () => navigate("/permits") },
+    { label: t("dashboard.expiring30d"), value: metrics.in30, icon: AlertTriangle, color: "text-warning", onClick: () => navigate("/permits") },
+    { label: t("dashboard.emailsSent"), value: msgStats.sent, icon: Send, color: "text-primary", onClick: () => navigate("/messages") },
+    { label: t("dashboard.pendingMsgs"), value: msgStats.pending, icon: Mail, color: "text-accent-foreground", onClick: () => navigate("/messages") },
   ];
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Visão geral do seu sistema</p>
+        <h1 className="font-display text-3xl font-bold text-foreground">{t("dashboard.title")}</h1>
+        <p className="text-muted-foreground mt-1">{t("dashboard.subtitle")}</p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {stats.map((stat) => (
           <Card key={stat.label} className="cursor-pointer hover:shadow-md transition-shadow" onClick={stat.onClick}>
@@ -126,21 +129,19 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Expiration Bar Chart */}
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="font-display text-lg flex items-center gap-2">
               <Clock className="w-5 h-5 text-muted-foreground" />
-              Vencimentos
+              {t("dashboard.expirations")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <Skeleton className="h-[220px] w-full" />
             ) : metrics.total === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-12">Nenhum permit cadastrado.</p>
+              <p className="text-muted-foreground text-sm text-center py-12">{t("dashboard.noPermits")}</p>
             ) : (
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={expirationChartData} layout="vertical" margin={{ left: 10, right: 20 }}>
@@ -159,19 +160,18 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Permits by Type Pie */}
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="font-display text-lg flex items-center gap-2">
               <FileCheck className="w-5 h-5 text-muted-foreground" />
-              Permits por Tipo
+              {t("dashboard.permitsByType")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <Skeleton className="h-[220px] w-full" />
             ) : permitsByType.length === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-12">Nenhum permit cadastrado.</p>
+              <p className="text-muted-foreground text-sm text-center py-12">{t("dashboard.noPermits")}</p>
             ) : (
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
@@ -197,19 +197,18 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Messages Pie */}
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="font-display text-lg flex items-center gap-2">
               <Mail className="w-5 h-5 text-muted-foreground" />
-              Mensagens
+              {t("dashboard.messages")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {loadingMsgs ? (
               <Skeleton className="h-[220px] w-full" />
             ) : msgChartData.length === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-12">Nenhuma mensagem registrada.</p>
+              <p className="text-muted-foreground text-sm text-center py-12">{t("dashboard.noMessages")}</p>
             ) : (
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
@@ -236,12 +235,11 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Expiration Breakdown */}
       <Card>
         <CardHeader>
           <CardTitle className="font-display text-lg flex items-center gap-2">
             <Clock className="w-5 h-5 text-muted-foreground" />
-            Resumo de Vencimentos
+            {t("dashboard.expirationSummary")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -252,11 +250,11 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-4">
               {[
-                { label: "Vencidos", count: metrics.expired, total: metrics.total },
-                { label: "Vencendo em 30 dias", count: metrics.in30, total: metrics.total },
-                { label: "Vencendo em 60 dias", count: metrics.in60, total: metrics.total },
-                { label: "Vencendo em 90 dias", count: metrics.in90, total: metrics.total },
-                { label: "Válidos (>90 dias)", count: metrics.active, total: metrics.total },
+                { label: t("dashboard.expired"), count: metrics.expired, total: metrics.total },
+                { label: t("dashboard.expiring30"), count: metrics.in30, total: metrics.total },
+                { label: t("dashboard.expiring60"), count: metrics.in60, total: metrics.total },
+                { label: t("dashboard.expiring90"), count: metrics.in90, total: metrics.total },
+                { label: t("dashboard.valid90"), count: metrics.active, total: metrics.total },
               ].map((row) => (
                 <div key={row.label} className="flex items-center gap-4">
                   <span className="text-sm text-muted-foreground w-44 shrink-0">{row.label}</span>
@@ -269,20 +267,19 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Urgent permits + Recent clients */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg flex items-center gap-2">
               <ShieldAlert className="w-5 h-5 text-destructive" />
-              Permits Urgentes (≤30 dias)
+              {t("dashboard.urgentPermits")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="space-y-3">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
             ) : urgentPermits.length === 0 ? (
-              <p className="text-muted-foreground text-sm">Nenhum permit com vencimento urgente. 🎉</p>
+              <p className="text-muted-foreground text-sm">{t("dashboard.noUrgent")}</p>
             ) : (
               <div className="space-y-2">
                 {urgentPermits.map((p) => {
@@ -295,7 +292,7 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">
-                          {p.expiration_date ? format(new Date(p.expiration_date), "dd MMM yyyy", { locale: pt }) : "—"}
+                          {p.expiration_date ? format(new Date(p.expiration_date), "dd MMM yyyy", { locale: dateLocales[language] }) : "—"}
                         </span>
                         <Badge className={status.color}>{status.label}</Badge>
                       </div>
@@ -309,13 +306,13 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-display text-lg">Últimos Clientes</CardTitle>
+            <CardTitle className="font-display text-lg">{t("dashboard.recentClients")}</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="space-y-3">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
             ) : !clients?.length ? (
-              <p className="text-muted-foreground text-sm">Nenhum cliente cadastrado.</p>
+              <p className="text-muted-foreground text-sm">{t("dashboard.noClients")}</p>
             ) : (
               <div className="space-y-2">
                 {clients.slice(0, 6).map((c) => (
