@@ -275,6 +275,17 @@ export default function ClientDetail() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="signatures" className="mt-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="font-display text-lg">{t("signature.tab")}</CardTitle>
+              <Button size="sm" onClick={() => setSignatureOpen(true)}><Plus className="w-4 h-4 mr-2" />{t("signature.new")}</Button>
+            </CardHeader>
+            <CardContent>
+              <SignatureViewer clientId={id!} />
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="activity" className="mt-4">
           {id && <ActivityTimeline clientId={id} />}
         </TabsContent>
