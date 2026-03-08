@@ -31,6 +31,7 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
   const { data: clients } = useClients();
   const { data: templates } = useMessageTemplates();
   const create = useCreateScheduledMessage();
+  const selectedClient = clients?.find((c) => c.id === clientId) || null;
 
   useEffect(() => {
     if (!open) {
