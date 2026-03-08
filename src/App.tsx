@@ -24,6 +24,7 @@ import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
 import ReportsPage from "./pages/ReportsPage";
 import KanbanPage from "./pages/KanbanPage";
+import FinancePage from "./pages/FinancePage";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalLayout from "./pages/portal/PortalLayout";
 import PortalDashboard from "./pages/portal/PortalDashboard";
