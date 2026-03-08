@@ -81,7 +81,6 @@ export default function ClientDetail() {
   const handleEditPermit = (permit: Permit) => { setEditingPermit(permit); setPermitDialogOpen(true); };
   const handleNewPermit = () => { setEditingPermit(null); setPermitDialogOpen(true); };
 
-  const { toast } = useToast();
 
   const handleGenerateReport = async () => {
     setAiLoading(true);
