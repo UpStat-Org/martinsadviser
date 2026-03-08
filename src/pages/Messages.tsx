@@ -13,7 +13,7 @@ import MessageTemplateDialog from "@/components/MessageTemplateDialog";
 import ScheduleMessageDialog from "@/components/ScheduleMessageDialog";
 
 const channelIcon = (ch: string) => {
-  if (ch === "whatsapp") return <MessageCircle className="w-4 h-4 text-emerald-500" />;
+  if (ch === "whatsapp") return <MessageCircle className="w-4 h-4 text-primary" />;
   if (ch === "sms") return <Phone className="w-4 h-4 text-primary" />;
   return <Mail className="w-4 h-4 text-accent-foreground" />;
 };
