@@ -276,6 +276,21 @@ export default function ClientDetail() {
         />
       )}
       <InvitePortalDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={client.id} clientName={client.company_name} />
+
+      {/* AI Report Dialog */}
+      <Dialog open={aiReportOpen} onOpenChange={setAiReportOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              {t("ai.reportTitle")} — {client.company_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
+            {aiReport}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
