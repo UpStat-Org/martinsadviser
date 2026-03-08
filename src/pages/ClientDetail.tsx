@@ -9,6 +9,7 @@ import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { ComplianceDashboard } from "@/components/ComplianceDashboard";
 import { DocumentViewer } from "@/components/DocumentViewer";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { InvitePortalDialog } from "@/components/InvitePortalDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
