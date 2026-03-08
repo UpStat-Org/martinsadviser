@@ -18,6 +18,7 @@ import Messages from "./pages/Messages";
 import CalendarPage from "./pages/CalendarPage";
 import SettingsPage from "./pages/SettingsPage";
 import AdminUsers from "./pages/AdminUsers";
+import ClientOnboarding from "./pages/ClientOnboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
