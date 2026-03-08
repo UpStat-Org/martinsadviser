@@ -43,6 +43,8 @@ export default function ClientDetail() {
   const [editingTruck, setEditingTruck] = useState<Truck | null>(null);
   const [permitDialogOpen, setPermitDialogOpen] = useState(false);
   const [editingPermit, setEditingPermit] = useState<Permit | null>(null);
+  const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
+  const [viewDocTitle, setViewDocTitle] = useState("");
 
   const statusMap: Record<string, { label: string; className: string }> = {
     active: { label: t("common.active"), className: "bg-success text-success-foreground" },
