@@ -173,7 +173,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
   const isPending = createPermit.isPending || updatePermit.isPending || uploading;
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setSelectedFile(null); }}>
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setSelectedFile(null); setIsDragging(false); } }}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
