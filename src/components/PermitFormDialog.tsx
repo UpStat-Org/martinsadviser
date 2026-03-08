@@ -107,7 +107,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
     try {
       const payload = {
         client_id: values.client_id,
-        truck_id: values.truck_id || null,
+        truck_id: values.truck_id && values.truck_id !== "none" ? values.truck_id : null,
         permit_type: values.permit_type,
         permit_number: values.permit_number || null,
         state: values.state || null,
