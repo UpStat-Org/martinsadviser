@@ -165,6 +165,62 @@ export default function Messages() {
           )}
         </TabsContent>
 
+        {/* Automações */}
+        <TabsContent value="automations">
+          <div className="flex justify-end mb-4">
+            <Button onClick={() => { setEditRule(null); setAutomationOpen(true); }}>
+              <Plus className="w-4 h-4 mr-2" /> Nova Automação
+            </Button>
+          </div>
+          {loadingR ? (
+            <Card><CardContent className="p-12 text-center text-muted-foreground">Carregando...</CardContent></Card>
+          ) : !rules?.length ? (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <p className="text-muted-foreground">Nenhuma automação configurada.</p>
+                <p className="text-sm text-muted-foreground mt-1">Crie regras para enviar alertas automaticamente quando permits estiverem próximos de vencer.</p>
+                <Button variant="outline" className="mt-4" onClick={() => { setEditRule(null); setAutomationOpen(true); }}>
+                  <Zap className="w-4 h-4 mr-2" /> Criar automação
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {rules.map((r) => (
+                <Card key={r.id} className={!r.enabled ? "opacity-60" : ""}>
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 font-medium">
+                        <Zap className={`w-4 h-4 ${r.enabled ? "text-warning" : "text-muted-foreground"}`} />
+                        {r.name}
+                      </div>
+                      <Switch
+                        checked={r.enabled}
+                        onCheckedChange={(checked) => toggleRule.mutate({ id: r.id, enabled: checked })}
+                      />
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      <Badge variant="secondary">{r.days_before} dias antes</Badge>
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        {channelIcon(r.channel)} {r.channel}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2">{r.body}</p>
+                    <div className="flex gap-1 justify-end">
+                      <Button variant="ghost" size="icon" onClick={() => { setEditRule(r); setAutomationOpen(true); }}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => deleteRule.mutate(r.id)}>
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
         {/* Templates */}
         <TabsContent value="templates">
           <div className="flex justify-end mb-4">
