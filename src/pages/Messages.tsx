@@ -68,7 +68,10 @@ export default function Messages() {
     try {
       const { data, error } = await supabase.functions.invoke("send-emails");
       if (error) throw error;
-      toast({ title: t("messages.sendComplete"), description: `${data?.sent || 0} email(s), ${data?.failed || 0} ${t("common.failed").toLowerCase()}.` });
+      toast({
+        title: t("messages.sendComplete"),
+        description: `${data?.sent || 0} ${t("common.sent").toLowerCase()}, ${data?.failed || 0} ${t("common.failed").toLowerCase()}.${data?.errors?.length ? `\n${data.errors.join("\n")}` : ""}`
+      });
     } catch (e: any) {
       toast({ title: t("messages.sendError"), description: e.message, variant: "destructive" });
     } finally {
@@ -78,10 +81,10 @@ export default function Messages() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground">{t("messages.title")}</h1>
-          <p className="text-muted-foreground mt-1">{t("messages.subtitle")}</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">{t("messages.title")}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">{t("messages.subtitle")}</p>
         </div>
         <div className="flex gap-2">
           {(pendingMsgs?.length ?? 0) > 0 && (

@@ -29,9 +29,9 @@ export default function Trucks() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground">{t("trucks.title")}</h1>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">{t("trucks.title")}</h1>
           <p className="text-muted-foreground mt-1">{t("trucks.subtitle")}</p>
         </div>
         <Button onClick={handleNew}><Plus className="w-4 h-4 mr-2" />{t("trucks.new")}</Button>

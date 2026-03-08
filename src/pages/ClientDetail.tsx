@@ -106,21 +106,22 @@ export default function ClientDetail() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/clients")}><ArrowLeft className="w-5 h-5" /></Button>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/clients")} className="shrink-0 self-start"><ArrowLeft className="w-5 h-5" /></Button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h1 className="font-display text-3xl font-bold text-foreground">{client.company_name}</h1>
             <Badge className={status.className}>{status.label}</Badge>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={handleGenerateReport} disabled={aiLoading}>
-          {aiLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-          {t("ai.generateReport")}
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}><UserPlus className="w-4 h-4 mr-2" />{t("portal.inviteClient")}</Button>
-        <Button variant="outline" onClick={() => setEditOpen(true)}><Pencil className="w-4 h-4 mr-2" />{t("common.edit")}</Button>
-        <AlertDialog>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={handleGenerateReport} disabled={aiLoading}>
+            {aiLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+            {t("ai.generateReport")}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}><UserPlus className="w-4 h-4 mr-2" />{t("portal.inviteClient")}</Button>
+          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}><Pencil className="w-4 h-4 mr-2" />{t("common.edit")}</Button>
+          <AlertDialog>
           <AlertDialogTrigger asChild><Button variant="destructive" size="icon"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -133,6 +134,7 @@ export default function ClientDetail() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
