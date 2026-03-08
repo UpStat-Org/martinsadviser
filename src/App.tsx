@@ -18,6 +18,7 @@ import Messages from "./pages/Messages";
 import CalendarPage from "./pages/CalendarPage";
 import SettingsPage from "./pages/SettingsPage";
 import AdminUsers from "./pages/AdminUsers";
+import ClientOnboarding from "./pages/ClientOnboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
           >
             <Route path="/" element={<Dashboard />} />
             <Route path="/clients" element={<Clients />} />
+            <Route path="/clients/onboarding" element={<ClientOnboarding />} />
             <Route path="/clients/:id" element={<ClientDetail />} />
             <Route path="/trucks" element={<Trucks />} />
             <Route path="/permits" element={<Permits />} />
