@@ -263,9 +263,21 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>DOT #</FormLabel>
-                    <FormControl>
-                      <Input placeholder="USDOT Number" {...field} />
-                    </FormControl>
+                    <div className="flex gap-2">
+                      <FormControl>
+                        <Input placeholder="USDOT Number" {...field} />
+                      </FormControl>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={handleDotLookup}
+                        disabled={lookingUp}
+                        title="Buscar dados FMCSA"
+                      >
+                        {lookingUp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
