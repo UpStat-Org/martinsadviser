@@ -44,7 +44,7 @@ export default function Clients() {
           <h1 className="font-display text-3xl font-bold text-foreground">Clientes</h1>
           <p className="text-muted-foreground mt-1">Gerencie suas transportadoras</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button onClick={() => navigate("/clients/onboarding")}>
           <Plus className="w-4 h-4 mr-2" />
           Novo Cliente
         </Button>
