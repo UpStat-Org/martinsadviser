@@ -82,6 +82,18 @@ export function AppSidebar() {
 
       {/* Footer */}
       <div className="border-t border-sidebar-border p-2 space-y-1">
+        {isAdmin && (
+          <NavLink
+            to="/admin/users"
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              location.pathname === "/admin/users" && "bg-sidebar-accent text-sidebar-primary"
+            )}
+          >
+            <ShieldCheck className="w-5 h-5 shrink-0" />
+            {!collapsed && <span>Usuários</span>}
+          </NavLink>
+        )}
         <NavLink
           to="/settings"
           className={cn(
