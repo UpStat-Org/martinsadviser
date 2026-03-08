@@ -35,7 +35,7 @@ export default function Login() {
             <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
               <Truck className="w-5 h-5" />
             </div>
-            <h1 className="font-display text-2xl font-bold text-foreground">TruckCRM</h1>
+            <h1 className="font-display text-2xl font-bold text-foreground">MartinsAdviser</h1>
           </div>
           <CardTitle className="font-display text-xl">Bem-vindo de volta</CardTitle>
           <CardDescription>Entre com suas credenciais para acessar o sistema</CardDescription>
