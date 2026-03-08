@@ -164,6 +164,13 @@ export default function ClientDetail() {
 
       <ComplianceDashboard permits={permits} />
 
+      <Card>
+        <CardHeader><CardTitle className="font-display text-lg flex items-center gap-2"><Map className="w-5 h-5 text-muted-foreground" />{t("map.title")}</CardTitle></CardHeader>
+        <CardContent>
+          <PermitCoverageMap permits={permits} />
+        </CardContent>
+      </Card>
+
       <Tabs defaultValue="trucks">
         <TabsList>
           <TabsTrigger value="trucks" className="gap-2"><TruckIcon className="w-4 h-4" />{t("trucks.title")} ({trucks?.length || 0})</TabsTrigger>
