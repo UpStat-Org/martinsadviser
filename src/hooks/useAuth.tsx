@@ -6,6 +6,7 @@ interface AuthState {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
+  role: "admin" | "operator" | "viewer" | "user" | null;
   approvalStatus: string | null;
 }
 
@@ -14,13 +15,14 @@ export function useAuth() {
     user: null,
     loading: true,
     isAdmin: false,
+    role: null,
     approvalStatus: null,
   });
 
   useEffect(() => {
     const fetchProfile = async (user: User | null) => {
       if (!user) {
-        setState({ user: null, loading: false, isAdmin: false, approvalStatus: null });
+        setState({ user: null, loading: false, isAdmin: false, role: null, approvalStatus: null });
         return;
       }
 
@@ -38,11 +40,13 @@ export function useAuth() {
         .eq("user_id", user.id);
 
       const isAdmin = roles?.some((r) => r.role === "admin") ?? false;
+      const userRole = roles?.length ? (roles[0].role as AuthState["role"]) : "user";
 
       setState({
         user,
         loading: false,
         isAdmin,
+        role: userRole,
         approvalStatus: profile?.approval_status ?? "pending",
       });
     };

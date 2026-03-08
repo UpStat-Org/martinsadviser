@@ -7,10 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Loader2 } from "lucide-react";
+import { Plus, Search, Loader2, Upload } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
 import { ClientFormDialog } from "@/components/ClientFormDialog";
+import { ClientImportDialog } from "@/components/ClientImportDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -24,9 +26,12 @@ const serviceLabels = [
 export default function Clients() {
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const { data: clients, isLoading } = useClients(search);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { role } = useAuth();
+  const isViewer = role === "viewer";
 
   const statusMap: Record<string, { label: string; className: string }> = {
     active: { label: t("common.active"), className: "bg-success text-success-foreground" },
@@ -41,12 +46,17 @@ export default function Clients() {
           <h1 className="font-display text-3xl font-bold text-foreground">{t("clients.title")}</h1>
           <p className="text-muted-foreground mt-1">{t("clients.subtitle")}</p>
         </div>
-        <Button onClick={() => navigate("/clients/onboarding")}>
-          <Plus className="w-4 h-4 mr-2" />
-          {t("clients.new")}
-        </Button>
+        {!isViewer && (
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />{t("import.title")}
+            </Button>
+            <Button onClick={() => navigate("/clients/onboarding")}>
+              <Plus className="w-4 h-4 mr-2" />{t("clients.new")}
+            </Button>
+          </div>
+        )}
       </div>
-
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -124,6 +134,7 @@ export default function Clients() {
       )}
 
       <ClientFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <ClientImportDialog open={importOpen} onOpenChange={setImportOpen} />
     </div>
   );
 }

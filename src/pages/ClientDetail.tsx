@@ -16,9 +16,12 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock, UserPlus } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock, UserPlus, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -38,7 +41,9 @@ export default function ClientDetail() {
   const deleteClient = useDeleteClient();
   const deleteTruck = useDeleteTruck();
   const deletePermit = useDeletePermit();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { role } = useAuth();
+  const isViewer = role === "viewer";
 
   const [editOpen, setEditOpen] = useState(false);
   const [truckDialogOpen, setTruckDialogOpen] = useState(false);
@@ -48,6 +53,9 @@ export default function ClientDetail() {
   const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
   const [viewDocTitle, setViewDocTitle] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [aiReport, setAiReport] = useState<string | null>(null);
+  const [aiReportOpen, setAiReportOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const statusMap: Record<string, { label: string; className: string }> = {
     active: { label: t("common.active"), className: "bg-success text-success-foreground" },
@@ -71,6 +79,23 @@ export default function ClientDetail() {
   const handleEditPermit = (permit: Permit) => { setEditingPermit(permit); setPermitDialogOpen(true); };
   const handleNewPermit = () => { setEditingPermit(null); setPermitDialogOpen(true); };
 
+  const handleGenerateReport = async () => {
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-report", {
+        body: { client_id: id, language },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiReport(data.report);
+      setAiReportOpen(true);
+    } catch (e: any) {
+      console.error(e);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -81,6 +106,10 @@ export default function ClientDetail() {
             <Badge className={status.className}>{status.label}</Badge>
           </div>
         </div>
+        <Button variant="outline" size="sm" onClick={handleGenerateReport} disabled={aiLoading}>
+          {aiLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+          {t("ai.generateReport")}
+        </Button>
         <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}><UserPlus className="w-4 h-4 mr-2" />{t("portal.inviteClient")}</Button>
         <Button variant="outline" onClick={() => setEditOpen(true)}><Pencil className="w-4 h-4 mr-2" />{t("common.edit")}</Button>
         <AlertDialog>
@@ -247,6 +276,21 @@ export default function ClientDetail() {
         />
       )}
       <InvitePortalDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={client.id} clientName={client.company_name} />
+
+      {/* AI Report Dialog */}
+      <Dialog open={aiReportOpen} onOpenChange={setAiReportOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              {t("ai.reportTitle")} — {client.company_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
+            {aiReport}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
