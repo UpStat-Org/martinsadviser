@@ -45,11 +45,11 @@ export function AppSidebar() {
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border">
         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-display font-bold text-sm shrink-0">
-          TC
+          MA
         </div>
         {!collapsed && (
           <span className="font-display font-semibold text-sidebar-primary-foreground text-lg truncate">
-            TruckCRM
+            MartinsAdviser
           </span>
         )}
       </div>
