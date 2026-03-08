@@ -10,11 +10,13 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
@@ -29,6 +31,7 @@ export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -79,6 +82,18 @@ export function AppSidebar() {
 
       {/* Footer */}
       <div className="border-t border-sidebar-border p-2 space-y-1">
+        {isAdmin && (
+          <NavLink
+            to="/admin/users"
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              location.pathname === "/admin/users" && "bg-sidebar-accent text-sidebar-primary"
+            )}
+          >
+            <ShieldCheck className="w-5 h-5 shrink-0" />
+            {!collapsed && <span>Usuários</span>}
+          </NavLink>
+        )}
         <NavLink
           to="/settings"
           className={cn(
