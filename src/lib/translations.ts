@@ -803,6 +803,48 @@ const translations: Record<Language, Record<string, string>> = {
     "import.errorsCount": "errors",
     "import.row": "Row",
     "import.missingName": "Company name is required",
+
+    // Search
+    "search.placeholder": "Search clients, trucks, permits...",
+    "search.noResults": "No results found.",
+
+    // Audit
+    "nav.audit": "Audit",
+    "audit.title": "Audit Log",
+    "audit.subtitle": "Complete history of system actions",
+    "audit.allEntities": "All entities",
+    "audit.allActions": "All actions",
+    "audit.date": "Date",
+    "audit.user": "User",
+    "audit.entity": "Entity",
+    "audit.action": "Action",
+    "audit.details": "Details",
+    "audit.empty": "No audit records.",
+    "activity.entity.invoice": "Invoice",
+    "activity.entity.task": "Task",
+
+    // Signatures
+    "signature.title": "Digital Signature",
+    "signature.tab": "Signatures",
+    "signature.new": "New Signature",
+    "signature.signerName": "Signer name",
+    "signature.signerEmail": "Signer email",
+    "signature.documentName": "Document name",
+    "signature.documentPlaceholder": "E.g.: IFTA Authorization 2026",
+    "signature.draw": "Draw your signature",
+    "signature.clear": "Clear",
+    "signature.confirm": "Confirm Signature",
+    "signature.saved": "Signature saved successfully!",
+    "signature.error": "Error saving signature",
+    "signature.empty": "No signatures recorded.",
+
+    // Map
+    "map.title": "Coverage by State",
+    "map.active": "Active",
+    "map.expiring": "Expiring",
+    "map.expired": "Expired",
+    "map.noCoverage": "No coverage",
+    "map.statesCovered": "states covered",
   },
   es: {
     "nav.dashboard": "Panel",
