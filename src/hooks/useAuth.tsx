@@ -40,11 +40,13 @@ export function useAuth() {
         .eq("user_id", user.id);
 
       const isAdmin = roles?.some((r) => r.role === "admin") ?? false;
+      const userRole = roles?.length ? (roles[0].role as AuthState["role"]) : "user";
 
       setState({
         user,
         loading: false,
         isAdmin,
+        role: userRole,
         approvalStatus: profile?.approval_status ?? "pending",
       });
     };
