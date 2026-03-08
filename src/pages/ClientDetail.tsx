@@ -43,6 +43,7 @@ export default function ClientDetail() {
   const deleteTruck = useDeleteTruck();
   const deletePermit = useDeletePermit();
   const { t, language } = useLanguage();
+  const { toast } = useToast();
   const { role } = useAuth();
   const isViewer = role === "viewer";
 
