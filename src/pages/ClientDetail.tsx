@@ -106,8 +106,8 @@ export default function ClientDetail() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/clients")}><ArrowLeft className="w-5 h-5" /></Button>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/clients")} className="shrink-0 self-start"><ArrowLeft className="w-5 h-5" /></Button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h1 className="font-display text-3xl font-bold text-foreground">{client.company_name}</h1>
