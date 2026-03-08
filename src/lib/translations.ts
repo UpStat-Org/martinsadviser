@@ -203,6 +203,9 @@ const translations: Record<Language, Record<string, string>> = {
     "admin.approved": "Aprovado",
     "admin.rejected": "Rejeitado",
     "admin.statusUpdated": "Status atualizado com sucesso",
+    "admin.deleteUser": "Excluir",
+    "admin.deleteUserConfirm": "Tem certeza que deseja excluir este usuário? Esta ação é irreversível.",
+    "admin.userDeleted": "Usuário excluído com sucesso",
 
     // Onboarding
     "onboarding.title": "Cadastrar Novo Cliente",
