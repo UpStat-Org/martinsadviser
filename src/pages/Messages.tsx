@@ -6,14 +6,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Trash2, Pencil, XCircle, Mail, Phone, MessageCircle, Eye } from "lucide-react";
+import { Plus, Trash2, Pencil, XCircle, Mail, Phone, MessageCircle, Eye, Zap, Power } from "lucide-react";
 import { useMessageTemplates, useDeleteTemplate, useScheduledMessages, useCancelScheduledMessage } from "@/hooks/useMessages";
 import type { MessageTemplate } from "@/hooks/useMessages";
 import MessageTemplateDialog from "@/components/MessageTemplateDialog";
 import ScheduleMessageDialog from "@/components/ScheduleMessageDialog";
+import AutomationRuleDialog from "@/components/AutomationRuleDialog";
 import { replacePlaceholders } from "@/lib/placeholders";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { ScheduledMessage } from "@/hooks/useMessages";
+import { useAutomationRules, useDeleteAutomationRule, useUpdateAutomationRule } from "@/hooks/useAutomationRules";
+import type { AutomationRule } from "@/hooks/useAutomationRules";
+import { Switch } from "@/components/ui/switch";
 
 const channelIcon = (ch: string) => {
   if (ch === "whatsapp") return <MessageCircle className="w-4 h-4 text-primary" />;
