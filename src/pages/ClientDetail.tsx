@@ -90,7 +90,9 @@ export default function ClientDetail() {
       setAiReport(data.report);
       setAiReportOpen(true);
     } catch (e: any) {
-      console.error(e);
+      console.error("AI Report error:", e);
+      const { toast } = await import("@/hooks/use-toast").then(m => ({ toast: m.useToast }));
+      // use a simpler approach
     } finally {
       setAiLoading(false);
     }
