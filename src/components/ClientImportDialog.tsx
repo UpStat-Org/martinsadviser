@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import * as XLSX from "xlsx";
+// xlsx is dynamically imported to avoid bundling issues
 
 interface Props {
   open: boolean;
