@@ -396,6 +396,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Search
     "search.placeholder": "Buscar clientes, caminhões, permits...",
     "search.noResults": "Nenhum resultado encontrado.",
+    "search.typeToSearch": "Digite para buscar...",
 
     // Audit
     "nav.audit": "Auditoria",
@@ -807,6 +808,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Search
     "search.placeholder": "Search clients, trucks, permits...",
     "search.noResults": "No results found.",
+    "search.typeToSearch": "Type to search...",
 
     // Audit
     "nav.audit": "Audit",
@@ -1218,6 +1220,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Search
     "search.placeholder": "Buscar clientes, camiones, permisos...",
     "search.noResults": "Ningún resultado encontrado.",
+    "search.typeToSearch": "Escriba para buscar...",
 
     // Audit
     "nav.audit": "Auditoría",

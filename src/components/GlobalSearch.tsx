@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Users, Truck, FileCheck, DollarSign } from "lucide-react";
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -85,28 +86,36 @@ export function GlobalSearch() {
           ⌘K
         </kbd>
       </button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder={t("search.placeholder")} value={query} onValueChange={setQuery} />
-        <CommandList>
-          <CommandEmpty>{loading ? t("common.loading") : t("search.noResults")}</CommandEmpty>
-          {Object.entries(grouped).map(([type, items]) => {
-            const Icon = icons[type as keyof typeof icons];
-            return (
-              <CommandGroup key={type} heading={labels[type as keyof typeof labels]}>
-                {items.map((item) => (
-                  <CommandItem key={item.id} onSelect={() => handleSelect(item.route)} className="gap-3">
-                    <Icon className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{item.label}</span>
-                      {item.sublabel && <span className="text-xs text-muted-foreground">{item.sublabel}</span>}
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            );
-          })}
-        </CommandList>
-      </CommandDialog>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="overflow-hidden p-0 shadow-lg">
+          <Command shouldFilter={false} className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+            <CommandInput placeholder={t("search.placeholder")} value={query} onValueChange={setQuery} />
+            <CommandList>
+              {results.length === 0 && (
+                <CommandEmpty>
+                  {loading ? t("common.loading") : query.length >= 2 ? t("search.noResults") : t("search.typeToSearch")}
+                </CommandEmpty>
+              )}
+              {Object.entries(grouped).map(([type, items]) => {
+                const Icon = icons[type as keyof typeof icons];
+                return (
+                  <CommandGroup key={type} heading={labels[type as keyof typeof labels]}>
+                    {items.map((item) => (
+                      <CommandItem key={item.id} value={item.id} onSelect={() => handleSelect(item.route)} className="gap-3">
+                        <Icon className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">{item.label}</span>
+                          {item.sublabel && <span className="text-xs text-muted-foreground">{item.sublabel}</span>}
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                );
+              })}
+            </CommandList>
+          </Command>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
