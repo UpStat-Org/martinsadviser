@@ -24,6 +24,7 @@ export function AppSidebar() {
     { to: "/permits", icon: FileCheck, label: t("nav.permits") },
     { to: "/messages", icon: MessageSquare, label: t("nav.messages") },
     { to: "/calendar", icon: CalendarDays, label: t("nav.calendar") },
+    { to: "/reports", icon: BarChart3, label: t("nav.reports") },
   ];
 
   const handleLogout = async () => {
