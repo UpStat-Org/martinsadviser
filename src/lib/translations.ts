@@ -249,6 +249,18 @@ const translations: Record<Language, Record<string, string>> = {
     "compliance.expired": "Vencidos",
     "compliance.total": "Total de Permits",
     "compliance.noPermits": "Nenhum permit cadastrado para avaliar compliance.",
+
+    // Documents
+    "documents.dragDrop": "Arraste e solte o arquivo aqui ou clique para selecionar",
+    "documents.maxSize": "Máximo 20MB • PDF, JPG, PNG",
+    "documents.attached": "Documento anexado",
+    "documents.replace": "Substituir",
+    "documents.viewer": "Visualizar Documento",
+    "documents.download": "Baixar",
+    "documents.close": "Fechar",
+    "documents.noPreview": "Pré-visualização não disponível para este tipo de arquivo.",
+    "documents.uploadError": "Erro ao enviar arquivo",
+    "documents.tooLarge": "Arquivo muito grande",
   },
   en: {
     "nav.dashboard": "Dashboard",
@@ -477,6 +489,17 @@ const translations: Record<Language, Record<string, string>> = {
     "compliance.expired": "Expired",
     "compliance.total": "Total Permits",
     "compliance.noPermits": "No permits registered to evaluate compliance.",
+
+    "documents.dragDrop": "Drag and drop a file here or click to select",
+    "documents.maxSize": "Max 20MB • PDF, JPG, PNG",
+    "documents.attached": "Document attached",
+    "documents.replace": "Replace",
+    "documents.viewer": "View Document",
+    "documents.download": "Download",
+    "documents.close": "Close",
+    "documents.noPreview": "Preview not available for this file type.",
+    "documents.uploadError": "Error uploading file",
+    "documents.tooLarge": "File too large",
   },
   es: {
     "nav.dashboard": "Panel",
@@ -705,6 +728,17 @@ const translations: Record<Language, Record<string, string>> = {
     "compliance.expired": "Vencidos",
     "compliance.total": "Total de Permisos",
     "compliance.noPermits": "Ningún permiso registrado para evaluar compliance.",
+
+    "documents.dragDrop": "Arrastra y suelta un archivo aquí o haz clic para seleccionar",
+    "documents.maxSize": "Máximo 20MB • PDF, JPG, PNG",
+    "documents.attached": "Documento adjunto",
+    "documents.replace": "Reemplazar",
+    "documents.viewer": "Ver Documento",
+    "documents.download": "Descargar",
+    "documents.close": "Cerrar",
+    "documents.noPreview": "Vista previa no disponible para este tipo de archivo.",
+    "documents.uploadError": "Error al subir archivo",
+    "documents.tooLarge": "Archivo muy grande",
   },
 };
 

@@ -17,9 +17,10 @@ import { useCreatePermit, useUpdatePermit, PERMIT_TYPES, type Permit } from "@/h
 import { useClients } from "@/hooks/useClients";
 import { useTrucks } from "@/hooks/useTrucks";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Upload, FileText, X, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const formSchema = z.object({
   client_id: z.string().min(1, "Cliente é obrigatório"),
@@ -46,9 +47,11 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
   const updatePermit = useUpdatePermit();
   const { data: clients } = useClients();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const isEditing = !!permit;
 
@@ -137,20 +140,40 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const validateAndSetFile = useCallback((file: File) => {
     if (file.size > 20 * 1024 * 1024) {
-      toast({ title: "Arquivo muito grande", description: "Máximo de 20MB", variant: "destructive" });
+      toast({ title: t("documents.tooLarge"), description: t("documents.maxSize"), variant: "destructive" });
       return;
     }
     setSelectedFile(file);
+  }, [toast, t]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) validateAndSetFile(file);
   };
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) validateAndSetFile(file);
+  }, [validateAndSetFile]);
 
   const isPending = createPermit.isPending || updatePermit.isPending || uploading;
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setSelectedFile(null); }}>
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setSelectedFile(null); setIsDragging(false); } }}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
@@ -283,9 +306,9 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
               )}
             />
 
-            {/* File upload */}
+            {/* File upload with drag-and-drop */}
             <div className="space-y-2">
-              <FormLabel>Documento (PDF)</FormLabel>
+              <FormLabel>{t("common.doc")} (PDF)</FormLabel>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -304,16 +327,27 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
               ) : permit?.document_url ? (
                 <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/50">
                   <FileText className="w-5 h-5 text-primary shrink-0" />
-                  <span className="text-sm text-muted-foreground flex-1">Documento já anexado</span>
+                  <span className="text-sm text-muted-foreground flex-1">{t("documents.attached")}</span>
                   <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-                    Substituir
+                    {t("documents.replace")}
                   </Button>
                 </div>
               ) : (
-                <Button type="button" variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Selecionar arquivo
-                </Button>
+                <div
+                  className={`flex flex-col items-center justify-center gap-2 p-6 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${
+                    isDragging
+                      ? "border-primary bg-primary/5"
+                      : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30"
+                  }`}
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <Upload className={`w-6 h-6 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
+                  <p className="text-sm text-muted-foreground text-center">{t("documents.dragDrop")}</p>
+                  <p className="text-xs text-muted-foreground/70">{t("documents.maxSize")}</p>
+                </div>
               )}
             </div>
 

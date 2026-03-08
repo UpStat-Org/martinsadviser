@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Search, Pencil, Trash2, Loader2, FileText, ExternalLink } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, FileText, ExternalLink, Eye } from "lucide-react";
 import { usePermits, useDeletePermit, getExpirationStatus } from "@/hooks/usePermits";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
+import { DocumentViewer } from "@/components/DocumentViewer";
 import type { Permit } from "@/hooks/usePermits";
 import { format } from "date-fns";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -18,6 +19,8 @@ export default function Permits() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPermit, setEditingPermit] = useState<Permit | null>(null);
+  const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
+  const [viewDocTitle, setViewDocTitle] = useState("");
   const { data: permits, isLoading } = usePermits(search || undefined, undefined, statusFilter);
   const deletePermit = useDeletePermit();
   const { t } = useLanguage();
@@ -96,11 +99,11 @@ export default function Permits() {
                         {permit.document_url ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <a href={permit.document_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors">
-                                <FileText className="w-4 h-4" /><ExternalLink className="w-3 h-3" />
-                              </a>
+                              <Button variant="ghost" size="icon" onClick={() => { setViewDocUrl(permit.document_url!); setViewDocTitle(`${permit.permit_type} - ${permit.permit_number || ""}`); }}>
+                                <FileText className="w-4 h-4 text-primary" />
+                              </Button>
                             </TooltipTrigger>
-                            <TooltipContent>{t("common.openDoc")}</TooltipContent>
+                            <TooltipContent>{t("documents.viewer")}</TooltipContent>
                           </Tooltip>
                         ) : <span className="text-muted-foreground text-xs">—</span>}
                       </TableCell>
@@ -131,6 +134,14 @@ export default function Permits() {
         </Card>
       )}
       <PermitFormDialog open={dialogOpen} onOpenChange={setDialogOpen} permit={editingPermit} />
+      {viewDocUrl && (
+        <DocumentViewer
+          open={!!viewDocUrl}
+          onOpenChange={(v) => { if (!v) setViewDocUrl(null); }}
+          url={viewDocUrl}
+          title={viewDocTitle}
+        />
+      )}
     </div>
   );
 }

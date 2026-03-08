@@ -7,13 +7,14 @@ import { ClientFormDialog } from "@/components/ClientFormDialog";
 import { TruckFormDialog } from "@/components/TruckFormDialog";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { ComplianceDashboard } from "@/components/ComplianceDashboard";
+import { DocumentViewer } from "@/components/DocumentViewer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -42,6 +43,8 @@ export default function ClientDetail() {
   const [editingTruck, setEditingTruck] = useState<Truck | null>(null);
   const [permitDialogOpen, setPermitDialogOpen] = useState(false);
   const [editingPermit, setEditingPermit] = useState<Permit | null>(null);
+  const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
+  const [viewDocTitle, setViewDocTitle] = useState("");
 
   const statusMap: Record<string, { label: string; className: string }> = {
     active: { label: t("common.active"), className: "bg-success text-success-foreground" },
@@ -181,7 +184,7 @@ export default function ClientDetail() {
               ) : (
                 <Table>
                   <TableHeader><TableRow>
-                    <TableHead>{t("common.type")}</TableHead><TableHead>{t("common.number")}</TableHead><TableHead>{t("common.truck")}</TableHead><TableHead>{t("common.state")}</TableHead><TableHead>{t("common.expiration")}</TableHead><TableHead>{t("clients.status")}</TableHead><TableHead className="w-24">{t("common.actions")}</TableHead>
+                    <TableHead>{t("common.type")}</TableHead><TableHead>{t("common.number")}</TableHead><TableHead>{t("common.truck")}</TableHead><TableHead>{t("common.state")}</TableHead><TableHead>{t("common.expiration")}</TableHead><TableHead>{t("clients.status")}</TableHead><TableHead>{t("common.doc")}</TableHead><TableHead className="w-24">{t("common.actions")}</TableHead>
                   </TableRow></TableHeader>
                   <TableBody>
                     {permits.map((permit) => {
@@ -194,6 +197,13 @@ export default function ClientDetail() {
                           <TableCell>{permit.state || "—"}</TableCell>
                           <TableCell>{permit.expiration_date ? format(new Date(permit.expiration_date), "dd/MM/yyyy") : "—"}</TableCell>
                           <TableCell><Badge className={expStatus.color}>{expStatus.label}</Badge></TableCell>
+                          <TableCell>
+                            {permit.document_url ? (
+                              <Button variant="ghost" size="icon" onClick={() => { setViewDocUrl(permit.document_url!); setViewDocTitle(`${permit.permit_type} - ${permit.permit_number || ""}`); }}>
+                                <FileText className="w-4 h-4 text-primary" />
+                              </Button>
+                            ) : <span className="text-muted-foreground text-xs">—</span>}
+                          </TableCell>
                           <TableCell>
                             <div className="flex gap-1">
                               <Button variant="ghost" size="icon" onClick={() => handleEditPermit(permit)}><Pencil className="w-4 h-4" /></Button>
@@ -220,6 +230,14 @@ export default function ClientDetail() {
       <ClientFormDialog open={editOpen} onOpenChange={setEditOpen} client={client} />
       <TruckFormDialog open={truckDialogOpen} onOpenChange={setTruckDialogOpen} truck={editingTruck} defaultClientId={id} />
       <PermitFormDialog open={permitDialogOpen} onOpenChange={setPermitDialogOpen} permit={editingPermit} defaultClientId={id} />
+      {viewDocUrl && (
+        <DocumentViewer
+          open={!!viewDocUrl}
+          onOpenChange={(v) => { if (!v) setViewDocUrl(null); }}
+          url={viewDocUrl}
+          title={viewDocTitle}
+        />
+      )}
     </div>
   );
 }
