@@ -1,0 +1,2 @@
+ALTER TABLE public.activity_log DROP CONSTRAINT activity_log_client_id_fkey;
+ALTER TABLE public.activity_log ADD CONSTRAINT activity_log_client_id_fkey FOREIGN KEY (client_id) REFERENCES public.clients(id) ON DELETE SET NULL;
