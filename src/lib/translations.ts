@@ -666,6 +666,10 @@ const translations: Record<Language, Record<string, string>> = {
     "login.noAccount": "Don't have an account?",
     "login.requestAccess": "Request access",
     "login.error": "Login error",
+    "login.brandingHeadline": "Manage your permits\nwith intelligence",
+    "login.brandingSubtitle": "Complete platform for permit, client and compliance management in road transport.",
+    "signup.brandingHeadline": "Start organizing\nyour operation",
+    "signup.brandingSubtitle": "Create your account and get full access to permit, compliance and communication management.",
 
     "signup.title": "Request Access",
     "signup.subtitle": "Fill in your details to request system access",
