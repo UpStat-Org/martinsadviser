@@ -41,7 +41,9 @@ export default function ClientDetail() {
   const deleteClient = useDeleteClient();
   const deleteTruck = useDeleteTruck();
   const deletePermit = useDeletePermit();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { role } = useAuth();
+  const isViewer = role === "viewer";
 
   const [editOpen, setEditOpen] = useState(false);
   const [truckDialogOpen, setTruckDialogOpen] = useState(false);
@@ -51,6 +53,9 @@ export default function ClientDetail() {
   const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
   const [viewDocTitle, setViewDocTitle] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [aiReport, setAiReport] = useState<string | null>(null);
+  const [aiReportOpen, setAiReportOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const statusMap: Record<string, { label: string; className: string }> = {
     active: { label: t("common.active"), className: "bg-success text-success-foreground" },
