@@ -18,6 +18,24 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.settings": "Configurações",
     "nav.users": "Usuários",
     "nav.logout": "Sair",
+    "nav.tasks": "Tarefas",
+
+    // Kanban
+    "kanban.title": "Quadro de Tarefas",
+    "kanban.subtitle": "Gerencie suas tarefas internas por cliente",
+    "kanban.newTask": "Nova Tarefa",
+    "kanban.editTask": "Editar Tarefa",
+    "kanban.editTaskDesc": "Altere os detalhes da tarefa",
+    "kanban.newTaskDesc": "Crie uma nova tarefa interna",
+    "kanban.deleteTask": "Excluir tarefa?",
+    "kanban.taskTitle": "Título",
+    "kanban.taskTitlePlaceholder": "Ex: Renovar IFTA do cliente X",
+    "kanban.taskDesc": "Descrição",
+    "kanban.taskDescPlaceholder": "Detalhes da tarefa...",
+    "kanban.priority": "Prioridade",
+    "kanban.client": "Cliente",
+    "kanban.dueDate": "Data limite",
+    "kanban.create": "Criar Tarefa",
 
     // Dashboard
     "dashboard.title": "Dashboard",
