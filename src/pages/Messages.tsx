@@ -141,7 +141,7 @@ export default function Messages() {
                     <TableRow key={m.id}>
                       <TableCell className="font-medium">{(m as any).clients?.company_name || "—"}</TableCell>
                       <TableCell><div className="flex items-center gap-1">{channelIcon(m.channel)} {m.channel}</div></TableCell>
-                      <TableCell className="max-w-[200px] truncate">{m.body}</TableCell>
+                      <TableCell className="max-w-[200px] truncate">{replacePlaceholders(m.body, m.clients)}</TableCell>
                       <TableCell>{m.sent_at ? format(new Date(m.sent_at), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "—"}</TableCell>
                       <TableCell>{statusBadge(m.status)}</TableCell>
                     </TableRow>
