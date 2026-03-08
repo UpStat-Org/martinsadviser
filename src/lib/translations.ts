@@ -261,6 +261,17 @@ const translations: Record<Language, Record<string, string>> = {
     "documents.noPreview": "Pré-visualização não disponível para este tipo de arquivo.",
     "documents.uploadError": "Erro ao enviar arquivo",
     "documents.tooLarge": "Arquivo muito grande",
+
+    // Activity Log
+    "activity.title": "Histórico de Atividades",
+    "activity.empty": "Nenhuma atividade registrada ainda.",
+    "activity.entity.permit": "Permit",
+    "activity.entity.truck": "Caminhão",
+    "activity.entity.client": "Cliente",
+    "activity.entity.message": "Mensagem",
+    "activity.action.created": "Criou",
+    "activity.action.updated": "Atualizou",
+    "activity.action.deleted": "Removeu",
   },
   en: {
     "nav.dashboard": "Dashboard",
