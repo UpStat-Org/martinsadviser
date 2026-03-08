@@ -150,6 +150,9 @@ const translations: Record<Language, Record<string, string>> = {
     "messages.preview": "Pré-visualização da Mensagem",
     "messages.sendComplete": "Envio concluído",
     "messages.sendError": "Erro ao enviar",
+    "messages.sendNow": "Enviar agora",
+    "messages.sendNowDesc": "Enviar imediatamente em vez de agendar",
+    "messages.scheduleFor": "Agendar para",
 
     // Calendar
     "calendar.title": "Calendário",
@@ -371,6 +374,9 @@ const translations: Record<Language, Record<string, string>> = {
     "messages.preview": "Message Preview",
     "messages.sendComplete": "Send complete",
     "messages.sendError": "Send error",
+    "messages.sendNow": "Send now",
+    "messages.sendNowDesc": "Send immediately instead of scheduling",
+    "messages.scheduleFor": "Schedule for",
 
     "calendar.title": "Calendar",
     "calendar.subtitle": "Permit expirations and events",
@@ -585,6 +591,9 @@ const translations: Record<Language, Record<string, string>> = {
     "messages.preview": "Vista previa del Mensaje",
     "messages.sendComplete": "Envío completado",
     "messages.sendError": "Error al enviar",
+    "messages.sendNow": "Enviar ahora",
+    "messages.sendNowDesc": "Enviar inmediatamente en vez de programar",
+    "messages.scheduleFor": "Programar para",
 
     "calendar.title": "Calendario",
     "calendar.subtitle": "Vencimientos de permisos y eventos",
