@@ -79,10 +79,18 @@ export default function Messages() {
           <h1 className="font-display text-3xl font-bold text-foreground">Mensagens</h1>
           <p className="text-muted-foreground mt-1">Templates e agendamento de envios</p>
         </div>
-        <Button onClick={() => setScheduleOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nova Mensagem
-        </Button>
+        <div className="flex gap-2">
+          {(pendingMsgs?.length ?? 0) > 0 && (
+            <Button variant="outline" onClick={handleSendNow} disabled={sending}>
+              {sending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+              Enviar Pendentes
+            </Button>
+          )}
+          <Button onClick={() => setScheduleOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Nova Mensagem
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="scheduled">
