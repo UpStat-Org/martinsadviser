@@ -101,9 +101,14 @@ export default function Messages() {
                       <TableCell>{format(new Date(m.scheduled_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</TableCell>
                       <TableCell>{statusBadge(m.status)}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" onClick={() => cancelMsg.mutate(m.id)} title="Cancelar">
-                          <XCircle className="w-4 h-4 text-destructive" />
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => setPreviewMsg(m)} title="Visualizar">
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => cancelMsg.mutate(m.id)} title="Cancelar">
+                            <XCircle className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
