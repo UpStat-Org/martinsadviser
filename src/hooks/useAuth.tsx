@@ -22,7 +22,7 @@ export function useAuth() {
   useEffect(() => {
     const fetchProfile = async (user: User | null) => {
       if (!user) {
-        setState({ user: null, loading: false, isAdmin: false, approvalStatus: null });
+        setState({ user: null, loading: false, isAdmin: false, role: null, approvalStatus: null });
         return;
       }
 
