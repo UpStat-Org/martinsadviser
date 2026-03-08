@@ -9,13 +9,14 @@ import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { ComplianceDashboard } from "@/components/ComplianceDashboard";
 import { DocumentViewer } from "@/components/DocumentViewer";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { InvitePortalDialog } from "@/components/InvitePortalDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock, UserPlus } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -46,6 +47,7 @@ export default function ClientDetail() {
   const [editingPermit, setEditingPermit] = useState<Permit | null>(null);
   const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
   const [viewDocTitle, setViewDocTitle] = useState("");
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   const statusMap: Record<string, { label: string; className: string }> = {
     active: { label: t("common.active"), className: "bg-success text-success-foreground" },
@@ -79,6 +81,7 @@ export default function ClientDetail() {
             <Badge className={status.className}>{status.label}</Badge>
           </div>
         </div>
+        <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}><UserPlus className="w-4 h-4 mr-2" />{t("portal.inviteClient")}</Button>
         <Button variant="outline" onClick={() => setEditOpen(true)}><Pencil className="w-4 h-4 mr-2" />{t("common.edit")}</Button>
         <AlertDialog>
           <AlertDialogTrigger asChild><Button variant="destructive" size="icon"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>
@@ -243,6 +246,7 @@ export default function ClientDetail() {
           title={viewDocTitle}
         />
       )}
+      <InvitePortalDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={client.id} clientName={client.company_name} />
     </div>
   );
 }
