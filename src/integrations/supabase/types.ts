@@ -80,6 +80,69 @@ export type Database = {
         }
         Relationships: []
       }
+      permits: {
+        Row: {
+          client_id: string
+          created_at: string
+          document_url: string | null
+          expiration_date: string | null
+          id: string
+          notes: string | null
+          permit_number: string | null
+          permit_type: string
+          state: string | null
+          status: string
+          truck_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          document_url?: string | null
+          expiration_date?: string | null
+          id?: string
+          notes?: string | null
+          permit_number?: string | null
+          permit_type: string
+          state?: string | null
+          status?: string
+          truck_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          document_url?: string | null
+          expiration_date?: string | null
+          id?: string
+          notes?: string | null
+          permit_number?: string | null
+          permit_type?: string
+          state?: string | null
+          status?: string
+          truck_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permits_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "permits_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           approval_status: string
@@ -106,6 +169,59 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      trucks: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          make: string | null
+          model: string | null
+          notes: string | null
+          plate: string
+          status: string
+          updated_at: string
+          user_id: string
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          make?: string | null
+          model?: string | null
+          notes?: string | null
+          plate: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          make?: string | null
+          model?: string | null
+          notes?: string | null
+          plate?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trucks_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
