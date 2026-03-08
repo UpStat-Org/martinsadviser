@@ -261,6 +261,17 @@ const translations: Record<Language, Record<string, string>> = {
     "documents.noPreview": "Pré-visualização não disponível para este tipo de arquivo.",
     "documents.uploadError": "Erro ao enviar arquivo",
     "documents.tooLarge": "Arquivo muito grande",
+
+    // Activity Log
+    "activity.title": "Histórico de Atividades",
+    "activity.empty": "Nenhuma atividade registrada ainda.",
+    "activity.entity.permit": "Permit",
+    "activity.entity.truck": "Caminhão",
+    "activity.entity.client": "Cliente",
+    "activity.entity.message": "Mensagem",
+    "activity.action.created": "Criou",
+    "activity.action.updated": "Atualizou",
+    "activity.action.deleted": "Removeu",
   },
   en: {
     "nav.dashboard": "Dashboard",
@@ -500,6 +511,16 @@ const translations: Record<Language, Record<string, string>> = {
     "documents.noPreview": "Preview not available for this file type.",
     "documents.uploadError": "Error uploading file",
     "documents.tooLarge": "File too large",
+
+    "activity.title": "Activity Log",
+    "activity.empty": "No activity recorded yet.",
+    "activity.entity.permit": "Permit",
+    "activity.entity.truck": "Truck",
+    "activity.entity.client": "Client",
+    "activity.entity.message": "Message",
+    "activity.action.created": "Created",
+    "activity.action.updated": "Updated",
+    "activity.action.deleted": "Deleted",
   },
   es: {
     "nav.dashboard": "Panel",
@@ -739,6 +760,16 @@ const translations: Record<Language, Record<string, string>> = {
     "documents.noPreview": "Vista previa no disponible para este tipo de archivo.",
     "documents.uploadError": "Error al subir archivo",
     "documents.tooLarge": "Archivo muy grande",
+
+    "activity.title": "Historial de Actividades",
+    "activity.empty": "Ninguna actividad registrada aún.",
+    "activity.entity.permit": "Permiso",
+    "activity.entity.truck": "Camión",
+    "activity.entity.client": "Cliente",
+    "activity.entity.message": "Mensaje",
+    "activity.action.created": "Creó",
+    "activity.action.updated": "Actualizó",
+    "activity.action.deleted": "Eliminó",
   },
 };
 
