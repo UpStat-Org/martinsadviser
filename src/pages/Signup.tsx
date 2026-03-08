@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Truck, CheckCircle } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Signup() {
   const [fullName, setFullName] = useState("");
@@ -15,11 +16,11 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -28,9 +29,8 @@ export default function Signup() {
         emailRedirectTo: window.location.origin,
       },
     });
-
     if (error) {
-      toast({ title: "Erro ao solicitar acesso", description: error.message, variant: "destructive" });
+      toast({ title: t("signup.error"), description: error.message, variant: "destructive" });
     } else {
       setSubmitted(true);
     }
@@ -43,12 +43,10 @@ export default function Signup() {
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center space-y-4">
             <CheckCircle className="w-12 h-12 text-success mx-auto" />
-            <h2 className="font-display text-xl font-bold text-foreground">Solicitação Enviada!</h2>
-            <p className="text-muted-foreground">
-              Sua solicitação de acesso foi enviada. Verifique seu email para confirmar o cadastro. Após confirmação, o administrador irá avaliar sua solicitação.
-            </p>
+            <h2 className="font-display text-xl font-bold text-foreground">{t("signup.success")}</h2>
+            <p className="text-muted-foreground">{t("signup.successDesc")}</p>
             <Link to="/login">
-              <Button variant="outline" className="mt-4">Voltar ao Login</Button>
+              <Button variant="outline" className="mt-4">{t("signup.backToLogin")}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -66,52 +64,31 @@ export default function Signup() {
             </div>
             <h1 className="font-display text-2xl font-bold text-foreground">MartinsAdviser</h1>
           </div>
-          <CardTitle className="font-display text-xl">Solicitar Acesso</CardTitle>
-          <CardDescription>Preencha seus dados para solicitar acesso ao sistema</CardDescription>
+          <CardTitle className="font-display text-xl">{t("signup.title")}</CardTitle>
+          <CardDescription>{t("signup.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome completo</Label>
-              <Input
-                id="name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Seu nome"
-                required
-              />
+              <Label htmlFor="name">{t("signup.fullName")}</Label>
+              <Input id="name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Seu nome" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
-                required
-              />
+              <Label htmlFor="email">{t("login.email")}</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                minLength={6}
-                required
-              />
+              <Label htmlFor="password">{t("login.password")}</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" minLength={6} required />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Enviando..." : "Solicitar Acesso"}
+              {loading ? t("signup.submitting") : t("signup.submit")}
             </Button>
           </form>
           <p className="text-center text-sm text-muted-foreground mt-4">
-            Já tem conta?{" "}
+            {t("signup.hasAccount")}{" "}
             <Link to="/login" className="text-primary hover:underline font-medium">
-              Entrar
+              {t("signup.login")}
             </Link>
           </p>
         </CardContent>
