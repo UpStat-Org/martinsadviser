@@ -118,6 +118,8 @@ export default function ClientDetail() {
         </Card>
       </div>
 
+      <ComplianceDashboard permits={permits} />
+
       <Tabs defaultValue="trucks">
         <TabsList>
           <TabsTrigger value="trucks" className="gap-2"><TruckIcon className="w-4 h-4" />{t("trucks.title")} ({trucks?.length || 0})</TabsTrigger>
