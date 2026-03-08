@@ -235,6 +235,10 @@ const translations: Record<Language, Record<string, string>> = {
     "login.noAccount": "Não tem conta?",
     "login.requestAccess": "Solicitar acesso",
     "login.error": "Erro ao entrar",
+    "login.brandingHeadline": "Gerencie seus permits\ncom inteligência",
+    "login.brandingSubtitle": "Plataforma completa para gestão de permits, clientes e compliance no transporte rodoviário.",
+    "signup.brandingHeadline": "Comece a organizar\nsua operação",
+    "signup.brandingSubtitle": "Crie sua conta e tenha acesso à gestão completa de permits, compliance e comunicação.",
 
     // Signup
     "signup.title": "Solicitar Acesso",
@@ -662,6 +666,10 @@ const translations: Record<Language, Record<string, string>> = {
     "login.noAccount": "Don't have an account?",
     "login.requestAccess": "Request access",
     "login.error": "Login error",
+    "login.brandingHeadline": "Manage your permits\nwith intelligence",
+    "login.brandingSubtitle": "Complete platform for permit, client and compliance management in road transport.",
+    "signup.brandingHeadline": "Start organizing\nyour operation",
+    "signup.brandingSubtitle": "Create your account and get full access to permit, compliance and communication management.",
 
     "signup.title": "Request Access",
     "signup.subtitle": "Fill in your details to request system access",
@@ -1084,6 +1092,10 @@ const translations: Record<Language, Record<string, string>> = {
     "login.noAccount": "¿No tienes cuenta?",
     "login.requestAccess": "Solicitar acceso",
     "login.error": "Error al ingresar",
+    "login.brandingHeadline": "Gestiona tus permits\ncon inteligencia",
+    "login.brandingSubtitle": "Plataforma completa para gestión de permits, clientes y compliance en el transporte por carretera.",
+    "signup.brandingHeadline": "Empieza a organizar\ntu operación",
+    "signup.brandingSubtitle": "Crea tu cuenta y accede a la gestión completa de permits, compliance y comunicación.",
 
     "signup.title": "Solicitar Acceso",
     "signup.subtitle": "Completa tus datos para solicitar acceso al sistema",

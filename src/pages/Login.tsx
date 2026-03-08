@@ -46,10 +46,12 @@ export default function Login() {
             <h1 className="font-display text-3xl font-bold">MartinsAdviser</h1>
           </div>
           <h2 className="font-display text-4xl font-bold leading-tight mb-4">
-            Gerencie seus permits<br />com inteligência
+            {t("login.brandingHeadline").split('\n').map((line, i) => (
+              <span key={i}>{line}{i === 0 && <br />}</span>
+            ))}
           </h2>
           <p className="text-primary-foreground/80 text-lg max-w-md">
-            Plataforma completa para gestão de permits, clientes e compliance no transporte rodoviário.
+            {t("login.brandingSubtitle")}
           </p>
         </div>
       </div>
