@@ -54,8 +54,23 @@ export default function Messages() {
   const { data: rules, isLoading: loadingR } = useAutomationRules();
   const deleteRule = useDeleteAutomationRule();
   const toggleRule = useUpdateAutomationRule();
+  const { toast } = useToast();
+  const [sending, setSending] = useState(false);
 
   const sentAndFailed = sentMsgs?.filter((m) => m.status === "sent" || m.status === "failed") || [];
+
+  const handleSendNow = async () => {
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-emails");
+      if (error) throw error;
+      toast({ title: "Envio concluído", description: `${data?.sent || 0} email(s) enviado(s), ${data?.failed || 0} falha(s).` });
+    } catch (e: any) {
+      toast({ title: "Erro ao enviar", description: e.message, variant: "destructive" });
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
