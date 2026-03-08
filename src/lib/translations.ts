@@ -511,6 +511,16 @@ const translations: Record<Language, Record<string, string>> = {
     "documents.noPreview": "Preview not available for this file type.",
     "documents.uploadError": "Error uploading file",
     "documents.tooLarge": "File too large",
+
+    "activity.title": "Activity Log",
+    "activity.empty": "No activity recorded yet.",
+    "activity.entity.permit": "Permit",
+    "activity.entity.truck": "Truck",
+    "activity.entity.client": "Client",
+    "activity.entity.message": "Message",
+    "activity.action.created": "Created",
+    "activity.action.updated": "Updated",
+    "activity.action.deleted": "Deleted",
   },
   es: {
     "nav.dashboard": "Panel",
