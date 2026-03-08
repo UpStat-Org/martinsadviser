@@ -36,6 +36,7 @@ export default function Messages() {
   const [templateOpen, setTemplateOpen] = useState(false);
   const [editTemplate, setEditTemplate] = useState<MessageTemplate | null>(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [previewMsg, setPreviewMsg] = useState<ScheduledMessage | null>(null);
 
   const { data: templates, isLoading: loadingT } = useMessageTemplates();
   const deleteTemplate = useDeleteTemplate();
