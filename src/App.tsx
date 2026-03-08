@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./components/AppLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import PendingApproval from "./pages/PendingApproval";
+import RejectedPage from "./pages/RejectedPage";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import ClientDetail from "./pages/ClientDetail";
@@ -14,6 +17,7 @@ import Permits from "./pages/Permits";
 import Messages from "./pages/Messages";
 import CalendarPage from "./pages/CalendarPage";
 import SettingsPage from "./pages/SettingsPage";
+import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +30,9 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/pending" element={<PendingApproval />} />
+          <Route path="/rejected" element={<RejectedPage />} />
           <Route
             element={
               <ProtectedRoute>
@@ -41,6 +48,7 @@ const App = () => (
             <Route path="/messages" element={<Messages />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

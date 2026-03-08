@@ -10,11 +10,13 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
