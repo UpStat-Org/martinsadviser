@@ -47,9 +47,11 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
   const updatePermit = useUpdatePermit();
   const { data: clients } = useClients();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const isEditing = !!permit;
 
