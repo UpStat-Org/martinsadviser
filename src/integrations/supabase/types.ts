@@ -420,36 +420,39 @@ export type Database = {
         Row: {
           client_id: string | null
           created_at: string
-          description: string | null
-          due_date: string | null
           id: string
-          priority: string
+          name: string
+          notes: string | null
+          operator: string | null
           status: string
-          title: string
+          tags: string[] | null
+          task_type: string
           updated_at: string
           user_id: string
         }
         Insert: {
           client_id?: string | null
           created_at?: string
-          description?: string | null
-          due_date?: string | null
           id?: string
-          priority?: string
+          name: string
+          notes?: string | null
+          operator?: string | null
           status?: string
-          title: string
+          tags?: string[] | null
+          task_type?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           client_id?: string | null
           created_at?: string
-          description?: string | null
-          due_date?: string | null
           id?: string
-          priority?: string
+          name?: string
+          notes?: string | null
+          operator?: string | null
           status?: string
-          title?: string
+          tags?: string[] | null
+          task_type?: string
           updated_at?: string
           user_id?: string
         }
