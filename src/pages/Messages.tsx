@@ -72,6 +72,10 @@ export default function Messages() {
         <TabsList>
           <TabsTrigger value="scheduled">Agendadas{pendingMsgs?.length ? ` (${pendingMsgs.length})` : ""}</TabsTrigger>
           <TabsTrigger value="sent">Enviadas</TabsTrigger>
+          <TabsTrigger value="automations">
+            <Zap className="w-4 h-4 mr-1" />
+            Automações{rules?.filter(r => r.enabled).length ? ` (${rules.filter(r => r.enabled).length})` : ""}
+          </TabsTrigger>
           <TabsTrigger value="templates">Templates</TabsTrigger>
         </TabsList>
 
