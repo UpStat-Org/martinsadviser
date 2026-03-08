@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTasks, useCreateTask, useUpdateTask, useDeleteTask, type Task } from "@/hooks/useTasks";
 import { useClients } from "@/hooks/useClients";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -9,21 +9,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, GripVertical, Trash2, Pencil, Loader2, Calendar } from "lucide-react";
-import { format } from "date-fns";
+import { Plus, GripVertical, Trash2, Pencil, Loader2, Tag, X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const COLUMNS = [
-  { id: "todo", label: "A Fazer", color: "bg-muted" },
-  { id: "in_progress", label: "Em Progresso", color: "bg-primary/10" },
-  { id: "done", label: "Concluído", color: "bg-success/10" },
+  { id: "not_started", label: "Not Started", color: "bg-muted" },
+  { id: "waiting", label: "Waiting", color: "bg-warning/10" },
+  { id: "in_progress", label: "In Progress", color: "bg-primary/10" },
+  { id: "completed", label: "Completed", color: "bg-success/10" },
+  { id: "discarded", label: "Discarded", color: "bg-destructive/10" },
 ];
 
-const PRIORITIES: Record<string, { label: string; className: string }> = {
-  low: { label: "Baixa", className: "bg-muted text-muted-foreground" },
-  medium: { label: "Média", className: "bg-warning/20 text-warning-foreground border-warning/30" },
-  high: { label: "Alta", className: "bg-destructive/20 text-destructive border-destructive/30" },
-};
+const TASK_TYPES = [
+  "IFTA", "CT", "NY", "KYU", "NM", "Automatic", "UCR", "BOC-3", "MCS-150", "Other",
+];
 
 export default function KanbanPage() {
   const { data: tasks, isLoading } = useTasks();
@@ -38,43 +37,62 @@ export default function KanbanPage() {
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   // Form state
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [clientId, setClientId] = useState<string>("");
-  const [priority, setPriority] = useState("medium");
-  const [dueDate, setDueDate] = useState("");
-  const [formStatus, setFormStatus] = useState("todo");
+  const [name, setName] = useState("");
+  const [taskType, setTaskType] = useState("");
+  const [clientId, setClientId] = useState("");
+  const [operator, setOperator] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [notes, setNotes] = useState("");
+  const [formStatus, setFormStatus] = useState("not_started");
 
-  const openNew = (status = "todo") => {
+  const openNew = (status = "not_started") => {
     setEditingTask(null);
-    setTitle("");
-    setDescription("");
+    setName("");
+    setTaskType("");
     setClientId("");
-    setPriority("medium");
-    setDueDate("");
+    setOperator("");
+    setTags([]);
+    setTagInput("");
+    setNotes("");
     setFormStatus(status);
     setDialogOpen(true);
   };
 
   const openEdit = (task: Task) => {
     setEditingTask(task);
-    setTitle(task.title);
-    setDescription(task.description || "");
+    setName(task.name);
+    setTaskType(task.task_type || "");
     setClientId(task.client_id || "");
-    setPriority(task.priority);
-    setDueDate(task.due_date || "");
+    setOperator(task.operator || "");
+    setTags(task.tags || []);
+    setTagInput("");
+    setNotes(task.notes || "");
     setFormStatus(task.status);
     setDialogOpen(true);
   };
 
+  const handleAddTag = () => {
+    const val = tagInput.trim();
+    if (val && !tags.includes(val)) {
+      setTags([...tags, val]);
+    }
+    setTagInput("");
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setTags(tags.filter((t) => t !== tag));
+  };
+
   const handleSubmit = async () => {
-    if (!title.trim()) return;
+    if (!name.trim()) return;
     const payload = {
-      title: title.trim(),
-      description: description || undefined,
+      name: name.trim(),
+      task_type: taskType || undefined,
       client_id: clientId || undefined,
-      priority,
-      due_date: dueDate || undefined,
+      operator: operator || undefined,
+      tags,
+      notes: notes || undefined,
       status: formStatus,
     };
     if (editingTask) {
@@ -85,14 +103,8 @@ export default function KanbanPage() {
     setDialogOpen(false);
   };
 
-  const handleDragStart = (taskId: string) => {
-    setDraggedTaskId(taskId);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
+  const handleDragStart = (taskId: string) => setDraggedTaskId(taskId);
+  const handleDragOver = (e: React.DragEvent) => e.preventDefault();
   const handleDrop = async (columnId: string) => {
     if (draggedTaskId) {
       await updateTask.mutateAsync({ id: draggedTaskId, status: columnId });
@@ -124,19 +136,19 @@ export default function KanbanPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 overflow-x-auto">
         {COLUMNS.map((col) => {
           const colTasks = getColumnTasks(col.id);
           return (
             <div
               key={col.id}
-              className="space-y-3"
+              className="space-y-3 min-w-[220px]"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop(col.id)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <h2 className="font-display font-semibold text-foreground">{col.label}</h2>
+                  <h2 className="font-display font-semibold text-sm text-foreground">{col.label}</h2>
                   <Badge variant="secondary" className="text-xs">{colTasks.length}</Badge>
                 </div>
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openNew(col.id)}>
@@ -144,7 +156,7 @@ export default function KanbanPage() {
                 </Button>
               </div>
 
-              <div className={`rounded-xl p-3 min-h-[200px] space-y-3 ${col.color} border border-border/50`}>
+              <div className={`rounded-xl p-2 min-h-[200px] space-y-2 ${col.color} border border-border/50`}>
                 {colTasks.map((task) => (
                   <Card
                     key={task.id}
@@ -155,10 +167,10 @@ export default function KanbanPage() {
                     }`}
                   >
                     <CardContent className="p-3 space-y-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-1.5">
+                      <div className="flex items-start justify-between gap-1">
+                        <div className="flex items-center gap-1.5 min-w-0">
                           <GripVertical className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
-                          <span className="font-medium text-sm text-foreground leading-tight">{task.title}</span>
+                          <span className="font-medium text-sm text-foreground leading-tight truncate">{task.name}</span>
                         </div>
                         <div className="flex gap-0.5 shrink-0">
                           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEdit(task)}>
@@ -184,26 +196,34 @@ export default function KanbanPage() {
                         </div>
                       </div>
 
-                      {task.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-2">{task.description}</p>
+                      {task.task_type && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">{task.task_type}</Badge>
                       )}
 
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${PRIORITIES[task.priority]?.className || ""}`}>
-                          {PRIORITIES[task.priority]?.label || task.priority}
-                        </Badge>
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         {task.clients?.company_name && (
                           <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                             {task.clients.company_name}
                           </Badge>
                         )}
-                        {task.due_date && (
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                            <Calendar className="w-3 h-3" />
-                            {format(new Date(task.due_date), "dd/MM")}
-                          </span>
+                        {task.operator && (
+                          <span className="text-[10px] text-muted-foreground">👤 {task.operator}</span>
                         )}
                       </div>
+
+                      {task.tags?.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {task.tags.map((tag) => (
+                            <Badge key={tag} variant="outline" className="text-[9px] px-1 py-0 bg-accent/50">
+                              <Tag className="w-2.5 h-2.5 mr-0.5" />{tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      {task.notes && (
+                        <p className="text-[10px] text-muted-foreground line-clamp-2">{task.notes}</p>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
@@ -215,7 +235,7 @@ export default function KanbanPage() {
 
       {/* Task Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-display">
               {editingTask ? t("kanban.editTask") : t("kanban.newTask")}
@@ -225,32 +245,31 @@ export default function KanbanPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Name */}
             <div>
-              <label className="text-sm font-medium">{t("kanban.taskTitle")} *</label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("kanban.taskTitlePlaceholder")} />
+              <label className="text-sm font-medium">Name *</label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Task name" />
             </div>
-            <div>
-              <label className="text-sm font-medium">{t("kanban.taskDesc")}</label>
-              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder={t("kanban.taskDescPlaceholder")} />
-            </div>
+
+            {/* Type & Client */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">{t("kanban.priority")}</label>
-                <Select value={priority} onValueChange={setPriority}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <label className="text-sm font-medium">Type</label>
+                <Select value={taskType} onValueChange={setTaskType}>
+                  <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Baixa</SelectItem>
-                    <SelectItem value="medium">Média</SelectItem>
-                    <SelectItem value="high">Alta</SelectItem>
+                    {TASK_TYPES.map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium">{t("kanban.client")}</label>
+                <label className="text-sm font-medium">Client</label>
                 <Select value={clientId} onValueChange={setClientId}>
-                  <SelectTrigger><SelectValue placeholder="Nenhum" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Nenhum</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {clients?.map((c) => (
                       <SelectItem key={c.id} value={c.id}>{c.company_name}</SelectItem>
                     ))}
@@ -258,14 +277,51 @@ export default function KanbanPage() {
                 </Select>
               </div>
             </div>
+
+            {/* Operator */}
             <div>
-              <label className="text-sm font-medium">{t("kanban.dueDate")}</label>
-              <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+              <label className="text-sm font-medium">Operator</label>
+              <Input value={operator} onChange={(e) => setOperator(e.target.value)} placeholder="Responsible person" />
             </div>
+
+            {/* Tags */}
+            <div>
+              <label className="text-sm font-medium">Tags</label>
+              <div className="flex gap-2">
+                <Input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  placeholder="Add tag and press Enter"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") { e.preventDefault(); handleAddTag(); }
+                  }}
+                />
+                <Button type="button" variant="outline" size="sm" onClick={handleAddTag}>Add</Button>
+              </div>
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="text-xs gap-1">
+                      {tag}
+                      <button onClick={() => handleRemoveTag(tag)} className="hover:text-destructive">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="text-sm font-medium">Notes</label>
+              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Additional notes..." />
+            </div>
+
             <div className="flex justify-end gap-3">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
-              <Button onClick={handleSubmit} disabled={!title.trim() || createTask.isPending || updateTask.isPending}>
-                {(createTask.isPending || updateTask.isPending) ? "Salvando..." : editingTask ? t("common.save") : t("kanban.create")}
+              <Button onClick={handleSubmit} disabled={!name.trim() || createTask.isPending || updateTask.isPending}>
+                {(createTask.isPending || updateTask.isPending) ? "Saving..." : editingTask ? t("common.save") : t("kanban.create")}
               </Button>
             </div>
           </div>

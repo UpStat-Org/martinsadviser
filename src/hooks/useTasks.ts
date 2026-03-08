@@ -6,11 +6,12 @@ export interface Task {
   id: string;
   user_id: string;
   client_id: string | null;
-  title: string;
-  description: string | null;
+  name: string;
+  notes: string | null;
   status: string;
-  priority: string;
-  due_date: string | null;
+  task_type: string;
+  operator: string | null;
+  tags: string[];
   created_at: string;
   updated_at: string;
   clients?: { company_name: string } | null;
@@ -25,7 +26,7 @@ export function useTasks() {
         .select("*, clients(company_name)")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as Task[];
+      return data as unknown as Task[];
     },
   });
 }
@@ -34,10 +35,10 @@ export function useCreateTask() {
   const qc = useQueryClient();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: async (task: { title: string; description?: string; client_id?: string; priority?: string; due_date?: string; status?: string }) => {
+    mutationFn: async (task: { name: string; task_type?: string; client_id?: string; operator?: string; tags?: string[]; notes?: string; status?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-      const { error } = await supabase.from("tasks").insert({ ...task, user_id: user.id });
+      const { error } = await supabase.from("tasks").insert({ ...task, user_id: user.id } as any);
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["tasks"] }); toast({ title: "Tarefa criada" }); },
@@ -48,8 +49,8 @@ export function useCreateTask() {
 export function useUpdateTask() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...updates }: { id: string; title?: string; description?: string; client_id?: string | null; priority?: string; due_date?: string | null; status?: string }) => {
-      const { error } = await supabase.from("tasks").update(updates).eq("id", id);
+    mutationFn: async ({ id, ...updates }: { id: string; name?: string; task_type?: string; client_id?: string | null; operator?: string | null; tags?: string[]; notes?: string | null; status?: string }) => {
+      const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
