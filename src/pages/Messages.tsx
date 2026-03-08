@@ -11,6 +11,9 @@ import { useMessageTemplates, useDeleteTemplate, useScheduledMessages, useCancel
 import type { MessageTemplate } from "@/hooks/useMessages";
 import MessageTemplateDialog from "@/components/MessageTemplateDialog";
 import ScheduleMessageDialog from "@/components/ScheduleMessageDialog";
+import { replacePlaceholders } from "@/lib/placeholders";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import type { ScheduledMessage } from "@/hooks/useMessages";
 
 const channelIcon = (ch: string) => {
   if (ch === "whatsapp") return <MessageCircle className="w-4 h-4 text-primary" />;
