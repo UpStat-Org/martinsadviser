@@ -227,6 +227,9 @@ export default function ClientDetail() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="activity" className="mt-4">
+          {id && <ActivityTimeline clientId={id} />}
+        </TabsContent>
       </Tabs>
 
       <ClientFormDialog open={editOpen} onOpenChange={setEditOpen} client={client} />
