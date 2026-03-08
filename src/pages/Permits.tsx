@@ -10,11 +10,12 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Search, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, FileText, ExternalLink } from "lucide-react";
 import { usePermits, useDeletePermit, getExpirationStatus } from "@/hooks/usePermits";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
 import type { Permit } from "@/hooks/usePermits";
 import { format } from "date-fns";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const statusFilters = [
   { value: "all", label: "Todos" },
@@ -105,6 +106,7 @@ export default function Permits() {
                   <TableHead>Estado</TableHead>
                   <TableHead>Vencimento</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Doc</TableHead>
                   <TableHead className="w-24">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -125,6 +127,26 @@ export default function Permits() {
                       </TableCell>
                       <TableCell>
                         <Badge className={expStatus.color}>{expStatus.label}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        {permit.document_url ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <a
+                                href={permit.document_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+                              >
+                                <FileText className="w-4 h-4" />
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            </TooltipTrigger>
+                            <TooltipContent>Abrir documento</TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">—</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
