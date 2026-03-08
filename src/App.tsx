@@ -23,6 +23,9 @@ import SettingsPage from "./pages/SettingsPage";
 import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
 import ReportsPage from "./pages/ReportsPage";
+import PortalLogin from "./pages/portal/PortalLogin";
+import PortalLayout from "./pages/portal/PortalLayout";
+import PortalDashboard from "./pages/portal/PortalDashboard";
 
 const queryClient = new QueryClient();
 
