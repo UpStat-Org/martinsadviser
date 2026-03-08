@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
-  Settings, LogOut, ChevronLeft, ChevronRight, ShieldCheck, BarChart3, ClipboardList, DollarSign,
+  Settings, LogOut, ChevronLeft, ChevronRight, ShieldCheck, BarChart3, ClipboardList, DollarSign, ScrollText,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -75,16 +75,28 @@ export function AppSidebar() {
 
       <div className="border-t border-sidebar-border p-2 space-y-1">
         {isAdmin && (
-          <NavLink
-            to="/admin/users"
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              location.pathname === "/admin/users" && "bg-sidebar-accent text-sidebar-primary"
-            )}
-          >
-            <ShieldCheck className="w-5 h-5 shrink-0" />
-            {!collapsed && <span>{t("nav.users")}</span>}
-          </NavLink>
+          <>
+            <NavLink
+              to="/admin/users"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                location.pathname === "/admin/users" && "bg-sidebar-accent text-sidebar-primary"
+              )}
+            >
+              <ShieldCheck className="w-5 h-5 shrink-0" />
+              {!collapsed && <span>{t("nav.users")}</span>}
+            </NavLink>
+            <NavLink
+              to="/audit"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                location.pathname === "/audit" && "bg-sidebar-accent text-sidebar-primary"
+              )}
+            >
+              <ScrollText className="w-5 h-5 shrink-0" />
+              {!collapsed && <span>{t("nav.audit")}</span>}
+            </NavLink>
+          </>
         )}
         <NavLink
           to="/settings"

@@ -10,13 +10,16 @@ import { ComplianceDashboard } from "@/components/ComplianceDashboard";
 import { DocumentViewer } from "@/components/DocumentViewer";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { InvitePortalDialog } from "@/components/InvitePortalDialog";
+import { SignatureDialog } from "@/components/SignatureDialog";
+import { SignatureViewer } from "@/components/SignatureViewer";
+import { PermitCoverageMap } from "@/components/PermitCoverageMap";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock, UserPlus, Sparkles } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock, UserPlus, Sparkles, PenLine, Map } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -55,6 +58,7 @@ export default function ClientDetail() {
   const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
   const [viewDocTitle, setViewDocTitle] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [signatureOpen, setSignatureOpen] = useState(false);
   const [aiReport, setAiReport] = useState<string | null>(null);
   const [aiReportOpen, setAiReportOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -160,10 +164,18 @@ export default function ClientDetail() {
 
       <ComplianceDashboard permits={permits} />
 
+      <Card>
+        <CardHeader><CardTitle className="font-display text-lg flex items-center gap-2"><Map className="w-5 h-5 text-muted-foreground" />{t("map.title")}</CardTitle></CardHeader>
+        <CardContent>
+          <PermitCoverageMap permits={permits} />
+        </CardContent>
+      </Card>
+
       <Tabs defaultValue="trucks">
         <TabsList>
           <TabsTrigger value="trucks" className="gap-2"><TruckIcon className="w-4 h-4" />{t("trucks.title")} ({trucks?.length || 0})</TabsTrigger>
           <TabsTrigger value="permits" className="gap-2"><FileCheck className="w-4 h-4" />{t("permits.title")} ({permits?.length || 0})</TabsTrigger>
+          <TabsTrigger value="signatures" className="gap-2"><PenLine className="w-4 h-4" />{t("signature.tab")} </TabsTrigger>
           <TabsTrigger value="activity" className="gap-2"><Clock className="w-4 h-4" />{t("activity.title")}</TabsTrigger>
         </TabsList>
 
@@ -263,6 +275,17 @@ export default function ClientDetail() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="signatures" className="mt-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="font-display text-lg">{t("signature.tab")}</CardTitle>
+              <Button size="sm" onClick={() => setSignatureOpen(true)}><Plus className="w-4 h-4 mr-2" />{t("signature.new")}</Button>
+            </CardHeader>
+            <CardContent>
+              <SignatureViewer clientId={id!} />
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="activity" className="mt-4">
           {id && <ActivityTimeline clientId={id} />}
         </TabsContent>
@@ -280,6 +303,7 @@ export default function ClientDetail() {
         />
       )}
       <InvitePortalDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={client.id} clientName={client.company_name} />
+      <SignatureDialog open={signatureOpen} onOpenChange={setSignatureOpen} clientId={client.id} />
 
       {/* AI Report Dialog */}
       <Dialog open={aiReportOpen} onOpenChange={setAiReportOpen}>

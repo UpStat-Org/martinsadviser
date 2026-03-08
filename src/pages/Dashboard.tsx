@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Truck, FileCheck, AlertTriangle, Clock, ShieldAlert, Mail, Send, XCircle } from "lucide-react";
+import { Users, Truck, FileCheck, AlertTriangle, Clock, ShieldAlert, Mail, Send, XCircle, Map } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
 import { usePermits, getExpirationStatus } from "@/hooks/usePermits";
 import { useTrucks } from "@/hooks/useTrucks";
@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { pt, enUS, es } from "date-fns/locale";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { PermitCoverageMap } from "@/components/PermitCoverageMap";
 
 const dateLocales = { pt, en: enUS, es };
 
@@ -333,6 +334,18 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-display text-lg flex items-center gap-2">
+            <Map className="w-5 h-5 text-muted-foreground" />
+            {t("map.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PermitCoverageMap permits={permits} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

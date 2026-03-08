@@ -25,6 +25,7 @@ import NotFound from "./pages/NotFound";
 import ReportsPage from "./pages/ReportsPage";
 import KanbanPage from "./pages/KanbanPage";
 import FinancePage from "./pages/FinancePage";
+import AuditPage from "./pages/AuditPage";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalLayout from "./pages/portal/PortalLayout";
 import PortalDashboard from "./pages/portal/PortalDashboard";
@@ -68,6 +69,7 @@ const App = () => (
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/finance" element={<FinancePage />} />
               <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/audit" element={<AuditPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
