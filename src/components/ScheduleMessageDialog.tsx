@@ -12,6 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useClients } from "@/hooks/useClients";
 import { useMessageTemplates, useCreateScheduledMessage } from "@/hooks/useMessages";
+import { replacePlaceholders } from "@/lib/placeholders";
 
 interface Props {
   open: boolean;
