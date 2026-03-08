@@ -22,6 +22,7 @@ import CalendarPage from "./pages/CalendarPage";
 import SettingsPage from "./pages/SettingsPage";
 import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
+import ReportsPage from "./pages/ReportsPage";
 
 const queryClient = new QueryClient();
 
