@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Trash2, Pencil, XCircle, Mail, Phone, MessageCircle, Eye, Zap, Power } from "lucide-react";
+import { Plus, Trash2, Pencil, XCircle, Mail, Phone, MessageCircle, Eye, Zap, Power, Send, Loader2 } from "lucide-react";
 import { useMessageTemplates, useDeleteTemplate, useScheduledMessages, useCancelScheduledMessage } from "@/hooks/useMessages";
 import type { MessageTemplate } from "@/hooks/useMessages";
 import MessageTemplateDialog from "@/components/MessageTemplateDialog";
