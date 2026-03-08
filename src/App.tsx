@@ -41,6 +41,10 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/pending" element={<PendingApproval />} />
+            <Route path="/portal/login" element={<PortalLogin />} />
+            <Route path="/portal" element={<PortalLayout />}>
+              <Route index element={<PortalDashboard />} />
+            </Route>
             <Route path="/rejected" element={<RejectedPage />} />
             <Route
               element={
