@@ -140,15 +140,35 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const validateAndSetFile = useCallback((file: File) => {
     if (file.size > 20 * 1024 * 1024) {
-      toast({ title: "Arquivo muito grande", description: "Máximo de 20MB", variant: "destructive" });
+      toast({ title: t("documents.tooLarge"), description: t("documents.maxSize"), variant: "destructive" });
       return;
     }
     setSelectedFile(file);
+  }, [toast, t]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) validateAndSetFile(file);
   };
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) validateAndSetFile(file);
+  }, [validateAndSetFile]);
 
   const isPending = createPermit.isPending || updatePermit.isPending || uploading;
 
