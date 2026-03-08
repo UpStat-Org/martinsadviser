@@ -64,10 +64,10 @@ export default function Dashboard() {
 
   const msgChartData = useMemo(() => {
     return [
-      { name: t("common.sent"), value: msgStats.sent, fill: "hsl(152, 60%, 40%)" },
-      { name: t("common.pending"), value: msgStats.pending, fill: "hsl(38, 92%, 50%)" },
-      { name: t("common.failed"), value: msgStats.failed, fill: "hsl(0, 72%, 51%)" },
-      { name: t("common.cancelled"), value: msgStats.cancelled, fill: "hsl(220, 16%, 60%)" },
+      { name: t("common.sent"), value: msgStats.sent, fill: "hsl(var(--chart-2))" },
+      { name: t("common.pending"), value: msgStats.pending, fill: "hsl(var(--chart-3))" },
+      { name: t("common.failed"), value: msgStats.failed, fill: "hsl(var(--chart-4))" },
+      { name: t("common.cancelled"), value: msgStats.cancelled, fill: "hsl(var(--border))" },
     ].filter(d => d.value > 0);
   }, [msgStats, t]);
 
@@ -85,43 +85,51 @@ export default function Dashboard() {
   }, [permits]);
 
   const expirationChartData = useMemo(() => [
-    { name: t("dashboard.expired"), count: metrics.expired, fill: "hsl(0, 72%, 51%)" },
-    { name: "≤30d", count: metrics.in30, fill: "hsl(38, 92%, 50%)" },
-    { name: "≤60d", count: metrics.in60, fill: "hsl(38, 70%, 60%)" },
-    { name: "≤90d", count: metrics.in90, fill: "hsl(220, 16%, 60%)" },
-    { name: ">90d", count: metrics.active, fill: "hsl(152, 60%, 40%)" },
+    { name: t("dashboard.expired"), count: metrics.expired, fill: "hsl(var(--chart-4))" },
+    { name: "≤30d", count: metrics.in30, fill: "hsl(var(--chart-3))" },
+    { name: "≤60d", count: metrics.in60, fill: "hsl(var(--chart-3) / 0.6)" },
+    { name: "≤90d", count: metrics.in90, fill: "hsl(var(--border))" },
+    { name: ">90d", count: metrics.active, fill: "hsl(var(--chart-2))" },
   ], [metrics, t]);
 
   const PIE_COLORS = [
-    "hsl(215, 80%, 48%)", "hsl(152, 60%, 40%)", "hsl(38, 92%, 50%)",
-    "hsl(0, 72%, 51%)", "hsl(280, 60%, 50%)", "hsl(180, 60%, 40%)",
+    "hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))", "hsl(var(--chart-5))", "hsl(158, 55%, 42%)",
     "hsl(320, 60%, 50%)", "hsl(60, 70%, 45%)",
   ];
 
   const isLoading = loadingClients || loadingTrucks || loadingPermits;
 
   const stats = [
-    { label: t("dashboard.clients"), value: clients?.length ?? 0, icon: Users, color: "text-primary", onClick: () => navigate("/clients") },
-    { label: t("dashboard.trucks"), value: trucks?.length ?? 0, icon: Truck, color: "text-primary", onClick: () => navigate("/trucks") },
-    { label: t("dashboard.activePermits"), value: metrics.active + metrics.in90 + metrics.in60, icon: FileCheck, color: "text-success", onClick: () => navigate("/permits") },
-    { label: t("dashboard.expiring30d"), value: metrics.in30, icon: AlertTriangle, color: "text-warning", onClick: () => navigate("/permits") },
-    { label: t("dashboard.emailsSent"), value: msgStats.sent, icon: Send, color: "text-primary", onClick: () => navigate("/messages") },
-    { label: t("dashboard.pendingMsgs"), value: msgStats.pending, icon: Mail, color: "text-accent-foreground", onClick: () => navigate("/messages") },
+    { label: t("dashboard.clients"), value: clients?.length ?? 0, icon: Users, bgColor: "bg-primary/8", iconColor: "text-primary", onClick: () => navigate("/clients") },
+    { label: t("dashboard.trucks"), value: trucks?.length ?? 0, icon: Truck, bgColor: "bg-primary/8", iconColor: "text-primary", onClick: () => navigate("/trucks") },
+    { label: t("dashboard.activePermits"), value: metrics.active + metrics.in90 + metrics.in60, icon: FileCheck, bgColor: "bg-success/8", iconColor: "text-success", onClick: () => navigate("/permits") },
+    { label: t("dashboard.expiring30d"), value: metrics.in30, icon: AlertTriangle, bgColor: "bg-warning/8", iconColor: "text-warning", onClick: () => navigate("/permits") },
+    { label: t("dashboard.emailsSent"), value: msgStats.sent, icon: Send, bgColor: "bg-primary/8", iconColor: "text-primary", onClick: () => navigate("/messages") },
+    { label: t("dashboard.pendingMsgs"), value: msgStats.pending, icon: Mail, bgColor: "bg-accent/8", iconColor: "text-accent-foreground", onClick: () => navigate("/messages") },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       <div>
         <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">{t("dashboard.title")}</h1>
         <p className="text-muted-foreground mt-1">{t("dashboard.subtitle")}</p>
       </div>
 
+      {/* Metric cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
-        {stats.map((stat) => (
-          <Card key={stat.label} className="cursor-pointer hover:shadow-md transition-shadow" onClick={stat.onClick}>
+        {stats.map((stat, i) => (
+          <Card
+            key={stat.label}
+            className="cursor-pointer hover:shadow-soft-md hover:-translate-y-0.5 transition-all duration-200"
+            onClick={stat.onClick}
+            style={{ animationDelay: `${i * 50}ms` }}
+          >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
-              <stat.icon className={`w-5 h-5 ${stat.color}`} />
+              <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</CardTitle>
+              <div className={`w-9 h-9 rounded-lg ${stat.bgColor} flex items-center justify-center`}>
+                <stat.icon className={`w-4 h-4 ${stat.iconColor}`} />
+              </div>
             </CardHeader>
             <CardContent>
               {isLoading || loadingMsgs ? <Skeleton className="h-9 w-16" /> : <div className="text-3xl font-display font-bold">{stat.value}</div>}
@@ -130,11 +138,14 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="font-display text-lg flex items-center gap-2">
-              <Clock className="w-5 h-5 text-muted-foreground" />
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-base flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-warning/10 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-warning" />
+              </div>
               {t("dashboard.expirations")}
             </CardTitle>
           </CardHeader>
@@ -146,11 +157,11 @@ export default function Dashboard() {
             ) : (
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={expirationChartData} layout="vertical" margin={{ left: 10, right: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
                   <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12 }} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={55} />
                   <Tooltip formatter={(value: number) => [value, "Permits"]} />
-                  <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                  <Bar dataKey="count" radius={[0, 6, 6, 0]}>
                     {expirationChartData.map((entry, i) => (
                       <Cell key={i} fill={entry.fill} />
                     ))}
@@ -162,9 +173,11 @@ export default function Dashboard() {
         </Card>
 
         <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="font-display text-lg flex items-center gap-2">
-              <FileCheck className="w-5 h-5 text-muted-foreground" />
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-base flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <FileCheck className="w-4 h-4 text-primary" />
+              </div>
               {t("dashboard.permitsByType")}
             </CardTitle>
           </CardHeader>
@@ -199,9 +212,11 @@ export default function Dashboard() {
         </Card>
 
         <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="font-display text-lg flex items-center gap-2">
-              <Mail className="w-5 h-5 text-muted-foreground" />
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-base flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
+                <Mail className="w-4 h-4 text-success" />
+              </div>
               {t("dashboard.messages")}
             </CardTitle>
           </CardHeader>
@@ -236,10 +251,13 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {/* Expiration summary */}
       <Card>
-        <CardHeader>
-          <CardTitle className="font-display text-lg flex items-center gap-2">
-            <Clock className="w-5 h-5 text-muted-foreground" />
+        <CardHeader className="pb-3">
+          <CardTitle className="font-display text-base flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+              <Clock className="w-4 h-4 text-muted-foreground" />
+            </div>
             {t("dashboard.expirationSummary")}
           </CardTitle>
         </CardHeader>
@@ -268,11 +286,14 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
+      {/* Urgent permits & Recent clients */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-display text-lg flex items-center gap-2">
-              <ShieldAlert className="w-5 h-5 text-destructive" />
+        <Card className="border-l-4 border-l-destructive">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-base flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                <ShieldAlert className="w-4 h-4 text-destructive" />
+              </div>
               {t("dashboard.urgentPermits")}
             </CardTitle>
           </CardHeader>
@@ -286,7 +307,7 @@ export default function Dashboard() {
                 {urgentPermits.map((p) => {
                   const status = getExpirationStatus(p.expiration_date);
                   return (
-                    <div key={p.id} className="flex items-center justify-between p-2 rounded-lg border">
+                    <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50 hover:bg-muted/60 transition-colors">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-sm font-medium">{(p as any).clients?.company_name ?? "—"}</span>
                         <span className="text-xs text-muted-foreground">{p.permit_type} {p.state ? `• ${p.state}` : ""}</span>
@@ -306,8 +327,13 @@ export default function Dashboard() {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="font-display text-lg">{t("dashboard.recentClients")}</CardTitle>
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-base flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Users className="w-4 h-4 text-primary" />
+              </div>
+              {t("dashboard.recentClients")}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -319,7 +345,7 @@ export default function Dashboard() {
                 {clients.slice(0, 6).map((c) => (
                   <div
                     key={c.id}
-                    className="flex items-center justify-between p-2 rounded-lg border cursor-pointer hover:bg-accent/50 transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50 cursor-pointer hover:bg-muted/60 transition-colors"
                     onClick={() => navigate(`/clients/${c.id}`)}
                   >
                     <div>
@@ -335,10 +361,13 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {/* Map */}
       <Card>
-        <CardHeader>
-          <CardTitle className="font-display text-lg flex items-center gap-2">
-            <Map className="w-5 h-5 text-muted-foreground" />
+        <CardHeader className="pb-3">
+          <CardTitle className="font-display text-base flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Map className="w-4 h-4 text-primary" />
+            </div>
             {t("map.title")}
           </CardTitle>
         </CardHeader>
