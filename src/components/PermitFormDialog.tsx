@@ -192,7 +192,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
                       <SelectTrigger><SelectValue placeholder="Selecione o caminhão" /></SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Nenhum</SelectItem>
+                      <SelectItem value="none">Nenhum</SelectItem>
                       {trucks?.map((t) => (
                         <SelectItem key={t.id} value={t.id}>{t.plate} {t.make ? `- ${t.make} ${t.model || ""}` : ""}</SelectItem>
                       ))}
