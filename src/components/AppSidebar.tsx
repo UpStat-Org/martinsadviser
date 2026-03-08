@@ -34,6 +34,7 @@ export function AppSidebar() {
     { to: "/reports", icon: BarChart3, label: t("nav.reports") },
     { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
     { to: "/finance", icon: DollarSign, label: t("nav.finance") },
+    { to: "/docs", icon: BookOpen, label: t("nav.docs") },
   ];
 
   const handleLogout = async () => {

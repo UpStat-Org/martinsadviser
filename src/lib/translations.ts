@@ -1282,6 +1282,13 @@ const translations: Record<Language, Record<string, string>> = {
     "map.expired": "Vencidos",
     "map.noCoverage": "Sin cobertura",
     "map.statesCovered": "estados cubiertos",
+
+    // Docs
+    "nav.docs": "Documentación",
+    "docs.title": "Documentación",
+    "docs.subtitle": "Tutorial completo del sistema — aprenda a usar cada funcionalidad",
+    "docs.welcomeTitle": "Bienvenido a la Documentación",
+    "docs.welcomeDesc": "Aquí encontrará tutoriales detallados de todas las páginas y funcionalidades del sistema. Haga clic en cada sección para expandir y ver el paso a paso.",
   },
 };
 
