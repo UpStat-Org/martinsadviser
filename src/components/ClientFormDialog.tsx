@@ -28,6 +28,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateClient, useUpdateClient, type Client } from "@/hooks/useClients";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Loader2, Search } from "lucide-react";
 
 const formSchema = z.object({
   company_name: z.string().min(1, "Nome da empresa é obrigatório"),
@@ -65,9 +68,42 @@ interface ClientFormDialogProps {
 }
 
 export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialogProps) {
+  const [lookingUp, setLookingUp] = useState(false);
   const createClient = useCreateClient();
   const updateClient = useUpdateClient();
   const isEditing = !!client;
+
+  const handleDotLookup = async () => {
+    const dotValue = form.getValues("dot");
+    if (!dotValue?.trim()) {
+      toast.error("Digite o número DOT primeiro");
+      return;
+    }
+    setLookingUp(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("fmcsa-lookup", {
+        body: { dot_number: dotValue.trim() },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      // Auto-fill fields
+      if (data.company_name) form.setValue("company_name", data.company_name);
+      if (data.phone) form.setValue("phone", data.phone);
+      if (data.address) form.setValue("address", data.address);
+      if (data.mc) form.setValue("mc", data.mc);
+      if (data.ein) form.setValue("ein", data.ein);
+      if (data.dot) form.setValue("dot", data.dot);
+
+      toast.success("Dados FMCSA importados!", {
+        description: `${data.company_name} — ${data.totalPowerUnits || 0} veículos, ${data.totalDrivers || 0} motoristas`,
+      });
+    } catch (err: any) {
+      toast.error("Erro ao buscar DOT", { description: err.message });
+    } finally {
+      setLookingUp(false);
+    }
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -227,9 +263,21 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>DOT #</FormLabel>
-                    <FormControl>
-                      <Input placeholder="USDOT Number" {...field} />
-                    </FormControl>
+                    <div className="flex gap-2">
+                      <FormControl>
+                        <Input placeholder="USDOT Number" {...field} />
+                      </FormControl>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={handleDotLookup}
+                        disabled={lookingUp}
+                        title="Buscar dados FMCSA"
+                      >
+                        {lookingUp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
