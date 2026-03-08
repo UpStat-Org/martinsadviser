@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Truck, FileCheck, AlertTriangle, Clock, ShieldAlert, Mail, Send, XCircle } from "lucide-react";
+import { Users, Truck, FileCheck, AlertTriangle, Clock, ShieldAlert, Mail, Send, XCircle, Map } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
 import { usePermits, getExpirationStatus } from "@/hooks/usePermits";
 import { useTrucks } from "@/hooks/useTrucks";
