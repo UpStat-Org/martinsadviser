@@ -235,6 +235,10 @@ const translations: Record<Language, Record<string, string>> = {
     "login.noAccount": "Não tem conta?",
     "login.requestAccess": "Solicitar acesso",
     "login.error": "Erro ao entrar",
+    "login.brandingHeadline": "Gerencie seus permits\ncom inteligência",
+    "login.brandingSubtitle": "Plataforma completa para gestão de permits, clientes e compliance no transporte rodoviário.",
+    "signup.brandingHeadline": "Comece a organizar\nsua operação",
+    "signup.brandingSubtitle": "Crie sua conta e tenha acesso à gestão completa de permits, compliance e comunicação.",
 
     // Signup
     "signup.title": "Solicitar Acesso",
