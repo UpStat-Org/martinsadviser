@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { pt, enUS, es } from "date-fns/locale";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { PermitCoverageMap } from "@/components/PermitCoverageMap";
 
 const dateLocales = { pt, en: enUS, es };
 
