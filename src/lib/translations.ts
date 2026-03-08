@@ -760,6 +760,16 @@ const translations: Record<Language, Record<string, string>> = {
     "documents.noPreview": "Vista previa no disponible para este tipo de archivo.",
     "documents.uploadError": "Error al subir archivo",
     "documents.tooLarge": "Archivo muy grande",
+
+    "activity.title": "Historial de Actividades",
+    "activity.empty": "Ninguna actividad registrada aún.",
+    "activity.entity.permit": "Permiso",
+    "activity.entity.truck": "Camión",
+    "activity.entity.client": "Cliente",
+    "activity.entity.message": "Mensaje",
+    "activity.action.created": "Creó",
+    "activity.action.updated": "Actualizó",
+    "activity.action.deleted": "Eliminó",
   },
 };
 
