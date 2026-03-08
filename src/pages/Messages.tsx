@@ -68,7 +68,10 @@ export default function Messages() {
     try {
       const { data, error } = await supabase.functions.invoke("send-emails");
       if (error) throw error;
-      toast({ title: t("messages.sendComplete"), description: `${data?.sent || 0} email(s), ${data?.failed || 0} ${t("common.failed").toLowerCase()}.` });
+      toast({
+        title: t("messages.sendComplete"),
+        description: `${data?.sent || 0} ${t("common.sent").toLowerCase()}, ${data?.failed || 0} ${t("common.failed").toLowerCase()}.${data?.errors?.length ? `\n${data.errors.join("\n")}` : ""}`
+      });
     } catch (e: any) {
       toast({ title: t("messages.sendError"), description: e.message, variant: "destructive" });
     } finally {
