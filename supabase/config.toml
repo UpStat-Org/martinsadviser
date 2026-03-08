@@ -1,1 +1,4 @@
 project_id = "zidfrlzgftaqhnvedpnm"
+
+[functions.create-portal-user]
+verify_jwt = false
