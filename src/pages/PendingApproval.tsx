@@ -3,10 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 export default function PendingApproval() {
   const { t } = useLanguage();
-  const handleLogout = async () => { await supabase.auth.signOut(); };
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
