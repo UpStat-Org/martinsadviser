@@ -19,6 +19,8 @@ export default function Permits() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPermit, setEditingPermit] = useState<Permit | null>(null);
+  const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
+  const [viewDocTitle, setViewDocTitle] = useState("");
   const { data: permits, isLoading } = usePermits(search || undefined, undefined, statusFilter);
   const deletePermit = useDeletePermit();
   const { t } = useLanguage();
