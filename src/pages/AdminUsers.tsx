@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Check, X, Loader2, Users, ShieldCheck } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Check, X, Loader2, Users, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -17,6 +18,7 @@ export default function AdminUsers() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { t, language } = useLanguage();
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
 
   const statusMap: Record<string, { label: string; className: string }> = {
     pending: { label: t("common.pending"), className: "bg-warning text-warning-foreground" },
@@ -55,9 +57,7 @@ export default function AdminUsers() {
 
   const setRole = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      // Delete existing roles
       await supabase.from("user_roles").delete().eq("user_id", userId);
-      // Insert new role
       const { error } = await supabase.from("user_roles").insert({ user_id: userId, role } as any);
       if (error) throw error;
     },
@@ -66,6 +66,27 @@ export default function AdminUsers() {
       toast({ title: t("admin.roleUpdated") });
     },
     onError: (error: any) => { toast({ title: "Error", description: error.message, variant: "destructive" }); },
+  });
+
+  const deleteUser = useMutation({
+    mutationFn: async (userId: string) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke("delete-user", {
+        body: { user_id: userId },
+      });
+      if (res.error) throw res.error;
+      if (res.data?.error) throw new Error(res.data.error);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-user-roles"] });
+      toast({ title: t("admin.userDeleted") });
+      setDeleteUserId(null);
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+      setDeleteUserId(null);
+    },
   });
 
   const getUserRole = (userId: string) => {
@@ -89,7 +110,7 @@ export default function AdminUsers() {
       ) : !profiles?.length ? (
         <Card><CardContent className="p-12 text-center"><Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" /><p className="text-muted-foreground">{t("admin.noRequests")}</p></CardContent></Card>
       ) : (
-        <Card><Table>
+        <Card className="overflow-x-auto"><Table>
           <TableHeader><TableRow>
             <TableHead>{t("admin.name")}</TableHead>
             <TableHead>{t("login.email")}</TableHead>
@@ -133,6 +154,9 @@ export default function AdminUsers() {
                           <X className="w-4 h-4 mr-1" />{t("admin.reject")}
                         </Button>
                       )}
+                      <Button size="sm" variant="destructive" onClick={() => setDeleteUserId(profile.id)} disabled={deleteUser.isPending}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -141,6 +165,26 @@ export default function AdminUsers() {
           </TableBody>
         </Table></Card>
       )}
+
+      <AlertDialog open={!!deleteUserId} onOpenChange={(open) => !open && setDeleteUserId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("admin.deleteUser")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("admin.deleteUserConfirm")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteUserId && deleteUser.mutate(deleteUserId)}
+              disabled={deleteUser.isPending}
+            >
+              {deleteUser.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+              {t("admin.deleteUser")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
