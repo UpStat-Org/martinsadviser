@@ -268,6 +268,7 @@ export default function Messages() {
 
       <MessageTemplateDialog open={templateOpen} onOpenChange={setTemplateOpen} template={editTemplate} />
       <ScheduleMessageDialog open={scheduleOpen} onOpenChange={setScheduleOpen} />
+      <AutomationRuleDialog open={automationOpen} onOpenChange={setAutomationOpen} rule={editRule} />
 
       {/* Preview Dialog */}
       <Dialog open={!!previewMsg} onOpenChange={() => setPreviewMsg(null)}>
