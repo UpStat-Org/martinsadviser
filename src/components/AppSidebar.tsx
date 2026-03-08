@@ -31,6 +31,7 @@ export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
