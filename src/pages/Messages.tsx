@@ -6,11 +6,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Trash2, Pencil, XCircle, Mail, Phone, MessageCircle } from "lucide-react";
+import { Plus, Trash2, Pencil, XCircle, Mail, Phone, MessageCircle, Eye } from "lucide-react";
 import { useMessageTemplates, useDeleteTemplate, useScheduledMessages, useCancelScheduledMessage } from "@/hooks/useMessages";
 import type { MessageTemplate } from "@/hooks/useMessages";
 import MessageTemplateDialog from "@/components/MessageTemplateDialog";
 import ScheduleMessageDialog from "@/components/ScheduleMessageDialog";
+import { replacePlaceholders } from "@/lib/placeholders";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import type { ScheduledMessage } from "@/hooks/useMessages";
 
 const channelIcon = (ch: string) => {
   if (ch === "whatsapp") return <MessageCircle className="w-4 h-4 text-primary" />;
@@ -33,6 +36,7 @@ export default function Messages() {
   const [templateOpen, setTemplateOpen] = useState(false);
   const [editTemplate, setEditTemplate] = useState<MessageTemplate | null>(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [previewMsg, setPreviewMsg] = useState<ScheduledMessage | null>(null);
 
   const { data: templates, isLoading: loadingT } = useMessageTemplates();
   const deleteTemplate = useDeleteTemplate();
@@ -93,13 +97,18 @@ export default function Messages() {
                     <TableRow key={m.id}>
                       <TableCell className="font-medium">{(m as any).clients?.company_name || "—"}</TableCell>
                       <TableCell><div className="flex items-center gap-1">{channelIcon(m.channel)} {m.channel}</div></TableCell>
-                      <TableCell className="max-w-[200px] truncate">{m.body}</TableCell>
+                      <TableCell className="max-w-[200px] truncate">{replacePlaceholders(m.body, m.clients)}</TableCell>
                       <TableCell>{format(new Date(m.scheduled_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</TableCell>
                       <TableCell>{statusBadge(m.status)}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" onClick={() => cancelMsg.mutate(m.id)} title="Cancelar">
-                          <XCircle className="w-4 h-4 text-destructive" />
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => setPreviewMsg(m)} title="Visualizar">
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => cancelMsg.mutate(m.id)} title="Cancelar">
+                            <XCircle className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -132,7 +141,7 @@ export default function Messages() {
                     <TableRow key={m.id}>
                       <TableCell className="font-medium">{(m as any).clients?.company_name || "—"}</TableCell>
                       <TableCell><div className="flex items-center gap-1">{channelIcon(m.channel)} {m.channel}</div></TableCell>
-                      <TableCell className="max-w-[200px] truncate">{m.body}</TableCell>
+                      <TableCell className="max-w-[200px] truncate">{replacePlaceholders(m.body, m.clients)}</TableCell>
                       <TableCell>{m.sent_at ? format(new Date(m.sent_at), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "—"}</TableCell>
                       <TableCell>{statusBadge(m.status)}</TableCell>
                     </TableRow>
@@ -190,6 +199,40 @@ export default function Messages() {
 
       <MessageTemplateDialog open={templateOpen} onOpenChange={setTemplateOpen} template={editTemplate} />
       <ScheduleMessageDialog open={scheduleOpen} onOpenChange={setScheduleOpen} />
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewMsg} onOpenChange={() => setPreviewMsg(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Pré-visualização da Mensagem</DialogTitle>
+          </DialogHeader>
+          {previewMsg && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                {channelIcon(previewMsg.channel)}
+                <span className="capitalize">{previewMsg.channel}</span>
+                <span>•</span>
+                <span>{previewMsg.clients?.company_name || "—"}</span>
+              </div>
+              {previewMsg.subject && (
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">Assunto</p>
+                  <p className="text-sm font-medium">{replacePlaceholders(previewMsg.subject, previewMsg.clients)}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-xs font-medium text-muted-foreground">Mensagem</p>
+                <p className="text-sm whitespace-pre-wrap rounded-md border bg-muted/50 p-3">
+                  {replacePlaceholders(previewMsg.body, previewMsg.clients)}
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Agendada para: {format(new Date(previewMsg.scheduled_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+              </p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

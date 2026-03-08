@@ -12,6 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useClients } from "@/hooks/useClients";
 import { useMessageTemplates, useCreateScheduledMessage } from "@/hooks/useMessages";
+import { replacePlaceholders } from "@/lib/placeholders";
 
 interface Props {
   open: boolean;
@@ -30,6 +31,7 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
   const { data: clients } = useClients();
   const { data: templates } = useMessageTemplates();
   const create = useCreateScheduledMessage();
+  const selectedClient = clients?.find((c) => c.id === clientId) || null;
 
   useEffect(() => {
     if (!open) {
@@ -120,6 +122,16 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
             <Label>Mensagem</Label>
             <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={4} />
           </div>
+
+          {/* Live preview */}
+          {body && clientId && (
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Pré-visualização</Label>
+              <div className="rounded-md border bg-muted/50 p-3 text-sm whitespace-pre-wrap">
+                {replacePlaceholders(body, selectedClient)}
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

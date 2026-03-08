@@ -26,7 +26,7 @@ export interface ScheduledMessage {
   status: string;
   sent_at: string | null;
   created_at: string;
-  clients?: { company_name: string } | null;
+  clients?: { company_name: string; dot?: string | null; mc?: string | null; ein?: string | null; email?: string | null; phone?: string | null } | null;
 }
 
 // ---- Templates ----
@@ -105,7 +105,7 @@ export function useScheduledMessages(status?: string) {
     queryFn: async () => {
       let query = supabase
         .from("scheduled_messages")
-        .select("*, clients(company_name)")
+        .select("*, clients(company_name, dot, mc, ein, email, phone)")
         .order("scheduled_at", { ascending: true });
       if (status) query = query.eq("status", status);
       const { data, error } = await query;
