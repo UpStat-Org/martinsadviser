@@ -10,7 +10,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Search, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Truck as TruckIcon } from "lucide-react";
 import { useTrucks, useDeleteTruck } from "@/hooks/useTrucks";
 import { TruckFormDialog } from "@/components/TruckFormDialog";
 import type { Truck } from "@/hooks/useTrucks";
@@ -28,7 +28,7 @@ export default function Trucks() {
   const handleNew = () => { setEditingTruck(null); setDialogOpen(true); };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">{t("trucks.title")}</h1>
@@ -40,44 +40,47 @@ export default function Trucks() {
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder={t("trucks.search")} className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input placeholder={t("trucks.search")} className="pl-10 bg-muted/30 border-border/60 focus:bg-background transition-colors" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
       ) : !trucks?.length ? (
-        <Card>
+        <Card className="shadow-soft">
           <CardContent className="p-12 text-center">
-            <p className="text-muted-foreground">{t("trucks.empty")}</p>
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+              <TruckIcon className="w-7 h-7 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground text-lg">{t("trucks.empty")}</p>
             <Button variant="outline" className="mt-4" onClick={handleNew}><Plus className="w-4 h-4 mr-2" />{t("trucks.registerFirst")}</Button>
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="overflow-hidden">
           <CardContent className="p-0">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>{t("trucks.plate")}</TableHead>
-                  <TableHead>{t("common.client")}</TableHead>
-                  <TableHead>{t("trucks.makeModel")}</TableHead>
-                  <TableHead>{t("trucks.year")}</TableHead>
-                  <TableHead>VIN</TableHead>
-                  <TableHead>{t("clients.status")}</TableHead>
-                  <TableHead className="w-24">{t("common.actions")}</TableHead>
+                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                  <TableHead className="font-semibold">{t("trucks.plate")}</TableHead>
+                  <TableHead className="font-semibold">{t("common.client")}</TableHead>
+                  <TableHead className="font-semibold">{t("trucks.makeModel")}</TableHead>
+                  <TableHead className="font-semibold">{t("trucks.year")}</TableHead>
+                  <TableHead className="font-semibold">VIN</TableHead>
+                  <TableHead className="font-semibold">{t("clients.status")}</TableHead>
+                  <TableHead className="w-24 font-semibold">{t("common.actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {trucks.map((truck) => (
-                  <TableRow key={truck.id}>
+                  <TableRow key={truck.id} className="hover:bg-muted/40 transition-colors">
                     <TableCell className="font-medium">{truck.plate}</TableCell>
                     <TableCell>{(truck as any).clients?.company_name || "—"}</TableCell>
                     <TableCell>{[truck.make, truck.model].filter(Boolean).join(" ") || "—"}</TableCell>
                     <TableCell>{truck.year || "—"}</TableCell>
-                    <TableCell className="text-xs font-mono">{truck.vin || "—"}</TableCell>
+                    <TableCell className="text-xs font-mono text-muted-foreground">{truck.vin || "—"}</TableCell>
                     <TableCell>
-                      <Badge className={truck.status === "active" ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}>
+                      <Badge variant="outline" className={truck.status === "active" ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground"}>
                         {truck.status === "active" ? t("common.active") : t("common.inactive")}
                       </Badge>
                     </TableCell>

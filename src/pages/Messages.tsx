@@ -24,7 +24,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const dateLocales = { pt: ptBR, en: enUS, es };
 
 const channelIcon = (ch: string) => {
-  if (ch === "whatsapp") return <MessageCircle className="w-4 h-4 text-primary" />;
+  if (ch === "whatsapp") return <MessageCircle className="w-4 h-4 text-success" />;
   if (ch === "sms") return <Phone className="w-4 h-4 text-primary" />;
   return <Mail className="w-4 h-4 text-accent-foreground" />;
 };
@@ -53,14 +53,14 @@ export default function Messages() {
   const sentAndFailed = sentMsgs?.filter((m) => m.status === "sent" || m.status === "failed") || [];
 
   const statusBadge = (s: string) => {
-    const map: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-      pending: { label: t("common.pending"), variant: "secondary" },
-      sent: { label: t("common.sent"), variant: "default" },
-      failed: { label: t("common.failed"), variant: "destructive" },
-      cancelled: { label: t("common.cancelled"), variant: "outline" },
+    const map: Record<string, { label: string; className: string }> = {
+      pending: { label: t("common.pending"), className: "bg-warning/10 text-warning border-warning/20" },
+      sent: { label: t("common.sent"), className: "bg-success/10 text-success border-success/20" },
+      failed: { label: t("common.failed"), className: "bg-destructive/10 text-destructive border-destructive/20" },
+      cancelled: { label: t("common.cancelled"), className: "bg-muted text-muted-foreground" },
     };
-    const m = map[s] || { label: s, variant: "outline" as const };
-    return <Badge variant={m.variant}>{m.label}</Badge>;
+    const m = map[s] || { label: s, className: "" };
+    return <Badge variant="outline" className={m.className}>{m.label}</Badge>;
   };
 
   const handleSendNow = async () => {
@@ -80,7 +80,7 @@ export default function Messages() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">{t("messages.title")}</h1>
@@ -98,7 +98,7 @@ export default function Messages() {
       </div>
 
       <Tabs defaultValue="scheduled">
-        <TabsList>
+        <TabsList className="bg-muted/50">
           <TabsTrigger value="scheduled">{t("messages.scheduled")}{pendingMsgs?.length ? ` (${pendingMsgs.length})` : ""}</TabsTrigger>
           <TabsTrigger value="sent">{t("messages.sentTab")}</TabsTrigger>
           <TabsTrigger value="automations"><Zap className="w-4 h-4 mr-1" />{t("messages.automations")}{rules?.filter(r => r.enabled).length ? ` (${rules.filter(r => r.enabled).length})` : ""}</TabsTrigger>
@@ -109,27 +109,30 @@ export default function Messages() {
           {loadingP ? (
             <Card><CardContent className="p-12 text-center text-muted-foreground">{t("common.loading")}</CardContent></Card>
           ) : !pendingMsgs?.length ? (
-            <Card><CardContent className="p-12 text-center">
-              <p className="text-muted-foreground">{t("messages.noScheduled")}</p>
+            <Card className="shadow-soft"><CardContent className="p-12 text-center">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-7 h-7 text-muted-foreground" />
+              </div>
+              <p className="text-muted-foreground text-lg">{t("messages.noScheduled")}</p>
               <Button variant="outline" className="mt-4" onClick={() => setScheduleOpen(true)}><Plus className="w-4 h-4 mr-2" />{t("messages.schedule")}</Button>
             </CardContent></Card>
           ) : (
-            <Card><Table>
-              <TableHeader><TableRow>
-                <TableHead>{t("common.client")}</TableHead>
-                <TableHead>{t("messages.channel")}</TableHead>
-                <TableHead>{t("messages.message")}</TableHead>
-                <TableHead>{t("messages.scheduledFor")}</TableHead>
-                <TableHead>{t("clients.status")}</TableHead>
+            <Card className="overflow-hidden"><Table>
+              <TableHeader><TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableHead className="font-semibold">{t("common.client")}</TableHead>
+                <TableHead className="font-semibold">{t("messages.channel")}</TableHead>
+                <TableHead className="font-semibold">{t("messages.message")}</TableHead>
+                <TableHead className="font-semibold">{t("messages.scheduledFor")}</TableHead>
+                <TableHead className="font-semibold">{t("clients.status")}</TableHead>
                 <TableHead className="w-10" />
               </TableRow></TableHeader>
               <TableBody>
                 {pendingMsgs.map((m) => (
-                  <TableRow key={m.id}>
+                  <TableRow key={m.id} className="hover:bg-muted/40 transition-colors">
                     <TableCell className="font-medium">{(m as any).clients?.company_name || "—"}</TableCell>
-                    <TableCell><div className="flex items-center gap-1">{channelIcon(m.channel)} {m.channel}</div></TableCell>
-                    <TableCell className="max-w-[200px] truncate">{replacePlaceholders(m.body, m.clients)}</TableCell>
-                    <TableCell>{format(new Date(m.scheduled_at), "dd/MM/yyyy HH:mm", { locale })}</TableCell>
+                    <TableCell><div className="flex items-center gap-1.5">{channelIcon(m.channel)} <span className="capitalize">{m.channel}</span></div></TableCell>
+                    <TableCell className="max-w-[200px] truncate text-muted-foreground">{replacePlaceholders(m.body, m.clients)}</TableCell>
+                    <TableCell className="text-muted-foreground">{format(new Date(m.scheduled_at), "dd/MM/yyyy HH:mm", { locale })}</TableCell>
                     <TableCell>{statusBadge(m.status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
@@ -159,21 +162,21 @@ export default function Messages() {
           ) : !sentAndFailed.length ? (
             <Card><CardContent className="p-12 text-center text-muted-foreground">{t("messages.noSent")}</CardContent></Card>
           ) : (
-            <Card><Table>
-              <TableHeader><TableRow>
-                <TableHead>{t("common.client")}</TableHead>
-                <TableHead>{t("messages.channel")}</TableHead>
-                <TableHead>{t("messages.message")}</TableHead>
-                <TableHead>{t("messages.sentAt")}</TableHead>
-                <TableHead>{t("clients.status")}</TableHead>
+            <Card className="overflow-hidden"><Table>
+              <TableHeader><TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableHead className="font-semibold">{t("common.client")}</TableHead>
+                <TableHead className="font-semibold">{t("messages.channel")}</TableHead>
+                <TableHead className="font-semibold">{t("messages.message")}</TableHead>
+                <TableHead className="font-semibold">{t("messages.sentAt")}</TableHead>
+                <TableHead className="font-semibold">{t("clients.status")}</TableHead>
               </TableRow></TableHeader>
               <TableBody>
                 {sentAndFailed.map((m) => (
-                  <TableRow key={m.id}>
+                  <TableRow key={m.id} className="hover:bg-muted/40 transition-colors">
                     <TableCell className="font-medium">{(m as any).clients?.company_name || "—"}</TableCell>
-                    <TableCell><div className="flex items-center gap-1">{channelIcon(m.channel)} {m.channel}</div></TableCell>
-                    <TableCell className="max-w-[200px] truncate">{replacePlaceholders(m.body, m.clients)}</TableCell>
-                    <TableCell>{m.sent_at ? format(new Date(m.sent_at), "dd/MM/yyyy HH:mm", { locale }) : "—"}</TableCell>
+                    <TableCell><div className="flex items-center gap-1.5">{channelIcon(m.channel)} <span className="capitalize">{m.channel}</span></div></TableCell>
+                    <TableCell className="max-w-[200px] truncate text-muted-foreground">{replacePlaceholders(m.body, m.clients)}</TableCell>
+                    <TableCell className="text-muted-foreground">{m.sent_at ? format(new Date(m.sent_at), "dd/MM/yyyy HH:mm", { locale }) : "—"}</TableCell>
                     <TableCell>{statusBadge(m.status)}</TableCell>
                   </TableRow>
                 ))}
@@ -189,22 +192,30 @@ export default function Messages() {
           {loadingR ? (
             <Card><CardContent className="p-12 text-center text-muted-foreground">{t("common.loading")}</CardContent></Card>
           ) : !rules?.length ? (
-            <Card><CardContent className="p-12 text-center">
-              <p className="text-muted-foreground">{t("messages.noAutomation")}</p>
+            <Card className="shadow-soft"><CardContent className="p-12 text-center">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-7 h-7 text-muted-foreground" />
+              </div>
+              <p className="text-muted-foreground text-lg">{t("messages.noAutomation")}</p>
               <p className="text-sm text-muted-foreground mt-1">{t("messages.automationDesc")}</p>
               <Button variant="outline" className="mt-4" onClick={() => { setEditRule(null); setAutomationOpen(true); }}><Zap className="w-4 h-4 mr-2" />{t("messages.createAutomation")}</Button>
             </CardContent></Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {rules.map((r) => (
-                <Card key={r.id} className={!r.enabled ? "opacity-60" : ""}>
+                <Card key={r.id} className={`hover:shadow-soft-md transition-all ${!r.enabled ? "opacity-60" : ""}`}>
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 font-medium"><Zap className={`w-4 h-4 ${r.enabled ? "text-warning" : "text-muted-foreground"}`} />{r.name}</div>
+                      <div className="flex items-center gap-2 font-medium">
+                        <div className={`w-7 h-7 rounded-md flex items-center justify-center ${r.enabled ? "bg-warning/10" : "bg-muted"}`}>
+                          <Zap className={`w-3.5 h-3.5 ${r.enabled ? "text-warning" : "text-muted-foreground"}`} />
+                        </div>
+                        {r.name}
+                      </div>
                       <Switch checked={r.enabled} onCheckedChange={(checked) => toggleRule.mutate({ id: r.id, enabled: checked })} />
                     </div>
                     <div className="flex gap-2 flex-wrap">
-                      <Badge variant="secondary">{r.days_before} {t("messages.daysBefore")}</Badge>
+                      <Badge variant="secondary" className="font-medium">{r.days_before} {t("messages.daysBefore")}</Badge>
                       <Badge variant="outline" className="flex items-center gap-1">{channelIcon(r.channel)} {r.channel}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-2">{r.body}</p>
@@ -230,7 +241,7 @@ export default function Messages() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {templates.map((tmpl) => (
-                <Card key={tmpl.id}>
+                <Card key={tmpl.id} className="hover:shadow-soft-md transition-all">
                   <CardContent className="p-4 space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 font-medium">{channelIcon(tmpl.channel)}{tmpl.name}</div>
@@ -265,7 +276,7 @@ export default function Messages() {
               {previewMsg.subject && (
                 <div><p className="text-xs font-medium text-muted-foreground">{t("messages.subject")}</p><p className="text-sm font-medium">{replacePlaceholders(previewMsg.subject, previewMsg.clients)}</p></div>
               )}
-              <div><p className="text-xs font-medium text-muted-foreground">{t("messages.message")}</p><p className="text-sm whitespace-pre-wrap rounded-md border bg-muted/50 p-3">{replacePlaceholders(previewMsg.body, previewMsg.clients)}</p></div>
+              <div><p className="text-xs font-medium text-muted-foreground">{t("messages.message")}</p><p className="text-sm whitespace-pre-wrap rounded-lg border bg-muted/30 p-3">{replacePlaceholders(previewMsg.body, previewMsg.clients)}</p></div>
               <p className="text-xs text-muted-foreground">{t("messages.scheduledFor")}: {format(new Date(previewMsg.scheduled_at), "dd/MM/yyyy HH:mm", { locale })}</p>
             </div>
           )}
