@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Trash2, Pencil, XCircle, Mail, Phone, MessageCircle, Eye, Zap, Power } from "lucide-react";
+import { Plus, Trash2, Pencil, XCircle, Mail, Phone, MessageCircle, Eye, Zap, Power, Send, Loader2 } from "lucide-react";
 import { useMessageTemplates, useDeleteTemplate, useScheduledMessages, useCancelScheduledMessage } from "@/hooks/useMessages";
 import type { MessageTemplate } from "@/hooks/useMessages";
 import MessageTemplateDialog from "@/components/MessageTemplateDialog";
@@ -18,6 +18,8 @@ import type { ScheduledMessage } from "@/hooks/useMessages";
 import { useAutomationRules, useDeleteAutomationRule, useUpdateAutomationRule } from "@/hooks/useAutomationRules";
 import type { AutomationRule } from "@/hooks/useAutomationRules";
 import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const channelIcon = (ch: string) => {
   if (ch === "whatsapp") return <MessageCircle className="w-4 h-4 text-primary" />;
@@ -52,8 +54,23 @@ export default function Messages() {
   const { data: rules, isLoading: loadingR } = useAutomationRules();
   const deleteRule = useDeleteAutomationRule();
   const toggleRule = useUpdateAutomationRule();
+  const { toast } = useToast();
+  const [sending, setSending] = useState(false);
 
   const sentAndFailed = sentMsgs?.filter((m) => m.status === "sent" || m.status === "failed") || [];
+
+  const handleSendNow = async () => {
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-emails");
+      if (error) throw error;
+      toast({ title: "Envio concluído", description: `${data?.sent || 0} email(s) enviado(s), ${data?.failed || 0} falha(s).` });
+    } catch (e: any) {
+      toast({ title: "Erro ao enviar", description: e.message, variant: "destructive" });
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -62,10 +79,18 @@ export default function Messages() {
           <h1 className="font-display text-3xl font-bold text-foreground">Mensagens</h1>
           <p className="text-muted-foreground mt-1">Templates e agendamento de envios</p>
         </div>
-        <Button onClick={() => setScheduleOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nova Mensagem
-        </Button>
+        <div className="flex gap-2">
+          {(pendingMsgs?.length ?? 0) > 0 && (
+            <Button variant="outline" onClick={handleSendNow} disabled={sending}>
+              {sending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+              Enviar Pendentes
+            </Button>
+          )}
+          <Button onClick={() => setScheduleOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Nova Mensagem
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="scheduled">

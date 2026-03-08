@@ -109,6 +109,21 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Trigger send-emails function after creating messages
+    if (totalCreated > 0) {
+      try {
+        await fetch(`${supabaseUrl}/functions/v1/send-emails`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${serviceRoleKey}`,
+          },
+        });
+      } catch (e) {
+        console.error("Error triggering send-emails:", e);
+      }
+    }
+
     return new Response(
       JSON.stringify({ message: "Done", created: totalCreated }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
