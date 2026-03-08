@@ -438,6 +438,13 @@ const translations: Record<Language, Record<string, string>> = {
     "map.expired": "Vencidos",
     "map.noCoverage": "Sem cobertura",
     "map.statesCovered": "estados cobertos",
+
+    // Docs
+    "nav.docs": "Documentação",
+    "docs.title": "Documentação",
+    "docs.subtitle": "Tutorial completo do sistema — aprenda a usar cada funcionalidade",
+    "docs.welcomeTitle": "Bem-vindo à Documentação",
+    "docs.welcomeDesc": "Aqui você encontra tutoriais detalhados de todas as páginas e funcionalidades do sistema. Clique em cada seção para expandir e ver o passo a passo.",
   },
   en: {
     "nav.dashboard": "Dashboard",
@@ -853,6 +860,13 @@ const translations: Record<Language, Record<string, string>> = {
     "map.expired": "Expired",
     "map.noCoverage": "No coverage",
     "map.statesCovered": "states covered",
+
+    // Docs
+    "nav.docs": "Documentation",
+    "docs.title": "Documentation",
+    "docs.subtitle": "Complete system tutorial — learn how to use every feature",
+    "docs.welcomeTitle": "Welcome to the Documentation",
+    "docs.welcomeDesc": "Here you'll find detailed tutorials for all pages and features. Click each section to expand and see the step-by-step guide.",
   },
   es: {
     "nav.dashboard": "Panel",
@@ -1268,6 +1282,13 @@ const translations: Record<Language, Record<string, string>> = {
     "map.expired": "Vencidos",
     "map.noCoverage": "Sin cobertura",
     "map.statesCovered": "estados cubiertos",
+
+    // Docs
+    "nav.docs": "Documentación",
+    "docs.title": "Documentación",
+    "docs.subtitle": "Tutorial completo del sistema — aprenda a usar cada funcionalidad",
+    "docs.welcomeTitle": "Bienvenido a la Documentación",
+    "docs.welcomeDesc": "Aquí encontrará tutoriales detallados de todas las páginas y funcionalidades del sistema. Haga clic en cada sección para expandir y ver el paso a paso.",
   },
 };
 
