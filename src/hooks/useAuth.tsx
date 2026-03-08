@@ -6,6 +6,7 @@ interface AuthState {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
+  role: "admin" | "operator" | "viewer" | "user" | null;
   approvalStatus: string | null;
 }
 
