@@ -106,6 +106,10 @@ export default function ClientDetail() {
             <Badge className={status.className}>{status.label}</Badge>
           </div>
         </div>
+        <Button variant="outline" size="sm" onClick={handleGenerateReport} disabled={aiLoading}>
+          {aiLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+          {t("ai.generateReport")}
+        </Button>
         <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}><UserPlus className="w-4 h-4 mr-2" />{t("portal.inviteClient")}</Button>
         <Button variant="outline" onClick={() => setEditOpen(true)}><Pencil className="w-4 h-4 mr-2" />{t("common.edit")}</Button>
         <AlertDialog>
