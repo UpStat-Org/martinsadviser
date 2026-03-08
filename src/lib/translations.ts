@@ -396,6 +396,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Search
     "search.placeholder": "Buscar clientes, caminhões, permits...",
     "search.noResults": "Nenhum resultado encontrado.",
+    "search.typeToSearch": "Digite para buscar...",
 
     // Audit
     "nav.audit": "Auditoria",
