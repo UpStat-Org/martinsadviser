@@ -66,7 +66,8 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
     setResults({ success: 0, errors: [] });
   };
 
-  const handleFile = useCallback((file: File) => {
+  const handleFile = useCallback(async (file: File) => {
+    const XLSX = await import("xlsx");
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
