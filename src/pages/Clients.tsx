@@ -46,11 +46,16 @@ export default function Clients() {
           <h1 className="font-display text-3xl font-bold text-foreground">{t("clients.title")}</h1>
           <p className="text-muted-foreground mt-1">{t("clients.subtitle")}</p>
         </div>
-        <Button onClick={() => navigate("/clients/onboarding")}>
-          <Plus className="w-4 h-4 mr-2" />
-          {t("clients.new")}
-        </Button>
-      </div>
+        {!isViewer && (
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />{t("import.title")}
+            </Button>
+            <Button onClick={() => navigate("/clients/onboarding")}>
+              <Plus className="w-4 h-4 mr-2" />{t("clients.new")}
+            </Button>
+          </div>
+        )}
 
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-sm">
