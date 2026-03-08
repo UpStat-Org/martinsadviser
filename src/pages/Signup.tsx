@@ -73,10 +73,12 @@ export default function Signup() {
             <h1 className="font-display text-3xl font-bold">MartinsAdviser</h1>
           </div>
           <h2 className="font-display text-4xl font-bold leading-tight mb-4">
-            Comece a organizar<br />sua operação
+            {t("signup.brandingHeadline").split('\n').map((line, i) => (
+              <span key={i}>{line}{i === 0 && <br />}</span>
+            ))}
           </h2>
           <p className="text-primary-foreground/80 text-lg max-w-md">
-            Crie sua conta e tenha acesso à gestão completa de permits, compliance e comunicação.
+            {t("signup.brandingSubtitle")}
           </p>
         </div>
       </div>
