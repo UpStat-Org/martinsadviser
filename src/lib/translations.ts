@@ -694,6 +694,17 @@ const translations: Record<Language, Record<string, string>> = {
     "notFound.back": "Volver al inicio",
 
     "language.title": "Idioma",
+
+    "compliance.title": "Compliance",
+    "compliance.score": "Score de Compliance",
+    "compliance.healthy": "Saludable",
+    "compliance.warning": "Atención",
+    "compliance.critical": "Crítico",
+    "compliance.inDate": "Al día",
+    "compliance.expiringSoon": "Vencen en 30d",
+    "compliance.expired": "Vencidos",
+    "compliance.total": "Total de Permisos",
+    "compliance.noPermits": "Ningún permiso registrado para evaluar compliance.",
   },
 };
 
