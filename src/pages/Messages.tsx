@@ -18,6 +18,8 @@ import type { ScheduledMessage } from "@/hooks/useMessages";
 import { useAutomationRules, useDeleteAutomationRule, useUpdateAutomationRule } from "@/hooks/useAutomationRules";
 import type { AutomationRule } from "@/hooks/useAutomationRules";
 import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const channelIcon = (ch: string) => {
   if (ch === "whatsapp") return <MessageCircle className="w-4 h-4 text-primary" />;
