@@ -6,14 +6,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Trash2, Pencil, XCircle, Mail, Phone, MessageCircle, Eye } from "lucide-react";
+import { Plus, Trash2, Pencil, XCircle, Mail, Phone, MessageCircle, Eye, Zap, Power } from "lucide-react";
 import { useMessageTemplates, useDeleteTemplate, useScheduledMessages, useCancelScheduledMessage } from "@/hooks/useMessages";
 import type { MessageTemplate } from "@/hooks/useMessages";
 import MessageTemplateDialog from "@/components/MessageTemplateDialog";
 import ScheduleMessageDialog from "@/components/ScheduleMessageDialog";
+import AutomationRuleDialog from "@/components/AutomationRuleDialog";
 import { replacePlaceholders } from "@/lib/placeholders";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { ScheduledMessage } from "@/hooks/useMessages";
+import { useAutomationRules, useDeleteAutomationRule, useUpdateAutomationRule } from "@/hooks/useAutomationRules";
+import type { AutomationRule } from "@/hooks/useAutomationRules";
+import { Switch } from "@/components/ui/switch";
 
 const channelIcon = (ch: string) => {
   if (ch === "whatsapp") return <MessageCircle className="w-4 h-4 text-primary" />;
@@ -37,12 +41,17 @@ export default function Messages() {
   const [editTemplate, setEditTemplate] = useState<MessageTemplate | null>(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [previewMsg, setPreviewMsg] = useState<ScheduledMessage | null>(null);
+  const [automationOpen, setAutomationOpen] = useState(false);
+  const [editRule, setEditRule] = useState<AutomationRule | null>(null);
 
   const { data: templates, isLoading: loadingT } = useMessageTemplates();
   const deleteTemplate = useDeleteTemplate();
   const { data: pendingMsgs, isLoading: loadingP } = useScheduledMessages("pending");
   const { data: sentMsgs, isLoading: loadingS } = useScheduledMessages();
   const cancelMsg = useCancelScheduledMessage();
+  const { data: rules, isLoading: loadingR } = useAutomationRules();
+  const deleteRule = useDeleteAutomationRule();
+  const toggleRule = useUpdateAutomationRule();
 
   const sentAndFailed = sentMsgs?.filter((m) => m.status === "sent" || m.status === "failed") || [];
 
@@ -63,6 +72,10 @@ export default function Messages() {
         <TabsList>
           <TabsTrigger value="scheduled">Agendadas{pendingMsgs?.length ? ` (${pendingMsgs.length})` : ""}</TabsTrigger>
           <TabsTrigger value="sent">Enviadas</TabsTrigger>
+          <TabsTrigger value="automations">
+            <Zap className="w-4 h-4 mr-1" />
+            Automações{rules?.filter(r => r.enabled).length ? ` (${rules.filter(r => r.enabled).length})` : ""}
+          </TabsTrigger>
           <TabsTrigger value="templates">Templates</TabsTrigger>
         </TabsList>
 
@@ -152,6 +165,62 @@ export default function Messages() {
           )}
         </TabsContent>
 
+        {/* Automações */}
+        <TabsContent value="automations">
+          <div className="flex justify-end mb-4">
+            <Button onClick={() => { setEditRule(null); setAutomationOpen(true); }}>
+              <Plus className="w-4 h-4 mr-2" /> Nova Automação
+            </Button>
+          </div>
+          {loadingR ? (
+            <Card><CardContent className="p-12 text-center text-muted-foreground">Carregando...</CardContent></Card>
+          ) : !rules?.length ? (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <p className="text-muted-foreground">Nenhuma automação configurada.</p>
+                <p className="text-sm text-muted-foreground mt-1">Crie regras para enviar alertas automaticamente quando permits estiverem próximos de vencer.</p>
+                <Button variant="outline" className="mt-4" onClick={() => { setEditRule(null); setAutomationOpen(true); }}>
+                  <Zap className="w-4 h-4 mr-2" /> Criar automação
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {rules.map((r) => (
+                <Card key={r.id} className={!r.enabled ? "opacity-60" : ""}>
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 font-medium">
+                        <Zap className={`w-4 h-4 ${r.enabled ? "text-warning" : "text-muted-foreground"}`} />
+                        {r.name}
+                      </div>
+                      <Switch
+                        checked={r.enabled}
+                        onCheckedChange={(checked) => toggleRule.mutate({ id: r.id, enabled: checked })}
+                      />
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      <Badge variant="secondary">{r.days_before} dias antes</Badge>
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        {channelIcon(r.channel)} {r.channel}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2">{r.body}</p>
+                    <div className="flex gap-1 justify-end">
+                      <Button variant="ghost" size="icon" onClick={() => { setEditRule(r); setAutomationOpen(true); }}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => deleteRule.mutate(r.id)}>
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
         {/* Templates */}
         <TabsContent value="templates">
           <div className="flex justify-end mb-4">
@@ -199,6 +268,7 @@ export default function Messages() {
 
       <MessageTemplateDialog open={templateOpen} onOpenChange={setTemplateOpen} template={editTemplate} />
       <ScheduleMessageDialog open={scheduleOpen} onOpenChange={setScheduleOpen} />
+      <AutomationRuleDialog open={automationOpen} onOpenChange={setAutomationOpen} rule={editRule} />
 
       {/* Preview Dialog */}
       <Dialog open={!!previewMsg} onOpenChange={() => setPreviewMsg(null)}>
