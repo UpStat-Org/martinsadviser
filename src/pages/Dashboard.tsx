@@ -116,7 +116,7 @@ export default function Dashboard() {
         <p className="text-muted-foreground mt-1">{t("dashboard.subtitle")}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
         {stats.map((stat) => (
           <Card key={stat.label} className="cursor-pointer hover:shadow-md transition-shadow" onClick={stat.onClick}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
