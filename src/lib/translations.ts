@@ -489,6 +489,17 @@ const translations: Record<Language, Record<string, string>> = {
     "compliance.expired": "Expired",
     "compliance.total": "Total Permits",
     "compliance.noPermits": "No permits registered to evaluate compliance.",
+
+    "documents.dragDrop": "Drag and drop a file here or click to select",
+    "documents.maxSize": "Max 20MB • PDF, JPG, PNG",
+    "documents.attached": "Document attached",
+    "documents.replace": "Replace",
+    "documents.viewer": "View Document",
+    "documents.download": "Download",
+    "documents.close": "Close",
+    "documents.noPreview": "Preview not available for this file type.",
+    "documents.uploadError": "Error uploading file",
+    "documents.tooLarge": "File too large",
   },
   es: {
     "nav.dashboard": "Panel",
