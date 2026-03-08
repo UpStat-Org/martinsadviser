@@ -88,7 +88,9 @@ export function GlobalSearch() {
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder={t("search.placeholder")} value={query} onValueChange={setQuery} />
         <CommandList>
-          <CommandEmpty>{loading ? t("common.loading") : t("search.noResults")}</CommandEmpty>
+          {results.length === 0 && (
+            <CommandEmpty>{loading ? t("common.loading") : query.length >= 2 ? t("search.noResults") : t("search.placeholder")}</CommandEmpty>
+          )}
           {Object.entries(grouped).map(([type, items]) => {
             const Icon = icons[type as keyof typeof icons];
             return (
