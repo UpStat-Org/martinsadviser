@@ -130,6 +130,15 @@ export default function Messages() {
                     <TableCell>{statusBadge(m.status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" title={t("messages.sendNow")} onClick={async () => {
+                          try {
+                            await supabase.from("scheduled_messages").update({ scheduled_at: new Date().toISOString() }).eq("id", m.id);
+                            await supabase.functions.invoke("send-emails");
+                            toast({ title: t("messages.sendComplete") });
+                          } catch (e: any) {
+                            toast({ title: t("messages.sendError"), description: e.message, variant: "destructive" });
+                          }
+                        }}><Send className="w-4 h-4 text-primary" /></Button>
                         <Button variant="ghost" size="icon" onClick={() => setPreviewMsg(m)}><Eye className="w-4 h-4" /></Button>
                         <Button variant="ghost" size="icon" onClick={() => cancelMsg.mutate(m.id)}><XCircle className="w-4 h-4 text-destructive" /></Button>
                       </div>
