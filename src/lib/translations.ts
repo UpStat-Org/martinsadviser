@@ -393,7 +393,47 @@ const translations: Record<Language, Record<string, string>> = {
     "import.imported": "importados",
     "import.errorsCount": "erros",
     "import.row": "Linha",
-    "import.missingName": "Nome da empresa é obrigatório",
+    // Search
+    "search.placeholder": "Buscar clientes, caminhões, permits...",
+    "search.noResults": "Nenhum resultado encontrado.",
+
+    // Audit
+    "nav.audit": "Auditoria",
+    "audit.title": "Auditoria",
+    "audit.subtitle": "Histórico completo de ações do sistema",
+    "audit.allEntities": "Todas entidades",
+    "audit.allActions": "Todas ações",
+    "audit.date": "Data",
+    "audit.user": "Usuário",
+    "audit.entity": "Entidade",
+    "audit.action": "Ação",
+    "audit.details": "Detalhes",
+    "audit.empty": "Nenhum registro de auditoria.",
+    "activity.entity.invoice": "Fatura",
+    "activity.entity.task": "Tarefa",
+
+    // Signatures
+    "signature.title": "Assinatura Digital",
+    "signature.tab": "Assinaturas",
+    "signature.new": "Nova Assinatura",
+    "signature.signerName": "Nome do assinante",
+    "signature.signerEmail": "Email do assinante",
+    "signature.documentName": "Nome do documento",
+    "signature.documentPlaceholder": "Ex: Autorização IFTA 2026",
+    "signature.draw": "Desenhe a assinatura",
+    "signature.clear": "Limpar",
+    "signature.confirm": "Confirmar Assinatura",
+    "signature.saved": "Assinatura salva com sucesso!",
+    "signature.error": "Erro ao salvar assinatura",
+    "signature.empty": "Nenhuma assinatura registrada.",
+
+    // Map
+    "map.title": "Cobertura por Estado",
+    "map.active": "Ativos",
+    "map.expiring": "Vencendo",
+    "map.expired": "Vencidos",
+    "map.noCoverage": "Sem cobertura",
+    "map.statesCovered": "estados cobertos",
   },
   en: {
     "nav.dashboard": "Dashboard",
