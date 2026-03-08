@@ -110,7 +110,14 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
 
   const onSubmit = async (values: FormValues) => {
     const payload = {
-      ...values,
+      company_name: values.company_name,
+      status: values.status,
+      service_ifta: values.service_ifta,
+      service_ct: values.service_ct,
+      service_ny: values.service_ny,
+      service_kyu: values.service_kyu,
+      service_nm: values.service_nm,
+      service_automatic: values.service_automatic,
       phone: values.phone || null,
       email: values.email || null,
       address: values.address || null,
