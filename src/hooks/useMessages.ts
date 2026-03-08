@@ -26,7 +26,7 @@ export interface ScheduledMessage {
   status: string;
   sent_at: string | null;
   created_at: string;
-  clients?: { company_name: string } | null;
+  clients?: { company_name: string; dot?: string | null; mc?: string | null; ein?: string | null; email?: string | null; phone?: string | null } | null;
 }
 
 // ---- Templates ----
