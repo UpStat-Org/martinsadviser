@@ -58,6 +58,7 @@ export default function ClientDetail() {
   const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
   const [viewDocTitle, setViewDocTitle] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [signatureOpen, setSignatureOpen] = useState(false);
   const [aiReport, setAiReport] = useState<string | null>(null);
   const [aiReportOpen, setAiReportOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
