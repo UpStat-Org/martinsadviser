@@ -237,6 +237,18 @@ const translations: Record<Language, Record<string, string>> = {
     "notFound.back": "Voltar ao início",
 
     "language.title": "Idioma",
+
+    // Compliance
+    "compliance.title": "Compliance",
+    "compliance.score": "Score de Compliance",
+    "compliance.healthy": "Saudável",
+    "compliance.warning": "Atenção",
+    "compliance.critical": "Crítico",
+    "compliance.inDate": "Em dia",
+    "compliance.expiringSoon": "Vencendo em 30d",
+    "compliance.expired": "Vencidos",
+    "compliance.total": "Total de Permits",
+    "compliance.noPermits": "Nenhum permit cadastrado para avaliar compliance.",
   },
   en: {
     "nav.dashboard": "Dashboard",
@@ -454,6 +466,17 @@ const translations: Record<Language, Record<string, string>> = {
     "notFound.back": "Return to Home",
 
     "language.title": "Language",
+
+    "compliance.title": "Compliance",
+    "compliance.score": "Compliance Score",
+    "compliance.healthy": "Healthy",
+    "compliance.warning": "Warning",
+    "compliance.critical": "Critical",
+    "compliance.inDate": "Up to date",
+    "compliance.expiringSoon": "Expiring in 30d",
+    "compliance.expired": "Expired",
+    "compliance.total": "Total Permits",
+    "compliance.noPermits": "No permits registered to evaluate compliance.",
   },
   es: {
     "nav.dashboard": "Panel",
@@ -671,6 +694,17 @@ const translations: Record<Language, Record<string, string>> = {
     "notFound.back": "Volver al inicio",
 
     "language.title": "Idioma",
+
+    "compliance.title": "Compliance",
+    "compliance.score": "Score de Compliance",
+    "compliance.healthy": "Saludable",
+    "compliance.warning": "Atención",
+    "compliance.critical": "Crítico",
+    "compliance.inDate": "Al día",
+    "compliance.expiringSoon": "Vencen en 30d",
+    "compliance.expired": "Vencidos",
+    "compliance.total": "Total de Permisos",
+    "compliance.noPermits": "Ningún permiso registrado para evaluar compliance.",
   },
 };
 

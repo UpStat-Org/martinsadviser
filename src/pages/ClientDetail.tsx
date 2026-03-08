@@ -6,6 +6,7 @@ import { usePermits, useDeletePermit, getExpirationStatus, type Permit } from "@
 import { ClientFormDialog } from "@/components/ClientFormDialog";
 import { TruckFormDialog } from "@/components/TruckFormDialog";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
+import { ComplianceDashboard } from "@/components/ComplianceDashboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -116,6 +117,8 @@ export default function ClientDetail() {
           </CardContent>
         </Card>
       </div>
+
+      <ComplianceDashboard permits={permits} />
 
       <Tabs defaultValue="trucks">
         <TabsList>
