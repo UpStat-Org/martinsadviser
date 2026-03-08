@@ -374,6 +374,9 @@ const translations: Record<Language, Record<string, string>> = {
     "messages.preview": "Message Preview",
     "messages.sendComplete": "Send complete",
     "messages.sendError": "Send error",
+    "messages.sendNow": "Send now",
+    "messages.sendNowDesc": "Send immediately instead of scheduling",
+    "messages.scheduleFor": "Schedule for",
 
     "calendar.title": "Calendar",
     "calendar.subtitle": "Permit expirations and events",
