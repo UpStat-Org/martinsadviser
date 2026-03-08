@@ -134,6 +134,14 @@ export default function Permits() {
         </Card>
       )}
       <PermitFormDialog open={dialogOpen} onOpenChange={setDialogOpen} permit={editingPermit} />
+      {viewDocUrl && (
+        <DocumentViewer
+          open={!!viewDocUrl}
+          onOpenChange={(v) => { if (!v) setViewDocUrl(null); }}
+          url={viewDocUrl}
+          title={viewDocTitle}
+        />
+      )}
     </div>
   );
 }
