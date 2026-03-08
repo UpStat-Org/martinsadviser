@@ -1,8 +1,23 @@
 import { useMemo, useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { format } from "date-fns";
 
-// Simplified US state paths (abbreviated for common states)
+const STATE_NAMES: Record<string, string> = {
+  AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California",
+  CO: "Colorado", CT: "Connecticut", DE: "Delaware", FL: "Florida", GA: "Georgia",
+  HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa",
+  KS: "Kansas", KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland",
+  MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi", MO: "Missouri",
+  MT: "Montana", NE: "Nebraska", NV: "Nevada", NH: "New Hampshire", NJ: "New Jersey",
+  NM: "New Mexico", NY: "New York", NC: "North Carolina", ND: "North Dakota", OH: "Ohio",
+  OK: "Oklahoma", OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina",
+  SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah", VT: "Vermont",
+  VA: "Virginia", WA: "Washington", WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming",
+};
+
 const US_STATES: Record<string, { path: string; cx: number; cy: number }> = {
   AL: { path: "M628,396 L628,448 L612,462 L606,450 L604,396Z", cx: 616, cy: 428 },
   AK: { path: "M161,485 L195,485 L195,520 L161,520Z", cx: 178, cy: 502 },
@@ -56,27 +71,34 @@ const US_STATES: Record<string, { path: string; cx: number; cy: number }> = {
   WY: { path: "M265,185 L365,185 L365,255 L265,255Z", cx: 315, cy: 220 },
 };
 
+export interface PermitForMap {
+  state: string | null;
+  status: string;
+  expiration_date: string | null;
+  permit_type?: string;
+  permit_number?: string | null;
+  client_id?: string;
+}
+
 interface PermitCoverageMapProps {
-  permits?: Array<{
-    state: string | null;
-    status: string;
-    expiration_date: string | null;
-  }>;
+  permits?: PermitForMap[];
   compact?: boolean;
 }
 
 export function PermitCoverageMap({ permits, compact = false }: PermitCoverageMapProps) {
   const { t } = useLanguage();
   const [hoveredState, setHoveredState] = useState<string | null>(null);
+  const [selectedState, setSelectedState] = useState<string | null>(null);
 
   const stateData = useMemo(() => {
-    const map: Record<string, { active: number; expiring: number; expired: number }> = {};
+    const map: Record<string, { active: number; expiring: number; expired: number; permits: PermitForMap[] }> = {};
     if (!permits) return map;
     const now = new Date();
     for (const p of permits) {
       if (!p.state) continue;
       const st = p.state.toUpperCase().trim();
-      if (!map[st]) map[st] = { active: 0, expiring: 0, expired: 0 };
+      if (!map[st]) map[st] = { active: 0, expiring: 0, expired: 0, permits: [] };
+      map[st].permits.push(p);
       if (!p.expiration_date) { map[st].active++; continue; }
       const diff = Math.ceil((new Date(p.expiration_date).getTime() - now.getTime()) / 86400000);
       if (diff < 0) map[st].expired++;
@@ -94,7 +116,16 @@ export function PermitCoverageMap({ permits, compact = false }: PermitCoverageMa
     return "hsl(152, 60%, 40%)";
   };
 
+  const getStatusBadge = (p: PermitForMap) => {
+    if (!p.expiration_date) return <Badge variant="outline">{t("common.active")}</Badge>;
+    const diff = Math.ceil((new Date(p.expiration_date).getTime() - new Date().getTime()) / 86400000);
+    if (diff < 0) return <Badge className="bg-destructive text-destructive-foreground">{t("common.expired")}</Badge>;
+    if (diff <= 30) return <Badge className="bg-warning text-warning-foreground">{diff}d</Badge>;
+    return <Badge className="bg-success text-success-foreground">{t("common.valid")}</Badge>;
+  };
+
   const coveredCount = Object.keys(stateData).length;
+  const selectedData = selectedState ? stateData[selectedState] : null;
 
   return (
     <div className={compact ? "" : "space-y-2"}>
@@ -110,35 +141,29 @@ export function PermitCoverageMap({ permits, compact = false }: PermitCoverageMa
         </div>
       )}
       <svg viewBox="100 60 760 480" className={`w-full ${compact ? "h-40" : "h-64"}`} xmlns="http://www.w3.org/2000/svg">
-        {Object.entries(US_STATES).map(([abbr, { path }]) => {
-          const data = stateData[abbr];
-          return (
-            <Tooltip key={abbr}>
-              <TooltipTrigger asChild>
-                <path
-                  d={path}
-                  fill={getColor(abbr)}
-                  stroke="hsl(var(--border))"
-                  strokeWidth="1"
-                  opacity={hoveredState === abbr ? 0.8 : 1}
-                  className="cursor-pointer transition-opacity"
-                  onMouseEnter={() => setHoveredState(abbr)}
-                  onMouseLeave={() => setHoveredState(null)}
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="font-medium">{abbr}</p>
-                {data ? (
-                  <div className="text-xs space-y-0.5">
-                    {data.active > 0 && <p>{t("map.active")}: {data.active}</p>}
-                    {data.expiring > 0 && <p>{t("map.expiring")}: {data.expiring}</p>}
-                    {data.expired > 0 && <p>{t("map.expired")}: {data.expired}</p>}
-                  </div>
-                ) : <p className="text-xs">{t("map.noCoverage")}</p>}
-              </TooltipContent>
-            </Tooltip>
-          );
-        })}
+        {Object.entries(US_STATES).map(([abbr, { path }]) => (
+          <Tooltip key={abbr}>
+            <TooltipTrigger asChild>
+              <path
+                d={path}
+                fill={getColor(abbr)}
+                stroke="hsl(var(--border))"
+                strokeWidth="1"
+                opacity={hoveredState === abbr ? 0.8 : 1}
+                className="cursor-pointer transition-opacity"
+                onMouseEnter={() => setHoveredState(abbr)}
+                onMouseLeave={() => setHoveredState(null)}
+                onClick={() => setSelectedState(abbr)}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="font-medium">{STATE_NAMES[abbr] || abbr}</p>
+              {stateData[abbr] ? (
+                <p className="text-xs">{stateData[abbr].permits.length} permit(s)</p>
+              ) : <p className="text-xs">{t("map.noCoverage")}</p>}
+            </TooltipContent>
+          </Tooltip>
+        ))}
         {Object.entries(US_STATES).map(([abbr, { cx, cy }]) => (
           <text key={`label-${abbr}`} x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fontSize="8" fill="hsl(var(--foreground))" className="pointer-events-none font-medium" opacity={0.7}>
             {abbr}
@@ -146,6 +171,57 @@ export function PermitCoverageMap({ permits, compact = false }: PermitCoverageMa
         ))}
       </svg>
       {!compact && <p className="text-xs text-muted-foreground text-center">{coveredCount} {t("map.statesCovered")}</p>}
+
+      {/* State Detail Modal */}
+      <Dialog open={!!selectedState} onOpenChange={(o) => !o && setSelectedState(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="w-4 h-4 rounded-sm inline-block" style={{ backgroundColor: selectedState ? getColor(selectedState) : undefined }} />
+              {selectedState && (STATE_NAMES[selectedState] || selectedState)} ({selectedState})
+            </DialogTitle>
+          </DialogHeader>
+          {selectedData ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-3 text-center">
+                <div className="p-3 rounded-lg bg-success/10 border">
+                  <p className="text-2xl font-bold text-success">{selectedData.active}</p>
+                  <p className="text-xs text-muted-foreground">{t("map.active")}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-warning/10 border">
+                  <p className="text-2xl font-bold text-warning">{selectedData.expiring}</p>
+                  <p className="text-xs text-muted-foreground">{t("map.expiring")}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-destructive/10 border">
+                  <p className="text-2xl font-bold text-destructive">{selectedData.expired}</p>
+                  <p className="text-xs text-muted-foreground">{t("map.expired")}</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium">{t("nav.permits")} ({selectedData.permits.length})</p>
+                {selectedData.permits.map((p, i) => (
+                  <div key={i} className="flex items-center justify-between p-2 rounded-lg border text-sm">
+                    <div>
+                      <span className="font-medium">{p.permit_type || "—"}</span>
+                      {p.permit_number && <span className="text-xs text-muted-foreground ml-2">#{p.permit_number}</span>}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {p.expiration_date && (
+                        <span className="text-xs text-muted-foreground">
+                          {format(new Date(p.expiration_date), "dd/MM/yyyy")}
+                        </span>
+                      )}
+                      {getStatusBadge(p)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm text-center py-4">{t("map.noCoverage")}</p>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
