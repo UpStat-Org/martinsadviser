@@ -203,6 +203,9 @@ const translations: Record<Language, Record<string, string>> = {
     "admin.approved": "Aprovado",
     "admin.rejected": "Rejeitado",
     "admin.statusUpdated": "Status atualizado com sucesso",
+    "admin.deleteUser": "Excluir",
+    "admin.deleteUserConfirm": "Tem certeza que deseja excluir este usuário? Esta ação é irreversível.",
+    "admin.userDeleted": "Usuário excluído com sucesso",
 
     // Onboarding
     "onboarding.title": "Cadastrar Novo Cliente",
@@ -622,6 +625,9 @@ const translations: Record<Language, Record<string, string>> = {
     "admin.approved": "Approved",
     "admin.rejected": "Rejected",
     "admin.statusUpdated": "Status updated successfully",
+    "admin.deleteUser": "Delete",
+    "admin.deleteUserConfirm": "Are you sure you want to delete this user? This action is irreversible.",
+    "admin.userDeleted": "User deleted successfully",
 
     "onboarding.title": "Register New Client",
     "onboarding.step": "Step",
@@ -1034,6 +1040,9 @@ const translations: Record<Language, Record<string, string>> = {
     "admin.approved": "Aprobado",
     "admin.rejected": "Rechazado",
     "admin.statusUpdated": "Estado actualizado exitosamente",
+    "admin.deleteUser": "Eliminar",
+    "admin.deleteUserConfirm": "¿Estás seguro de que deseas eliminar este usuario? Esta acción es irreversible.",
+    "admin.userDeleted": "Usuario eliminado exitosamente",
 
     "onboarding.title": "Registrar Nuevo Cliente",
     "onboarding.step": "Paso",
