@@ -122,6 +122,16 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
             <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={4} />
           </div>
 
+          {/* Live preview */}
+          {body && clientId && (
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Pré-visualização</Label>
+              <div className="rounded-md border bg-muted/50 p-3 text-sm whitespace-pre-wrap">
+                {replacePlaceholders(body, selectedClient)}
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Data</Label>
