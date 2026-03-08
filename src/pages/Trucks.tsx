@@ -14,6 +14,7 @@ import { Plus, Search, Pencil, Trash2, Loader2 } from "lucide-react";
 import { useTrucks, useDeleteTruck } from "@/hooks/useTrucks";
 import { TruckFormDialog } from "@/components/TruckFormDialog";
 import type { Truck } from "@/hooks/useTrucks";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Trucks() {
   const [search, setSearch] = useState("");
@@ -21,54 +22,35 @@ export default function Trucks() {
   const [editingTruck, setEditingTruck] = useState<Truck | null>(null);
   const { data: trucks, isLoading } = useTrucks(search || undefined);
   const deleteTruck = useDeleteTruck();
+  const { t } = useLanguage();
 
-  const handleEdit = (truck: Truck) => {
-    setEditingTruck(truck);
-    setDialogOpen(true);
-  };
-
-  const handleNew = () => {
-    setEditingTruck(null);
-    setDialogOpen(true);
-  };
+  const handleEdit = (truck: Truck) => { setEditingTruck(truck); setDialogOpen(true); };
+  const handleNew = () => { setEditingTruck(null); setDialogOpen(true); };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground">Caminhões</h1>
-          <p className="text-muted-foreground mt-1">Gerencie a frota dos seus clientes</p>
+          <h1 className="font-display text-3xl font-bold text-foreground">{t("trucks.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("trucks.subtitle")}</p>
         </div>
-        <Button onClick={handleNew}>
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Caminhão
-        </Button>
+        <Button onClick={handleNew}><Plus className="w-4 h-4 mr-2" />{t("trucks.new")}</Button>
       </div>
 
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por placa, VIN, marca..."
-            className="pl-10"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <Input placeholder={t("trucks.search")} className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </div>
+        <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
       ) : !trucks?.length ? (
         <Card>
           <CardContent className="p-12 text-center">
-            <p className="text-muted-foreground">Nenhum caminhão cadastrado ainda.</p>
-            <Button variant="outline" className="mt-4" onClick={handleNew}>
-              <Plus className="w-4 h-4 mr-2" />
-              Cadastrar primeiro caminhão
-            </Button>
+            <p className="text-muted-foreground">{t("trucks.empty")}</p>
+            <Button variant="outline" className="mt-4" onClick={handleNew}><Plus className="w-4 h-4 mr-2" />{t("trucks.registerFirst")}</Button>
           </CardContent>
         </Card>
       ) : (
@@ -77,13 +59,13 @@ export default function Trucks() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Placa</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Marca/Modelo</TableHead>
-                  <TableHead>Ano</TableHead>
+                  <TableHead>{t("trucks.plate")}</TableHead>
+                  <TableHead>{t("common.client")}</TableHead>
+                  <TableHead>{t("trucks.makeModel")}</TableHead>
+                  <TableHead>{t("trucks.year")}</TableHead>
                   <TableHead>VIN</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-24">Ações</TableHead>
+                  <TableHead>{t("clients.status")}</TableHead>
+                  <TableHead className="w-24">{t("common.actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -96,30 +78,22 @@ export default function Trucks() {
                     <TableCell className="text-xs font-mono">{truck.vin || "—"}</TableCell>
                     <TableCell>
                       <Badge className={truck.status === "active" ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}>
-                        {truck.status === "active" ? "Ativo" : "Inativo"}
+                        {truck.status === "active" ? t("common.active") : t("common.inactive")}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(truck)}>
-                          <Pencil className="w-4 h-4" />
-                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(truck)}><Pencil className="w-4 h-4" /></Button>
                         <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="w-4 h-4 text-destructive" />
-                            </Button>
-                          </AlertDialogTrigger>
+                          <AlertDialogTrigger asChild><Button variant="ghost" size="icon"><Trash2 className="w-4 h-4 text-destructive" /></Button></AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Remover caminhão?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Essa ação não pode ser desfeita. O caminhão será removido permanentemente.
-                              </AlertDialogDescription>
+                              <AlertDialogTitle>{t("trucks.removeTruck")}</AlertDialogTitle>
+                              <AlertDialogDescription>{t("trucks.removeTruckDesc")}</AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => deleteTruck.mutate(truck.id)}>Remover</AlertDialogAction>
+                              <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteTruck.mutate(truck.id)}>{t("common.delete")}</AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
@@ -132,12 +106,7 @@ export default function Trucks() {
           </CardContent>
         </Card>
       )}
-
-      <TruckFormDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        truck={editingTruck}
-      />
+      <TruckFormDialog open={dialogOpen} onOpenChange={setDialogOpen} truck={editingTruck} />
     </div>
   );
 }
