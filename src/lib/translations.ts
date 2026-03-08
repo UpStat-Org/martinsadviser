@@ -6,123 +6,9 @@ export const languageLabels: Record<Language, { flag: string; label: string }> =
   es: { flag: "🇪🇸", label: "Español" },
 };
 
-type TranslationKeys = {
-  // Sidebar
-  "nav.dashboard": string;
-  "nav.clients": string;
-  "nav.trucks": string;
-  "nav.permits": string;
-  "nav.messages": string;
-  "nav.calendar": string;
-  "nav.settings": string;
-  "nav.users": string;
-  "nav.logout": string;
-
-  // Dashboard
-  "dashboard.title": string;
-  "dashboard.subtitle": string;
-  "dashboard.clients": string;
-  "dashboard.trucks": string;
-  "dashboard.activePermits": string;
-  "dashboard.expiring30d": string;
-  "dashboard.emailsSent": string;
-  "dashboard.pendingMsgs": string;
-  "dashboard.expirations": string;
-  "dashboard.permitsByType": string;
-  "dashboard.messages": string;
-  "dashboard.expirationSummary": string;
-  "dashboard.expired": string;
-  "dashboard.expiring30": string;
-  "dashboard.expiring60": string;
-  "dashboard.expiring90": string;
-  "dashboard.valid90": string;
-  "dashboard.urgentPermits": string;
-  "dashboard.noUrgent": string;
-  "dashboard.recentClients": string;
-  "dashboard.noClients": string;
-  "dashboard.noPermits": string;
-  "dashboard.noMessages": string;
-
-  // Clients
-  "clients.title": string;
-  "clients.subtitle": string;
-  "clients.new": string;
-  "clients.search": string;
-  "clients.noResults": string;
-  "clients.empty": string;
-  "clients.registerFirst": string;
-  "clients.company": string;
-  "clients.phone": string;
-  "clients.services": string;
-  "clients.status": string;
-
-  // Common
-  "common.active": string;
-  "common.inactive": string;
-  "common.pending": string;
-  "common.cancel": string;
-  "common.save": string;
-  "common.saving": string;
-  "common.delete": string;
-  "common.edit": string;
-  "common.add": string;
-  "common.back": string;
-  "common.next": string;
-  "common.finish": string;
-  "common.loading": string;
-  "common.noData": string;
-  "common.expired": string;
-  "common.valid": string;
-  "common.sent": string;
-  "common.failed": string;
-  "common.cancelled": string;
-
-  // Onboarding
-  "onboarding.title": string;
-  "onboarding.step": string;
-  "onboarding.companyData": string;
-  "onboarding.services": string;
-  "onboarding.trucksStep": string;
-  "onboarding.permitsStep": string;
-  "onboarding.review": string;
-  "onboarding.companyName": string;
-  "onboarding.servicesDesc": string;
-  "onboarding.trucksDesc": string;
-  "onboarding.permitsDesc": string;
-  "onboarding.addTruck": string;
-  "onboarding.addPermit": string;
-  "onboarding.finishRegistration": string;
-
-  // Login
-  "login.welcome": string;
-  "login.subtitle": string;
-  "login.email": string;
-  "login.password": string;
-  "login.submit": string;
-  "login.submitting": string;
-  "login.noAccount": string;
-  "login.requestAccess": string;
-  "login.error": string;
-
-  // Signup
-  "signup.title": string;
-  "signup.subtitle": string;
-  "signup.fullName": string;
-  "signup.submit": string;
-  "signup.submitting": string;
-  "signup.hasAccount": string;
-  "signup.login": string;
-  "signup.success": string;
-  "signup.successDesc": string;
-  "signup.backToLogin": string;
-  "signup.error": string;
-
-  // Language
-  "language.title": string;
-};
-
-const translations: Record<Language, TranslationKeys> = {
+const translations: Record<Language, Record<string, string>> = {
   pt: {
+    // Nav
     "nav.dashboard": "Dashboard",
     "nav.clients": "Clientes",
     "nav.trucks": "Caminhões",
@@ -133,6 +19,7 @@ const translations: Record<Language, TranslationKeys> = {
     "nav.users": "Usuários",
     "nav.logout": "Sair",
 
+    // Dashboard
     "dashboard.title": "Dashboard",
     "dashboard.subtitle": "Visão geral do seu sistema",
     "dashboard.clients": "Clientes",
@@ -157,6 +44,7 @@ const translations: Record<Language, TranslationKeys> = {
     "dashboard.noPermits": "Nenhum permit cadastrado.",
     "dashboard.noMessages": "Nenhuma mensagem registrada.",
 
+    // Clients
     "clients.title": "Clientes",
     "clients.subtitle": "Gerencie suas transportadoras",
     "clients.new": "Novo Cliente",
@@ -168,7 +56,15 @@ const translations: Record<Language, TranslationKeys> = {
     "clients.phone": "Telefone",
     "clients.services": "Serviços",
     "clients.status": "Status",
+    "clients.info": "Informações",
+    "clients.notFound": "Cliente não encontrado.",
+    "clients.removeClient": "Remover cliente?",
+    "clients.removeClientDesc": "Essa ação não pode ser desfeita. O cliente e todos os dados associados serão removidos permanentemente.",
+    "clients.noTrucks": "Nenhum caminhão vinculado a este cliente.",
+    "clients.noPermits": "Nenhum permit vinculado a este cliente.",
+    "clients.notes": "Observações",
 
+    // Common
     "common.active": "Ativo",
     "common.inactive": "Inativo",
     "common.pending": "Pendente",
@@ -188,7 +84,106 @@ const translations: Record<Language, TranslationKeys> = {
     "common.sent": "Enviadas",
     "common.failed": "Falhas",
     "common.cancelled": "Canceladas",
+    "common.actions": "Ações",
+    "common.type": "Tipo",
+    "common.number": "Número",
+    "common.state": "Estado",
+    "common.expiration": "Vencimento",
+    "common.client": "Cliente",
+    "common.truck": "Caminhão",
+    "common.doc": "Doc",
+    "common.openDoc": "Abrir documento",
+    "common.cannotUndo": "Essa ação não pode ser desfeita.",
+    "common.noDetails": "Sem detalhes",
+    "common.today": "Hoje",
 
+    // Trucks
+    "trucks.title": "Caminhões",
+    "trucks.subtitle": "Gerencie a frota dos seus clientes",
+    "trucks.new": "Novo Caminhão",
+    "trucks.search": "Buscar por placa, VIN, marca...",
+    "trucks.empty": "Nenhum caminhão cadastrado ainda.",
+    "trucks.registerFirst": "Cadastrar primeiro caminhão",
+    "trucks.plate": "Placa",
+    "trucks.makeModel": "Marca/Modelo",
+    "trucks.year": "Ano",
+    "trucks.removeTruck": "Remover caminhão?",
+    "trucks.removeTruckDesc": "Essa ação não pode ser desfeita. O caminhão será removido permanentemente.",
+
+    // Permits
+    "permits.title": "Permits",
+    "permits.subtitle": "Controle de IRP, IFTA, UCR, Oversize e mais",
+    "permits.new": "Novo Permit",
+    "permits.search": "Buscar permits...",
+    "permits.empty": "Nenhum permit cadastrado ainda.",
+    "permits.registerFirst": "Cadastrar primeiro permit",
+    "permits.all": "Todos",
+    "permits.actives": "Ativos",
+    "permits.expired": "Vencidos",
+    "permits.pendings": "Pendentes",
+    "permits.removePermit": "Remover permit?",
+
+    // Messages
+    "messages.title": "Mensagens",
+    "messages.subtitle": "Templates e agendamento de envios",
+    "messages.new": "Nova Mensagem",
+    "messages.sendPending": "Enviar Pendentes",
+    "messages.scheduled": "Agendadas",
+    "messages.sentTab": "Enviadas",
+    "messages.automations": "Automações",
+    "messages.templates": "Templates",
+    "messages.noScheduled": "Nenhuma mensagem agendada.",
+    "messages.schedule": "Agendar mensagem",
+    "messages.scheduledFor": "Agendada para",
+    "messages.message": "Mensagem",
+    "messages.channel": "Canal",
+    "messages.noSent": "Nenhuma mensagem enviada ainda.",
+    "messages.sentAt": "Enviada em",
+    "messages.newAutomation": "Nova Automação",
+    "messages.noAutomation": "Nenhuma automação configurada.",
+    "messages.automationDesc": "Crie regras para enviar alertas automaticamente quando permits estiverem próximos de vencer.",
+    "messages.createAutomation": "Criar automação",
+    "messages.daysBefore": "dias antes",
+    "messages.newTemplate": "Novo Template",
+    "messages.noTemplates": "Nenhum template criado.",
+    "messages.subject": "Assunto",
+    "messages.preview": "Pré-visualização da Mensagem",
+    "messages.sendComplete": "Envio concluído",
+    "messages.sendError": "Erro ao enviar",
+
+    // Calendar
+    "calendar.title": "Calendário",
+    "calendar.subtitle": "Vencimentos de permits e eventos",
+    "calendar.selectDate": "Selecione uma data",
+    "calendar.noPermitsDate": "Nenhum permit vence nesta data.",
+    "calendar.upcoming30": "Próximos Vencimentos (30 dias)",
+    "calendar.noUpcoming": "Nenhum permit vencendo nos próximos 30 dias. 🎉",
+    "calendar.expiredUrgent": "Vencido/Urgente",
+    "calendar.days31_90": "31-90 dias",
+
+    // Settings
+    "settings.title": "Configurações",
+    "settings.subtitle": "Integrações e preferências do sistema",
+    "settings.configureWhatsapp": "Configure a integração com WhatsApp",
+    "settings.configureSms": "Configure o provedor de SMS",
+    "settings.configureEmail": "Configure o provedor de email",
+    "settings.syncCalendar": "Sincronize vencimentos automaticamente",
+    "settings.configure": "Configurar",
+    "settings.connect": "Conectar",
+
+    // Admin
+    "admin.title": "Gerenciar Usuários",
+    "admin.subtitle": "Aprove ou rejeite solicitações de acesso",
+    "admin.noRequests": "Nenhuma solicitação de acesso.",
+    "admin.name": "Nome",
+    "admin.date": "Data",
+    "admin.approve": "Aprovar",
+    "admin.reject": "Rejeitar",
+    "admin.approved": "Aprovado",
+    "admin.rejected": "Rejeitado",
+    "admin.statusUpdated": "Status atualizado com sucesso",
+
+    // Onboarding
     "onboarding.title": "Cadastrar Novo Cliente",
     "onboarding.step": "Passo",
     "onboarding.companyData": "Dados da Empresa",
@@ -203,7 +198,10 @@ const translations: Record<Language, TranslationKeys> = {
     "onboarding.addTruck": "Adicionar Caminhão",
     "onboarding.addPermit": "Adicionar Permit",
     "onboarding.finishRegistration": "Finalizar Cadastro",
+    "onboarding.company": "Empresa",
+    "onboarding.noService": "Nenhum serviço selecionado",
 
+    // Login
     "login.welcome": "Bem-vindo de volta",
     "login.subtitle": "Entre com suas credenciais para acessar o sistema",
     "login.email": "Email",
@@ -214,6 +212,7 @@ const translations: Record<Language, TranslationKeys> = {
     "login.requestAccess": "Solicitar acesso",
     "login.error": "Erro ao entrar",
 
+    // Signup
     "signup.title": "Solicitar Acesso",
     "signup.subtitle": "Preencha seus dados para solicitar acesso ao sistema",
     "signup.fullName": "Nome completo",
@@ -225,6 +224,14 @@ const translations: Record<Language, TranslationKeys> = {
     "signup.successDesc": "Sua solicitação de acesso foi enviada. Verifique seu email para confirmar o cadastro. Após confirmação, o administrador irá avaliar sua solicitação.",
     "signup.backToLogin": "Voltar ao Login",
     "signup.error": "Erro ao solicitar acesso",
+
+    // Pending / Rejected / 404
+    "pending.title": "Aguardando Aprovação",
+    "pending.desc": "Sua conta está em análise. O administrador irá avaliar sua solicitação em breve.",
+    "rejected.title": "Acesso Negado",
+    "rejected.desc": "Sua solicitação de acesso foi recusada pelo administrador.",
+    "notFound.title": "Página não encontrada",
+    "notFound.back": "Voltar ao início",
 
     "language.title": "Idioma",
   },
@@ -274,6 +281,13 @@ const translations: Record<Language, TranslationKeys> = {
     "clients.phone": "Phone",
     "clients.services": "Services",
     "clients.status": "Status",
+    "clients.info": "Information",
+    "clients.notFound": "Client not found.",
+    "clients.removeClient": "Remove client?",
+    "clients.removeClientDesc": "This action cannot be undone. The client and all associated data will be permanently removed.",
+    "clients.noTrucks": "No trucks linked to this client.",
+    "clients.noPermits": "No permits linked to this client.",
+    "clients.notes": "Notes",
 
     "common.active": "Active",
     "common.inactive": "Inactive",
@@ -294,6 +308,98 @@ const translations: Record<Language, TranslationKeys> = {
     "common.sent": "Sent",
     "common.failed": "Failed",
     "common.cancelled": "Cancelled",
+    "common.actions": "Actions",
+    "common.type": "Type",
+    "common.number": "Number",
+    "common.state": "State",
+    "common.expiration": "Expiration",
+    "common.client": "Client",
+    "common.truck": "Truck",
+    "common.doc": "Doc",
+    "common.openDoc": "Open document",
+    "common.cannotUndo": "This action cannot be undone.",
+    "common.noDetails": "No details",
+    "common.today": "Today",
+
+    "trucks.title": "Trucks",
+    "trucks.subtitle": "Manage your clients' fleet",
+    "trucks.new": "New Truck",
+    "trucks.search": "Search by plate, VIN, make...",
+    "trucks.empty": "No trucks registered yet.",
+    "trucks.registerFirst": "Register first truck",
+    "trucks.plate": "Plate",
+    "trucks.makeModel": "Make/Model",
+    "trucks.year": "Year",
+    "trucks.removeTruck": "Remove truck?",
+    "trucks.removeTruckDesc": "This action cannot be undone. The truck will be permanently removed.",
+
+    "permits.title": "Permits",
+    "permits.subtitle": "IRP, IFTA, UCR, Oversize control and more",
+    "permits.new": "New Permit",
+    "permits.search": "Search permits...",
+    "permits.empty": "No permits registered yet.",
+    "permits.registerFirst": "Register first permit",
+    "permits.all": "All",
+    "permits.actives": "Active",
+    "permits.expired": "Expired",
+    "permits.pendings": "Pending",
+    "permits.removePermit": "Remove permit?",
+
+    "messages.title": "Messages",
+    "messages.subtitle": "Templates and scheduled sends",
+    "messages.new": "New Message",
+    "messages.sendPending": "Send Pending",
+    "messages.scheduled": "Scheduled",
+    "messages.sentTab": "Sent",
+    "messages.automations": "Automations",
+    "messages.templates": "Templates",
+    "messages.noScheduled": "No scheduled messages.",
+    "messages.schedule": "Schedule message",
+    "messages.scheduledFor": "Scheduled for",
+    "messages.message": "Message",
+    "messages.channel": "Channel",
+    "messages.noSent": "No messages sent yet.",
+    "messages.sentAt": "Sent at",
+    "messages.newAutomation": "New Automation",
+    "messages.noAutomation": "No automations configured.",
+    "messages.automationDesc": "Create rules to automatically send alerts when permits are close to expiring.",
+    "messages.createAutomation": "Create automation",
+    "messages.daysBefore": "days before",
+    "messages.newTemplate": "New Template",
+    "messages.noTemplates": "No templates created.",
+    "messages.subject": "Subject",
+    "messages.preview": "Message Preview",
+    "messages.sendComplete": "Send complete",
+    "messages.sendError": "Send error",
+
+    "calendar.title": "Calendar",
+    "calendar.subtitle": "Permit expirations and events",
+    "calendar.selectDate": "Select a date",
+    "calendar.noPermitsDate": "No permits expire on this date.",
+    "calendar.upcoming30": "Upcoming Expirations (30 days)",
+    "calendar.noUpcoming": "No permits expiring in the next 30 days. 🎉",
+    "calendar.expiredUrgent": "Expired/Urgent",
+    "calendar.days31_90": "31-90 days",
+
+    "settings.title": "Settings",
+    "settings.subtitle": "Integrations and system preferences",
+    "settings.configureWhatsapp": "Configure WhatsApp integration",
+    "settings.configureSms": "Configure SMS provider",
+    "settings.configureEmail": "Configure email provider",
+    "settings.syncCalendar": "Sync expirations automatically",
+    "settings.configure": "Configure",
+    "settings.connect": "Connect",
+
+    "admin.title": "Manage Users",
+    "admin.subtitle": "Approve or reject access requests",
+    "admin.noRequests": "No access requests.",
+    "admin.name": "Name",
+    "admin.date": "Date",
+    "admin.approve": "Approve",
+    "admin.reject": "Reject",
+    "admin.approved": "Approved",
+    "admin.rejected": "Rejected",
+    "admin.statusUpdated": "Status updated successfully",
 
     "onboarding.title": "Register New Client",
     "onboarding.step": "Step",
@@ -309,6 +415,8 @@ const translations: Record<Language, TranslationKeys> = {
     "onboarding.addTruck": "Add Truck",
     "onboarding.addPermit": "Add Permit",
     "onboarding.finishRegistration": "Finish Registration",
+    "onboarding.company": "Company",
+    "onboarding.noService": "No services selected",
 
     "login.welcome": "Welcome back",
     "login.subtitle": "Enter your credentials to access the system",
@@ -331,6 +439,13 @@ const translations: Record<Language, TranslationKeys> = {
     "signup.successDesc": "Your access request has been submitted. Check your email to confirm registration. After confirmation, the administrator will review your request.",
     "signup.backToLogin": "Back to Login",
     "signup.error": "Error requesting access",
+
+    "pending.title": "Awaiting Approval",
+    "pending.desc": "Your account is under review. The administrator will evaluate your request shortly.",
+    "rejected.title": "Access Denied",
+    "rejected.desc": "Your access request has been denied by the administrator.",
+    "notFound.title": "Page not found",
+    "notFound.back": "Return to Home",
 
     "language.title": "Language",
   },
@@ -380,6 +495,13 @@ const translations: Record<Language, TranslationKeys> = {
     "clients.phone": "Teléfono",
     "clients.services": "Servicios",
     "clients.status": "Estado",
+    "clients.info": "Información",
+    "clients.notFound": "Cliente no encontrado.",
+    "clients.removeClient": "¿Eliminar cliente?",
+    "clients.removeClientDesc": "Esta acción no se puede deshacer. El cliente y todos los datos asociados serán eliminados permanentemente.",
+    "clients.noTrucks": "Ningún camión vinculado a este cliente.",
+    "clients.noPermits": "Ningún permiso vinculado a este cliente.",
+    "clients.notes": "Observaciones",
 
     "common.active": "Activo",
     "common.inactive": "Inactivo",
@@ -400,6 +522,98 @@ const translations: Record<Language, TranslationKeys> = {
     "common.sent": "Enviados",
     "common.failed": "Fallidos",
     "common.cancelled": "Cancelados",
+    "common.actions": "Acciones",
+    "common.type": "Tipo",
+    "common.number": "Número",
+    "common.state": "Estado",
+    "common.expiration": "Vencimiento",
+    "common.client": "Cliente",
+    "common.truck": "Camión",
+    "common.doc": "Doc",
+    "common.openDoc": "Abrir documento",
+    "common.cannotUndo": "Esta acción no se puede deshacer.",
+    "common.noDetails": "Sin detalles",
+    "common.today": "Hoy",
+
+    "trucks.title": "Camiones",
+    "trucks.subtitle": "Gestiona la flota de tus clientes",
+    "trucks.new": "Nuevo Camión",
+    "trucks.search": "Buscar por placa, VIN, marca...",
+    "trucks.empty": "Ningún camión registrado aún.",
+    "trucks.registerFirst": "Registrar primer camión",
+    "trucks.plate": "Placa",
+    "trucks.makeModel": "Marca/Modelo",
+    "trucks.year": "Año",
+    "trucks.removeTruck": "¿Eliminar camión?",
+    "trucks.removeTruckDesc": "Esta acción no se puede deshacer. El camión será eliminado permanentemente.",
+
+    "permits.title": "Permisos",
+    "permits.subtitle": "Control de IRP, IFTA, UCR, Oversize y más",
+    "permits.new": "Nuevo Permiso",
+    "permits.search": "Buscar permisos...",
+    "permits.empty": "Ningún permiso registrado aún.",
+    "permits.registerFirst": "Registrar primer permiso",
+    "permits.all": "Todos",
+    "permits.actives": "Activos",
+    "permits.expired": "Vencidos",
+    "permits.pendings": "Pendientes",
+    "permits.removePermit": "¿Eliminar permiso?",
+
+    "messages.title": "Mensajes",
+    "messages.subtitle": "Templates y programación de envíos",
+    "messages.new": "Nuevo Mensaje",
+    "messages.sendPending": "Enviar Pendientes",
+    "messages.scheduled": "Programados",
+    "messages.sentTab": "Enviados",
+    "messages.automations": "Automatizaciones",
+    "messages.templates": "Templates",
+    "messages.noScheduled": "Ningún mensaje programado.",
+    "messages.schedule": "Programar mensaje",
+    "messages.scheduledFor": "Programado para",
+    "messages.message": "Mensaje",
+    "messages.channel": "Canal",
+    "messages.noSent": "Ningún mensaje enviado aún.",
+    "messages.sentAt": "Enviado en",
+    "messages.newAutomation": "Nueva Automatización",
+    "messages.noAutomation": "Ninguna automatización configurada.",
+    "messages.automationDesc": "Crea reglas para enviar alertas automáticamente cuando los permisos estén por vencer.",
+    "messages.createAutomation": "Crear automatización",
+    "messages.daysBefore": "días antes",
+    "messages.newTemplate": "Nuevo Template",
+    "messages.noTemplates": "Ningún template creado.",
+    "messages.subject": "Asunto",
+    "messages.preview": "Vista previa del Mensaje",
+    "messages.sendComplete": "Envío completado",
+    "messages.sendError": "Error al enviar",
+
+    "calendar.title": "Calendario",
+    "calendar.subtitle": "Vencimientos de permisos y eventos",
+    "calendar.selectDate": "Selecciona una fecha",
+    "calendar.noPermitsDate": "Ningún permiso vence en esta fecha.",
+    "calendar.upcoming30": "Próximos Vencimientos (30 días)",
+    "calendar.noUpcoming": "Ningún permiso venciendo en los próximos 30 días. 🎉",
+    "calendar.expiredUrgent": "Vencido/Urgente",
+    "calendar.days31_90": "31-90 días",
+
+    "settings.title": "Configuración",
+    "settings.subtitle": "Integraciones y preferencias del sistema",
+    "settings.configureWhatsapp": "Configura la integración con WhatsApp",
+    "settings.configureSms": "Configura el proveedor de SMS",
+    "settings.configureEmail": "Configura el proveedor de email",
+    "settings.syncCalendar": "Sincroniza vencimientos automáticamente",
+    "settings.configure": "Configurar",
+    "settings.connect": "Conectar",
+
+    "admin.title": "Gestionar Usuarios",
+    "admin.subtitle": "Aprueba o rechaza solicitudes de acceso",
+    "admin.noRequests": "Ninguna solicitud de acceso.",
+    "admin.name": "Nombre",
+    "admin.date": "Fecha",
+    "admin.approve": "Aprobar",
+    "admin.reject": "Rechazar",
+    "admin.approved": "Aprobado",
+    "admin.rejected": "Rechazado",
+    "admin.statusUpdated": "Estado actualizado exitosamente",
 
     "onboarding.title": "Registrar Nuevo Cliente",
     "onboarding.step": "Paso",
@@ -415,6 +629,8 @@ const translations: Record<Language, TranslationKeys> = {
     "onboarding.addTruck": "Agregar Camión",
     "onboarding.addPermit": "Agregar Permiso",
     "onboarding.finishRegistration": "Finalizar Registro",
+    "onboarding.company": "Empresa",
+    "onboarding.noService": "Ningún servicio seleccionado",
 
     "login.welcome": "Bienvenido de vuelta",
     "login.subtitle": "Ingresa tus credenciales para acceder al sistema",
@@ -438,11 +654,18 @@ const translations: Record<Language, TranslationKeys> = {
     "signup.backToLogin": "Volver al Login",
     "signup.error": "Error al solicitar acceso",
 
+    "pending.title": "Esperando Aprobación",
+    "pending.desc": "Tu cuenta está en revisión. El administrador evaluará tu solicitud pronto.",
+    "rejected.title": "Acceso Denegado",
+    "rejected.desc": "Tu solicitud de acceso fue rechazada por el administrador.",
+    "notFound.title": "Página no encontrada",
+    "notFound.back": "Volver al inicio",
+
     "language.title": "Idioma",
   },
 };
 
-export function getTranslation(lang: Language, key: keyof TranslationKeys): string {
+export function getTranslation(lang: Language, key: string): string {
   return translations[lang]?.[key] ?? translations.pt[key] ?? key;
 }
 
