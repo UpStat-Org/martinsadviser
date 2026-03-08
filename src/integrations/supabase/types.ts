@@ -236,6 +236,63 @@ export type Database = {
         }
         Relationships: []
       }
+      document_signatures: {
+        Row: {
+          client_id: string
+          created_at: string
+          document_name: string
+          id: string
+          ip_address: string | null
+          permit_id: string | null
+          signature_data: string
+          signed_at: string
+          signer_email: string | null
+          signer_name: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          document_name: string
+          id?: string
+          ip_address?: string | null
+          permit_id?: string | null
+          signature_data: string
+          signed_at?: string
+          signer_email?: string | null
+          signer_name: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          document_name?: string
+          id?: string
+          ip_address?: string | null
+          permit_id?: string | null
+          signature_data?: string
+          signed_at?: string
+          signer_email?: string | null
+          signer_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_signatures_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_signatures_permit_id_fkey"
+            columns: ["permit_id"]
+            isOneToOne: false
+            referencedRelation: "permits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount: number
