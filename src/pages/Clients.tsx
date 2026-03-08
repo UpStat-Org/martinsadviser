@@ -7,10 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Loader2 } from "lucide-react";
+import { Plus, Search, Loader2, Upload } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
 import { ClientFormDialog } from "@/components/ClientFormDialog";
+import { ClientImportDialog } from "@/components/ClientImportDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
