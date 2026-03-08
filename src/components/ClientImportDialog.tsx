@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import * as XLSX from "xlsx";
+// xlsx is dynamically imported to avoid bundling issues
 
 interface Props {
   open: boolean;
@@ -66,7 +66,8 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
     setResults({ success: 0, errors: [] });
   };
 
-  const handleFile = useCallback((file: File) => {
+  const handleFile = useCallback(async (file: File) => {
+    const XLSX = await import("xlsx");
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
