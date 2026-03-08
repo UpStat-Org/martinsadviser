@@ -199,6 +199,40 @@ export default function Messages() {
 
       <MessageTemplateDialog open={templateOpen} onOpenChange={setTemplateOpen} template={editTemplate} />
       <ScheduleMessageDialog open={scheduleOpen} onOpenChange={setScheduleOpen} />
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewMsg} onOpenChange={() => setPreviewMsg(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Pré-visualização da Mensagem</DialogTitle>
+          </DialogHeader>
+          {previewMsg && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                {channelIcon(previewMsg.channel)}
+                <span className="capitalize">{previewMsg.channel}</span>
+                <span>•</span>
+                <span>{previewMsg.clients?.company_name || "—"}</span>
+              </div>
+              {previewMsg.subject && (
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">Assunto</p>
+                  <p className="text-sm font-medium">{replacePlaceholders(previewMsg.subject, previewMsg.clients)}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-xs font-medium text-muted-foreground">Mensagem</p>
+                <p className="text-sm whitespace-pre-wrap rounded-md border bg-muted/50 p-3">
+                  {replacePlaceholders(previewMsg.body, previewMsg.clients)}
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Agendada para: {format(new Date(previewMsg.scheduled_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+              </p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
