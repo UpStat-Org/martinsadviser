@@ -230,6 +230,14 @@ export default function ClientDetail() {
       <ClientFormDialog open={editOpen} onOpenChange={setEditOpen} client={client} />
       <TruckFormDialog open={truckDialogOpen} onOpenChange={setTruckDialogOpen} truck={editingTruck} defaultClientId={id} />
       <PermitFormDialog open={permitDialogOpen} onOpenChange={setPermitDialogOpen} permit={editingPermit} defaultClientId={id} />
+      {viewDocUrl && (
+        <DocumentViewer
+          open={!!viewDocUrl}
+          onOpenChange={(v) => { if (!v) setViewDocUrl(null); }}
+          url={viewDocUrl}
+          title={viewDocTitle}
+        />
+      )}
     </div>
   );
 }
