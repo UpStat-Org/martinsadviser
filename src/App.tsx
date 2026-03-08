@@ -66,6 +66,7 @@ const App = () => (
               <Route path="/tasks" element={<KanbanPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/finance" element={<FinancePage />} />
               <Route path="/admin/users" element={<AdminUsers />} />
             </Route>
             <Route path="*" element={<NotFound />} />

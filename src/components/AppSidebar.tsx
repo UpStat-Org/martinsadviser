@@ -26,6 +26,7 @@ export function AppSidebar() {
     { to: "/calendar", icon: CalendarDays, label: t("nav.calendar") },
     { to: "/reports", icon: BarChart3, label: t("nav.reports") },
     { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
+    { to: "/finance", icon: DollarSign, label: t("nav.finance") },
   ];
 
   const handleLogout = async () => {

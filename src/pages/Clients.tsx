@@ -134,6 +134,7 @@ export default function Clients() {
       )}
 
       <ClientFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <ClientImportDialog open={importOpen} onOpenChange={setImportOpen} />
     </div>
   );
 }
