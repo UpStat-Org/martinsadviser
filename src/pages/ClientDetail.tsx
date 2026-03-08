@@ -22,6 +22,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -79,6 +80,8 @@ export default function ClientDetail() {
   const handleEditPermit = (permit: Permit) => { setEditingPermit(permit); setPermitDialogOpen(true); };
   const handleNewPermit = () => { setEditingPermit(null); setPermitDialogOpen(true); };
 
+  const { toast } = useToast();
+
   const handleGenerateReport = async () => {
     setAiLoading(true);
     try {
@@ -90,7 +93,8 @@ export default function ClientDetail() {
       setAiReport(data.report);
       setAiReportOpen(true);
     } catch (e: any) {
-      console.error(e);
+      console.error("AI Report error:", e);
+      toast({ title: "Erro ao gerar relatório", description: e.message, variant: "destructive" });
     } finally {
       setAiLoading(false);
     }
