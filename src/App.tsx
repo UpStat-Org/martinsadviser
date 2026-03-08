@@ -23,6 +23,7 @@ import SettingsPage from "./pages/SettingsPage";
 import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
 import ReportsPage from "./pages/ReportsPage";
+import KanbanPage from "./pages/KanbanPage";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalLayout from "./pages/portal/PortalLayout";
 import PortalDashboard from "./pages/portal/PortalDashboard";
@@ -61,6 +62,7 @@ const App = () => (
               <Route path="/permits" element={<Permits />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/tasks" element={<KanbanPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/admin/users" element={<AdminUsers />} />

@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
-  Settings, LogOut, ChevronLeft, ChevronRight, ShieldCheck, BarChart3,
+  Settings, LogOut, ChevronLeft, ChevronRight, ShieldCheck, BarChart3, ClipboardList,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -25,6 +25,7 @@ export function AppSidebar() {
     { to: "/messages", icon: MessageSquare, label: t("nav.messages") },
     { to: "/calendar", icon: CalendarDays, label: t("nav.calendar") },
     { to: "/reports", icon: BarChart3, label: t("nav.reports") },
+    { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
   ];
 
   const handleLogout = async () => {
