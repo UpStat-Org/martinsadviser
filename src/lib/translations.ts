@@ -185,12 +185,17 @@ const translations: Record<Language, Record<string, string>> = {
     // Settings
     "settings.title": "Configurações",
     "settings.subtitle": "Integrações e preferências do sistema",
-    "settings.configureWhatsapp": "Configure a integração com WhatsApp",
-    "settings.configureSms": "Configure o provedor de SMS",
-    "settings.configureEmail": "Configure o provedor de email",
-    "settings.syncCalendar": "Sincronize vencimentos automaticamente",
-    "settings.configure": "Configurar",
+    "settings.syncCalendar": "Sincronize vencimentos de permits automaticamente com o Google Calendar",
     "settings.connect": "Conectar",
+    "settings.disconnect": "Desconectar",
+    "settings.connected": "Conectado",
+    "settings.notConnected": "Não conectado",
+    "settings.syncNow": "Sincronizar Agora",
+    "settings.syncing": "Sincronizando...",
+    "settings.syncSuccess": "Sincronização concluída!",
+    "settings.syncError": "Erro ao sincronizar",
+    "settings.connectError": "Erro ao conectar",
+    "settings.disconnected": "Desconectado com sucesso",
 
     // Admin
     "admin.title": "Gerenciar Usuários",
