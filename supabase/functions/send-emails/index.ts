@@ -35,7 +35,7 @@ async function sendWhatsApp(apiKey: string, phone: string, body: string, templat
     payload.variables = { message: body };
   } else {
     // Use a generic template or send raw text
-    payload.templateId = "generic-notification";
+    payload.templateId = "generic_notification";
     payload.variables = { message: body };
   }
 
