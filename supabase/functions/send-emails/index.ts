@@ -14,7 +14,7 @@ async function sendEmail(resendApiKey: string, toEmail: string, subject: string,
       Authorization: `Bearer ${resendApiKey}`,
     },
     body: JSON.stringify({
-      from: "Permits <onboarding@resend.dev>",
+      from: "Permits <noreply@upstat.online>",
       to: [toEmail],
       subject: subject || "Aviso de Vencimento",
       text: body,
