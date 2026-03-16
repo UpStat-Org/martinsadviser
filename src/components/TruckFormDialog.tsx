@@ -68,6 +68,34 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
         },
   });
 
+  useEffect(() => {
+    if (open) {
+      form.reset(
+        truck
+          ? {
+              client_id: truck.client_id,
+              plate: truck.plate,
+              vin: truck.vin || "",
+              year: truck.year || undefined,
+              make: truck.make || "",
+              model: truck.model || "",
+              status: truck.status,
+              notes: truck.notes || "",
+            }
+          : {
+              client_id: defaultClientId || "",
+              plate: "",
+              vin: "",
+              year: undefined,
+              make: "",
+              model: "",
+              status: "active",
+              notes: "",
+            }
+      );
+    }
+  }, [open, truck]);
+
   const onSubmit = async (values: FormValues) => {
     const payload = {
       client_id: values.client_id,
