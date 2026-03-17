@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { useParams, useNavigate } from "react-router-dom";
 import { useClient, useDeleteClient } from "@/hooks/useClients";
 import { useTrucks, useDeleteTruck, type Truck } from "@/hooks/useTrucks";
@@ -316,8 +317,8 @@ export default function ClientDetail() {
               {t("ai.reportTitle")} — {client.company_name}
             </DialogTitle>
           </DialogHeader>
-          <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
-            {aiReport}
+          <div className="prose prose-sm dark:prose-invert max-w-none">
+            <ReactMarkdown>{aiReport || ""}</ReactMarkdown>
           </div>
         </DialogContent>
       </Dialog>
