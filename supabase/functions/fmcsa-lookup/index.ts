@@ -1,32 +1,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import https from "node:https";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
-
-function fetchFmcsa(url: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const req = https.get(
-      url,
-      { rejectUnauthorized: false, headers: { Accept: "application/json" } },
-      (res) => {
-        let body = "";
-        res.on("data", (chunk: string) => (body += chunk));
-        res.on("end", () => {
-          if (res.statusCode && res.statusCode >= 400) {
-            reject(new Error(`FMCSA API error [${res.statusCode}]: ${body}`));
-          } else {
-            resolve(body);
-          }
-        });
-      }
-    );
-    req.on("error", reject);
-  });
-}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -59,10 +37,20 @@ Deno.serve(async (req) => {
     const webKey = Deno.env.get("FMCSA_WEB_KEY");
     if (!webKey) throw new Error("FMCSA_WEB_KEY not configured");
 
-    // Call FMCSA QC API using node:https to bypass TLS cert issue
-    const apiUrl = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dot_number}?webKey=${webKey}`;
-    const responseText = await fetchFmcsa(apiUrl);
-    const data = JSON.parse(responseText);
+    // Call FMCSA QC API via allorigins proxy to bypass TLS certificate issue
+    const fmcsaUrl = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dot_number}?webKey=${webKey}`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(fmcsaUrl)}`;
+    
+    const response = await fetch(proxyUrl, {
+      headers: { Accept: "application/json" },
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`FMCSA API error [${response.status}]: ${text}`);
+    }
+
+    const data = await response.json();
     const carrier = data?.content?.carrier;
 
     if (!carrier) {
@@ -84,7 +72,6 @@ Deno.serve(async (req) => {
       mc: carrier.mcNumber || "",
       ein: carrier.ein || "",
       dot: String(carrier.dotNumber || dot_number),
-      // Extra info
       totalDrivers: carrier.totalDrivers || 0,
       totalPowerUnits: carrier.totalPowerUnits || 0,
       carrierOperation: carrier.carrierOperation?.carrierOperationDesc || "",
