@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Agent, fetch as undiciFetch } from "npm:undici@6";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -37,10 +38,18 @@ Deno.serve(async (req) => {
     const webKey = Deno.env.get("FMCSA_WEB_KEY");
     if (!webKey) throw new Error("FMCSA_WEB_KEY not configured");
 
-    // Call FMCSA QC API
+    // Call FMCSA QC API using undici with TLS verification disabled
     const apiUrl = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dot_number}?webKey=${webKey}`;
-    const response = await fetch(apiUrl, {
+    
+    const agent = new Agent({
+      connect: {
+        rejectUnauthorized: false,
+      },
+    });
+
+    const response = await undiciFetch(apiUrl, {
       headers: { Accept: "application/json" },
+      dispatcher: agent,
     });
 
     if (!response.ok) {
@@ -49,7 +58,7 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json();
-    const carrier = data?.content?.carrier;
+    const carrier = (data as any)?.content?.carrier;
 
     if (!carrier) {
       throw new Error("Carrier not found for DOT " + dot_number);
@@ -70,7 +79,6 @@ Deno.serve(async (req) => {
       mc: carrier.mcNumber || "",
       ein: carrier.ein || "",
       dot: String(carrier.dotNumber || dot_number),
-      // Extra info
       totalDrivers: carrier.totalDrivers || 0,
       totalPowerUnits: carrier.totalPowerUnits || 0,
       carrierOperation: carrier.carrierOperation?.carrierOperationDesc || "",
