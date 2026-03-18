@@ -37,10 +37,13 @@ Deno.serve(async (req) => {
     const webKey = Deno.env.get("FMCSA_WEB_KEY");
     if (!webKey) throw new Error("FMCSA_WEB_KEY not configured");
 
-    // Call FMCSA QC API
+    // Call FMCSA QC API - use custom HTTP client to handle their TLS cert
     const apiUrl = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dot_number}?webKey=${webKey}`;
+    const httpClient = Deno.createHttpClient({ caCerts: [] });
     const response = await fetch(apiUrl, {
       headers: { Accept: "application/json" },
+      // @ts-ignore - Deno specific API
+      client: httpClient,
     });
 
     if (!response.ok) {
