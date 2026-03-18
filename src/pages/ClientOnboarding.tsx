@@ -326,7 +326,19 @@ export default function ClientOnboarding() {
                   <FormField control={form.control} name="dot" render={({ field }) => (
                     <FormItem>
                       <FormLabel>DOT #</FormLabel>
-                      <FormControl><Input placeholder="USDOT Number" {...field} /></FormControl>
+                      <div className="flex gap-2">
+                        <FormControl><Input placeholder="USDOT Number" {...field} /></FormControl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={handleDotLookup}
+                          disabled={lookingUp}
+                          title="Buscar dados FMCSA"
+                        >
+                          {lookingUp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                        </Button>
+                      </div>
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="mc" render={({ field }) => (
