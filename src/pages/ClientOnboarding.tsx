@@ -82,6 +82,38 @@ export default function ClientOnboarding() {
 
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [lookingUp, setLookingUp] = useState(false);
+
+  const handleDotLookup = async () => {
+    const dotValue = form.getValues("dot");
+    if (!dotValue?.trim()) {
+      sonnerToast.error("Digite o número DOT primeiro");
+      return;
+    }
+    setLookingUp(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("fmcsa-lookup", {
+        body: { dot_number: dotValue.trim() },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data.company_name) form.setValue("company_name", data.company_name);
+      if (data.phone) form.setValue("phone", data.phone);
+      if (data.address) form.setValue("address", data.address);
+      if (data.mc) form.setValue("mc", data.mc);
+      if (data.ein) form.setValue("ein", data.ein);
+      if (data.dot) form.setValue("dot", data.dot);
+
+      sonnerToast.success("Dados FMCSA importados!", {
+        description: `${data.company_name} — ${data.totalPowerUnits || 0} veículos, ${data.totalDrivers || 0} motoristas`,
+      });
+    } catch (err: any) {
+      sonnerToast.error("Erro ao buscar DOT", { description: err.message });
+    } finally {
+      setLookingUp(false);
+    }
+  };
 
   // Step 1: Client info
   const form = useForm<ClientValues>({
