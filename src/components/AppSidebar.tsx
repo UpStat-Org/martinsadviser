@@ -2,6 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
   Settings, LogOut, ChevronLeft, ChevronRight, ShieldCheck, BarChart3, ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen,
+  Sparkles,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -24,15 +25,21 @@ export function AppSidebar() {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  const navItems = [
+  const mainNavItems = [
     { to: "/", icon: LayoutDashboard, label: t("nav.dashboard") },
     { to: "/clients", icon: Users, label: t("nav.clients") },
     { to: "/trucks", icon: Truck, label: t("nav.trucks") },
     { to: "/permits", icon: FileCheck, label: t("nav.permits") },
+    { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
+  ];
+
+  const commsNavItems = [
     { to: "/messages", icon: MessageSquare, label: t("nav.messages") },
     { to: "/calendar", icon: CalendarDays, label: t("nav.calendar") },
+  ];
+
+  const insightsNavItems = [
     { to: "/reports", icon: BarChart3, label: t("nav.reports") },
-    { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
     { to: "/finance", icon: DollarSign, label: t("nav.finance") },
     { to: "/docs", icon: BookOpen, label: t("nav.docs") },
   ];
@@ -42,17 +49,74 @@ export function AppSidebar() {
     navigate("/login");
   };
 
+  const isActive = (path: string) =>
+    path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
+
+  const showLabel = !collapsed || isMobile;
+
+  const renderNavItem = (item: { to: string; icon: any; label: string }) => {
+    const active = isActive(item.to);
+    return (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        title={collapsed ? item.label : undefined}
+        className={cn(
+          "group flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 relative",
+          collapsed && !isMobile && "justify-center px-0",
+          active
+            ? "bg-sidebar-accent text-sidebar-primary-foreground shadow-sm"
+            : "text-sidebar-foreground/70 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
+        )}
+      >
+        {active && (
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full bg-gradient-to-b from-sidebar-primary to-sidebar-primary/60" />
+        )}
+        <item.icon
+          className={cn(
+            "w-[18px] h-[18px] shrink-0 transition-colors",
+            active
+              ? "text-sidebar-primary"
+              : "text-sidebar-foreground/50 group-hover:text-sidebar-foreground/80"
+          )}
+        />
+        {showLabel && <span className="truncate">{item.label}</span>}
+      </NavLink>
+    );
+  };
+
+  const renderSection = (label: string, items: typeof mainNavItems) => (
+    <div className="space-y-0.5">
+      {showLabel && (
+        <p className="px-3 pt-4 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-sidebar-foreground/30">
+          {label}
+        </p>
+      )}
+      {!showLabel && <div className="my-2 mx-3 h-px bg-sidebar-border/60" />}
+      {items.map(renderNavItem)}
+    </div>
+  );
+
   const sidebarContent = (
-    <>
+    <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border">
-        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-sidebar-primary to-sidebar-primary/70 text-sidebar-primary-foreground font-display font-bold text-sm shrink-0 shadow-soft">
+      <div className={cn(
+        "flex items-center gap-3 h-16 border-b border-sidebar-border/50 shrink-0",
+        collapsed && !isMobile ? "justify-center px-2" : "px-5"
+      )}>
+        <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-sidebar-primary via-sidebar-primary/80 to-purple-500 text-white font-display font-bold text-xs shrink-0 shadow-lg shadow-sidebar-primary/20">
           MA
+          <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-sidebar-background" />
         </div>
-        {(!collapsed || isMobile) && (
-          <span className="font-display font-bold text-sidebar-primary-foreground text-lg truncate tracking-tight">
-            MartinsAdviser
-          </span>
+        {showLabel && (
+          <div className="flex flex-col min-w-0">
+            <span className="font-display font-bold text-sidebar-primary-foreground text-sm truncate tracking-tight leading-tight">
+              MartinsAdviser
+            </span>
+            <span className="text-[10px] text-sidebar-foreground/40 leading-tight">
+              Permit Management
+            </span>
+          </div>
         )}
         {isMobile && (
           <button onClick={() => setMobileOpen(false)} className="ml-auto text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors">
@@ -61,99 +125,45 @@ export function AppSidebar() {
         )}
       </div>
 
-      {/* Main nav */}
-      <nav className="flex-1 py-4 space-y-0.5 px-2 overflow-y-auto">
-        {navItems.map((item) => {
-          const isActive = item.to === "/" ? location.pathname === "/" : location.pathname.startsWith(item.to);
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={cn(
-                "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative",
-                isActive
-                  ? "bg-sidebar-accent text-sidebar-primary-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-              )}
-            >
-              {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-sidebar-primary rounded-r-full" />
-              )}
-              <item.icon className={cn("w-5 h-5 shrink-0 transition-colors", isActive ? "text-sidebar-primary" : "text-sidebar-foreground/60 group-hover:text-sidebar-foreground")} />
-              {(!collapsed || isMobile) && <span className="truncate">{item.label}</span>}
-            </NavLink>
-          );
-        })}
+      {/* Navigation */}
+      <nav className="flex-1 py-2 px-2.5 overflow-y-auto space-y-0.5 sidebar-scrollbar">
+        {renderSection("Menu", mainNavItems)}
+        {renderSection("Comunicação", commsNavItems)}
+        {renderSection("Insights", insightsNavItems)}
       </nav>
 
       {/* Bottom section */}
-      <div className="border-t border-sidebar-border p-2 space-y-0.5">
+      <div className="border-t border-sidebar-border/50 p-2.5 space-y-0.5 shrink-0">
         {isAdmin && (
           <>
-            <NavLink
-              to="/admin/users"
-              className={cn(
-                "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative",
-                location.pathname === "/admin/users"
-                  ? "bg-sidebar-accent text-sidebar-primary-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-              )}
-            >
-              {location.pathname === "/admin/users" && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-sidebar-primary rounded-r-full" />
-              )}
-              <ShieldCheck className={cn("w-5 h-5 shrink-0", location.pathname === "/admin/users" ? "text-sidebar-primary" : "text-sidebar-foreground/60")} />
-              {(!collapsed || isMobile) && <span>{t("nav.users")}</span>}
-            </NavLink>
-            <NavLink
-              to="/audit"
-              className={cn(
-                "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative",
-                location.pathname === "/audit"
-                  ? "bg-sidebar-accent text-sidebar-primary-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-              )}
-            >
-              {location.pathname === "/audit" && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-sidebar-primary rounded-r-full" />
-              )}
-              <ScrollText className={cn("w-5 h-5 shrink-0", location.pathname === "/audit" ? "text-sidebar-primary" : "text-sidebar-foreground/60")} />
-              {(!collapsed || isMobile) && <span>{t("nav.audit")}</span>}
-            </NavLink>
+            {renderNavItem({ to: "/admin/users", icon: ShieldCheck, label: t("nav.users") })}
+            {renderNavItem({ to: "/audit", icon: ScrollText, label: t("nav.audit") })}
           </>
         )}
-        <NavLink
-          to="/settings"
-          className={cn(
-            "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative",
-            location.pathname === "/settings"
-              ? "bg-sidebar-accent text-sidebar-primary-foreground"
-              : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-          )}
-        >
-          {location.pathname === "/settings" && (
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-sidebar-primary rounded-r-full" />
-          )}
-          <Settings className={cn("w-5 h-5 shrink-0", location.pathname === "/settings" ? "text-sidebar-primary" : "text-sidebar-foreground/60")} />
-          {(!collapsed || isMobile) && <span>{t("nav.settings")}</span>}
-        </NavLink>
+        {renderNavItem({ to: "/settings", icon: Settings, label: t("nav.settings") })}
+
         <button
           onClick={handleLogout}
-          className="group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-sidebar-foreground hover:bg-destructive/10 hover:text-destructive w-full"
+          title={collapsed ? t("nav.logout") : undefined}
+          className={cn(
+            "group flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 text-sidebar-foreground/60 hover:bg-red-500/10 hover:text-red-400 w-full",
+            collapsed && !isMobile && "justify-center px-0"
+          )}
         >
-          <LogOut className="w-5 h-5 shrink-0 text-sidebar-foreground/60 group-hover:text-destructive transition-colors" />
-          {(!collapsed || isMobile) && <span>{t("nav.logout")}</span>}
+          <LogOut className="w-[18px] h-[18px] shrink-0 text-sidebar-foreground/40 group-hover:text-red-400 transition-colors" />
+          {showLabel && <span>{t("nav.logout")}</span>}
         </button>
+
         {!isMobile && (
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex items-center justify-center w-full py-2 text-sidebar-foreground/40 hover:text-sidebar-foreground transition-colors"
+            className="flex items-center justify-center w-full py-1.5 mt-1 rounded-md text-sidebar-foreground/30 hover:text-sidebar-foreground/60 hover:bg-sidebar-accent/30 transition-all"
           >
-            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
           </button>
         )}
       </div>
-    </>
+    </div>
   );
 
   if (isMobile) {
@@ -167,12 +177,12 @@ export function AppSidebar() {
         </button>
 
         {mobileOpen && (
-          <div className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <div className="fixed inset-0 z-40 bg-foreground/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
         )}
 
         <aside
           className={cn(
-            "fixed inset-y-0 left-0 z-50 flex flex-col w-72 bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-transform duration-300",
+            "fixed inset-y-0 left-0 z-50 flex flex-col w-72 bg-sidebar text-sidebar-foreground border-r border-sidebar-border/50 shadow-2xl transition-transform duration-300",
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
@@ -185,10 +195,12 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "hidden lg:flex flex-col h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300",
-        collapsed ? "w-16" : "w-64"
+        "hidden lg:flex flex-col h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border/40 transition-all duration-300 relative",
+        collapsed ? "w-[60px]" : "w-60"
       )}
     >
+      {/* Subtle gradient overlay at the top */}
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-sidebar-primary/[0.04] to-transparent pointer-events-none" />
       {sidebarContent}
     </aside>
   );

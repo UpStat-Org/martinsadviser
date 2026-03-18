@@ -48,14 +48,14 @@
     --chart-4: 0 68% 55%;
     --chart-5: 280 55% 55%;
 
-    --sidebar-background: 225 25% 10%;
+    --sidebar-background: 228 24% 8%;
     --sidebar-foreground: 220 14% 72%;
-    --sidebar-primary: 234 75% 62%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 225 20% 16%;
+    --sidebar-primary: 234 80% 65%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 228 20% 14%;
     --sidebar-accent-foreground: 220 14% 92%;
-    --sidebar-border: 225 18% 18%;
-    --sidebar-ring: 234 75% 62%;
+    --sidebar-border: 228 16% 16%;
+    --sidebar-ring: 234 80% 65%;
   }
 
   .dark {
