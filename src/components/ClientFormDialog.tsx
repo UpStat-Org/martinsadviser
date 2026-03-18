@@ -28,8 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateClient, useUpdateClient, type Client } from "@/hooks/useClients";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useFmcsaLookup } from "@/hooks/useFmcsaLookup";
 import { Loader2, Search } from "lucide-react";
 
 const formSchema = z.object({
