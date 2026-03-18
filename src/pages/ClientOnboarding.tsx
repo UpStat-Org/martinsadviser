@@ -17,7 +17,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  ArrowLeft, ArrowRight, Building2, Settings2, Truck, FileCheck, CheckCircle2, Plus, X, Loader2,
+  ArrowLeft, ArrowRight, Building2, Settings2, Truck, FileCheck, CheckCircle2, Plus, X, Loader2, Search,
 } from "lucide-react";
 import { useCreateClient } from "@/hooks/useClients";
 import { useCreateTruck } from "@/hooks/useTrucks";
