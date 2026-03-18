@@ -37,9 +37,9 @@ Deno.serve(async (req) => {
     const webKey = Deno.env.get("FMCSA_WEB_KEY");
     if (!webKey) throw new Error("FMCSA_WEB_KEY not configured");
 
-    // Call FMCSA QC API via corsproxy to bypass TLS certificate issue
+    // Call FMCSA QC API via allorigins proxy to bypass TLS certificate issue
     const fmcsaUrl = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${dot_number}?webKey=${webKey}`;
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(fmcsaUrl)}`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(fmcsaUrl)}`;
     
     const response = await fetch(proxyUrl, {
       headers: { Accept: "application/json" },
