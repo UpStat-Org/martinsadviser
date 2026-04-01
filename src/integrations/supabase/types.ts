@@ -182,6 +182,7 @@ export type Database = {
           mc: string | null
           notes: string | null
           phone: string | null
+          registration_responsible: string | null
           service_automatic: boolean
           service_ct: boolean
           service_ifta: boolean
@@ -203,6 +204,7 @@ export type Database = {
           mc?: string | null
           notes?: string | null
           phone?: string | null
+          registration_responsible?: string | null
           service_automatic?: boolean
           service_ct?: boolean
           service_ifta?: boolean
@@ -224,6 +226,7 @@ export type Database = {
           mc?: string | null
           notes?: string | null
           phone?: string | null
+          registration_responsible?: string | null
           service_automatic?: boolean
           service_ct?: boolean
           service_ifta?: boolean

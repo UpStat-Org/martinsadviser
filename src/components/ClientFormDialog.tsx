@@ -33,6 +33,7 @@ import { Loader2, Search } from "lucide-react";
 
 const formSchema = z.object({
   company_name: z.string().min(1, "Nome da empresa é obrigatório"),
+  registration_responsible: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().email("Email inválido").optional().or(z.literal("")),
   address: z.string().optional(),
@@ -90,6 +91,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
     defaultValues: client
       ? {
           company_name: client.company_name,
+          registration_responsible: (client as any).registration_responsible || "",
           phone: client.phone || "",
           email: client.email || "",
           address: client.address || "",
@@ -107,6 +109,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
         }
       : {
           company_name: "",
+          registration_responsible: "",
           phone: "",
           email: "",
           address: "",
@@ -127,6 +130,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
   const onSubmit = async (values: FormValues) => {
     const payload = {
       company_name: values.company_name,
+      registration_responsible: values.registration_responsible || null,
       status: values.status,
       service_ifta: values.service_ifta,
       service_ct: values.service_ct,
@@ -175,6 +179,20 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                     <FormLabel>Company Name *</FormLabel>
                     <FormControl>
                       <Input placeholder="Nome da empresa" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="registration_responsible"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Nome do Responsável do Cadastro</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome do responsável" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
