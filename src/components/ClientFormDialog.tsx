@@ -198,6 +198,10 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="phone"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
