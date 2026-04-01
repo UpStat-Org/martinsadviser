@@ -11,6 +11,8 @@ export const PERMIT_TYPES = [
   "IRP",
   "IFTA",
   "UCR",
+  "Apportioned",
+  "Renew Commercial",
   "Oversize",
   "Overweight",
   "Trip Permit",

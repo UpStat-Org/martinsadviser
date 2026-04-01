@@ -33,6 +33,7 @@ import { Loader2, Search } from "lucide-react";
 
 const formSchema = z.object({
   company_name: z.string().min(1, "Nome da empresa é obrigatório"),
+  registration_responsible: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().email("Email inválido").optional().or(z.literal("")),
   address: z.string().optional(),
