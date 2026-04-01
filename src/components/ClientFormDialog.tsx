@@ -187,7 +187,17 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
 
               <FormField
                 control={form.control}
-                name="phone"
+                name="registration_responsible"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Nome do Responsável do Cadastro</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome do responsável" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
