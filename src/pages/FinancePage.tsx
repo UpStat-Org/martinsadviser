@@ -12,7 +12,7 @@ import { useInvoices, useCreateInvoice, useUpdateInvoice, useDeleteInvoice, type
 import { useClients } from "@/hooks/useClients";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
-import { DollarSign, Plus, Loader2, Pencil, Trash2, TrendingUp, Clock, AlertTriangle } from "lucide-react";
+import { DollarSign, Plus, Loader2, Pencil, Trash2, TrendingUp, Clock, AlertTriangle, Download, Trophy } from "lucide-react";
 import { format } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -114,6 +114,44 @@ export default function FinancePage() {
     return Object.entries(counts).filter(([, v]) => v > 0).map(([name, value]) => ({ name, value }));
   }, [invoices]);
 
+  const revenueByClient = useMemo(() => {
+    if (!invoices || !clients) return [];
+    const map: Record<string, { name: string; paid: number; pending: number; total: number }> = {};
+    invoices.forEach((inv) => {
+      const name = inv.clients?.company_name || "—";
+      if (!map[inv.client_id]) map[inv.client_id] = { name, paid: 0, pending: 0, total: 0 };
+      const amount = Number(inv.amount);
+      map[inv.client_id].total += amount;
+      if (inv.status === "paid") map[inv.client_id].paid += amount;
+      else if (inv.status === "pending" || inv.status === "overdue") map[inv.client_id].pending += amount;
+    });
+    return Object.values(map).sort((a, b) => b.total - a.total);
+  }, [invoices, clients]);
+
+  const exportFinanceCsv = () => {
+    if (!filtered.length) return;
+    const rows = filtered.map((inv) => ({
+      Cliente: inv.clients?.company_name || "—",
+      Descrição: inv.description || "",
+      Valor: Number(inv.amount).toFixed(2),
+      Vencimento: inv.due_date,
+      Pagamento: inv.paid_date || "",
+      Status: statusLabel(inv.status),
+    }));
+    const headers = Object.keys(rows[0]);
+    const csv = [
+      headers.join(","),
+      ...rows.map((r) => headers.map((h) => `"${String((r as any)[h]).replace(/"/g, '""')}"`).join(",")),
+    ].join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `financeiro-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const statusLabel = (s: string) => {
     const map: Record<string, string> = { pending: t("common.pending"), paid: t("finance.paid"), overdue: t("finance.overdue"), cancelled: t("common.cancelled") };
     return map[s] || s;
@@ -128,11 +166,16 @@ export default function FinancePage() {
           <h1 className="font-display text-3xl font-bold text-foreground">{t("finance.title")}</h1>
           <p className="text-muted-foreground mt-1">{t("finance.subtitle")}</p>
         </div>
-        {!isViewer && (
-          <Button onClick={openNew}>
-            <Plus className="w-4 h-4 mr-2" />{t("finance.newInvoice")}
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportFinanceCsv} disabled={!filtered.length}>
+            <Download className="w-4 h-4 mr-2" />Exportar CSV
           </Button>
-        )}
+          {!isViewer && (
+            <Button onClick={openNew}>
+              <Plus className="w-4 h-4 mr-2" />{t("finance.newInvoice")}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Summary cards */}
@@ -203,6 +246,42 @@ export default function FinancePage() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Revenue by Client */}
+      {revenueByClient.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-lg flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-warning" />
+              Revenue por Cliente
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>#</TableHead>
+                  <TableHead>{t("common.client")}</TableHead>
+                  <TableHead>Pago</TableHead>
+                  <TableHead>Pendente</TableHead>
+                  <TableHead>Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {revenueByClient.slice(0, 10).map((row, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="font-mono text-muted-foreground">{i + 1}</TableCell>
+                    <TableCell className="font-medium">{row.name}</TableCell>
+                    <TableCell className="text-success font-mono">{fmt(row.paid)}</TableCell>
+                    <TableCell className="text-warning font-mono">{fmt(row.pending)}</TableCell>
+                    <TableCell className="font-bold font-mono">{fmt(row.total)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       )}
 
       {/* Filters */}

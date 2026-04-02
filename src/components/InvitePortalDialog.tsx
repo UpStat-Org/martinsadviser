@@ -60,7 +60,7 @@ export function InvitePortalDialog({ open, onOpenChange, clientId, clientName }:
           </div>
           <div className="space-y-2">
             <Label>{t("portal.invitePassword")}</Label>
-            <Input type="text" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} placeholder="Min. 6 caracteres" />
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} placeholder="Min. 6 caracteres" />
           </div>
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>

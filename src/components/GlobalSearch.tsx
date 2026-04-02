@@ -38,12 +38,13 @@ export function GlobalSearch() {
     setLoading(true);
     const pattern = `%${q}%`;
 
-    const [clients, trucks, permits, invoices] = await Promise.all([
+    const results = await Promise.allSettled([
       supabase.from("clients").select("id, company_name, dot, mc").or(`company_name.ilike.${pattern},dot.ilike.${pattern},mc.ilike.${pattern},ein.ilike.${pattern}`).limit(5),
       supabase.from("trucks").select("id, plate, make, model, client_id").or(`plate.ilike.${pattern},vin.ilike.${pattern},make.ilike.${pattern}`).limit(5),
       supabase.from("permits").select("id, permit_type, permit_number, state, client_id").or(`permit_type.ilike.${pattern},permit_number.ilike.${pattern},state.ilike.${pattern}`).limit(5),
       supabase.from("invoices").select("id, description, client_id, amount, status").or(`description.ilike.${pattern},status.ilike.${pattern}`).limit(5),
     ]);
+    const [clients, trucks, permits, invoices] = results.map((r) => r.status === "fulfilled" ? r.value : { data: null });
 
     const items: SearchResult[] = [
       ...(clients.data?.map((c) => ({ id: c.id, label: c.company_name, sublabel: [c.dot && `DOT ${c.dot}`, c.mc && `MC ${c.mc}`].filter(Boolean).join(" • "), type: "client" as const, route: `/clients/${c.id}` })) || []),

@@ -35,14 +35,19 @@ function exportToCsv(rows: Record<string, any>[], filename: string) {
   URL.revokeObjectURL(url);
 }
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function exportToPdf(rows: Record<string, any>[], title: string, filename: string) {
   if (!rows.length) return;
   const headers = Object.keys(rows[0]);
+  const safeTitle = escapeHtml(title);
 
   const html = `
     <!DOCTYPE html>
     <html><head>
-      <title>${title}</title>
+      <title>${safeTitle}</title>
       <style>
         body { font-family: Arial, sans-serif; margin: 30px; color: #1a1a1a; }
         h1 { font-size: 20px; margin-bottom: 5px; }
@@ -54,11 +59,11 @@ function exportToPdf(rows: Record<string, any>[], title: string, filename: strin
         .footer { margin-top: 20px; font-size: 10px; color: #999; text-align: right; }
       </style>
     </head><body>
-      <h1>${title}</h1>
+      <h1>${safeTitle}</h1>
       <div class="meta">${new Date().toLocaleDateString()} — ${rows.length} registros</div>
       <table>
-        <thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead>
-        <tbody>${rows.map((row) => `<tr>${headers.map((h) => `<td>${row[h] ?? "—"}</td>`).join("")}</tr>`).join("")}</tbody>
+        <thead><tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr></thead>
+        <tbody>${rows.map((row) => `<tr>${headers.map((h) => `<td>${escapeHtml(String(row[h] ?? "—"))}</td>`).join("")}</tr>`).join("")}</tbody>
       </table>
       <div class="footer">MartinsAdviser Report</div>
     </body></html>
@@ -69,7 +74,10 @@ function exportToPdf(rows: Record<string, any>[], title: string, filename: strin
     win.document.write(html);
     win.document.close();
     setTimeout(() => { win.print(); }, 500);
+  } else {
+    return false;
   }
+  return true;
 }
 
 export default function ReportsPage() {
@@ -113,7 +121,7 @@ export default function ReportsPage() {
       Type: p.permit_type,
       Number: p.permit_number || "",
       Client: clientMap[p.client_id] || "",
-      Truck: (p as any).trucks?.plate || "",
+      Truck: p.trucks?.plate || "",
       State: p.state || "",
       Expiration: p.expiration_date ? format(new Date(p.expiration_date), "dd/MM/yyyy") : "",
       Status: getExpirationStatus(p.expiration_date).label,
@@ -126,8 +134,12 @@ export default function ReportsPage() {
   };
 
   const handlePdf = () => {
-    exportToPdf(exportRows, t("reports.title"), `permits-report-${format(new Date(), "yyyy-MM-dd")}`);
-    toast({ title: t("reports.generated") });
+    const success = exportToPdf(exportRows, t("reports.title"), `permits-report-${format(new Date(), "yyyy-MM-dd")}`);
+    if (success === false) {
+      toast({ title: "Popup bloqueado. Permita popups para exportar o PDF.", variant: "destructive" });
+    } else {
+      toast({ title: t("reports.generated") });
+    }
   };
 
   return (
@@ -235,7 +247,7 @@ export default function ReportsPage() {
                       <TableCell className="font-medium">{permit.permit_type}</TableCell>
                       <TableCell className="font-mono text-xs">{permit.permit_number || "—"}</TableCell>
                       <TableCell>{clientMap[permit.client_id] || "—"}</TableCell>
-                      <TableCell>{(permit as any).trucks?.plate || "—"}</TableCell>
+                      <TableCell>{permit.trucks?.plate || "—"}</TableCell>
                       <TableCell>{permit.state || "—"}</TableCell>
                       <TableCell>{permit.expiration_date ? format(new Date(permit.expiration_date), "dd/MM/yyyy") : "—"}</TableCell>
                       <TableCell><Badge className={expStatus.color}>{expStatus.label}</Badge></TableCell>

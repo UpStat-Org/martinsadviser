@@ -16,6 +16,7 @@ import { useMessageTemplates, useCreateScheduledMessage } from "@/hooks/useMessa
 import { replacePlaceholders } from "@/lib/placeholders";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   open: boolean;
@@ -37,6 +38,7 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
   const create = useCreateScheduledMessage();
   const selectedClient = clients?.find((c) => c.id === clientId) || null;
   const { t } = useLanguage();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!open) {
@@ -80,10 +82,11 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
     }, {
       onSuccess: async () => {
         if (sendNow) {
-          // Trigger send-emails immediately
           try {
             await supabase.functions.invoke("send-emails");
-          } catch (_) { /* silent */ }
+          } catch {
+            toast({ title: t("messages.sendError") || "Mensagem agendada, mas o envio imediato falhou. Será reenviada automaticamente.", variant: "destructive" });
+          }
         }
         onOpenChange(false);
       }

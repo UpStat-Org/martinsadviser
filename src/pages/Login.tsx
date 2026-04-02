@@ -19,13 +19,18 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      toast({ title: t("login.error"), description: error.message, variant: "destructive" });
-    } else {
-      navigate("/");
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast({ title: t("login.error"), description: error.message, variant: "destructive" });
+      } else {
+        navigate("/");
+      }
+    } catch (err: any) {
+      toast({ title: t("login.error"), description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

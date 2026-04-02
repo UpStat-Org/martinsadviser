@@ -86,7 +86,7 @@ export default function PortalDashboard() {
                         <TableRow key={permit.id}>
                           <TableCell className="font-medium">{permit.permit_type}</TableCell>
                           <TableCell className="font-mono text-xs">{permit.permit_number || "—"}</TableCell>
-                          <TableCell>{(permit as any).trucks?.plate || "—"}</TableCell>
+                          <TableCell>{permit.trucks?.plate || "—"}</TableCell>
                           <TableCell>{permit.state || "—"}</TableCell>
                           <TableCell>{permit.expiration_date ? format(new Date(permit.expiration_date), "dd/MM/yyyy") : "—"}</TableCell>
                           <TableCell><Badge className={expStatus.color}>{expStatus.label}</Badge></TableCell>

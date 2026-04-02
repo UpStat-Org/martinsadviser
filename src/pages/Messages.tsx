@@ -129,7 +129,7 @@ export default function Messages() {
               <TableBody>
                 {pendingMsgs.map((m) => (
                   <TableRow key={m.id} className="hover:bg-muted/40 transition-colors">
-                    <TableCell className="font-medium">{(m as any).clients?.company_name || "—"}</TableCell>
+                    <TableCell className="font-medium">{m.clients?.company_name || "—"}</TableCell>
                     <TableCell><div className="flex items-center gap-1.5">{channelIcon(m.channel)} <span className="capitalize">{m.channel}</span></div></TableCell>
                     <TableCell className="max-w-[200px] truncate text-muted-foreground">{replacePlaceholders(m.body, m.clients)}</TableCell>
                     <TableCell className="text-muted-foreground">{format(new Date(m.scheduled_at), "dd/MM/yyyy HH:mm", { locale })}</TableCell>
@@ -173,7 +173,7 @@ export default function Messages() {
               <TableBody>
                 {sentAndFailed.map((m) => (
                   <TableRow key={m.id} className="hover:bg-muted/40 transition-colors">
-                    <TableCell className="font-medium">{(m as any).clients?.company_name || "—"}</TableCell>
+                    <TableCell className="font-medium">{m.clients?.company_name || "—"}</TableCell>
                     <TableCell><div className="flex items-center gap-1.5">{channelIcon(m.channel)} <span className="capitalize">{m.channel}</span></div></TableCell>
                     <TableCell className="max-w-[200px] truncate text-muted-foreground">{replacePlaceholders(m.body, m.clients)}</TableCell>
                     <TableCell className="text-muted-foreground">{m.sent_at ? format(new Date(m.sent_at), "dd/MM/yyyy HH:mm", { locale }) : "—"}</TableCell>

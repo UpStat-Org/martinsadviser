@@ -692,6 +692,104 @@ export type Database = {
           },
         ]
       }
+      permit_history: {
+        Row: {
+          id: string
+          permit_id: string
+          changed_by: string
+          change_type: string
+          old_values: Json | null
+          new_values: Json | null
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          permit_id: string
+          changed_by: string
+          change_type: string
+          old_values?: Json | null
+          new_values?: Json | null
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          permit_id?: string
+          changed_by?: string
+          change_type?: string
+          old_values?: Json | null
+          new_values?: Json | null
+          notes?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permit_history_permit_id_fkey"
+            columns: ["permit_id"]
+            isOneToOne: false
+            referencedRelation: "permits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          id: string
+          entity_type: string
+          entity_id: string
+          user_id: string
+          user_name: string
+          body: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          entity_type: string
+          entity_id: string
+          user_id: string
+          user_name: string
+          body: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          entity_type?: string
+          entity_id?: string
+          user_id?: string
+          user_name?: string
+          body?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      saved_filters: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          page: string
+          filters: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          page: string
+          filters?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          page?: string
+          filters?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

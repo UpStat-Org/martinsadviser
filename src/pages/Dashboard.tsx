@@ -309,7 +309,7 @@ export default function Dashboard() {
                   return (
                     <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50 hover:bg-muted/60 transition-colors">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-sm font-medium">{(p as any).clients?.company_name ?? "—"}</span>
+                        <span className="text-sm font-medium">{p.clients?.company_name ?? "—"}</span>
                         <span className="text-xs text-muted-foreground">{p.permit_type} {p.state ? `• ${p.state}` : ""}</span>
                       </div>
                       <div className="flex items-center gap-2">

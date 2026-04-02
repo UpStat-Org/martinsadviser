@@ -103,9 +103,9 @@ export default function CalendarPage() {
                   return (
                     <div key={p.id} className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors" onClick={() => navigate("/permits")}>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-sm font-medium">{(p as any).clients?.company_name ?? "—"}</span>
+                        <span className="text-sm font-medium">{p.clients?.company_name ?? "—"}</span>
                         <span className="text-xs text-muted-foreground">{p.permit_type} {p.permit_number ? `#${p.permit_number}` : ""} {p.state ? `• ${p.state}` : ""}</span>
-                        {(p as any).trucks?.plate && <span className="text-xs text-muted-foreground">{t("trucks.plate")}: {(p as any).trucks.plate}</span>}
+                        {p.trucks?.plate && <span className="text-xs text-muted-foreground">{t("trucks.plate")}: {p.trucks?.plate}</span>}
                       </div>
                       <Badge className={status.color}>{status.label}</Badge>
                     </div>
@@ -139,7 +139,7 @@ export default function CalendarPage() {
                     <div className="flex items-start gap-3">
                       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-destructive/10 shrink-0"><AlertTriangle className="w-5 h-5 text-destructive" /></div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-sm font-medium">{(p as any).clients?.company_name ?? "—"}</span>
+                        <span className="text-sm font-medium">{p.clients?.company_name ?? "—"}</span>
                         <span className="text-xs text-muted-foreground">{p.permit_type} {p.state ? `• ${p.state}` : ""}</span>
                         <span className="text-xs text-muted-foreground">{format(new Date(p.expiration_date!), "dd/MM/yyyy")}</span>
                       </div>

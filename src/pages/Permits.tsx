@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Search, Pencil, Trash2, Loader2, FileText, FileCheck } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, FileText, FileCheck, RefreshCw, History } from "lucide-react";
 import { usePermits, useDeletePermit, getExpirationStatus } from "@/hooks/usePermits";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { DocumentViewer } from "@/components/DocumentViewer";
@@ -13,6 +13,12 @@ import type { Permit } from "@/hooks/usePermits";
 import { format } from "date-fns";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useUpdatePermit } from "@/hooks/usePermits";
+import { useCreatePermitHistory } from "@/hooks/usePermitHistory";
+import { PermitHistoryDialog } from "@/components/PermitHistoryDialog";
+import { useToast } from "@/hooks/use-toast";
+import { SavedFiltersBar } from "@/components/SavedFiltersBar";
 
 export default function Permits() {
   const [search, setSearch] = useState("");
@@ -23,7 +29,73 @@ export default function Permits() {
   const [viewDocTitle, setViewDocTitle] = useState("");
   const { data: permits, isLoading } = usePermits(search || undefined, undefined, statusFilter);
   const deletePermit = useDeletePermit();
+  const updatePermit = useUpdatePermit();
+  const createHistory = useCreatePermitHistory();
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [historyPermitId, setHistoryPermitId] = useState<string | null>(null);
+  const [historyPermitLabel, setHistoryPermitLabel] = useState("");
+  const [bulkRenewing, setBulkRenewing] = useState(false);
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (!permits) return;
+    if (selected.size === permits.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(permits.map((p) => p.id)));
+    }
+  };
+
+  const handleBulkRenew = async () => {
+    if (selected.size === 0 || !permits) return;
+    setBulkRenewing(true);
+    const today = new Date();
+    const nextYear = new Date(today);
+    nextYear.setFullYear(nextYear.getFullYear() + 1);
+    const newExpDate = nextYear.toISOString().split("T")[0];
+
+    let success = 0;
+    for (const id of selected) {
+      const permit = permits.find((p) => p.id === id);
+      if (!permit) continue;
+      try {
+        await createHistory.mutateAsync({
+          permit_id: id,
+          change_type: "renewed",
+          old_values: {
+            expiration_date: permit.expiration_date,
+            status: permit.status,
+          },
+          new_values: {
+            expiration_date: newExpDate,
+            status: "active",
+          },
+          notes: `Renovação em lote — validade anterior: ${permit.expiration_date || "—"}`,
+        });
+        await updatePermit.mutateAsync({
+          id,
+          expiration_date: newExpDate,
+          status: "active",
+        });
+        success++;
+      } catch {
+        // continue with next
+      }
+    }
+    setBulkRenewing(false);
+    setSelected(new Set());
+    toast({ title: `${success} permit(s) renovado(s) com sucesso!` });
+  };
 
   const statusFilters = [
     { value: "all", label: t("permits.all") },
@@ -42,7 +114,15 @@ export default function Permits() {
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">{t("permits.title")}</h1>
           <p className="text-muted-foreground mt-1">{t("permits.subtitle")}</p>
         </div>
-        <Button onClick={handleNew}><Plus className="w-4 h-4 mr-2" />{t("permits.new")}</Button>
+        <div className="flex gap-2">
+          {selected.size > 0 && (
+            <Button variant="outline" onClick={handleBulkRenew} disabled={bulkRenewing}>
+              <RefreshCw className={`w-4 h-4 mr-2 ${bulkRenewing ? "animate-spin" : ""}`} />
+              Renovar {selected.size} selecionado(s)
+            </Button>
+          )}
+          <Button onClick={handleNew}><Plus className="w-4 h-4 mr-2" />{t("permits.new")}</Button>
+        </div>
       </div>
 
       <div className="flex items-center gap-4 flex-wrap">
@@ -64,6 +144,15 @@ export default function Permits() {
         </div>
       </div>
 
+      <SavedFiltersBar
+        page="permits"
+        currentFilters={{ search, statusFilter }}
+        onApply={(f) => {
+          if (f.search !== undefined) setSearch(f.search);
+          if (f.statusFilter !== undefined) setStatusFilter(f.statusFilter);
+        }}
+      />
+
       {isLoading ? (
         <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
       ) : !permits?.length ? (
@@ -82,6 +171,12 @@ export default function Permits() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30 hover:bg-muted/30">
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={permits?.length ? selected.size === permits.length : false}
+                      onCheckedChange={toggleAll}
+                    />
+                  </TableHead>
                   <TableHead className="font-semibold">{t("common.type")}</TableHead>
                   <TableHead className="font-semibold">{t("common.number")}</TableHead>
                   <TableHead className="font-semibold">{t("common.client")}</TableHead>
@@ -98,10 +193,16 @@ export default function Permits() {
                   const expStatus = getExpirationStatus(permit.expiration_date);
                   return (
                     <TableRow key={permit.id} className="hover:bg-muted/40 transition-colors">
+                      <TableCell>
+                        <Checkbox
+                          checked={selected.has(permit.id)}
+                          onCheckedChange={() => toggleSelect(permit.id)}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">{permit.permit_type}</TableCell>
                       <TableCell className="font-mono text-xs text-muted-foreground">{permit.permit_number || "—"}</TableCell>
-                      <TableCell>{(permit as any).clients?.company_name || "—"}</TableCell>
-                      <TableCell>{(permit as any).trucks?.plate || "—"}</TableCell>
+                      <TableCell>{permit.clients?.company_name || "—"}</TableCell>
+                      <TableCell>{permit.trucks?.plate || "—"}</TableCell>
                       <TableCell>{permit.state || "—"}</TableCell>
                       <TableCell>{permit.expiration_date ? format(new Date(permit.expiration_date), "dd/MM/yyyy") : "—"}</TableCell>
                       <TableCell><Badge variant="outline" className={expStatus.color}>{expStatus.label}</Badge></TableCell>
@@ -119,6 +220,7 @@ export default function Permits() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => { setHistoryPermitId(permit.id); setHistoryPermitLabel(`${permit.permit_type} ${permit.permit_number || ""}`); }}><History className="w-4 h-4 text-muted-foreground" /></Button>
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(permit)}><Pencil className="w-4 h-4" /></Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild><Button variant="ghost" size="icon"><Trash2 className="w-4 h-4 text-destructive" /></Button></AlertDialogTrigger>
@@ -144,6 +246,14 @@ export default function Permits() {
         </Card>
       )}
       <PermitFormDialog open={dialogOpen} onOpenChange={setDialogOpen} permit={editingPermit} />
+      {historyPermitId && (
+        <PermitHistoryDialog
+          open={!!historyPermitId}
+          onOpenChange={(v) => { if (!v) setHistoryPermitId(null); }}
+          permitId={historyPermitId}
+          permitLabel={historyPermitLabel}
+        />
+      )}
       {viewDocUrl && (
         <DocumentViewer
           open={!!viewDocUrl}

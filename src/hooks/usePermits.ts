@@ -11,6 +11,11 @@ export type Permit = Tables<"permits">;
 export type PermitInsert = TablesInsert<"permits">;
 export type PermitUpdate = TablesUpdate<"permits">;
 
+export type PermitWithRelations = Permit & {
+  clients?: { company_name: string } | null;
+  trucks?: { plate: string } | null;
+};
+
 export const PERMIT_TYPES = [
   "IRP",
   "IFTA",
@@ -47,7 +52,7 @@ export function usePermits(
       }
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data as PermitWithRelations[];
     },
   });
 }

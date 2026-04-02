@@ -99,6 +99,7 @@ export default function ClientOnboarding() {
   const createTruck = useCreateTruck();
   const createPermit = useCreatePermit();
 
+  const [templateSelected, setTemplateSelected] = useState(false);
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const { lookup, loading: lookingUp } = useFmcsaLookup();
@@ -163,6 +164,18 @@ export default function ClientOnboarding() {
     expiration_date: "",
     truck_index: null,
   });
+
+  const serviceTemplates = [
+    { name: "IFTA Only", desc: "Apenas serviço IFTA", services: { service_ifta: true, service_ct: false, service_ny: false, service_kyu: false, service_nm: false, service_automatic: false } },
+    { name: "CT + NY", desc: "Combustível CT e NY", services: { service_ifta: false, service_ct: true, service_ny: true, service_kyu: false, service_nm: false, service_automatic: false } },
+    { name: "Full Compliance", desc: "Todos os serviços ativos", services: { service_ifta: true, service_ct: true, service_ny: true, service_kyu: true, service_nm: true, service_automatic: true } },
+    { name: "Personalizado", desc: "Escolha manualmente os serviços", services: { service_ifta: false, service_ct: false, service_ny: false, service_kyu: false, service_nm: false, service_automatic: false } },
+  ];
+
+  const applyTemplate = (services: Record<string, boolean>) => {
+    setSelectedServices({ ...selectedServices, ...services });
+    setTemplateSelected(true);
+  };
 
   const progress = ((step + 1) / steps.length) * 100;
 
@@ -285,6 +298,39 @@ export default function ClientOnboarding() {
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
+      {!templateSelected ? (
+        <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
+          <div className="text-center">
+            <h1 className="font-display text-3xl font-bold">Cadastrar Novo Cliente</h1>
+            <p className="text-muted-foreground mt-2">Escolha um template para iniciar o cadastro</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {serviceTemplates.map((tmpl) => (
+              <Card
+                key={tmpl.name}
+                className="cursor-pointer hover:shadow-soft-md hover:border-primary/40 transition-all p-6"
+                onClick={() => applyTemplate(tmpl.services)}
+              >
+                <h3 className="font-display font-semibold text-lg">{tmpl.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{tmpl.desc}</p>
+                <div className="flex flex-wrap gap-1 mt-3">
+                  {Object.entries(tmpl.services)
+                    .filter(([, v]) => v)
+                    .map(([key]) => (
+                      <Badge key={key} variant="secondary" className="text-xs">
+                        {key.replace("service_", "").toUpperCase()}
+                      </Badge>
+                    ))}
+                  {Object.values(tmpl.services).every((v) => !v) && (
+                    <Badge variant="outline" className="text-xs">Manual</Badge>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      ) : (
+      <>
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button
@@ -951,6 +997,8 @@ export default function ClientOnboarding() {
           </Button>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

@@ -91,7 +91,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
     defaultValues: client
       ? {
           company_name: client.company_name,
-          registration_responsible: (client as any).registration_responsible || "",
+          registration_responsible: client.registration_responsible || "",
           phone: client.phone || "",
           email: client.email || "",
           address: client.address || "",

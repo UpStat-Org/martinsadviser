@@ -21,13 +21,14 @@ export default function PortalLogin() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
       // Check if this user is a portal user
       const { data: portalLink } = await supabase
         .from("client_portal_users")
         .select("client_id")
+        .eq("user_id", authData.user.id)
         .single();
 
       if (!portalLink) {

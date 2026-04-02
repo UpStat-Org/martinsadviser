@@ -20,13 +20,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock, UserPlus, Sparkles, PenLine, Map } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock, UserPlus, Sparkles, PenLine, Map, FileDown, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { CommentsSection } from "@/components/CommentsSection";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -47,6 +48,73 @@ export default function ClientDetail() {
   const deleteTruck = useDeleteTruck();
   const deletePermit = useDeletePermit();
   const { t, language } = useLanguage();
+
+  const generateCompliancePdf = () => {
+    if (!client || !permits) return;
+    const validPermits = permits.filter((p) => {
+      if (!p.expiration_date) return false;
+      return new Date(p.expiration_date) > new Date();
+    });
+    const score = permits.length > 0 ? Math.round((validPermits.length / permits.length) * 100) : 0;
+    const healthLabel = score >= 80 ? "Saudável" : score >= 50 ? "Atenção" : "Crítico";
+    const healthColor = score >= 80 ? "#16a34a" : score >= 50 ? "#d97706" : "#dc2626";
+
+    const rows = permits.map((p) => {
+      const exp = p.expiration_date ? new Date(p.expiration_date) : null;
+      const diff = exp ? Math.ceil((exp.getTime() - Date.now()) / 86400000) : null;
+      const status = !exp ? "Sem data" : diff! < 0 ? "Vencido" : diff! <= 30 ? `${diff}d restantes` : diff! <= 90 ? `${diff}d restantes` : "Válido";
+      return `<tr>
+        <td>${escapeHtml(p.permit_type)}</td>
+        <td>${escapeHtml(p.permit_number || "—")}</td>
+        <td>${escapeHtml(p.state || "—")}</td>
+        <td>${exp ? format(exp, "dd/MM/yyyy") : "—"}</td>
+        <td style="color:${!exp || diff! < 0 ? "#dc2626" : diff! <= 30 ? "#dc2626" : diff! <= 90 ? "#d97706" : "#16a34a"}">${status}</td>
+      </tr>`;
+    }).join("");
+
+    const html = `<!DOCTYPE html><html><head><title>Compliance Report - ${escapeHtml(client.company_name)}</title>
+      <style>
+        body{font-family:Arial,sans-serif;margin:40px;color:#1a1a1a}
+        h1{font-size:22px;margin-bottom:4px}
+        .meta{color:#666;font-size:12px;margin-bottom:24px}
+        .score-box{display:inline-block;padding:12px 24px;border-radius:8px;background:${healthColor}15;border:2px solid ${healthColor};margin-bottom:24px}
+        .score-box .number{font-size:36px;font-weight:bold;color:${healthColor}}
+        .score-box .label{font-size:14px;color:${healthColor}}
+        table{width:100%;border-collapse:collapse;font-size:12px;margin-top:16px}
+        th{background:#f4f4f5;padding:8px;text-align:left;border-bottom:2px solid #e4e4e7;font-weight:600}
+        td{padding:6px 8px;border-bottom:1px solid #e4e4e7}
+        .info{display:flex;gap:24px;margin-bottom:16px;font-size:13px}
+        .info span{color:#666}
+        .footer{margin-top:24px;font-size:10px;color:#999;text-align:right}
+      </style></head><body>
+      <h1>Relatório de Compliance</h1>
+      <div class="meta">${escapeHtml(client.company_name)} — ${new Date().toLocaleDateString()}</div>
+      <div class="info">
+        ${client.dot ? `<div><span>DOT:</span> ${escapeHtml(client.dot)}</div>` : ""}
+        ${client.mc ? `<div><span>MC:</span> ${escapeHtml(client.mc)}</div>` : ""}
+        ${client.ein ? `<div><span>EIN:</span> ${escapeHtml(client.ein)}</div>` : ""}
+      </div>
+      <div class="score-box"><div class="number">${score}%</div><div class="label">${healthLabel}</div></div>
+      <p style="font-size:13px;color:#666">${validPermits.length} de ${permits.length} permits em dia</p>
+      <table>
+        <thead><tr><th>Tipo</th><th>Número</th><th>Estado</th><th>Validade</th><th>Status</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="footer">MartinsAdviser — Compliance Report</div>
+    </body></html>`;
+
+    const win = window.open("", "_blank");
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+      setTimeout(() => win.print(), 500);
+    }
+  };
+
+  function escapeHtml(str: string): string {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
   const { toast } = useToast();
   const { role } = useAuth();
   const isViewer = role === "viewer";
@@ -120,6 +188,9 @@ export default function ClientDetail() {
             {aiLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
             {t("ai.generateReport")}
           </Button>
+          <Button variant="outline" onClick={generateCompliancePdf} disabled={!permits?.length}>
+              <FileDown className="w-4 h-4 mr-2" />Compliance PDF
+            </Button>
           <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}><UserPlus className="w-4 h-4 mr-2" />{t("portal.inviteClient")}</Button>
           <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}><Pencil className="w-4 h-4 mr-2" />{t("common.edit")}</Button>
           <AlertDialog>
@@ -180,6 +251,7 @@ export default function ClientDetail() {
           <TabsTrigger value="permits" className="gap-2"><FileCheck className="w-4 h-4" />{t("permits.title")} ({permits?.length || 0})</TabsTrigger>
           <TabsTrigger value="signatures" className="gap-2"><PenLine className="w-4 h-4" />{t("signature.tab")} </TabsTrigger>
           <TabsTrigger value="activity" className="gap-2"><Clock className="w-4 h-4" />{t("activity.title")}</TabsTrigger>
+            <TabsTrigger value="comments" className="gap-2"><MessageSquare className="w-4 h-4" />Comentários</TabsTrigger>
         </TabsList>
 
         <TabsContent value="trucks" className="mt-4">
@@ -292,6 +364,9 @@ export default function ClientDetail() {
         <TabsContent value="activity" className="mt-4">
           {id && <ActivityTimeline clientId={id} />}
         </TabsContent>
+          <TabsContent value="comments" className="mt-4">
+            <CommentsSection entityType="client" entityId={id!} />
+          </TabsContent>
       </Tabs>
 
       <ClientFormDialog open={editOpen} onOpenChange={setEditOpen} client={client} />
