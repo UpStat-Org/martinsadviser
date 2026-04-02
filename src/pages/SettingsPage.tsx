@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, RefreshCw, Check, X, Loader2 } from "lucide-react";
+import { CalendarDays, RefreshCw, Check, X, Loader2, User, Save, Key } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function SettingsPage() {
   const { t } = useLanguage();
@@ -14,6 +17,45 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [connecting, setConnecting] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  async function loadProfile() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    setEmail(user.email || "");
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+    if (profile) setFullName(profile.full_name || "");
+  }
+
+  async function handleSaveProfile() {
+    setSavingProfile(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from("profiles").update({ full_name: fullName }).eq("id", user.id);
+      if (newPassword) {
+        const { error } = await supabase.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+        setNewPassword("");
+      }
+      toast({ title: "Perfil atualizado!" });
+    } catch (e: any) {
+      toast({ title: "Erro ao salvar", description: e.message, variant: "destructive" });
+    } finally {
+      setSavingProfile(false);
+    }
+  }
 
   useEffect(() => {
     checkConnection();
@@ -108,6 +150,49 @@ export default function SettingsPage() {
         <p className="text-muted-foreground mt-1">{t("settings.subtitle")}</p>
       </div>
 
+      <Tabs defaultValue="profile">
+        <TabsList>
+          <TabsTrigger value="profile" className="gap-2"><User className="w-4 h-4" />Perfil</TabsTrigger>
+          <TabsTrigger value="integrations" className="gap-2"><CalendarDays className="w-4 h-4" />Integrações</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="profile" className="mt-4 space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Meu Perfil</CardTitle>
+                  <CardDescription>Gerencie seus dados pessoais</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Nome completo</Label>
+                  <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Seu nome" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input value={email} disabled className="bg-muted/50" />
+                </div>
+              </div>
+              <div className="space-y-2 max-w-sm">
+                <Label className="flex items-center gap-1.5"><Key className="w-3.5 h-3.5" />Nova senha</Label>
+                <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Deixe em branco para manter" />
+              </div>
+              <Button onClick={handleSaveProfile} disabled={savingProfile}>
+                {savingProfile ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                Salvar perfil
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="integrations" className="mt-4">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -149,6 +234,8 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

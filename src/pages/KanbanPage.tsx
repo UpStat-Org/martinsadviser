@@ -9,7 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, GripVertical, Trash2, Pencil, Loader2, Tag, X } from "lucide-react";
+import { Plus, GripVertical, Trash2, Pencil, Loader2, Tag, X, Calendar as CalendarIcon, AlertCircle, MessageSquare } from "lucide-react";
+import { CommentsSection } from "@/components/CommentsSection";
+import { format, isPast, isToday } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const COLUMNS = [
@@ -45,6 +47,9 @@ export default function KanbanPage() {
   const [tagInput, setTagInput] = useState("");
   const [notes, setNotes] = useState("");
   const [formStatus, setFormStatus] = useState("not_started");
+  const [dueDate, setDueDate] = useState("");
+  const [priority, setPriority] = useState("medium");
+  const [showComments, setShowComments] = useState<string | null>(null);
 
   const openNew = (status = "not_started") => {
     setEditingTask(null);
@@ -55,6 +60,8 @@ export default function KanbanPage() {
     setTags([]);
     setTagInput("");
     setNotes("");
+    setDueDate("");
+    setPriority("medium");
     setFormStatus(status);
     setDialogOpen(true);
   };
@@ -68,6 +75,8 @@ export default function KanbanPage() {
     setTags(task.tags || []);
     setTagInput("");
     setNotes(task.notes || "");
+    setDueDate(task.due_date || "");
+    setPriority(task.priority || "medium");
     setFormStatus(task.status);
     setDialogOpen(true);
   };
@@ -93,6 +102,8 @@ export default function KanbanPage() {
       operator: operator || undefined,
       tags,
       notes: notes || undefined,
+      due_date: dueDate || undefined,
+      priority: priority || undefined,
       status: formStatus,
     };
     if (editingTask) {
@@ -173,6 +184,9 @@ export default function KanbanPage() {
                           <span className="font-medium text-sm text-foreground leading-tight truncate">{task.name}</span>
                         </div>
                         <div className="flex gap-0.5 shrink-0">
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); setShowComments(task.id); }}>
+                            <MessageSquare className="w-3 h-3 text-muted-foreground" />
+                          </Button>
                           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEdit(task)}>
                             <Pencil className="w-3 h-3" />
                           </Button>
@@ -219,6 +233,28 @@ export default function KanbanPage() {
                             </Badge>
                           ))}
                         </div>
+                      )}
+
+                      {task.due_date && (
+                        <div className={`flex items-center gap-1 text-[10px] ${
+                          isPast(new Date(task.due_date)) && task.status !== "completed" && task.status !== "discarded"
+                            ? "text-destructive font-medium"
+                            : isToday(new Date(task.due_date))
+                            ? "text-warning font-medium"
+                            : "text-muted-foreground"
+                        }`}>
+                          <CalendarIcon className="w-2.5 h-2.5" />
+                          {format(new Date(task.due_date), "dd/MM")}
+                          {isPast(new Date(task.due_date)) && task.status !== "completed" && task.status !== "discarded" && " (atrasada)"}
+                        </div>
+                      )}
+
+                      {task.priority && task.priority !== "medium" && (
+                        <Badge variant="outline" className={`text-[9px] px-1 py-0 ${
+                          task.priority === "high" ? "border-destructive/40 text-destructive" : "border-muted-foreground/40 text-muted-foreground"
+                        }`}>
+                          {task.priority === "high" ? "Alta" : "Baixa"}
+                        </Badge>
                       )}
 
                       {task.notes && (
@@ -278,6 +314,25 @@ export default function KanbanPage() {
               </div>
             </div>
 
+            {/* Due Date & Priority */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Prazo</label>
+                <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Prioridade</label>
+                <Select value={priority} onValueChange={setPriority}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Baixa</SelectItem>
+                    <SelectItem value="medium">Média</SelectItem>
+                    <SelectItem value="high">Alta</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             {/* Operator */}
             <div>
               <label className="text-sm font-medium">Operator</label>
@@ -325,6 +380,16 @@ export default function KanbanPage() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Comments Dialog */}
+      <Dialog open={!!showComments} onOpenChange={(v) => { if (!v) setShowComments(null); }}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-display">Comentários da Tarefa</DialogTitle>
+          </DialogHeader>
+          {showComments && <CommentsSection entityType="task" entityId={showComments} />}
         </DialogContent>
       </Dialog>
     </div>

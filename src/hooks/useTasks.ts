@@ -12,6 +12,8 @@ export interface Task {
   task_type: string;
   operator: string | null;
   tags: string[];
+  due_date: string | null;
+  priority: string | null;
   created_at: string;
   updated_at: string;
   clients?: { company_name: string } | null;
@@ -35,7 +37,7 @@ export function useCreateTask() {
   const qc = useQueryClient();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: async (task: { name: string; task_type?: string; client_id?: string; operator?: string; tags?: string[]; notes?: string; status?: string }) => {
+    mutationFn: async (task: { name: string; task_type?: string; client_id?: string; operator?: string; tags?: string[]; notes?: string; status?: string; due_date?: string; priority?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
       const { error } = await supabase.from("tasks").insert({ ...task, user_id: user.id } as any);
@@ -49,7 +51,7 @@ export function useCreateTask() {
 export function useUpdateTask() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...updates }: { id: string; name?: string; task_type?: string; client_id?: string | null; operator?: string | null; tags?: string[]; notes?: string | null; status?: string }) => {
+    mutationFn: async ({ id, ...updates }: { id: string; name?: string; task_type?: string; client_id?: string | null; operator?: string | null; tags?: string[]; notes?: string | null; status?: string; due_date?: string | null; priority?: string | null }) => {
       const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
       if (error) throw error;
     },

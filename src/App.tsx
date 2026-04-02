@@ -3,9 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import { AppLayout } from "./components/AppLayout";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -35,12 +37,14 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <ThemeProvider attribute="class" defaultTheme="light" storageKey="martins-theme">
     <LanguageProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
         <LanguageSwitcher />
         <BrowserRouter>
+          <ErrorBoundary>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -75,9 +79,11 @@ const App = () => (
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </ErrorBoundary>
         </BrowserRouter>
       </TooltipProvider>
     </LanguageProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

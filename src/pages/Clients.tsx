@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,12 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Loader2, Upload, Users } from "lucide-react";
+import { Plus, Search, Loader2, Upload, Users, FileCheck, Truck as TruckIcon, ShieldAlert, ShieldCheck as ShieldOk } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
 import { ClientFormDialog } from "@/components/ClientFormDialog";
 import { ClientImportDialog } from "@/components/ClientImportDialog";
+import { PaginationBar } from "@/components/PaginationBar";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermits } from "@/hooks/usePermits";
+import { useTrucks } from "@/hooks/useTrucks";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -32,6 +35,53 @@ export default function Clients() {
   const { t } = useLanguage();
   const { role } = useAuth();
   const isViewer = role === "viewer";
+
+  const [serviceFilter, setServiceFilter] = useState<string | null>(null);
+  const { data: allPermits } = usePermits();
+  const { data: allTrucks } = useTrucks();
+
+  const permitCountByClient = useMemo(() => {
+    const map: Record<string, number> = {};
+    allPermits?.forEach((p) => { map[p.client_id] = (map[p.client_id] || 0) + 1; });
+    return map;
+  }, [allPermits]);
+
+  const truckCountByClient = useMemo(() => {
+    const map: Record<string, number> = {};
+    allTrucks?.forEach((t) => { map[t.client_id] = (map[t.client_id] || 0) + 1; });
+    return map;
+  }, [allTrucks]);
+
+  const riskByClient = useMemo(() => {
+    const map: Record<string, "ok" | "warning" | "danger"> = {};
+    if (!allPermits) return map;
+    const now = new Date();
+    allPermits.forEach((p) => {
+      if (!p.expiration_date) return;
+      const diff = Math.ceil((new Date(p.expiration_date).getTime() - now.getTime()) / 86400000);
+      const current = map[p.client_id] || "ok";
+      if (diff < 0 || diff <= 30) map[p.client_id] = "danger";
+      else if (diff <= 90 && current !== "danger") map[p.client_id] = "warning";
+      else if (!map[p.client_id]) map[p.client_id] = "ok";
+    });
+    return map;
+  }, [allPermits]);
+
+  const filteredClients = useMemo(() => {
+    if (!clients || !serviceFilter) return clients;
+    return clients.filter((c) => (c as any)[serviceFilter] === true);
+  }, [clients, serviceFilter]);
+
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 15;
+  const totalPages = Math.ceil((filteredClients?.length || 0) / PAGE_SIZE);
+  const paginatedClients = useMemo(() => {
+    if (!filteredClients) return [];
+    const start = (page - 1) * PAGE_SIZE;
+    return filteredClients.slice(start, start + PAGE_SIZE);
+  }, [filteredClients, page]);
+
+  useEffect(() => { setPage(1); }, [search, serviceFilter]);
 
   const statusMap: Record<string, { label: string; className: string }> = {
     active: { label: t("common.active"), className: "bg-success/10 text-success border-success/20" },
@@ -67,13 +117,30 @@ export default function Clients() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+        <div className="flex gap-1.5 flex-wrap">
+          {serviceLabels.map((s) => (
+            <Badge
+              key={s.key}
+              variant={serviceFilter === s.key ? "default" : "outline"}
+              className={`cursor-pointer transition-all text-xs ${serviceFilter === s.key ? "" : "hover:bg-muted"}`}
+              onClick={() => setServiceFilter(serviceFilter === s.key ? null : s.key)}
+            >
+              {s.label}
+            </Badge>
+          ))}
+          {serviceFilter && (
+            <Badge variant="outline" className="cursor-pointer hover:bg-destructive/10 text-xs" onClick={() => setServiceFilter(null)}>
+              Limpar
+            </Badge>
+          )}
+        </div>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
-      ) : !clients?.length ? (
+      ) : !filteredClients?.length ? (
         <Card className="shadow-soft">
           <CardContent className="p-12 text-center">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
@@ -100,11 +167,14 @@ export default function Clients() {
                 <TableHead className="font-semibold">MC</TableHead>
                 <TableHead className="font-semibold">{t("clients.phone")}</TableHead>
                 <TableHead className="font-semibold">{t("clients.services")}</TableHead>
+                <TableHead className="font-semibold text-center">Permits</TableHead>
+                <TableHead className="font-semibold text-center">Trucks</TableHead>
+                <TableHead className="font-semibold">Risco</TableHead>
                 <TableHead className="font-semibold">{t("clients.status")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {clients.map((client) => {
+              {paginatedClients.map((client) => {
                 const status = statusMap[client.status] || statusMap.active;
                 const activeServices = serviceLabels.filter((s) => client[s.key]);
                 return (
@@ -125,6 +195,29 @@ export default function Clients() {
                         {!activeServices.length && <span className="text-xs text-muted-foreground">—</span>}
                       </div>
                     </TableCell>
+                    <TableCell className="text-center">
+                      <span className="text-sm font-mono">{permitCountByClient[client.id] || 0}</span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className="text-sm font-mono">{truckCountByClient[client.id] || 0}</span>
+                    </TableCell>
+                    <TableCell>
+                      {riskByClient[client.id] === "danger" ? (
+                        <Badge className="bg-destructive/10 text-destructive border-destructive/20 gap-1" variant="outline">
+                          <ShieldAlert className="w-3 h-3" />Urgente
+                        </Badge>
+                      ) : riskByClient[client.id] === "warning" ? (
+                        <Badge className="bg-warning/10 text-warning border-warning/20 gap-1" variant="outline">
+                          <ShieldAlert className="w-3 h-3" />Atenção
+                        </Badge>
+                      ) : permitCountByClient[client.id] > 0 ? (
+                        <Badge className="bg-success/10 text-success border-success/20 gap-1" variant="outline">
+                          <ShieldOk className="w-3 h-3" />OK
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="outline" className={status.className}>{status.label}</Badge>
                     </TableCell>
@@ -135,6 +228,8 @@ export default function Clients() {
           </Table>
         </Card>
       )}
+
+      <PaginationBar page={page} totalPages={totalPages} onPageChange={setPage} />
 
       <ClientFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
       <ClientImportDialog open={importOpen} onOpenChange={setImportOpen} />

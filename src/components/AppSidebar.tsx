@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
   Settings, LogOut, ChevronLeft, ChevronRight, ShieldCheck, BarChart3, ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen,
-  Sparkles,
+  Sparkles, Sun, Moon,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTheme } from "next-themes";
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -20,6 +21,7 @@ export function AppSidebar() {
   const { isAdmin } = useAuth();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     setMobileOpen(false);
@@ -152,6 +154,22 @@ export function AppSidebar() {
         >
           <LogOut className="w-[18px] h-[18px] shrink-0 text-sidebar-foreground/40 group-hover:text-red-400 transition-colors" />
           {showLabel && <span>{t("nav.logout")}</span>}
+        </button>
+
+        <button
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          title={collapsed ? (theme === "dark" ? "Light mode" : "Dark mode") : undefined}
+          className={cn(
+            "group flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 text-sidebar-foreground/60 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground w-full",
+            collapsed && !isMobile && "justify-center px-0"
+          )}
+        >
+          {theme === "dark" ? (
+            <Sun className="w-[18px] h-[18px] shrink-0 text-sidebar-foreground/40 group-hover:text-yellow-400 transition-colors" />
+          ) : (
+            <Moon className="w-[18px] h-[18px] shrink-0 text-sidebar-foreground/40 group-hover:text-sidebar-foreground transition-colors" />
+          )}
+          {showLabel && <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
         </button>
 
         {!isMobile && (

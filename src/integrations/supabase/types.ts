@@ -593,10 +593,12 @@ export type Database = {
         Row: {
           client_id: string | null
           created_at: string
+          due_date: string | null
           id: string
           name: string
           notes: string | null
           operator: string | null
+          priority: string | null
           status: string
           tags: string[] | null
           task_type: string
@@ -606,10 +608,12 @@ export type Database = {
         Insert: {
           client_id?: string | null
           created_at?: string
+          due_date?: string | null
           id?: string
           name: string
           notes?: string | null
           operator?: string | null
+          priority?: string | null
           status?: string
           tags?: string[] | null
           task_type?: string
@@ -619,10 +623,12 @@ export type Database = {
         Update: {
           client_id?: string | null
           created_at?: string
+          due_date?: string | null
           id?: string
           name?: string
           notes?: string | null
           operator?: string | null
+          priority?: string | null
           status?: string
           tags?: string[] | null
           task_type?: string

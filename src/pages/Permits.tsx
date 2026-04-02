@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { DocumentViewer } from "@/components/DocumentViewer";
 import type { Permit } from "@/hooks/usePermits";
 import { format } from "date-fns";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { PaginationBar } from "@/components/PaginationBar";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useUpdatePermit } from "@/hooks/usePermits";
@@ -37,6 +38,17 @@ export default function Permits() {
   const [historyPermitId, setHistoryPermitId] = useState<string | null>(null);
   const [historyPermitLabel, setHistoryPermitLabel] = useState("");
   const [bulkRenewing, setBulkRenewing] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
+  const totalPages = Math.ceil((permits?.length || 0) / PAGE_SIZE);
+  const paginatedPermits = useMemo(() => {
+    if (!permits) return [];
+    const start = (page - 1) * PAGE_SIZE;
+    return permits.slice(start, start + PAGE_SIZE);
+  }, [permits, page]);
+
+  useEffect(() => { setPage(1); }, [search, statusFilter]);
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -189,7 +201,7 @@ export default function Permits() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {permits.map((permit) => {
+                {paginatedPermits.map((permit) => {
                   const expStatus = getExpirationStatus(permit.expiration_date);
                   return (
                     <TableRow key={permit.id} className="hover:bg-muted/40 transition-colors">
@@ -245,6 +257,9 @@ export default function Permits() {
           </CardContent>
         </Card>
       )}
+
+      <PaginationBar page={page} totalPages={totalPages} onPageChange={setPage} />
+
       <PermitFormDialog open={dialogOpen} onOpenChange={setDialogOpen} permit={editingPermit} />
       {historyPermitId && (
         <PermitHistoryDialog

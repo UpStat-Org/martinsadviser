@@ -11,8 +11,9 @@ import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { format } from "date-fns";
 import { pt, enUS, es } from "date-fns/locale";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line } from "recharts";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useInvoices } from "@/hooks/useInvoices";
 import { PermitCoverageMap } from "@/components/PermitCoverageMap";
 
 const dateLocales = { pt, en: enUS, es };
@@ -22,6 +23,7 @@ export default function Dashboard() {
   const { data: trucks, isLoading: loadingTrucks } = useTrucks();
   const { data: permits, isLoading: loadingPermits } = usePermits();
   const { data: allMessages, isLoading: loadingMsgs } = useScheduledMessages();
+  const { data: invoices } = useInvoices();
   const navigate = useNavigate();
   const { t, language } = useLanguage();
 
@@ -97,6 +99,46 @@ export default function Dashboard() {
     "hsl(var(--chart-4))", "hsl(var(--chart-5))", "hsl(158, 55%, 42%)",
     "hsl(320, 60%, 50%)", "hsl(60, 70%, 45%)",
   ];
+
+  const trendData = useMemo(() => {
+    if (!permits) return [];
+    const now = new Date();
+    const months: { month: string; compliance: number; total: number; expiring: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+      const monthLabel = format(d, "MMM yy", { locale: dateLocales[language] });
+      const relevantPermits = permits.filter((p) => p.expiration_date && new Date(p.created_at) <= monthEnd);
+      const valid = relevantPermits.filter((p) => {
+        const exp = new Date(p.expiration_date!);
+        return exp > monthEnd;
+      });
+      const expiring = relevantPermits.filter((p) => {
+        const exp = new Date(p.expiration_date!);
+        const diff = Math.ceil((exp.getTime() - monthEnd.getTime()) / 86400000);
+        return diff >= 0 && diff <= 30;
+      });
+      const score = relevantPermits.length > 0 ? Math.round((valid.length / relevantPermits.length) * 100) : 100;
+      months.push({ month: monthLabel, compliance: score, total: relevantPermits.length, expiring: expiring.length });
+    }
+    return months;
+  }, [permits, language]);
+
+  const revenueTrend = useMemo(() => {
+    if (!invoices) return [];
+    const now = new Date();
+    const months: { month: string; revenue: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = format(d, "yyyy-MM");
+      const monthLabel = format(d, "MMM yy", { locale: dateLocales[language] });
+      const total = invoices
+        .filter((inv) => inv.status === "paid" && (inv.paid_date || inv.due_date).startsWith(monthKey))
+        .reduce((sum, inv) => sum + Number(inv.amount), 0);
+      months.push({ month: monthLabel, revenue: total });
+    }
+    return months;
+  }, [invoices, language]);
 
   const isLoading = loadingClients || loadingTrucks || loadingPermits;
 
@@ -285,6 +327,55 @@ export default function Dashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* Trends */}
+      {trendData.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="font-display text-base flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
+                  <FileCheck className="w-4 h-4 text-success" />
+                </div>
+                Compliance Score (6 meses)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={220}>
+                <LineChart data={trendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                  <Tooltip formatter={(value: number) => [`${value}%`, "Compliance"]} />
+                  <Line type="monotone" dataKey="compliance" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={{ r: 4 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="font-display text-base flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <AlertTriangle className="w-4 h-4 text-primary" />
+                </div>
+                Revenue Mensal (6 meses)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={220}>
+                <LineChart data={revenueTrend}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip formatter={(value: number) => [`$${value.toFixed(2)}`, "Revenue"]} />
+                  <Line type="monotone" dataKey="revenue" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={{ r: 4 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Urgent permits & Recent clients */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
