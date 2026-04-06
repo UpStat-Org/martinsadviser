@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-// FMCSA QC API - free public API, webKey is a public registration key
-const FMCSA_WEB_KEY = "4e139e371c6090a67efc2b3c554549bc5c99aebf";
+const FMCSA_WEB_KEY = import.meta.env.VITE_FMCSA_WEB_KEY || "";
 
 export interface FmcsaResult {
   company_name: string;

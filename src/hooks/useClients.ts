@@ -7,15 +7,22 @@ export type Client = Tables<"clients">;
 export type ClientInsert = TablesInsert<"clients">;
 export type ClientUpdate = TablesUpdate<"clients">;
 
+function sanitizeSearch(value: string): string {
+  return value.replace(/[,%().*\\]/g, "");
+}
+
 export function useClients(search?: string) {
   return useQuery({
     queryKey: ["clients", search],
     queryFn: async () => {
       let query = supabase.from("clients").select("*").order("company_name");
       if (search) {
-        query = query.or(
-          `company_name.ilike.%${search}%,dot.ilike.%${search}%,mc.ilike.%${search}%,ein.ilike.%${search}%`
-        );
+        const safe = sanitizeSearch(search);
+        if (safe) {
+          query = query.or(
+            `company_name.ilike.%${safe}%,dot.ilike.%${safe}%,mc.ilike.%${safe}%,ein.ilike.%${safe}%`
+          );
+        }
       }
       const { data, error } = await query;
       if (error) throw error;
@@ -38,6 +45,32 @@ export function useClient(id: string | undefined) {
       return data;
     },
   });
+}
+
+export function useCheckClientDuplicate() {
+  return async (dot?: string | null, ein?: string | null, excludeId?: string) => {
+    const duplicates: string[] = [];
+
+    if (dot?.trim()) {
+      let query = supabase.from("clients").select("id, company_name").eq("dot", dot.trim());
+      if (excludeId) query = query.neq("id", excludeId);
+      const { data } = await query;
+      if (data?.length) {
+        duplicates.push(`DOT "${dot}" já cadastrado em: ${data[0].company_name}`);
+      }
+    }
+
+    if (ein?.trim()) {
+      let query = supabase.from("clients").select("id, company_name").eq("ein", ein.trim());
+      if (excludeId) query = query.neq("id", excludeId);
+      const { data } = await query;
+      if (data?.length) {
+        duplicates.push(`EIN "${ein}" já cadastrado em: ${data[0].company_name}`);
+      }
+    }
+
+    return duplicates;
+  };
 }
 
 export function useCreateClient() {

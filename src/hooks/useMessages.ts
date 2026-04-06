@@ -135,6 +135,42 @@ export function useCreateScheduledMessage() {
   });
 }
 
+export function useClientMessages(clientId?: string) {
+  return useQuery({
+    queryKey: ["client_messages", clientId],
+    enabled: !!clientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("scheduled_messages")
+        .select("*")
+        .eq("client_id", clientId!)
+        .order("scheduled_at", { ascending: false });
+      if (error) throw error;
+      return data as ScheduledMessage[];
+    },
+  });
+}
+
+export function useRetryMessage() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("scheduled_messages")
+        .update({ status: "pending", sent_at: null })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["client_messages"] });
+      qc.invalidateQueries({ queryKey: ["scheduled_messages"] });
+      toast({ title: "Mensagem reenviada para a fila!" });
+    },
+    onError: (e) => { toast({ title: "Erro ao reenviar", description: e.message, variant: "destructive" }); },
+  });
+}
+
 export function useCancelScheduledMessage() {
   const qc = useQueryClient();
   const { toast } = useToast();

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import { useParams, useNavigate } from "react-router-dom";
 import { useClient, useDeleteClient } from "@/hooks/useClients";
@@ -28,6 +28,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { CommentsSection } from "@/components/CommentsSection";
+import { useClientMessages, useRetryMessage } from "@/hooks/useMessages";
+import { useInvoices } from "@/hooks/useInvoices";
+import { usePermitDocuments } from "@/hooks/usePermitDocuments";
+import { Send, RotateCw, MessageCircle, DollarSign } from "lucide-react";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -47,6 +51,18 @@ export default function ClientDetail() {
   const deleteClient = useDeleteClient();
   const deleteTruck = useDeleteTruck();
   const deletePermit = useDeletePermit();
+  const { data: clientMessages } = useClientMessages(id);
+  const retryMessage = useRetryMessage();
+  const { data: clientInvoices } = useInvoices(id);
+  const { data: docVersions } = usePermitDocuments(viewDocPermitId || undefined);
+
+  const financeSummary = useMemo(() => {
+    if (!clientInvoices) return { total: 0, paid: 0, pending: 0 };
+    const total = clientInvoices.reduce((s, i) => s + Number(i.amount), 0);
+    const paid = clientInvoices.filter((i) => i.status === "paid").reduce((s, i) => s + Number(i.amount), 0);
+    const pending = clientInvoices.filter((i) => i.status === "pending" || i.status === "overdue").reduce((s, i) => s + Number(i.amount), 0);
+    return { total, paid, pending };
+  }, [clientInvoices]);
   const { t, language } = useLanguage();
 
   const generateCompliancePdf = () => {
@@ -126,6 +142,7 @@ export default function ClientDetail() {
   const [editingPermit, setEditingPermit] = useState<Permit | null>(null);
   const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
   const [viewDocTitle, setViewDocTitle] = useState("");
+  const [viewDocPermitId, setViewDocPermitId] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [signatureOpen, setSignatureOpen] = useState(false);
   const [aiReport, setAiReport] = useState<string | null>(null);
@@ -226,14 +243,33 @@ export default function ClientDetail() {
             {client.notes && <div className="pt-2"><p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{t("clients.notes")}</p><p className="text-sm whitespace-pre-wrap">{client.notes}</p></div>}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader><CardTitle className="font-display text-lg">{t("clients.services")}</CardTitle></CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {serviceLabels.map((s) => <Badge key={s.key} variant={client[s.key] ? "default" : "outline"} className={!client[s.key] ? "opacity-40" : ""}>{s.label}</Badge>)}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader><CardTitle className="font-display text-lg">{t("clients.services")}</CardTitle></CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {serviceLabels.map((s) => <Badge key={s.key} variant={client[s.key] ? "default" : "outline"} className={!client[s.key] ? "opacity-40" : ""}>{s.label}</Badge>)}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="font-display text-lg flex items-center gap-2"><DollarSign className="w-5 h-5 text-success" />Financeiro</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Total Faturado</span>
+                <span className="font-mono font-bold">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(financeSummary.total)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Recebido</span>
+                <span className="font-mono text-success">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(financeSummary.paid)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Pendente</span>
+                <span className="font-mono text-warning">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(financeSummary.pending)}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <ComplianceDashboard permits={permits} />
@@ -250,6 +286,7 @@ export default function ClientDetail() {
           <TabsTrigger value="trucks" className="gap-2"><TruckIcon className="w-4 h-4" />{t("trucks.title")} ({trucks?.length || 0})</TabsTrigger>
           <TabsTrigger value="permits" className="gap-2"><FileCheck className="w-4 h-4" />{t("permits.title")} ({permits?.length || 0})</TabsTrigger>
           <TabsTrigger value="signatures" className="gap-2"><PenLine className="w-4 h-4" />{t("signature.tab")} </TabsTrigger>
+          <TabsTrigger value="messages" className="gap-2"><Send className="w-4 h-4" />Mensagens ({clientMessages?.length || 0})</TabsTrigger>
           <TabsTrigger value="activity" className="gap-2"><Clock className="w-4 h-4" />{t("activity.title")}</TabsTrigger>
             <TabsTrigger value="comments" className="gap-2"><MessageSquare className="w-4 h-4" />Comentários</TabsTrigger>
         </TabsList>
@@ -324,7 +361,7 @@ export default function ClientDetail() {
                           <TableCell><Badge className={expStatus.color}>{expStatus.label}</Badge></TableCell>
                           <TableCell>
                             {permit.document_url ? (
-                              <Button variant="ghost" size="icon" onClick={() => { setViewDocUrl(permit.document_url!); setViewDocTitle(`${permit.permit_type} - ${permit.permit_number || ""}`); }}>
+                              <Button variant="ghost" size="icon" onClick={() => { setViewDocUrl(permit.document_url!); setViewDocTitle(`${permit.permit_type} - ${permit.permit_number || ""}`); setViewDocPermitId(permit.id); }}>
                                 <FileText className="w-4 h-4 text-primary" />
                               </Button>
                             ) : <span className="text-muted-foreground text-xs">—</span>}
@@ -361,6 +398,76 @@ export default function ClientDetail() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="messages" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-display text-lg flex items-center gap-2">
+                <Send className="w-5 h-5 text-muted-foreground" /> Histórico de Mensagens
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {!clientMessages?.length ? (
+                <div className="p-8 text-center text-muted-foreground">Nenhuma mensagem enviada para este cliente</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Canal</TableHead>
+                      <TableHead>Assunto</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Agendado</TableHead>
+                      <TableHead>Enviado</TableHead>
+                      <TableHead className="w-16">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {clientMessages.map((msg) => {
+                      const channelIcon: Record<string, string> = { email: "📧", sms: "📱", whatsapp: "💬" };
+                      const statusColors: Record<string, string> = {
+                        sent: "bg-success text-success-foreground",
+                        pending: "bg-warning text-warning-foreground",
+                        failed: "bg-destructive text-destructive-foreground",
+                        cancelled: "bg-muted text-muted-foreground",
+                      };
+                      return (
+                        <TableRow key={msg.id}>
+                          <TableCell>
+                            <span className="text-lg mr-1">{channelIcon[msg.channel] || "📨"}</span>
+                            <span className="text-xs uppercase">{msg.channel}</span>
+                          </TableCell>
+                          <TableCell>
+                            <p className="font-medium text-sm">{msg.subject || "(sem assunto)"}</p>
+                            <p className="text-xs text-muted-foreground truncate max-w-[300px]">{msg.body}</p>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={statusColors[msg.status] || "bg-muted"}>
+                              {msg.status === "sent" ? "Enviado" : msg.status === "pending" ? "Pendente" : msg.status === "failed" ? "Falhou" : "Cancelado"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm">{format(new Date(msg.scheduled_at), "dd/MM/yyyy HH:mm")}</TableCell>
+                          <TableCell className="text-sm">{msg.sent_at ? format(new Date(msg.sent_at), "dd/MM/yyyy HH:mm") : "—"}</TableCell>
+                          <TableCell>
+                            {msg.status === "failed" && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Reenviar"
+                                onClick={() => retryMessage.mutate(msg.id)}
+                                disabled={retryMessage.isPending}
+                              >
+                                <RotateCw className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="activity" className="mt-4">
           {id && <ActivityTimeline clientId={id} />}
         </TabsContent>
@@ -375,9 +482,10 @@ export default function ClientDetail() {
       {viewDocUrl && (
         <DocumentViewer
           open={!!viewDocUrl}
-          onOpenChange={(v) => { if (!v) setViewDocUrl(null); }}
+          onOpenChange={(v) => { if (!v) { setViewDocUrl(null); setViewDocPermitId(null); } }}
           url={viewDocUrl}
           title={viewDocTitle}
+          versions={docVersions}
         />
       )}
       <InvitePortalDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={client.id} clientName={client.company_name} />

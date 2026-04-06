@@ -5,31 +5,30 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2 } from "lucide-react";
-// xlsx is dynamically imported to avoid bundling issues
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-type ColumnMapping = Record<string, string>; // spreadsheet col -> our field
+type ColumnMapping = Record<string, string>;
 
-const OUR_FIELDS = ["company_name", "phone", "email", "address", "dot", "mc", "ein"] as const;
-const REQUIRED_FIELDS = ["company_name"] as const;
+const OUR_FIELDS = ["permit_type", "permit_number", "state", "expiration_date", "client_dot", "client_name", "truck_plate", "status"] as const;
+const REQUIRED_FIELDS = ["permit_type"] as const;
 
 const COLUMN_ALIASES: Record<string, string[]> = {
-  company_name: ["name", "nome", "nombre", "company", "empresa", "company_name", "razao social", "razão social", "razon social", "company name", "nome da empresa"],
-  phone: ["phone", "telefone", "tel", "teléfono", "telefono", "celular", "fone", "whatsapp"],
-  email: ["email", "e-mail", "correo", "correo electrónico", "correo electronico"],
-  address: ["address", "endereco", "endereço", "direccion", "dirección", "endereco completo", "endereço completo"],
-  dot: ["dot", "dot#", "dot number", "dot #", "numero dot"],
-  mc: ["mc", "mc#", "mc number", "mc #", "numero mc"],
-  ein: ["ein", "ein#", "ein number", "ein #", "numero ein"],
+  permit_type: ["permit_type", "tipo", "type", "tipo de permit", "permit type", "tipo permit"],
+  permit_number: ["permit_number", "numero", "number", "número", "nº", "permit number", "numero permit"],
+  state: ["state", "estado", "uf", "st"],
+  expiration_date: ["expiration_date", "expiration", "vencimento", "validade", "expiry", "data vencimento", "exp date"],
+  client_dot: ["client_dot", "dot", "dot#", "dot number", "dot #", "numero dot"],
+  client_name: ["client_name", "client", "cliente", "empresa", "company", "company_name", "nome da empresa"],
+  truck_plate: ["truck_plate", "plate", "placa", "truck", "caminhao", "caminhão"],
+  status: ["status", "situacao", "situação"],
 };
 
 function detectMapping(headers: string[]): ColumnMapping {
@@ -45,8 +44,7 @@ function detectMapping(headers: string[]): ColumnMapping {
   return mapping;
 }
 
-export function ClientImportDialog({ open, onOpenChange }: Props) {
-  const { t } = useLanguage();
+export function PermitImportDialog({ open, onOpenChange }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -76,7 +74,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const json = XLSX.utils.sheet_to_json<Record<string, string>>(sheet, { defval: "" });
         if (!json.length) {
-          toast({ title: t("import.emptyFile"), variant: "destructive" });
+          toast({ title: "Arquivo vazio", variant: "destructive" });
           return;
         }
         const hdrs = Object.keys(json[0]);
@@ -85,11 +83,11 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
         setMapping(detectMapping(hdrs));
         setStep("mapping");
       } catch {
-        toast({ title: t("import.parseError"), variant: "destructive" });
+        toast({ title: "Erro ao ler arquivo", variant: "destructive" });
       }
     };
     reader.readAsArrayBuffer(file);
-  }, [toast, t]);
+  }, [toast]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -106,6 +104,17 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
   const missingRequired = REQUIRED_FIELDS.filter((f) => !mappedFields.includes(f));
   const canImport = missingRequired.length === 0;
 
+  const FIELD_LABELS: Record<string, string> = {
+    permit_type: "Tipo *",
+    permit_number: "Número",
+    state: "Estado",
+    expiration_date: "Vencimento",
+    client_dot: "DOT do Cliente",
+    client_name: "Nome do Cliente",
+    truck_plate: "Placa do Caminhão",
+    status: "Status",
+  };
+
   const handleImport = async () => {
     setStep("importing");
     const { data: { user } } = await supabase.auth.getUser();
@@ -118,25 +127,84 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
       reverseMapping[field] = col;
     }
 
+    // Cache for client lookups
+    const clientCache: Record<string, string | null> = {};
+    const truckCache: Record<string, string | null> = {};
+
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      const client: Record<string, any> = { user_id: user.id, status: "active" };
-      for (const field of OUR_FIELDS) {
+      const getValue = (field: string) => {
         const col = reverseMapping[field];
-        if (col && row[col]) {
-          client[field] = String(row[col]).trim();
-        }
-      }
+        return col && row[col] ? String(row[col]).trim() : "";
+      };
 
-      if (!client.company_name) {
-        errors.push(`${t("import.row")} ${i + 2}: ${t("import.missingName")}`);
+      const permitType = getValue("permit_type");
+      if (!permitType) {
+        errors.push(`Linha ${i + 2}: Tipo do permit é obrigatório`);
         setProgress(Math.round(((i + 1) / rows.length) * 100));
         continue;
       }
 
-      const { error } = await supabase.from("clients").insert(client as any);
+      // Resolve client_id
+      let clientId: string | null = null;
+      const clientDot = getValue("client_dot");
+      const clientName = getValue("client_name");
+
+      if (clientDot) {
+        if (clientCache[`dot:${clientDot}`] !== undefined) {
+          clientId = clientCache[`dot:${clientDot}`];
+        } else {
+          const { data } = await supabase.from("clients").select("id").eq("dot", clientDot).limit(1);
+          clientId = data?.[0]?.id || null;
+          clientCache[`dot:${clientDot}`] = clientId;
+        }
+      }
+
+      if (!clientId && clientName) {
+        if (clientCache[`name:${clientName}`] !== undefined) {
+          clientId = clientCache[`name:${clientName}`];
+        } else {
+          const { data } = await supabase.from("clients").select("id").ilike("company_name", clientName).limit(1);
+          clientId = data?.[0]?.id || null;
+          clientCache[`name:${clientName}`] = clientId;
+        }
+      }
+
+      if (!clientId && (clientDot || clientName)) {
+        errors.push(`Linha ${i + 2}: Cliente não encontrado (DOT: ${clientDot || "—"}, Nome: ${clientName || "—"})`);
+        setProgress(Math.round(((i + 1) / rows.length) * 100));
+        continue;
+      }
+
+      // Resolve truck_id
+      let truckId: string | null = null;
+      const truckPlate = getValue("truck_plate");
+      if (truckPlate && clientId) {
+        const cacheKey = `${clientId}:${truckPlate}`;
+        if (truckCache[cacheKey] !== undefined) {
+          truckId = truckCache[cacheKey];
+        } else {
+          const { data } = await supabase.from("trucks").select("id").eq("client_id", clientId).ilike("plate", truckPlate).limit(1);
+          truckId = data?.[0]?.id || null;
+          truckCache[cacheKey] = truckId;
+        }
+      }
+
+      const permit: Record<string, any> = {
+        user_id: user.id,
+        permit_type: permitType,
+        status: getValue("status") || "active",
+      };
+
+      if (clientId) permit.client_id = clientId;
+      if (truckId) permit.truck_id = truckId;
+      if (getValue("permit_number")) permit.permit_number = getValue("permit_number");
+      if (getValue("state")) permit.state = getValue("state");
+      if (getValue("expiration_date")) permit.expiration_date = getValue("expiration_date");
+
+      const { error } = await supabase.from("permits").insert(permit as any);
       if (error) {
-        errors.push(`${t("import.row")} ${i + 2}: ${error.message}`);
+        errors.push(`Linha ${i + 2}: ${error.message}`);
       } else {
         success++;
       }
@@ -145,7 +213,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
 
     setResults({ success, errors });
     setStep("done");
-    queryClient.invalidateQueries({ queryKey: ["clients"] });
+    queryClient.invalidateQueries({ queryKey: ["permits"] });
   };
 
   return (
@@ -154,9 +222,9 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileSpreadsheet className="w-5 h-5" />
-            {t("import.title")}
+            Importar Permits
           </DialogTitle>
-          <DialogDescription>{t("import.subtitle")}</DialogDescription>
+          <DialogDescription>Importe permits de uma planilha CSV ou Excel</DialogDescription>
         </DialogHeader>
 
         {step === "upload" && (
@@ -164,20 +232,20 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
             className="border-2 border-dashed border-border rounded-lg p-12 text-center cursor-pointer hover:border-primary/50 transition-colors"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
-            onClick={() => document.getElementById("import-file-input")?.click()}
+            onClick={() => document.getElementById("permit-import-file-input")?.click()}
           >
             <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">{t("import.dragDrop")}</p>
+            <p className="text-sm text-muted-foreground">Arraste uma planilha ou clique para selecionar</p>
             <p className="text-xs text-muted-foreground mt-1">.xlsx, .xls, .csv</p>
-            <input id="import-file-input" type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleInput} />
+            <input id="permit-import-file-input" type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleInput} />
           </div>
         )}
 
         {step === "mapping" && (
           <div className="space-y-4">
             <div className="space-y-2">
-              <p className="text-sm font-medium">{t("import.columnMapping")}</p>
-              <p className="text-xs text-muted-foreground">{t("import.mappingDesc")}</p>
+              <p className="text-sm font-medium">Mapeamento de Colunas</p>
+              <p className="text-xs text-muted-foreground">Associe as colunas da planilha aos campos do sistema</p>
               {headers.map((header) => (
                 <div key={header} className="flex items-center gap-3">
                   <span className="text-sm w-40 truncate font-mono">{header}</span>
@@ -190,13 +258,12 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
                       return next;
                     })}
                   >
-                    <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="skip">{t("import.skip")}</SelectItem>
+                      <SelectItem value="skip">Pular</SelectItem>
                       {OUR_FIELDS.map((f) => (
                         <SelectItem key={f} value={f} disabled={mappedFields.includes(f) && mapping[header] !== f}>
-                          {t(`import.field.${f}`)}
-                          {REQUIRED_FIELDS.includes(f as any) && " *"}
+                          {FIELD_LABELS[f] || f}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -208,26 +275,25 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
             {missingRequired.length > 0 && (
               <div className="text-sm text-destructive flex items-center gap-2">
                 <XCircle className="w-4 h-4" />
-                {t("import.missingRequired")}: {missingRequired.map((f) => t(`import.field.${f}`)).join(", ")}
+                Campos obrigatórios faltando: {missingRequired.map((f) => FIELD_LABELS[f] || f).join(", ")}
               </div>
             )}
 
-            {/* Preview */}
             <div>
-              <p className="text-sm font-medium mb-2">{t("import.preview")} ({rows.length} {t("import.rows")})</p>
+              <p className="text-sm font-medium mb-2">Preview ({rows.length} linhas)</p>
               <div className="max-h-48 overflow-auto border rounded">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       {Object.entries(mapping).map(([col, field]) => (
-                        <TableHead key={col} className="text-xs">{t(`import.field.${field}`)}</TableHead>
+                        <TableHead key={col} className="text-xs">{FIELD_LABELS[field] || field}</TableHead>
                       ))}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {rows.slice(0, 5).map((row, i) => (
                       <TableRow key={i}>
-                        {Object.entries(mapping).map(([col, field]) => (
+                        {Object.entries(mapping).map(([col]) => (
                           <TableCell key={col} className="text-xs">{row[col] || "—"}</TableCell>
                         ))}
                       </TableRow>
@@ -238,7 +304,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
             </div>
 
             <Button onClick={handleImport} disabled={!canImport} className="w-full">
-              {t("import.importButton")} {rows.length} {t("nav.clients").toLowerCase()}
+              Importar {rows.length} permits
             </Button>
           </div>
         )}
@@ -247,7 +313,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
           <div className="space-y-4 py-6">
             <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
             <Progress value={progress} className="w-full" />
-            <p className="text-sm text-center text-muted-foreground">{t("import.importing")}... {progress}%</p>
+            <p className="text-sm text-center text-muted-foreground">Importando... {progress}%</p>
           </div>
         )}
 
@@ -256,9 +322,9 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
             <div className="flex items-center gap-3 justify-center">
               <CheckCircle2 className="w-8 h-8 text-success" />
               <div>
-                <p className="font-medium">{t("import.complete")}</p>
+                <p className="font-medium">Importação concluída</p>
                 <p className="text-sm text-muted-foreground">
-                  {results.success} {t("import.imported")}, {results.errors.length} {t("import.errorsCount")}
+                  {results.success} importados, {results.errors.length} erros
                 </p>
               </div>
             </div>
@@ -269,7 +335,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
                 ))}
               </div>
             )}
-            <Button onClick={() => { reset(); onOpenChange(false); }} className="w-full">{t("documents.close")}</Button>
+            <Button onClick={() => { reset(); onOpenChange(false); }} className="w-full">Fechar</Button>
           </div>
         )}
       </DialogContent>

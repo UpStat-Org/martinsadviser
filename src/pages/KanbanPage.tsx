@@ -210,9 +210,14 @@ export default function KanbanPage() {
                         </div>
                       </div>
 
-                      {task.task_type && (
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">{task.task_type}</Badge>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {task.task_type && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">{task.task_type}</Badge>
+                        )}
+                        {task.notes?.startsWith("[Auto]") && (
+                          <Badge className="text-[10px] px-1.5 py-0 bg-primary/20 text-primary border-primary/30">Auto</Badge>
+                        )}
+                      </div>
 
                       <div className="flex items-center gap-1.5 flex-wrap">
                         {task.clients?.company_name && (

@@ -105,6 +105,32 @@ Deno.serve(async (req) => {
           .from("automation_log")
           .insert({ rule_id: rule.id, permit_id: permit.id });
 
+        // Create renewal task in Kanban
+        const taskName = `Renovar ${permit.permit_type} - ${client?.company_name || ""}`;
+        const priority = rule.days_before <= 15 ? "high" : rule.days_before <= 30 ? "medium" : "low";
+
+        // Check if task already exists for this permit
+        const { data: existingTask } = await supabase
+          .from("tasks")
+          .select("id")
+          .eq("client_id", permit.client_id)
+          .ilike("name", `%Renovar ${permit.permit_type}%`)
+          .in("status", ["not_started", "waiting", "in_progress"])
+          .maybeSingle();
+
+        if (!existingTask) {
+          await supabase.from("tasks").insert({
+            user_id: rule.user_id,
+            client_id: permit.client_id,
+            name: taskName,
+            task_type: permit.permit_type,
+            status: "not_started",
+            priority,
+            due_date: permit.expiration_date,
+            notes: `[Auto] Task criada automaticamente. Permit #${permit.permit_number || "—"} vence em ${permit.expiration_date}.`,
+          });
+        }
+
         totalCreated++;
       }
     }

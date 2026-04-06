@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -27,7 +27,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCreateClient, useUpdateClient, type Client } from "@/hooks/useClients";
+import { useCreateClient, useUpdateClient, useCheckClientDuplicate, type Client } from "@/hooks/useClients";
+import { useToast } from "@/hooks/use-toast";
 import { useFmcsaLookup } from "@/hooks/useFmcsaLookup";
 import { Loader2, Search } from "lucide-react";
 
@@ -70,7 +71,9 @@ interface ClientFormDialogProps {
 export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialogProps) {
   const createClient = useCreateClient();
   const updateClient = useUpdateClient();
+  const checkDuplicate = useCheckClientDuplicate();
   const { lookup, loading: lookingUp } = useFmcsaLookup();
+  const { toast } = useToast();
   const isEditing = !!client;
 
   const handleDotLookup = async () => {
@@ -127,6 +130,50 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
         },
   });
 
+  useEffect(() => {
+    if (open) {
+      form.reset(
+        client
+          ? {
+              company_name: client.company_name,
+              registration_responsible: client.registration_responsible || "",
+              phone: client.phone || "",
+              email: client.email || "",
+              address: client.address || "",
+              ein: client.ein || "",
+              dot: client.dot || "",
+              mc: client.mc || "",
+              status: client.status,
+              service_ifta: client.service_ifta,
+              service_ct: client.service_ct,
+              service_ny: client.service_ny,
+              service_kyu: client.service_kyu,
+              service_nm: client.service_nm,
+              service_automatic: client.service_automatic,
+              notes: client.notes || "",
+            }
+          : {
+              company_name: "",
+              registration_responsible: "",
+              phone: "",
+              email: "",
+              address: "",
+              ein: "",
+              dot: "",
+              mc: "",
+              status: "active",
+              service_ifta: false,
+              service_ct: false,
+              service_ny: false,
+              service_kyu: false,
+              service_nm: false,
+              service_automatic: false,
+              notes: "",
+            }
+      );
+    }
+  }, [open, client]);
+
   const onSubmit = async (values: FormValues) => {
     const payload = {
       company_name: values.company_name,
@@ -146,6 +193,20 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
       mc: values.mc || null,
       notes: values.notes || null,
     };
+
+    const duplicates = await checkDuplicate(
+      values.dot,
+      values.ein,
+      isEditing ? client.id : undefined
+    );
+    if (duplicates.length > 0) {
+      toast({
+        title: "Possível duplicata encontrada",
+        description: duplicates.join(". "),
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (isEditing) {
       await updateClient.mutateAsync({ id: client.id, ...payload });
@@ -301,7 +362,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Status" />

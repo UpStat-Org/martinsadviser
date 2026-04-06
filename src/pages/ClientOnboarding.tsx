@@ -38,7 +38,7 @@ import {
   Loader2,
   Search,
 } from "lucide-react";
-import { useCreateClient } from "@/hooks/useClients";
+import { useCreateClient, useCheckClientDuplicate } from "@/hooks/useClients";
 import { useCreateTruck } from "@/hooks/useTrucks";
 import { useCreatePermit, PERMIT_TYPES } from "@/hooks/usePermits";
 import { useToast } from "@/hooks/use-toast";
@@ -98,6 +98,7 @@ export default function ClientOnboarding() {
   const createClient = useCreateClient();
   const createTruck = useCreateTruck();
   const createPermit = useCreatePermit();
+  const checkDuplicate = useCheckClientDuplicate();
 
   const [templateSelected, setTemplateSelected] = useState(false);
   const [step, setStep] = useState(0);
@@ -236,6 +237,18 @@ export default function ClientOnboarding() {
     setSaving(true);
     try {
       const vals = form.getValues();
+
+      const duplicates = await checkDuplicate(vals.dot, vals.ein);
+      if (duplicates.length > 0) {
+        toast({
+          title: "Possível duplicata encontrada",
+          description: duplicates.join(". "),
+          variant: "destructive",
+        });
+        setSaving(false);
+        return;
+      }
+
       const client = await createClient.mutateAsync({
         company_name: vals.company_name,
         registration_responsible: vals.registration_responsible || null,
@@ -425,7 +438,7 @@ export default function ClientOnboarding() {
                     name="registration_responsible"
                     render={({ field }) => (
                       <FormItem className="md:col-span-2">
-                        <FormLabel>Nome do Responsável *</FormLabel>
+                        <FormLabel>Nome do Responsável</FormLabel>
                         <FormControl>
                           <Input placeholder="Nome do responsável" {...field} />
                         </FormControl>

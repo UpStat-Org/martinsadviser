@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Search, Pencil, Trash2, Loader2, FileText, FileCheck, RefreshCw, History } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, FileText, FileCheck, RefreshCw, History, Upload } from "lucide-react";
 import { usePermits, useDeletePermit, getExpirationStatus } from "@/hooks/usePermits";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { DocumentViewer } from "@/components/DocumentViewer";
@@ -20,6 +20,7 @@ import { useCreatePermitHistory } from "@/hooks/usePermitHistory";
 import { PermitHistoryDialog } from "@/components/PermitHistoryDialog";
 import { useToast } from "@/hooks/use-toast";
 import { SavedFiltersBar } from "@/components/SavedFiltersBar";
+import { PermitImportDialog } from "@/components/PermitImportDialog";
 
 export default function Permits() {
   const [search, setSearch] = useState("");
@@ -38,6 +39,7 @@ export default function Permits() {
   const [historyPermitId, setHistoryPermitId] = useState<string | null>(null);
   const [historyPermitLabel, setHistoryPermitLabel] = useState("");
   const [bulkRenewing, setBulkRenewing] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
@@ -133,6 +135,9 @@ export default function Permits() {
               Renovar {selected.size} selecionado(s)
             </Button>
           )}
+          <Button variant="outline" onClick={() => setImportOpen(true)}>
+            <Upload className="w-4 h-4 mr-2" />Importar
+          </Button>
           <Button onClick={handleNew}><Plus className="w-4 h-4 mr-2" />{t("permits.new")}</Button>
         </div>
       </div>
@@ -261,6 +266,7 @@ export default function Permits() {
       <PaginationBar page={page} totalPages={totalPages} onPageChange={setPage} />
 
       <PermitFormDialog open={dialogOpen} onOpenChange={setDialogOpen} permit={editingPermit} />
+      <PermitImportDialog open={importOpen} onOpenChange={setImportOpen} />
       {historyPermitId && (
         <PermitHistoryDialog
           open={!!historyPermitId}

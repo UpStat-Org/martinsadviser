@@ -116,17 +116,40 @@ export default function FinancePage() {
 
   const revenueByClient = useMemo(() => {
     if (!invoices || !clients) return [];
-    const map: Record<string, { name: string; paid: number; pending: number; total: number }> = {};
+    const map: Record<string, { name: string; paid: number; pending: number; overdue: number; total: number; count: number; avgTicket: number; maxOverdueDays: number }> = {};
+    const now = new Date();
     invoices.forEach((inv) => {
       const name = inv.clients?.company_name || "—";
-      if (!map[inv.client_id]) map[inv.client_id] = { name, paid: 0, pending: 0, total: 0 };
+      if (!map[inv.client_id]) map[inv.client_id] = { name, paid: 0, pending: 0, overdue: 0, total: 0, count: 0, avgTicket: 0, maxOverdueDays: 0 };
+      const entry = map[inv.client_id];
       const amount = Number(inv.amount);
-      map[inv.client_id].total += amount;
-      if (inv.status === "paid") map[inv.client_id].paid += amount;
-      else if (inv.status === "pending" || inv.status === "overdue") map[inv.client_id].pending += amount;
+      entry.total += amount;
+      entry.count += 1;
+      if (inv.status === "paid") entry.paid += amount;
+      else if (inv.status === "overdue") {
+        entry.overdue += amount;
+        entry.pending += amount;
+        const dueDiff = Math.ceil((now.getTime() - new Date(inv.due_date).getTime()) / 86400000);
+        if (dueDiff > entry.maxOverdueDays) entry.maxOverdueDays = dueDiff;
+      } else if (inv.status === "pending") {
+        entry.pending += amount;
+      }
     });
+    Object.values(map).forEach((e) => { e.avgTicket = e.count > 0 ? e.total / e.count : 0; });
     return Object.values(map).sort((a, b) => b.total - a.total);
   }, [invoices, clients]);
+
+  const delinquentClients = useMemo(() => {
+    return revenueByClient.filter((c) => c.maxOverdueDays > 30);
+  }, [revenueByClient]);
+
+  const topClientsChartData = useMemo(() => {
+    return revenueByClient.slice(0, 10).map((c) => ({
+      name: c.name.length > 20 ? c.name.substring(0, 20) + "…" : c.name,
+      paid: c.paid,
+      pending: c.pending,
+    }));
+  }, [revenueByClient]);
 
   const exportFinanceCsv = () => {
     if (!filtered.length) return;
@@ -248,34 +271,95 @@ export default function FinancePage() {
         </div>
       )}
 
-      {/* Revenue by Client */}
+      {/* Revenue by Client - Chart + Table */}
       {revenueByClient.length > 0 && (
-        <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="font-display text-lg flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-warning" />
+                Top 10 Clientes por Receita
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={topClientsChartData} layout="vertical" margin={{ left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis type="number" className="text-xs fill-muted-foreground" />
+                  <YAxis dataKey="name" type="category" width={120} className="text-xs fill-muted-foreground" />
+                  <Tooltip formatter={(value: number) => fmt(value)} />
+                  <Bar dataKey="paid" stackId="a" fill="hsl(152, 60%, 40%)" name="Pago" />
+                  <Bar dataKey="pending" stackId="a" fill="hsl(38, 92%, 50%)" name="Pendente" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="font-display text-lg flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-success" />
+                Receita por Cliente
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#</TableHead>
+                    <TableHead>{t("common.client")}</TableHead>
+                    <TableHead>Invoices</TableHead>
+                    <TableHead>Ticket Médio</TableHead>
+                    <TableHead>Pago</TableHead>
+                    <TableHead>Pendente</TableHead>
+                    <TableHead>Total</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {revenueByClient.slice(0, 10).map((row, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="font-mono text-muted-foreground">{i + 1}</TableCell>
+                      <TableCell className="font-medium">{row.name}</TableCell>
+                      <TableCell className="text-center">{row.count}</TableCell>
+                      <TableCell className="font-mono">{fmt(row.avgTicket)}</TableCell>
+                      <TableCell className="text-success font-mono">{fmt(row.paid)}</TableCell>
+                      <TableCell className="text-warning font-mono">{fmt(row.pending)}</TableCell>
+                      <TableCell className="font-bold font-mono">{fmt(row.total)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Delinquent Clients Alert */}
+      {delinquentClients.length > 0 && (
+        <Card className="border-destructive/50">
           <CardHeader className="pb-3">
-            <CardTitle className="font-display text-lg flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-warning" />
-              Revenue por Cliente
+            <CardTitle className="font-display text-lg flex items-center gap-2 text-destructive">
+              <AlertTriangle className="w-5 h-5" />
+              Clientes Inadimplentes ({delinquentClients.length})
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>#</TableHead>
                   <TableHead>{t("common.client")}</TableHead>
-                  <TableHead>Pago</TableHead>
-                  <TableHead>Pendente</TableHead>
-                  <TableHead>Total</TableHead>
+                  <TableHead>Valor em Atraso</TableHead>
+                  <TableHead>Dias de Atraso</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {revenueByClient.slice(0, 10).map((row, i) => (
+                {delinquentClients.map((row, i) => (
                   <TableRow key={i}>
-                    <TableCell className="font-mono text-muted-foreground">{i + 1}</TableCell>
                     <TableCell className="font-medium">{row.name}</TableCell>
-                    <TableCell className="text-success font-mono">{fmt(row.paid)}</TableCell>
-                    <TableCell className="text-warning font-mono">{fmt(row.pending)}</TableCell>
-                    <TableCell className="font-bold font-mono">{fmt(row.total)}</TableCell>
+                    <TableCell className="text-destructive font-mono font-bold">{fmt(row.overdue)}</TableCell>
+                    <TableCell>
+                      <Badge className="bg-destructive text-destructive-foreground">{row.maxOverdueDays} dias</Badge>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

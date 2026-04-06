@@ -10,8 +10,11 @@ import { usePermits, getExpirationStatus, PERMIT_TYPES } from "@/hooks/usePermit
 import { useClients } from "@/hooks/useClients";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { Download, FileText, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Download, FileText, Loader2, ShieldCheck } from "lucide-react";
 import { format } from "date-fns";
+import { generateBatchCompliancePdf } from "@/utils/compliancePdf";
 
 function exportToCsv(rows: Record<string, any>[], filename: string) {
   if (!rows.length) return;
@@ -92,6 +95,54 @@ export default function ReportsPage() {
   const [filterState, setFilterState] = useState("all");
   const [filterClient, setFilterClient] = useState("all");
 
+  // Batch compliance
+  const [batchOpen, setBatchOpen] = useState(false);
+  const [selectedClients, setSelectedClients] = useState<Set<string>>(new Set());
+  const [batchGenerating, setBatchGenerating] = useState(false);
+
+  const toggleClient = (id: string) => {
+    setSelectedClients((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllClients = () => {
+    if (!clients) return;
+    if (selectedClients.size === clients.length) {
+      setSelectedClients(new Set());
+    } else {
+      setSelectedClients(new Set(clients.map((c) => c.id)));
+    }
+  };
+
+  const handleBatchCompliance = async () => {
+    if (!selectedClients.size || !clients || !permits) return;
+    setBatchGenerating(true);
+
+    const clientsWithPermits = clients
+      .filter((c) => selectedClients.has(c.id))
+      .map((c) => ({
+        client: { company_name: c.company_name, dot: c.dot, mc: c.mc, ein: c.ein },
+        permits: permits.filter((p) => p.client_id === c.id).map((p) => ({
+          permit_type: p.permit_type,
+          permit_number: p.permit_number,
+          state: p.state,
+          expiration_date: p.expiration_date,
+        })),
+      }));
+
+    const success = generateBatchCompliancePdf(clientsWithPermits);
+    if (!success) {
+      toast({ title: "Popup bloqueado. Permita popups para gerar o PDF.", variant: "destructive" });
+    } else {
+      toast({ title: "Relatório de compliance gerado!" });
+      setBatchOpen(false);
+    }
+    setBatchGenerating(false);
+  };
+
   const states = useMemo(() => {
     if (!permits) return [];
     const s = new Set(permits.map((p) => p.state).filter(Boolean) as string[]);
@@ -150,6 +201,9 @@ export default function ReportsPage() {
           <p className="text-muted-foreground mt-1">{t("reports.subtitle")}</p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => { setSelectedClients(new Set()); setBatchOpen(true); }}>
+            <ShieldCheck className="w-4 h-4 mr-2" />Compliance em Lote
+          </Button>
           <Button variant="outline" onClick={handleCsv} disabled={!filtered.length}>
             <Download className="w-4 h-4 mr-2" />{t("reports.exportCsv")}
           </Button>
@@ -259,6 +313,58 @@ export default function ReportsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Batch Compliance Dialog */}
+      <Dialog open={batchOpen} onOpenChange={setBatchOpen}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-primary" />
+              Relatório de Compliance em Lote
+            </DialogTitle>
+            <DialogDescription>Selecione os clientes para gerar o relatório consolidado</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 pb-2 border-b">
+              <Checkbox
+                checked={clients?.length ? selectedClients.size === clients.length : false}
+                onCheckedChange={toggleAllClients}
+              />
+              <span className="text-sm font-medium">Selecionar todos ({clients?.length || 0})</span>
+              {selectedClients.size > 0 && (
+                <Badge variant="secondary" className="ml-auto">{selectedClients.size} selecionados</Badge>
+              )}
+            </div>
+            <div className="space-y-1 max-h-[400px] overflow-y-auto">
+              {clients?.map((c) => (
+                <label key={c.id} className="flex items-center gap-3 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                  <Checkbox
+                    checked={selectedClients.has(c.id)}
+                    onCheckedChange={() => toggleClient(c.id)}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{c.company_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {[c.dot && `DOT: ${c.dot}`, c.mc && `MC: ${c.mc}`].filter(Boolean).join(" · ") || "Sem DOT/MC"}
+                    </p>
+                  </div>
+                </label>
+              ))}
+            </div>
+            <Button
+              onClick={handleBatchCompliance}
+              disabled={selectedClients.size === 0 || batchGenerating}
+              className="w-full"
+            >
+              {batchGenerating ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Gerando...</>
+              ) : (
+                <>Gerar PDF ({selectedClients.size} clientes)</>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
