@@ -61,6 +61,6 @@ Deno.serve(async (req) => {
       headers: { Location: `${appUrl}/settings?gcal=connected` },
     });
   } catch (error) {
-    return new Response(`Error: ${error.message}`, { status: 500 });
+    return new Response(`Error: ${(error as Error).message}`, { status: 500 });
   }
 });
