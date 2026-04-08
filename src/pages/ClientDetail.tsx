@@ -54,6 +54,7 @@ export default function ClientDetail() {
   const { data: clientMessages } = useClientMessages(id);
   const retryMessage = useRetryMessage();
   const { data: clientInvoices } = useInvoices(id);
+  const [viewDocPermitId, setViewDocPermitId] = useState<string | null>(null);
   const { data: docVersions } = usePermitDocuments(viewDocPermitId || undefined);
 
   const financeSummary = useMemo(() => {
