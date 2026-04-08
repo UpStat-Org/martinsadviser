@@ -239,6 +239,36 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          body: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          user_id: string
+          user_name: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
       document_signatures: {
         Row: {
           client_id: string
@@ -442,6 +472,47 @@ export type Database = {
         }
         Relationships: []
       }
+      permit_history: {
+        Row: {
+          change_type: string
+          changed_by: string
+          created_at: string
+          id: string
+          new_values: Json | null
+          notes: string | null
+          old_values: Json | null
+          permit_id: string
+        }
+        Insert: {
+          change_type: string
+          changed_by: string
+          created_at?: string
+          id?: string
+          new_values?: Json | null
+          notes?: string | null
+          old_values?: Json | null
+          permit_id: string
+        }
+        Update: {
+          change_type?: string
+          changed_by?: string
+          created_at?: string
+          id?: string
+          new_values?: Json | null
+          notes?: string | null
+          old_values?: Json | null
+          permit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permit_history_permit_id_fkey"
+            columns: ["permit_id"]
+            isOneToOne: false
+            referencedRelation: "permits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permits: {
         Row: {
           client_id: string
@@ -529,6 +600,33 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_filters: {
+        Row: {
+          created_at: string
+          filters: Json
+          id: string
+          name: string
+          page: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          name: string
+          page: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          name?: string
+          page?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -697,104 +795,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      permit_history: {
-        Row: {
-          id: string
-          permit_id: string
-          changed_by: string
-          change_type: string
-          old_values: Json | null
-          new_values: Json | null
-          notes: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          permit_id: string
-          changed_by: string
-          change_type: string
-          old_values?: Json | null
-          new_values?: Json | null
-          notes?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          permit_id?: string
-          changed_by?: string
-          change_type?: string
-          old_values?: Json | null
-          new_values?: Json | null
-          notes?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "permit_history_permit_id_fkey"
-            columns: ["permit_id"]
-            isOneToOne: false
-            referencedRelation: "permits"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      comments: {
-        Row: {
-          id: string
-          entity_type: string
-          entity_id: string
-          user_id: string
-          user_name: string
-          body: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          entity_type: string
-          entity_id: string
-          user_id: string
-          user_name: string
-          body: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          entity_type?: string
-          entity_id?: string
-          user_id?: string
-          user_name?: string
-          body?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
-      saved_filters: {
-        Row: {
-          id: string
-          user_id: string
-          name: string
-          page: string
-          filters: Json
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          name: string
-          page: string
-          filters?: Json
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          page?: string
-          filters?: Json
-          created_at?: string
-        }
-        Relationships: []
       }
       user_roles: {
         Row: {
