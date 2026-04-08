@@ -205,13 +205,13 @@ export default function ClientDetail() {
             {aiLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
             {t("ai.generateReport")}
           </Button>
-          <Button variant="outline" onClick={generateCompliancePdf} disabled={!permits?.length}>
+          <Button variant="outline" size="sm" onClick={generateCompliancePdf} disabled={!permits?.length}>
               <FileDown className="w-4 h-4 mr-2" />Compliance PDF
             </Button>
           <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}><UserPlus className="w-4 h-4 mr-2" />{t("portal.inviteClient")}</Button>
           <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}><Pencil className="w-4 h-4 mr-2" />{t("common.edit")}</Button>
           <AlertDialog>
-          <AlertDialogTrigger asChild><Button variant="destructive" size="icon"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>
+          <AlertDialogTrigger asChild><Button variant="destructive" size="sm" className="px-3"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>{t("clients.removeClient")}</AlertDialogTitle>
