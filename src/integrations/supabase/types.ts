@@ -472,6 +472,50 @@ export type Database = {
         }
         Relationships: []
       }
+      permit_documents: {
+        Row: {
+          created_at: string
+          document_url: string
+          file_name: string | null
+          id: string
+          is_current: boolean
+          notes: string | null
+          permit_id: string
+          user_id: string | null
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          document_url: string
+          file_name?: string | null
+          id?: string
+          is_current?: boolean
+          notes?: string | null
+          permit_id: string
+          user_id?: string | null
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          document_url?: string
+          file_name?: string | null
+          id?: string
+          is_current?: boolean
+          notes?: string | null
+          permit_id?: string
+          user_id?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permit_documents_permit_id_fkey"
+            columns: ["permit_id"]
+            isOneToOne: false
+            referencedRelation: "permits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permit_history: {
         Row: {
           change_type: string
