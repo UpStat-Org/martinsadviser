@@ -143,7 +143,6 @@ export default function ClientDetail() {
   const [editingPermit, setEditingPermit] = useState<Permit | null>(null);
   const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
   const [viewDocTitle, setViewDocTitle] = useState("");
-  const [viewDocPermitId, setViewDocPermitId] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [signatureOpen, setSignatureOpen] = useState(false);
   const [aiReport, setAiReport] = useState<string | null>(null);
