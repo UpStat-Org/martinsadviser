@@ -28,6 +28,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { CommentsSection } from "@/components/CommentsSection";
+import { InternalNotesSection } from "@/components/InternalNotesSection";
+import { AIChatPanel } from "@/components/AIChatPanel";
+import { Lock } from "lucide-react";
 import { useClientMessages, useRetryMessage } from "@/hooks/useMessages";
 import { useInvoices } from "@/hooks/useInvoices";
 import { usePermitDocuments } from "@/hooks/usePermitDocuments";
@@ -289,6 +292,8 @@ export default function ClientDetail() {
           <TabsTrigger value="messages" className="gap-2"><Send className="w-4 h-4" />Mensagens ({clientMessages?.length || 0})</TabsTrigger>
           <TabsTrigger value="activity" className="gap-2"><Clock className="w-4 h-4" />{t("activity.title")}</TabsTrigger>
             <TabsTrigger value="comments" className="gap-2"><MessageSquare className="w-4 h-4" />Comentários</TabsTrigger>
+            <TabsTrigger value="notes" className="gap-2"><Lock className="w-4 h-4" />Notas Internas</TabsTrigger>
+            <TabsTrigger value="ai" className="gap-2"><Sparkles className="w-4 h-4" />Assistente IA</TabsTrigger>
         </TabsList>
 
         <TabsContent value="trucks" className="mt-4">
@@ -473,6 +478,12 @@ export default function ClientDetail() {
         </TabsContent>
           <TabsContent value="comments" className="mt-4">
             <CommentsSection entityType="client" entityId={id!} />
+          </TabsContent>
+          <TabsContent value="notes" className="mt-4">
+            <InternalNotesSection clientId={id!} />
+          </TabsContent>
+          <TabsContent value="ai" className="mt-4">
+            <AIChatPanel clientId={id!} clientName={client.company_name} />
           </TabsContent>
       </Tabs>
 

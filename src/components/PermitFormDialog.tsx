@@ -16,6 +16,7 @@ import {
 import { useCreatePermit, useUpdatePermit, PERMIT_TYPES, type Permit } from "@/hooks/usePermits";
 import { useClients } from "@/hooks/useClients";
 import { useTrucks } from "@/hooks/useTrucks";
+import { useEmployees, employeeName } from "@/hooks/useEmployees";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef, useCallback } from "react";
 import { Upload, FileText, X, Loader2 } from "lucide-react";
@@ -31,6 +32,7 @@ const formSchema = z.object({
   expiration_date: z.string().optional(),
   status: z.string().default("active"),
   notes: z.string().optional(),
+  assigned_to: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -46,6 +48,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
   const createPermit = useCreatePermit();
   const updatePermit = useUpdatePermit();
   const { data: clients } = useClients();
+  const { data: employees } = useEmployees();
   const { toast } = useToast();
   const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -67,6 +70,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
           expiration_date: permit.expiration_date || "",
           status: permit.status,
           notes: permit.notes || "",
+          assigned_to: (permit as any).assigned_to || "",
         }
       : {
           client_id: defaultClientId || "",
@@ -77,6 +81,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
           expiration_date: "",
           status: "active",
           notes: "",
+          assigned_to: "",
         },
   });
 
@@ -117,7 +122,8 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
         expiration_date: values.expiration_date || null,
         status: values.status,
         notes: values.notes || null,
-      };
+        assigned_to: values.assigned_to && values.assigned_to !== "none" ? values.assigned_to : null,
+      } as any;
 
       let savedPermit: Permit;
       if (isEditing) {
@@ -284,6 +290,28 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="assigned_to"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Responsável</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value || "none"}>
+                    <FormControl>
+                      <SelectTrigger><SelectValue placeholder="Sem responsável" /></SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="none">Sem responsável</SelectItem>
+                      {employees?.map((e) => (
+                        <SelectItem key={e.id} value={e.id}>{employeeName(e)}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

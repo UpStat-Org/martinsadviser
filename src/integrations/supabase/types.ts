@@ -559,6 +559,7 @@ export type Database = {
       }
       permits: {
         Row: {
+          assigned_to: string | null
           client_id: string
           created_at: string
           document_url: string | null
@@ -574,6 +575,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_to?: string | null
           client_id: string
           created_at?: string
           document_url?: string | null
@@ -589,6 +591,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_to?: string | null
           client_id?: string
           created_at?: string
           document_url?: string | null

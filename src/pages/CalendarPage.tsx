@@ -52,6 +52,38 @@ export default function CalendarPage() {
     return { expired, warning, ok };
   }, [permits]);
 
+  // Heatmap: count of expirations per day for the next 12 weeks
+  const heatmap = useMemo(() => {
+    const days: { date: Date; count: number }[] = [];
+    if (!permits) return days;
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const counts = new Map<string, number>();
+    for (const p of permits) {
+      if (!p.expiration_date) continue;
+      const key = p.expiration_date;
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    for (let i = 0; i < 7 * 12; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      const key = d.toISOString().slice(0, 10);
+      days.push({ date: d, count: counts.get(key) ?? 0 });
+    }
+    return days;
+  }, [permits]);
+
+  const heatmapMax = useMemo(() => heatmap.reduce((m, d) => Math.max(m, d.count), 0), [heatmap]);
+
+  const heatColor = (count: number) => {
+    if (count === 0) return "bg-muted/40";
+    const ratio = heatmapMax ? count / heatmapMax : 0;
+    if (ratio < 0.25) return "bg-success/40";
+    if (ratio < 0.5) return "bg-warning/50";
+    if (ratio < 0.75) return "bg-warning/80";
+    return "bg-destructive/80";
+  };
+
   const upcomingPermits = useMemo(() => {
     if (!permits) return [];
     const now = new Date();
@@ -116,6 +148,46 @@ export default function CalendarPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-display text-lg flex items-center gap-2">
+            <CalendarDays className="w-5 h-5 text-primary" /> Heatmap de Vencimentos (12 semanas)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <Skeleton className="h-40 w-full" />
+          ) : heatmapMax === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">Sem vencimentos nas próximas 12 semanas.</p>
+          ) : (
+            <div className="space-y-2">
+              <div className="grid grid-flow-col grid-rows-7 gap-1" style={{ gridAutoColumns: "minmax(14px, 1fr)" }}>
+                {heatmap.map((d) => (
+                  <button
+                    key={d.date.toISOString()}
+                    title={`${format(d.date, "dd/MM/yyyy")} — ${d.count} permit${d.count === 1 ? "" : "s"}`}
+                    onClick={() => { setDate(d.date); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    className={`aspect-square rounded-sm ${heatColor(d.count)} hover:ring-2 hover:ring-primary transition-all`}
+                  />
+                ))}
+              </div>
+              <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
+                <span>Hoje → 12 semanas</span>
+                <div className="flex items-center gap-1">
+                  <span>menos</span>
+                  <span className="w-3 h-3 rounded-sm bg-muted/40" />
+                  <span className="w-3 h-3 rounded-sm bg-success/40" />
+                  <span className="w-3 h-3 rounded-sm bg-warning/50" />
+                  <span className="w-3 h-3 rounded-sm bg-warning/80" />
+                  <span className="w-3 h-3 rounded-sm bg-destructive/80" />
+                  <span>mais</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

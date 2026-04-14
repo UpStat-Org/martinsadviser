@@ -29,6 +29,8 @@ import KanbanPage from "./pages/KanbanPage";
 import FinancePage from "./pages/FinancePage";
 import AuditPage from "./pages/AuditPage";
 import DocumentationPage from "./pages/DocumentationPage";
+import MyDeskPage from "./pages/MyDeskPage";
+import WorkloadPage from "./pages/WorkloadPage";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalLayout from "./pages/portal/PortalLayout";
 import PortalDashboard from "./pages/portal/PortalDashboard";
@@ -62,6 +64,8 @@ const App = () => (
               }
             >
               <Route path="/" element={<Dashboard />} />
+              <Route path="/my" element={<MyDeskPage />} />
+              <Route path="/workload" element={<WorkloadPage />} />
               <Route path="/clients" element={<Clients />} />
               <Route path="/clients/onboarding" element={<ClientOnboarding />} />
               <Route path="/clients/:id" element={<ClientDetail />} />

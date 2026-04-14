@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
   Settings, LogOut, ChevronLeft, ChevronRight, ShieldCheck, BarChart3, ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen,
-  Sparkles, Sun, Moon,
+  Sparkles, Sun, Moon, Briefcase, Activity,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -29,6 +29,7 @@ export function AppSidebar() {
 
   const mainNavItems = [
     { to: "/", icon: LayoutDashboard, label: t("nav.dashboard") },
+    { to: "/my", icon: Briefcase, label: "Minha Mesa" },
     { to: "/clients", icon: Users, label: t("nav.clients") },
     { to: "/trucks", icon: Truck, label: t("nav.trucks") },
     { to: "/permits", icon: FileCheck, label: t("nav.permits") },
@@ -138,6 +139,7 @@ export function AppSidebar() {
       <div className="border-t border-sidebar-border/50 p-2.5 space-y-0.5 shrink-0">
         {isAdmin && (
           <>
+            {renderNavItem({ to: "/workload", icon: Activity, label: "Workload" })}
             {renderNavItem({ to: "/admin/users", icon: ShieldCheck, label: t("nav.users") })}
             {renderNavItem({ to: "/audit", icon: ScrollText, label: t("nav.audit") })}
           </>
