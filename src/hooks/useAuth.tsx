@@ -8,6 +8,7 @@ interface AuthState {
   isAdmin: boolean;
   role: "admin" | "operator" | "viewer" | "user" | null;
   approvalStatus: string | null;
+  fullName: string | null;
 }
 
 export function useAuth() {
@@ -17,19 +18,20 @@ export function useAuth() {
     isAdmin: false,
     role: null,
     approvalStatus: null,
+    fullName: null,
   });
 
   useEffect(() => {
     const fetchProfile = async (user: User | null) => {
       if (!user) {
-        setState({ user: null, loading: false, isAdmin: false, role: null, approvalStatus: null });
+        setState({ user: null, loading: false, isAdmin: false, role: null, approvalStatus: null, fullName: null });
         return;
       }
 
       // Get approval status
       const { data: profile } = await supabase
         .from("profiles")
-        .select("approval_status")
+        .select("approval_status, full_name")
         .eq("id", user.id)
         .single();
 
@@ -48,6 +50,7 @@ export function useAuth() {
         isAdmin,
         role: userRole,
         approvalStatus: profile?.approval_status ?? "pending",
+        fullName: profile?.full_name ?? null,
       });
     };
 
