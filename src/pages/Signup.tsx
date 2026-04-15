@@ -22,6 +22,8 @@ import {
   Check,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Logo } from "@/components/Logo";
+import { Wordmark } from "@/components/Wordmark";
 
 export default function Signup() {
   const [fullName, setFullName] = useState("");
@@ -134,18 +136,11 @@ export default function Signup() {
         <div className="relative z-10 flex flex-col justify-between px-16 xl:px-20 py-14 w-full">
           {/* Logo */}
           <div className="flex items-center gap-3 animate-slide-in-left">
-            <div className="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
-              <Truck className="w-5 h-5 text-white" />
+            <div className="relative shrink-0">
+              <Logo className="w-12 h-12 rounded-2xl shadow-xl ring-1 ring-white/20" />
               <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gradient-to-br from-emerald-300 to-emerald-500 ring-2 ring-[#0b0d2e]" />
             </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-display text-2xl font-bold text-white tracking-tight">
-                MartinsAdviser
-              </span>
-              <span className="text-[11px] uppercase tracking-[0.2em] text-white/50 mt-1">
-                Permits · Compliance · AI
-              </span>
-            </div>
+            <Wordmark size="xl" tone="light" />
           </div>
 
           {/* Headline */}
@@ -210,13 +205,9 @@ export default function Signup() {
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative z-10">
         <div className="w-full max-w-[440px]">
           {/* Mobile logo */}
-          <div className="flex items-center justify-center gap-2.5 mb-10 lg:hidden animate-fade-in">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
-              <Truck className="w-5 h-5" />
-            </div>
-            <h1 className="font-display text-2xl font-bold text-foreground tracking-tight">
-              MartinsAdviser
-            </h1>
+          <div className="flex items-center justify-center gap-3 mb-10 lg:hidden animate-fade-in">
+            <Logo className="w-10 h-10 rounded-xl shadow-md" />
+            <Wordmark size="lg" tone="dark" />
           </div>
 
           <div className="glass-card-premium shimmer-border rounded-3xl p-8 sm:p-10 animate-fade-in">

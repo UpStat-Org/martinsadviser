@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
         display: ["Space Grotesk", "sans-serif"],
+        brand: ["Unbounded", "Space Grotesk", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

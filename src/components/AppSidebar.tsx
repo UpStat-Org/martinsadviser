@@ -11,6 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Logo } from "@/components/Logo";
+import { Wordmark } from "@/components/Wordmark";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -128,18 +130,11 @@ export function AppSidebar() {
         "flex items-center gap-3 h-14 border-b border-sidebar-border/40 shrink-0",
         collapsed && !isMobile ? "justify-center px-2" : "px-4"
       )}>
-        <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-sidebar-primary via-sidebar-primary/80 to-purple-500 text-white font-display font-bold text-xs shrink-0 shadow-sm">
-          MA
+        <div className="relative shrink-0">
+          <Logo className="w-8 h-8 rounded-lg shadow-sm" />
           <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 ring-1 ring-sidebar-background" />
         </div>
-        {showLabel && (
-          <div className="flex flex-col min-w-0 leading-tight">
-            <span className="font-display font-semibold text-sidebar-foreground text-[13px] truncate tracking-tight">
-              MartinsAdviser
-            </span>
-            <span className="text-[10px] text-sidebar-foreground/50">Permit Management</span>
-          </div>
-        )}
+        {showLabel && <Wordmark size="sm" tone="dark" className="min-w-0" />}
         {isMobile && (
           <button onClick={() => setMobileOpen(false)} className="ml-auto text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors">
             <X className="w-4 h-4" />

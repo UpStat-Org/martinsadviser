@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import { Logo } from "@/components/Logo";
+import { Wordmark } from "@/components/Wordmark";
+import { HeroScene } from "@/components/hero/HeroScene";
 import {
   Truck,
   Shield,
@@ -123,13 +126,9 @@ export default function LandingPage() {
       <header className="fixed top-0 inset-x-0 z-50">
         <div className="mx-auto max-w-7xl px-6 py-4">
           <nav className="glass-card-premium rounded-2xl px-5 py-3 flex items-center justify-between">
-            <Link to="/lp" className="flex items-center gap-2.5">
-              <div className="relative flex items-center justify-center w-9 h-9 rounded-xl btn-gradient">
-                <Truck className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-display text-lg font-bold tracking-tight">
-                MartinsAdviser
-              </span>
+            <Link to="/lp" className="flex items-center gap-3">
+              <Logo className="w-9 h-9 rounded-xl shadow-sm" />
+              <Wordmark size="md" tone="dark" />
             </Link>
             <div className="hidden md:flex items-center gap-7 text-sm font-medium text-muted-foreground">
               <a href="#features" className="hover:text-foreground transition-colors">
@@ -175,7 +174,9 @@ export default function LandingPage() {
           style={{ animationDelay: "1.5s" }}
         />
 
-        <div className="relative mx-auto max-w-7xl px-6 text-center">
+        <HeroScene />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-6 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/15 backdrop-blur-md mb-8 animate-fade-in">
             <Sparkles className="w-3.5 h-3.5 text-white/80" />
             <span className="text-xs font-medium text-white/80 tracking-wide">
@@ -536,10 +537,8 @@ export default function LandingPage() {
       <footer className="relative border-t border-border/60 py-10">
         <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg btn-gradient">
-              <Truck className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-display font-bold">MartinsAdviser</span>
+            <Logo className="w-8 h-8 rounded-lg" />
+            <Wordmark size="sm" tone="dark" />
           </div>
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} MartinsAdviser · Todos os direitos reservados
