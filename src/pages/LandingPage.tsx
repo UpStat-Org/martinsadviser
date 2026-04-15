@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
 import { HeroScene } from "@/components/hero/HeroScene";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Truck,
   Shield,
@@ -24,102 +25,41 @@ import {
   TrendingUp,
   Activity,
   Star,
+  MousePointerClick,
 } from "lucide-react";
 
-const features = [
-  {
-    icon: FileText,
-    title: "Gestão de Permits",
-    desc: "Acompanhe solicitações, aprovações e renovações em um fluxo centralizado com histórico completo e alertas automáticos.",
-    gradient: "from-indigo-500 to-violet-500",
-  },
-  {
-    icon: Users,
-    title: "Clientes & Portal",
-    desc: "Base completa de clientes com portal dedicado para acompanhamento de permits, documentos e comunicação em tempo real.",
-    gradient: "from-blue-500 to-cyan-500",
-  },
-  {
-    icon: Truck,
-    title: "Frota & Caminhões",
-    desc: "Cadastro detalhado de veículos, motoristas e documentações com validade monitorada automaticamente.",
-    gradient: "from-emerald-500 to-teal-500",
-  },
-  {
-    icon: Bot,
-    title: "Assistente com IA",
-    desc: "Gere relatórios, analise compliance e receba recomendações inteligentes com um assistente integrado ao seu fluxo.",
-    gradient: "from-fuchsia-500 to-pink-500",
-  },
-  {
-    icon: Kanban,
-    title: "Tarefas & Kanban",
-    desc: "Organize operações em quadros visuais com workloads por colaborador, prazos e prioridades claras.",
-    gradient: "from-orange-500 to-amber-500",
-  },
-  {
-    icon: Calendar,
-    title: "Agenda Integrada",
-    desc: "Visualize vencimentos, reuniões e prazos em um calendário unificado com lembretes configuráveis.",
-    gradient: "from-rose-500 to-red-500",
-  },
-  {
-    icon: BarChart3,
-    title: "Relatórios Avançados",
-    desc: "Dashboards ricos, exportação em PDF e métricas em tempo real para tomada de decisão orientada por dados.",
-    gradient: "from-sky-500 to-blue-500",
-  },
-  {
-    icon: DollarSign,
-    title: "Financeiro",
-    desc: "Controle receitas, despesas e faturamento por cliente com relatórios financeiros integrados.",
-    gradient: "from-green-500 to-emerald-500",
-  },
-  {
-    icon: MessageSquare,
-    title: "Comunicação",
-    desc: "Mensagens internas, comentários em permits e notas colaborativas para manter todo o time alinhado.",
-    gradient: "from-purple-500 to-indigo-500",
-  },
-  {
-    icon: Shield,
-    title: "Compliance & Auditoria",
-    desc: "Trilha completa de auditoria, controle de permissões e histórico imutável para auditorias e compliance.",
-    gradient: "from-slate-500 to-zinc-500",
-  },
-  {
-    icon: Bell,
-    title: "Alertas Inteligentes",
-    desc: "Notificações automáticas para vencimentos, pendências e eventos críticos — nunca perca um prazo.",
-    gradient: "from-yellow-500 to-orange-500",
-  },
-  {
-    icon: Activity,
-    title: "Workload & Produtividade",
-    desc: "Visualize a carga de trabalho da equipe, redistribua tarefas e aumente a produtividade com dados reais.",
-    gradient: "from-cyan-500 to-sky-500",
-  },
-];
-
-const workflow = [
-  {
-    step: "01",
-    title: "Cadastre clientes e frota",
-    desc: "Onboarding guiado para clientes, caminhões e documentações em poucos minutos.",
-  },
-  {
-    step: "02",
-    title: "Gerencie permits e tarefas",
-    desc: "Organize solicitações, aprovações e prazos com quadros Kanban e calendário integrado.",
-  },
-  {
-    step: "03",
-    title: "Monitore e decida com IA",
-    desc: "Dashboards, relatórios e recomendações inteligentes para operar com excelência.",
-  },
-];
-
 export default function LandingPage() {
+  const { t } = useLanguage();
+
+  const features = [
+    { icon: FileText, k: "permits", gradient: "from-indigo-500 to-violet-500" },
+    { icon: Users, k: "clients", gradient: "from-blue-500 to-cyan-500" },
+    { icon: Truck, k: "fleet", gradient: "from-emerald-500 to-teal-500" },
+    { icon: Bot, k: "ai", gradient: "from-fuchsia-500 to-pink-500" },
+    { icon: Kanban, k: "kanban", gradient: "from-orange-500 to-amber-500" },
+    { icon: Calendar, k: "calendar", gradient: "from-rose-500 to-red-500" },
+    { icon: BarChart3, k: "reports", gradient: "from-sky-500 to-blue-500" },
+    { icon: DollarSign, k: "finance", gradient: "from-green-500 to-emerald-500" },
+    { icon: MessageSquare, k: "comms", gradient: "from-purple-500 to-indigo-500" },
+    { icon: Shield, k: "compliance", gradient: "from-slate-500 to-zinc-500" },
+    { icon: Bell, k: "alerts", gradient: "from-yellow-500 to-orange-500" },
+    { icon: Activity, k: "workload", gradient: "from-cyan-500 to-sky-500" },
+  ];
+
+  const workflow = [
+    { step: "01", k: "1" },
+    { step: "02", k: "2" },
+    { step: "03", k: "3" },
+  ];
+
+  const whyBenefits = [
+    { icon: MousePointerClick, k: "b5" },
+    { icon: Zap, k: "b1" },
+    { icon: Lock, k: "b2" },
+    { icon: TrendingUp, k: "b3" },
+    { icon: Globe, k: "b4" },
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* ============ NAVBAR ============ */}
@@ -132,16 +72,16 @@ export default function LandingPage() {
             </Link>
             <div className="hidden md:flex items-center gap-7 text-sm font-medium text-muted-foreground">
               <a href="#features" className="hover:text-foreground transition-colors">
-                Recursos
+                {t("lp.nav.features")}
               </a>
               <a href="#workflow" className="hover:text-foreground transition-colors">
-                Como funciona
+                {t("lp.nav.workflow")}
               </a>
               <a href="#why" className="hover:text-foreground transition-colors">
-                Por que escolher
+                {t("lp.nav.why")}
               </a>
               <a href="#cta" className="hover:text-foreground transition-colors">
-                Começar
+                {t("lp.nav.start")}
               </a>
             </div>
             <div className="flex items-center gap-2">
@@ -149,13 +89,13 @@ export default function LandingPage() {
                 to="/login"
                 className="hidden sm:inline-flex h-9 px-4 items-center rounded-lg text-sm font-semibold text-foreground/80 hover:text-foreground transition-colors"
               >
-                Entrar
+                {t("lp.nav.signin")}
               </Link>
               <Link
                 to="/signup"
                 className="inline-flex h-9 px-4 items-center gap-1.5 rounded-lg btn-gradient text-white text-sm font-semibold hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
               >
-                Solicitar acesso
+                {t("lp.nav.requestAccess")}
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -180,17 +120,17 @@ export default function LandingPage() {
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/15 backdrop-blur-md mb-8 animate-fade-in">
             <Sparkles className="w-3.5 h-3.5 text-white/80" />
             <span className="text-xs font-medium text-white/80 tracking-wide">
-              Plataforma completa para gestão de permits e compliance
+              {t("lp.hero.badge")}
             </span>
           </div>
 
           <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-[84px] font-bold leading-[1.02] gradient-text max-w-5xl mx-auto animate-fade-in">
-            A operação do seu
+            {t("lp.hero.title1")}
             <br />
-            transporte rodoviário,
+            {t("lp.hero.title2")}
             <br />
             <span className="relative inline-block">
-              sob controle total.
+              {t("lp.hero.title3")}
               <span className="absolute -bottom-2 left-0 right-0 h-[6px] bg-gradient-to-r from-primary via-purple-500 to-accent rounded-full blur-sm opacity-70" />
             </span>
           </h1>
@@ -199,8 +139,7 @@ export default function LandingPage() {
             className="mt-8 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed animate-fade-in"
             style={{ animationDelay: "0.1s" }}
           >
-            Gerencie permits, clientes, frota e compliance em um só lugar — com IA, automações e
-            relatórios inteligentes que simplificam o dia a dia da sua operação.
+            {t("lp.hero.subtitle")}
           </p>
 
           <div
@@ -212,14 +151,14 @@ export default function LandingPage() {
               className="group w-full sm:w-auto h-12 px-7 btn-gradient text-white font-semibold rounded-xl inline-flex items-center justify-center gap-2 transition-all hover:shadow-[0_12px_40px_-10px_hsl(234_75%_58%/0.6)] active:scale-[0.98] relative overflow-hidden"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              Solicitar acesso gratuito
+              {t("lp.hero.ctaPrimary")}
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
               to="/login"
               className="w-full sm:w-auto h-12 px-7 rounded-xl inline-flex items-center justify-center gap-2 text-white font-semibold bg-white/5 border border-white/15 backdrop-blur-md hover:bg-white/10 transition-all"
             >
-              Já tenho conta
+              {t("lp.hero.ctaSecondary")}
             </Link>
           </div>
 
@@ -229,10 +168,10 @@ export default function LandingPage() {
             style={{ animationDelay: "0.3s" }}
           >
             {[
-              { v: "99.9%", l: "Uptime" },
-              { v: "24/7", l: "Suporte" },
-              { v: "IA", l: "Integrada" },
-              { v: "100%", l: "Compliance" },
+              { v: "99.9%", l: t("lp.hero.stat.uptime") },
+              { v: "24/7", l: t("lp.hero.stat.support") },
+              { v: t("lp.hero.stat.aiValue"), l: t("lp.hero.stat.aiLabel") },
+              { v: "100%", l: t("lp.hero.stat.compliance") },
             ].map((s) => (
               <div key={s.l} className="text-center">
                 <div className="font-display text-3xl sm:text-4xl font-bold gradient-text">
@@ -270,9 +209,9 @@ export default function LandingPage() {
                 <div className="col-span-9 space-y-3">
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { v: "128", l: "Permits ativos", c: "from-indigo-500 to-violet-500" },
-                      { v: "24", l: "Vencendo", c: "from-amber-500 to-orange-500" },
-                      { v: "96%", l: "Aprovados", c: "from-emerald-500 to-teal-500" },
+                      { v: "128", l: t("lp.mock.permitsActive"), c: "from-indigo-500 to-violet-500" },
+                      { v: "24", l: t("lp.mock.expiring"), c: "from-amber-500 to-orange-500" },
+                      { v: "96%", l: t("lp.mock.approved"), c: "from-emerald-500 to-teal-500" },
                     ].map((k) => (
                       <div
                         key={k.l}
@@ -313,24 +252,21 @@ export default function LandingPage() {
           <div className="text-center max-w-2xl mx-auto mb-16">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4">
               <Zap className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs font-semibold text-primary">Recursos</span>
+              <span className="text-xs font-semibold text-primary">{t("lp.features.badge")}</span>
             </div>
             <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-              Tudo que você precisa em{" "}
+              {t("lp.features.title1")}{" "}
               <span className="bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent">
-                uma única plataforma
+                {t("lp.features.title2")}
               </span>
             </h2>
-            <p className="text-muted-foreground text-lg">
-              Do onboarding do cliente até o relatório final — cada etapa da sua operação em um
-              fluxo integrado e inteligente.
-            </p>
+            <p className="text-muted-foreground text-lg">{t("lp.features.subtitle")}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {features.map((f, i) => (
               <div
-                key={f.title}
+                key={f.k}
                 className="group glass-card-premium rounded-2xl p-6 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden animate-fade-in"
                 style={{ animationDelay: `${i * 0.03}s` }}
               >
@@ -342,8 +278,10 @@ export default function LandingPage() {
                 >
                   <f.icon className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="font-display text-lg font-bold mb-2">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+                <h3 className="font-display text-lg font-bold mb-2">{t(`lp.feat.${f.k}.title`)}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {t(`lp.feat.${f.k}.desc`)}
+                </p>
               </div>
             ))}
           </div>
@@ -356,14 +294,12 @@ export default function LandingPage() {
           <div className="text-center max-w-2xl mx-auto mb-16">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4">
               <Activity className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs font-semibold text-primary">Como funciona</span>
+              <span className="text-xs font-semibold text-primary">{t("lp.workflow.badge")}</span>
             </div>
             <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-              3 passos para transformar sua operação
+              {t("lp.workflow.title")}
             </h2>
-            <p className="text-muted-foreground text-lg">
-              Comece em minutos e veja resultados desde o primeiro dia.
-            </p>
+            <p className="text-muted-foreground text-lg">{t("lp.workflow.subtitle")}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
@@ -379,8 +315,10 @@ export default function LandingPage() {
                     {w.step}
                   </div>
                 </div>
-                <h3 className="font-display text-xl font-bold mb-2">{w.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{w.desc}</p>
+                <h3 className="font-display text-xl font-bold mb-2">{t(`lp.step.${w.k}.title`)}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {t(`lp.step.${w.k}.desc`)}
+                </p>
               </div>
             ))}
           </div>
@@ -394,49 +332,29 @@ export default function LandingPage() {
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4">
                 <Star className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-semibold text-primary">Por que MartinsAdviser</span>
+                <span className="text-xs font-semibold text-primary">{t("lp.why.badge")}</span>
               </div>
               <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight mb-6">
-                Feito para transportadoras que{" "}
+                {t("lp.why.title1")}{" "}
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  não podem errar
+                  {t("lp.why.title2")}
                 </span>
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed mb-8">
-                Cada recurso foi pensado para reduzir tempo manual, evitar falhas de compliance e
-                dar visibilidade total sobre sua operação.
+                {t("lp.why.subtitle")}
               </p>
 
               <div className="space-y-4">
-                {[
-                  {
-                    icon: Zap,
-                    title: "Produtividade 3x maior",
-                    desc: "Automatize tarefas repetitivas e foque no que importa.",
-                  },
-                  {
-                    icon: Lock,
-                    title: "Segurança de nível empresarial",
-                    desc: "Controle de permissões, auditoria e criptografia em todas as camadas.",
-                  },
-                  {
-                    icon: TrendingUp,
-                    title: "Decisões orientadas por dados",
-                    desc: "Dashboards e relatórios com IA para enxergar além dos números.",
-                  },
-                  {
-                    icon: Globe,
-                    title: "Acesso de qualquer lugar",
-                    desc: "100% web, responsivo e multi-idioma (PT, EN, ES).",
-                  },
-                ].map((b) => (
-                  <div key={b.title} className="flex gap-4">
+                {whyBenefits.map((b) => (
+                  <div key={b.k} className="flex gap-4">
                     <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                       <b.icon className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-1">{b.title}</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{b.desc}</p>
+                      <h4 className="font-semibold text-foreground mb-1">{t(`lp.why.${b.k}.title`)}</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {t(`lp.why.${b.k}.desc`)}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -451,28 +369,26 @@ export default function LandingPage() {
                     <Bot className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <div className="font-display font-bold">Assistente IA</div>
+                    <div className="font-display font-bold">{t("lp.ai.title")}</div>
                     <div className="text-xs text-muted-foreground flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Online agora
+                      {t("lp.ai.status")}
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   <div className="ml-auto max-w-[85%] bg-primary/10 border border-primary/20 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm">
-                    Qual o status dos permits vencendo esta semana?
+                    {t("lp.ai.userMsg")}
                   </div>
                   <div className="max-w-[90%] bg-muted/60 rounded-2xl rounded-tl-sm px-4 py-3 text-sm space-y-2">
-                    <p>Identifiquei <b>12 permits</b> com vencimento nos próximos 7 dias:</p>
+                    <p dangerouslySetInnerHTML={{ __html: t("lp.ai.botIntro") }} />
                     <ul className="space-y-1 text-muted-foreground">
                       <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> 8 já em
-                        renovação
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> {t("lp.ai.botItem1")}
                       </li>
                       <li className="flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5 text-amber-500" /> 4 pendentes — devo
-                        priorizar?
+                        <Clock className="w-3.5 h-3.5 text-amber-500" /> {t("lp.ai.botItem2")}
                       </li>
                     </ul>
                   </div>
@@ -491,7 +407,7 @@ export default function LandingPage() {
                         style={{ animationDelay: "0.4s" }}
                       />
                     </span>
-                    analisando sua base...
+                    {t("lp.ai.analyzing")}
                   </div>
                 </div>
               </div>
@@ -508,26 +424,23 @@ export default function LandingPage() {
 
         <div className="relative mx-auto max-w-4xl px-6 text-center">
           <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold gradient-text leading-tight mb-6">
-            Pronto para transformar sua operação?
+            {t("lp.cta.title")}
           </h2>
-          <p className="text-white/70 text-lg max-w-xl mx-auto mb-10">
-            Solicite seu acesso e descubra como a MartinsAdviser pode simplificar a gestão de
-            permits, compliance e todo o ciclo operacional.
-          </p>
+          <p className="text-white/70 text-lg max-w-xl mx-auto mb-10">{t("lp.cta.subtitle")}</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/signup"
               className="group w-full sm:w-auto h-12 px-8 btn-gradient text-white font-semibold rounded-xl inline-flex items-center justify-center gap-2 transition-all hover:shadow-[0_12px_40px_-10px_hsl(234_75%_58%/0.7)] active:scale-[0.98] relative overflow-hidden"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              Solicitar acesso
+              {t("lp.nav.requestAccess")}
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
               to="/login"
               className="w-full sm:w-auto h-12 px-8 rounded-xl inline-flex items-center justify-center gap-2 text-white font-semibold bg-white/5 border border-white/15 backdrop-blur-md hover:bg-white/10 transition-all"
             >
-              Entrar
+              {t("lp.nav.signin")}
             </Link>
           </div>
         </div>
@@ -541,14 +454,14 @@ export default function LandingPage() {
             <Wordmark size="sm" tone="dark" />
           </div>
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} MartinsAdviser · Todos os direitos reservados
+            © {new Date().getFullYear()} MartinsAdviser · {t("lp.footer.rights")}
           </p>
           <div className="flex items-center gap-5 text-sm text-muted-foreground">
             <Link to="/login" className="hover:text-foreground transition-colors">
-              Entrar
+              {t("lp.nav.signin")}
             </Link>
             <Link to="/signup" className="hover:text-foreground transition-colors">
-              Solicitar acesso
+              {t("lp.nav.requestAccess")}
             </Link>
           </div>
         </div>
