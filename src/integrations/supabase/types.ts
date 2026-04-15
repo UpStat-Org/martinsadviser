@@ -55,6 +55,41 @@ export type Database = {
           },
         ]
       }
+      ai_chat_messages: {
+        Row: {
+          client_id: string
+          content: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string | null
+        }
+        Insert: {
+          client_id: string
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string | null
+        }
+        Update: {
+          client_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_chat_messages_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       automation_log: {
         Row: {
           created_at: string
@@ -137,6 +172,47 @@ export type Database = {
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "message_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_internal_notes: {
+        Row: {
+          body: string
+          client_id: string
+          created_at: string
+          id: string
+          pinned: boolean
+          updated_at: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          body?: string
+          client_id: string
+          created_at?: string
+          id?: string
+          pinned?: boolean
+          updated_at?: string
+          user_id: string
+          user_name?: string
+        }
+        Update: {
+          body?: string
+          client_id?: string
+          created_at?: string
+          id?: string
+          pinned?: boolean
+          updated_at?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_internal_notes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
         ]
@@ -736,6 +812,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          assigned_to: string | null
           client_id: string | null
           created_at: string
           due_date: string | null
@@ -751,6 +828,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_to?: string | null
           client_id?: string | null
           created_at?: string
           due_date?: string | null
@@ -766,6 +844,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_to?: string | null
           client_id?: string | null
           created_at?: string
           due_date?: string | null
