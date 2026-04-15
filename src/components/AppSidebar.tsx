@@ -103,8 +103,8 @@ export function AppSidebar() {
           "group relative flex items-center gap-3 h-9 rounded-md text-[13px] font-medium transition-colors",
           collapsed && !isMobile ? "justify-center px-0 mx-1" : "px-2.5",
           active
-            ? "bg-sidebar-accent text-sidebar-primary-foreground"
-            : "text-sidebar-foreground/65 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
+            ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
+            : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
         )}
       >
         {active && !collapsed && (
@@ -134,10 +134,10 @@ export function AppSidebar() {
         </div>
         {showLabel && (
           <div className="flex flex-col min-w-0 leading-tight">
-            <span className="font-display font-semibold text-sidebar-primary-foreground text-[13px] truncate tracking-tight">
+            <span className="font-display font-semibold text-sidebar-foreground text-[13px] truncate tracking-tight">
               MartinsAdviser
             </span>
-            <span className="text-[10px] text-sidebar-foreground/40">Permit Management</span>
+            <span className="text-[10px] text-sidebar-foreground/50">Permit Management</span>
           </div>
         )}
         {isMobile && (
@@ -162,7 +162,7 @@ export function AppSidebar() {
                 )}
                 title={collapsed && !isMobile ? displayName : undefined}
               >
-                <div className="relative shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-sidebar-primary/30 to-purple-500/30 ring-1 ring-sidebar-border/50 flex items-center justify-center text-[11px] font-semibold text-sidebar-primary-foreground">
+                <div className="relative shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 ring-1 ring-sidebar-border/50 flex items-center justify-center text-[11px] font-semibold text-white shadow-sm">
                   {initials}
                 </div>
                 {showLabel && (

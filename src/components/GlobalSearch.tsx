@@ -79,41 +79,92 @@ export function GlobalSearch() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-background text-muted-foreground text-sm hover:bg-accent transition-colors w-full max-w-sm"
+        className="group relative flex items-center gap-2.5 h-10 px-3.5 rounded-xl bg-muted/50 hover:bg-muted border border-border/60 hover:border-border text-muted-foreground text-sm transition-all w-full max-w-md shadow-sm hover:shadow-md"
       >
-        <Search className="w-4 h-4" />
-        <span className="flex-1 text-left">{t("search.placeholder")}</span>
-        <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+        <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 group-hover:from-primary/25 group-hover:to-primary/10 transition-colors">
+          <Search className="w-3.5 h-3.5 text-primary" />
+        </div>
+        <span className="flex-1 text-left font-medium">{t("search.placeholder")}</span>
+        <kbd className="hidden sm:inline-flex h-6 items-center gap-1 rounded-md border border-border/80 bg-background/80 px-1.5 font-mono text-[10px] font-semibold text-muted-foreground shadow-sm">
           ⌘K
         </kbd>
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="overflow-hidden p-0 shadow-lg">
-          <Command shouldFilter={false} className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+        <DialogContent className="overflow-hidden p-0 shadow-2xl rounded-2xl border-border/60 max-w-xl">
+          <Command shouldFilter={false} className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.15em] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input-wrapper]_svg]:text-primary [&_[cmdk-input]]:h-14 [&_[cmdk-input]]:text-base [&_[cmdk-item]]:px-3 [&_[cmdk-item]]:py-2.5 [&_[cmdk-item]]:rounded-lg [&_[cmdk-item]]:gap-3 [&_[cmdk-item][data-selected=true]]:bg-accent">
             <CommandInput placeholder={t("search.placeholder")} value={query} onValueChange={setQuery} />
-            <CommandList>
+            <CommandList className="max-h-[440px] p-1">
               {results.length === 0 && (
-                <CommandEmpty>
-                  {loading ? t("common.loading") : query.length >= 2 ? t("search.noResults") : t("search.typeToSearch")}
+                <CommandEmpty className="py-10 text-center">
+                  <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
+                    <div className="w-12 h-12 rounded-2xl bg-muted/70 flex items-center justify-center">
+                      <Search className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <span>
+                      {loading
+                        ? t("common.loading")
+                        : query.length >= 2
+                        ? t("search.noResults")
+                        : t("search.typeToSearch")}
+                    </span>
+                  </div>
                 </CommandEmpty>
               )}
               {Object.entries(grouped).map(([type, items]) => {
                 const Icon = icons[type as keyof typeof icons];
+                const iconGradient = {
+                  client: "from-indigo-500 to-violet-500",
+                  truck: "from-blue-500 to-cyan-500",
+                  permit: "from-emerald-500 to-teal-500",
+                  invoice: "from-amber-500 to-orange-500",
+                }[type as keyof typeof icons];
                 return (
                   <CommandGroup key={type} heading={labels[type as keyof typeof labels]}>
                     {items.map((item) => (
-                      <CommandItem key={item.id} value={item.id} onSelect={() => handleSelect(item.route)} className="gap-3">
-                        <Icon className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium">{item.label}</span>
-                          {item.sublabel && <span className="text-xs text-muted-foreground">{item.sublabel}</span>}
+                      <CommandItem
+                        key={item.id}
+                        value={item.id}
+                        onSelect={() => handleSelect(item.route)}
+                      >
+                        <div
+                          className={`w-8 h-8 rounded-lg bg-gradient-to-br ${iconGradient} flex items-center justify-center shadow-sm flex-shrink-0`}
+                        >
+                          <Icon className="w-4 h-4 text-white" />
                         </div>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="text-sm font-semibold truncate">{item.label}</span>
+                          {item.sublabel && (
+                            <span className="text-xs text-muted-foreground truncate">
+                              {item.sublabel}
+                            </span>
+                          )}
+                        </div>
+                        <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border/80 bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-0 group-hover:opacity-100">
+                          ↵
+                        </kbd>
                       </CommandItem>
                     ))}
                   </CommandGroup>
                 );
               })}
             </CommandList>
+            <div className="border-t border-border/60 px-3 py-2 flex items-center justify-between text-[11px] text-muted-foreground bg-muted/30">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center gap-1">
+                  <kbd className="h-4 px-1 rounded bg-background border border-border font-mono text-[10px]">↑↓</kbd>
+                  navegar
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <kbd className="h-4 px-1 rounded bg-background border border-border font-mono text-[10px]">↵</kbd>
+                  abrir
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <kbd className="h-4 px-1 rounded bg-background border border-border font-mono text-[10px]">esc</kbd>
+                  fechar
+                </span>
+              </div>
+              <span className="font-semibold text-primary">MartinsAdviser</span>
+            </div>
           </Command>
         </DialogContent>
       </Dialog>

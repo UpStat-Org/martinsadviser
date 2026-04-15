@@ -193,83 +193,338 @@ export default function ClientDetail() {
     }
   };
 
+  const clientInitials = client.company_name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s) => s[0]?.toUpperCase() ?? "")
+    .join("");
+
+  const gradients = [
+    "from-indigo-500 to-violet-500",
+    "from-blue-500 to-cyan-500",
+    "from-emerald-500 to-teal-500",
+    "from-orange-500 to-amber-500",
+    "from-rose-500 to-red-500",
+    "from-fuchsia-500 to-pink-500",
+    "from-sky-500 to-blue-500",
+    "from-purple-500 to-indigo-500",
+  ];
+  let h = 0;
+  for (let i = 0; i < client.id.length; i++) h = (h * 31 + client.id.charCodeAt(i)) >>> 0;
+  const clientGradient = gradients[h % gradients.length];
+
+  const activePermits = permits?.filter((p) => {
+    if (!p.expiration_date) return false;
+    return new Date(p.expiration_date) > new Date();
+  }).length ?? 0;
+  const complianceScore = permits && permits.length > 0
+    ? Math.round((activePermits / permits.length) * 100)
+    : 100;
+
+  const currency = (v: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v);
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/clients")} className="shrink-0 self-start"><ArrowLeft className="w-5 h-5" /></Button>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <h1 className="font-display text-3xl font-bold text-foreground">{client.company_name}</h1>
-            <Badge className={status.className}>{status.label}</Badge>
+    <div className="space-y-6 animate-fade-in">
+      {/* ============ HERO HEADER ============ */}
+      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
+        <div className="absolute inset-0 grid-pattern opacity-40" />
+        <div className="absolute inset-0 noise-overlay" />
+        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+        <div className="orb w-64 h-64 bg-accent/20 bottom-0 left-1/3" />
+
+        <div className="relative">
+          <button
+            onClick={() => navigate("/clients")}
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/10 border border-white/15 backdrop-blur-md text-white text-xs font-semibold hover:bg-white/15 transition-all mb-5"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            {t("common.back")}
+          </button>
+
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+            <div className="flex items-start gap-4 min-w-0">
+              <div
+                className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${clientGradient} flex items-center justify-center text-white font-display font-bold text-2xl sm:text-3xl shadow-2xl ring-4 ring-white/10 flex-shrink-0`}
+              >
+                {clientInitials}
+              </div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <Badge className={status.className}>{status.label}</Badge>
+                  {client.dot && (
+                    <span className="inline-flex items-center h-6 px-2 rounded-md text-[11px] font-bold uppercase tracking-wider bg-white/10 border border-white/15 text-white/80">
+                      DOT {client.dot}
+                    </span>
+                  )}
+                  {client.mc && (
+                    <span className="inline-flex items-center h-6 px-2 rounded-md text-[11px] font-bold uppercase tracking-wider bg-white/10 border border-white/15 text-white/80">
+                      MC {client.mc}
+                    </span>
+                  )}
+                </div>
+                <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold gradient-text leading-tight break-words">
+                  {client.company_name}
+                </h1>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-white/70">
+                  {client.phone && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5" />
+                      {client.phone}
+                    </span>
+                  )}
+                  {client.email && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5" />
+                      {client.email}
+                    </span>
+                  )}
+                  {client.address && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5" />
+                      {client.address}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={handleGenerateReport}
+                disabled={aiLoading}
+                className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg disabled:opacity-60"
+              >
+                {aiLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+                {t("ai.generateReport")}
+              </button>
+              <button
+                onClick={generateCompliancePdf}
+                disabled={!permits?.length}
+                className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all disabled:opacity-40"
+              >
+                <FileDown className="w-4 h-4" />
+                {t("clientDetail.compliancePdf")}
+              </button>
+              <button
+                onClick={() => setInviteOpen(true)}
+                className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
+              >
+                <UserPlus className="w-4 h-4" />
+                {t("portal.inviteClient")}
+              </button>
+              <button
+                onClick={() => setEditOpen(true)}
+                className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
+              >
+                <Pencil className="w-4 h-4" />
+                {t("common.edit")}
+              </button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button className="h-10 w-10 rounded-xl bg-red-500/20 border border-red-400/30 backdrop-blur-md text-white inline-flex items-center justify-center hover:bg-red-500/30 transition-all">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t("clients.removeClient")}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t("clients.removeClientDesc")}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>
+                      {t("common.delete")}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={handleGenerateReport} disabled={aiLoading}>
-            {aiLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-            {t("ai.generateReport")}
-          </Button>
-          <Button variant="outline" size="sm" onClick={generateCompliancePdf} disabled={!permits?.length}>
-              <FileDown className="w-4 h-4 mr-2" />{t("clientDetail.compliancePdf")}
-            </Button>
-          <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}><UserPlus className="w-4 h-4 mr-2" />{t("portal.inviteClient")}</Button>
-          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}><Pencil className="w-4 h-4 mr-2" />{t("common.edit")}</Button>
-          <AlertDialog>
-          <AlertDialogTrigger asChild><Button variant="destructive" size="sm" className="px-3"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>{t("clients.removeClient")}</AlertDialogTitle>
-              <AlertDialogDescription>{t("clients.removeClientDesc")}</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete}>{t("common.delete")}</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+
+          {/* Quick metric pills */}
+          <div className="relative mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { label: "Permits", value: permits?.length ?? 0, icon: FileCheck, tint: "from-emerald-400 to-teal-400" },
+              { label: "Trucks", value: trucks?.length ?? 0, icon: TruckIcon, tint: "from-sky-400 to-blue-400" },
+              { label: "Compliance", value: `${complianceScore}%`, icon: Sparkles, tint: "from-fuchsia-400 to-pink-400" },
+              { label: "Faturado", value: currency(financeSummary.total), icon: DollarSign, tint: "from-amber-400 to-orange-400" },
+            ].map((m) => (
+              <div
+                key={m.label}
+                className="relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md p-3 sm:p-4"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className={`w-9 h-9 rounded-xl bg-gradient-to-br ${m.tint} flex items-center justify-center shadow-md flex-shrink-0`}
+                  >
+                    <m.icon className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-semibold text-white/60 uppercase tracking-wider">
+                      {m.label}
+                    </div>
+                    <div className="font-display text-lg sm:text-xl font-bold text-white truncate">
+                      {m.value}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <CardHeader><CardTitle className="font-display text-lg">{t("clients.info")}</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div><p className="text-xs text-muted-foreground uppercase tracking-wider">EIN</p><p className="font-medium">{client.ein || "—"}</p></div>
-              <div><p className="text-xs text-muted-foreground uppercase tracking-wider">DOT #</p><p className="font-medium">{client.dot || "—"}</p></div>
-              <div><p className="text-xs text-muted-foreground uppercase tracking-wider">MC #</p><p className="font-medium">{client.mc || "—"}</p></div>
+      {/* ============ INFO / SERVICES / FINANCE ============ */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Info */}
+        <Card className="lg:col-span-2 border-border/50 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md">
+                <FileText className="w-4 h-4 text-white" />
+              </div>
+              <CardTitle className="font-display text-base">{t("clients.info")}</CardTitle>
             </div>
-            <div className="flex flex-col gap-2 pt-2">
-              {client.phone && <div className="flex items-center gap-2 text-sm"><Phone className="w-4 h-4 text-muted-foreground" /><span>{client.phone}</span></div>}
-              {client.email && <div className="flex items-center gap-2 text-sm"><Mail className="w-4 h-4 text-muted-foreground" /><span>{client.email}</span></div>}
-              {client.address && <div className="flex items-center gap-2 text-sm"><MapPin className="w-4 h-4 text-muted-foreground" /><span>{client.address}</span></div>}
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {[
+                { label: "EIN", value: client.ein },
+                { label: "DOT #", value: client.dot },
+                { label: "MC #", value: client.mc },
+              ].map((f) => (
+                <div
+                  key={f.label}
+                  className="rounded-xl bg-muted/40 border border-border/50 p-3"
+                >
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-[0.15em] font-semibold mb-1">
+                    {f.label}
+                  </p>
+                  <p className="font-mono text-sm font-bold">{f.value || "—"}</p>
+                </div>
+              ))}
             </div>
-            {client.notes && <div className="pt-2"><p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{t("clients.notes")}</p><p className="text-sm whitespace-pre-wrap">{client.notes}</p></div>}
+
+            {(client.phone || client.email || client.address) && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border/50">
+                {client.phone && (
+                  <a
+                    href={`tel:${client.phone}`}
+                    className="flex items-center gap-2.5 p-2.5 rounded-lg hover:bg-muted/60 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-3.5 h-3.5 text-emerald-500" />
+                    </div>
+                    <span className="text-sm truncate">{client.phone}</span>
+                  </a>
+                )}
+                {client.email && (
+                  <a
+                    href={`mailto:${client.email}`}
+                    className="flex items-center gap-2.5 p-2.5 rounded-lg hover:bg-muted/60 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-3.5 h-3.5 text-indigo-500" />
+                    </div>
+                    <span className="text-sm truncate">{client.email}</span>
+                  </a>
+                )}
+                {client.address && (
+                  <div className="flex items-center gap-2.5 p-2.5 rounded-lg">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-3.5 h-3.5 text-amber-500" />
+                    </div>
+                    <span className="text-sm truncate">{client.address}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {client.notes && (
+              <div className="pt-4 border-t border-border/50">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-[0.15em] font-semibold mb-2">
+                  {t("clients.notes")}
+                </p>
+                <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                  {client.notes}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
-        <div className="space-y-6">
-          <Card>
-            <CardHeader><CardTitle className="font-display text-lg">{t("clients.services")}</CardTitle></CardHeader>
+
+        {/* Services + Finance */}
+        <div className="space-y-4">
+          <Card className="border-border/50 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 to-cyan-500" />
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center shadow-md">
+                  <FileCheck className="w-4 h-4 text-white" />
+                </div>
+                <CardTitle className="font-display text-base">
+                  {t("clients.services")}
+                </CardTitle>
+              </div>
+            </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {serviceLabels.map((s) => <Badge key={s.key} variant={client[s.key] ? "default" : "outline"} className={!client[s.key] ? "opacity-40" : ""}>{s.label}</Badge>)}
+              <div className="flex flex-wrap gap-1.5">
+                {serviceLabels.map((s) => {
+                  const active = !!client[s.key];
+                  return (
+                    <span
+                      key={s.key}
+                      className={`inline-flex items-center h-7 px-3 rounded-lg text-xs font-semibold transition-all ${
+                        active
+                          ? "btn-gradient text-white shadow-md"
+                          : "bg-muted/50 text-muted-foreground/60 line-through"
+                      }`}
+                    >
+                      {s.label}
+                    </span>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader><CardTitle className="font-display text-lg flex items-center gap-2"><DollarSign className="w-5 h-5 text-success" />{t("clientDetail.finance")}</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">{t("clientDetail.totalBilled")}</span>
-                <span className="font-mono font-bold">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(financeSummary.total)}</span>
+
+          <Card className="border-border/50 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
+                  <DollarSign className="w-4 h-4 text-white" />
+                </div>
+                <CardTitle className="font-display text-base">
+                  {t("clientDetail.finance")}
+                </CardTitle>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">{t("clientDetail.received")}</span>
-                <span className="font-mono text-success">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(financeSummary.paid)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">{t("clientDetail.pending")}</span>
-                <span className="font-mono text-warning">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(financeSummary.pending)}</span>
-              </div>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {[
+                { label: t("clientDetail.totalBilled"), value: financeSummary.total, color: "text-foreground" },
+                { label: t("clientDetail.received"), value: financeSummary.paid, color: "text-emerald-600 dark:text-emerald-400" },
+                { label: t("clientDetail.pending"), value: financeSummary.pending, color: "text-amber-600 dark:text-amber-400" },
+              ].map((r) => (
+                <div
+                  key={r.label}
+                  className="flex justify-between items-center py-2 border-b border-border/40 last:border-0"
+                >
+                  <span className="text-sm text-muted-foreground">{r.label}</span>
+                  <span className={`font-mono font-bold text-sm ${r.color}`}>
+                    {currency(r.value)}
+                  </span>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </div>
@@ -277,15 +532,23 @@ export default function ClientDetail() {
 
       <ComplianceDashboard permits={permits} />
 
-      <Card>
-        <CardHeader><CardTitle className="font-display text-lg flex items-center gap-2"><Map className="w-5 h-5 text-muted-foreground" />{t("map.title")}</CardTitle></CardHeader>
+      <Card className="border-border/50 relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500" />
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-blue-500 flex items-center justify-center shadow-md">
+              <Map className="w-4 h-4 text-white" />
+            </div>
+            <CardTitle className="font-display text-base">{t("map.title")}</CardTitle>
+          </div>
+        </CardHeader>
         <CardContent>
           <PermitCoverageMap permits={permits} />
         </CardContent>
       </Card>
 
       <Tabs defaultValue="trucks">
-        <TabsList>
+        <TabsList className="h-auto p-1.5 bg-muted/50 rounded-2xl flex-wrap gap-1">
           <TabsTrigger value="trucks" className="gap-2"><TruckIcon className="w-4 h-4" />{t("trucks.title")} ({trucks?.length || 0})</TabsTrigger>
           <TabsTrigger value="permits" className="gap-2"><FileCheck className="w-4 h-4" />{t("permits.title")} ({permits?.length || 0})</TabsTrigger>
           <TabsTrigger value="signatures" className="gap-2"><PenLine className="w-4 h-4" />{t("signature.tab")} </TabsTrigger>

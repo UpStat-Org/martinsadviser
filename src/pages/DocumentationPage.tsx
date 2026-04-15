@@ -13,9 +13,34 @@ import { type ReactNode } from "react";
 function Tip({ children, variant = "info" }: { children: ReactNode; variant?: "info" | "warning" }) {
   const isWarning = variant === "warning";
   return (
-    <div className={`flex gap-3 rounded-lg border-l-4 p-4 my-3 ${isWarning ? "border-l-warning bg-warning/5" : "border-l-primary bg-primary/5"}`}>
-      {isWarning ? <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" /> : <Lightbulb className="w-5 h-5 text-primary shrink-0 mt-0.5" />}
-      <p className="text-sm text-muted-foreground">{children}</p>
+    <div
+      className={`relative overflow-hidden flex gap-3 rounded-xl p-4 my-3 border ${
+        isWarning
+          ? "bg-amber-500/5 border-amber-500/20"
+          : "bg-primary/5 border-primary/15"
+      }`}
+    >
+      <div
+        className={`absolute top-0 left-0 bottom-0 w-1 ${
+          isWarning
+            ? "bg-gradient-to-b from-amber-500 to-orange-500"
+            : "bg-gradient-to-b from-indigo-500 to-violet-500"
+        }`}
+      />
+      <div
+        className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${
+          isWarning
+            ? "bg-gradient-to-br from-amber-500 to-orange-500"
+            : "bg-gradient-to-br from-indigo-500 to-violet-500"
+        }`}
+      >
+        {isWarning ? (
+          <AlertTriangle className="w-4 h-4 text-white" />
+        ) : (
+          <Lightbulb className="w-4 h-4 text-white" />
+        )}
+      </div>
+      <p className="text-sm text-foreground/80 leading-relaxed pt-0.5">{children}</p>
     </div>
   );
 }
@@ -24,8 +49,8 @@ function Steps({ items }: { items: string[] }) {
   return (
     <ol className="space-y-3 my-4">
       {items.map((item, i) => (
-        <li key={i} className="flex gap-3 items-start">
-          <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 mt-0.5">
+        <li key={i} className="flex gap-3 items-start group">
+          <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 text-white text-xs font-bold shrink-0 mt-0.5 shadow-sm ring-2 ring-background group-hover:scale-105 transition-transform">
             {i + 1}
           </span>
           <span className="text-sm text-foreground leading-relaxed">{item}</span>
@@ -37,7 +62,9 @@ function Steps({ items }: { items: string[] }) {
 
 function SectionIcon({ icon: Icon, color }: { icon: any; color: string }) {
   return (
-    <div className={`flex items-center justify-center w-9 h-9 rounded-lg ${color} shrink-0`}>
+    <div
+      className={`flex items-center justify-center w-10 h-10 rounded-xl ${color} shrink-0 shadow-sm`}
+    >
       <Icon className="w-5 h-5" />
     </div>
   );
@@ -60,39 +87,87 @@ export default function DocumentationPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <h1 className="font-display text-3xl font-bold text-foreground">{t("docs.title")}</h1>
-        <p className="text-muted-foreground mt-1">{t("docs.subtitle")}</p>
-      </div>
+      {/* ============ HERO ============ */}
+      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
+        <div className="absolute inset-0 grid-pattern opacity-40" />
+        <div className="absolute inset-0 noise-overlay" />
+        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
 
-      <Card className="border-primary/20 bg-primary/5">
-        <CardContent className="flex gap-4 items-start p-5">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 shrink-0">
-            <BookOpen className="w-5 h-5 text-primary" />
+        <div className="relative flex items-start gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
+            <BookOpen className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="font-semibold text-foreground text-base">{t("docs.welcomeTitle")}</h2>
-            <p className="text-sm text-muted-foreground mt-1">{t("docs.welcomeDesc")}</p>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+              {t("docs.title")}
+            </h1>
+            <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
+              {t("docs.subtitle")}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ============ WELCOME ============ */}
+      <Card className="border-border/50 relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
+        <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 opacity-10 blur-2xl pointer-events-none" />
+        <CardContent className="relative flex gap-4 items-start p-6">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 flex items-center justify-center shadow-xl flex-shrink-0">
+            <BookOpen className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1">
+            <h2 className="font-display font-bold text-base mb-1">
+              {t("docs.welcomeTitle")}
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {t("docs.welcomeDesc")}
+            </p>
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              <span className="inline-flex items-center h-6 px-2 rounded-md text-[10px] font-bold bg-primary/10 text-primary border border-primary/15">
+                {sections.length} seções
+              </span>
+              <span className="inline-flex items-center h-6 px-2 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                Passo a passo
+              </span>
+              <span className="inline-flex items-center h-6 px-2 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                Dicas
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* ============ SECTIONS ============ */}
       <Accordion type="multiple" className="space-y-3">
-        {sections.map((section) => (
-          <AccordionItem key={section.id} value={section.id} className="border rounded-lg bg-card shadow-soft px-1 overflow-hidden">
-            <AccordionTrigger className="hover:no-underline px-4 py-4">
-              <div className="flex items-center gap-3">
+        {sections.map((section, i) => (
+          <AccordionItem
+            key={section.id}
+            value={section.id}
+            className="border border-border/50 rounded-2xl bg-card shadow-sm hover:shadow-md transition-shadow overflow-hidden group"
+          >
+            <AccordionTrigger className="hover:no-underline px-5 py-4 group-data-[state=open]:border-b group-data-[state=open]:border-border/50">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-muted text-muted-foreground font-bold text-[10px] shrink-0">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 <SectionIcon icon={section.icon} color={section.color} />
-                <div className="text-left">
-                  <span className="font-semibold text-foreground">{section.title}</span>
-                  <p className="text-xs text-muted-foreground font-normal mt-0.5">{section.description}</p>
+                <div className="text-left min-w-0">
+                  <span className="font-display font-bold text-foreground text-[15px] truncate block">
+                    {section.title}
+                  </span>
+                  <p className="text-xs text-muted-foreground font-normal mt-0.5 truncate">
+                    {section.description}
+                  </p>
                 </div>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="px-4 pb-5">
+            <AccordionContent className="px-5 pb-5 pt-4">
               <Steps items={section.steps} />
               {section.tips.map((tip, i) => (
-                <Tip key={i} variant={tip.variant as any}>{tip.text}</Tip>
+                <Tip key={i} variant={tip.variant as any}>
+                  {tip.text}
+                </Tip>
               ))}
             </AccordionContent>
           </AccordionItem>
