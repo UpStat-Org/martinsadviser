@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useComments, useCreateComment, useDeleteComment } from "@/hooks/useComments";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CommentsSectionProps {
   entityType: string;
@@ -19,6 +20,7 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
   const createComment = useCreateComment();
   const deleteComment = useDeleteComment();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const handleSubmit = () => {
     if (!body.trim()) return;
@@ -33,7 +35,7 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
       <CardHeader className="pb-3">
         <CardTitle className="font-display text-lg flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-muted-foreground" />
-          Comentários
+          {t("comments.title")}
           {comments?.length ? <span className="text-sm font-normal text-muted-foreground">({comments.length})</span> : null}
         </CardTitle>
       </CardHeader>
@@ -41,7 +43,7 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
         {/* New comment form */}
         <div className="flex gap-2">
           <Textarea
-            placeholder="Adicionar comentário..."
+            placeholder={t("comments.placeholder")}
             value={body}
             onChange={(e) => setBody(e.target.value)}
             rows={2}
@@ -70,7 +72,7 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           </div>
         ) : !comments?.length ? (
-          <p className="text-sm text-muted-foreground text-center py-4">Nenhum comentário ainda.</p>
+          <p className="text-sm text-muted-foreground text-center py-4">{t("comments.empty")}</p>
         ) : (
           <div className="space-y-3">
             {comments.map((comment) => (

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useInternalNotes, useCreateInternalNote, useDeleteInternalNote, useUpdateInternalNote } from "@/hooks/useInternalNotes";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function InternalNotesSection({ clientId }: { clientId: string }) {
   const [body, setBody] = useState("");
@@ -15,6 +16,7 @@ export function InternalNotesSection({ clientId }: { clientId: string }) {
   const remove = useDeleteInternalNote();
   const update = useUpdateInternalNote();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const submit = () => {
     if (!body.trim()) return;
@@ -26,9 +28,9 @@ export function InternalNotesSection({ clientId }: { clientId: string }) {
       <CardHeader className="pb-3">
         <CardTitle className="font-display text-lg flex items-center gap-2">
           <Lock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-          Notas Internas
+          {t("notes.internal.title")}
           <span className="text-xs font-normal text-muted-foreground">
-            (privadas — invisíveis no portal do cliente)
+            {t("notes.internal.private")}
           </span>
           {notes?.length ? <span className="text-sm font-normal text-muted-foreground ml-auto">{notes.length}</span> : null}
         </CardTitle>
@@ -36,7 +38,7 @@ export function InternalNotesSection({ clientId }: { clientId: string }) {
       <CardContent className="space-y-4">
         <div className="flex gap-2">
           <Textarea
-            placeholder="Ex: cliente difícil, sempre paga atrasado..."
+            placeholder={t("notes.internal.placeholder")}
             value={body}
             onChange={(e) => setBody(e.target.value)}
             rows={2}
@@ -58,7 +60,7 @@ export function InternalNotesSection({ clientId }: { clientId: string }) {
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           </div>
         ) : !notes?.length ? (
-          <p className="text-sm text-muted-foreground text-center py-4">Sem notas internas ainda.</p>
+          <p className="text-sm text-muted-foreground text-center py-4">{t("notes.internal.empty")}</p>
         ) : (
           <div className="space-y-3">
             {notes.map((n) => (
@@ -81,7 +83,7 @@ export function InternalNotesSection({ clientId }: { clientId: string }) {
                     variant="ghost"
                     size="icon"
                     className="w-7 h-7"
-                    title={n.pinned ? "Desafixar" : "Fixar"}
+                    title={n.pinned ? t("notes.internal.unpin") : t("notes.internal.pin")}
                     onClick={() => update.mutate({ id: n.id, client_id: clientId, pinned: !n.pinned })}
                   >
                     {n.pinned ? <PinOff className="w-3 h-3" /> : <Pin className="w-3 h-3" />}

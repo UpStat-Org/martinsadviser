@@ -187,7 +187,7 @@ export default function ClientDetail() {
       setAiReportOpen(true);
     } catch (e: any) {
       console.error("AI Report error:", e);
-      toast({ title: "Erro ao gerar relatório", description: e.message, variant: "destructive" });
+      toast({ title: t("clientDetail.reportError"), description: e.message, variant: "destructive" });
     } finally {
       setAiLoading(false);
     }
@@ -209,7 +209,7 @@ export default function ClientDetail() {
             {t("ai.generateReport")}
           </Button>
           <Button variant="outline" size="sm" onClick={generateCompliancePdf} disabled={!permits?.length}>
-              <FileDown className="w-4 h-4 mr-2" />Compliance PDF
+              <FileDown className="w-4 h-4 mr-2" />{t("clientDetail.compliancePdf")}
             </Button>
           <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}><UserPlus className="w-4 h-4 mr-2" />{t("portal.inviteClient")}</Button>
           <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}><Pencil className="w-4 h-4 mr-2" />{t("common.edit")}</Button>
@@ -256,18 +256,18 @@ export default function ClientDetail() {
             </CardContent>
           </Card>
           <Card>
-            <CardHeader><CardTitle className="font-display text-lg flex items-center gap-2"><DollarSign className="w-5 h-5 text-success" />Financeiro</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="font-display text-lg flex items-center gap-2"><DollarSign className="w-5 h-5 text-success" />{t("clientDetail.finance")}</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Total Faturado</span>
+                <span className="text-sm text-muted-foreground">{t("clientDetail.totalBilled")}</span>
                 <span className="font-mono font-bold">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(financeSummary.total)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Recebido</span>
+                <span className="text-sm text-muted-foreground">{t("clientDetail.received")}</span>
                 <span className="font-mono text-success">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(financeSummary.paid)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Pendente</span>
+                <span className="text-sm text-muted-foreground">{t("clientDetail.pending")}</span>
                 <span className="font-mono text-warning">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(financeSummary.pending)}</span>
               </div>
             </CardContent>
@@ -289,11 +289,11 @@ export default function ClientDetail() {
           <TabsTrigger value="trucks" className="gap-2"><TruckIcon className="w-4 h-4" />{t("trucks.title")} ({trucks?.length || 0})</TabsTrigger>
           <TabsTrigger value="permits" className="gap-2"><FileCheck className="w-4 h-4" />{t("permits.title")} ({permits?.length || 0})</TabsTrigger>
           <TabsTrigger value="signatures" className="gap-2"><PenLine className="w-4 h-4" />{t("signature.tab")} </TabsTrigger>
-          <TabsTrigger value="messages" className="gap-2"><Send className="w-4 h-4" />Mensagens ({clientMessages?.length || 0})</TabsTrigger>
+          <TabsTrigger value="messages" className="gap-2"><Send className="w-4 h-4" />{t("clientDetail.messagesTab")} ({clientMessages?.length || 0})</TabsTrigger>
           <TabsTrigger value="activity" className="gap-2"><Clock className="w-4 h-4" />{t("activity.title")}</TabsTrigger>
-            <TabsTrigger value="comments" className="gap-2"><MessageSquare className="w-4 h-4" />Comentários</TabsTrigger>
-            <TabsTrigger value="notes" className="gap-2"><Lock className="w-4 h-4" />Notas Internas</TabsTrigger>
-            <TabsTrigger value="ai" className="gap-2"><Sparkles className="w-4 h-4" />Assistente IA</TabsTrigger>
+            <TabsTrigger value="comments" className="gap-2"><MessageSquare className="w-4 h-4" />{t("clientDetail.commentsTab")}</TabsTrigger>
+            <TabsTrigger value="notes" className="gap-2"><Lock className="w-4 h-4" />{t("clientDetail.notesTab")}</TabsTrigger>
+            <TabsTrigger value="ai" className="gap-2"><Sparkles className="w-4 h-4" />{t("clientDetail.aiTab")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="trucks" className="mt-4">
@@ -407,22 +407,22 @@ export default function ClientDetail() {
           <Card>
             <CardHeader>
               <CardTitle className="font-display text-lg flex items-center gap-2">
-                <Send className="w-5 h-5 text-muted-foreground" /> Histórico de Mensagens
+                <Send className="w-5 h-5 text-muted-foreground" /> {t("clientDetail.messagesHistory")}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {!clientMessages?.length ? (
-                <div className="p-8 text-center text-muted-foreground">Nenhuma mensagem enviada para este cliente</div>
+                <div className="p-8 text-center text-muted-foreground">{t("clientDetail.noMessages")}</div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Canal</TableHead>
-                      <TableHead>Assunto</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Agendado</TableHead>
-                      <TableHead>Enviado</TableHead>
-                      <TableHead className="w-16">Ações</TableHead>
+                      <TableHead>{t("clientDetail.channel")}</TableHead>
+                      <TableHead>{t("clientDetail.subject")}</TableHead>
+                      <TableHead>{t("clients.status")}</TableHead>
+                      <TableHead>{t("clientDetail.scheduled")}</TableHead>
+                      <TableHead>{t("clientDetail.sent")}</TableHead>
+                      <TableHead className="w-16">{t("common.actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -441,12 +441,12 @@ export default function ClientDetail() {
                             <span className="text-xs uppercase">{msg.channel}</span>
                           </TableCell>
                           <TableCell>
-                            <p className="font-medium text-sm">{msg.subject || "(sem assunto)"}</p>
+                            <p className="font-medium text-sm">{msg.subject || t("clientDetail.noSubject")}</p>
                             <p className="text-xs text-muted-foreground truncate max-w-[300px]">{msg.body}</p>
                           </TableCell>
                           <TableCell>
                             <Badge className={statusColors[msg.status] || "bg-muted"}>
-                              {msg.status === "sent" ? "Enviado" : msg.status === "pending" ? "Pendente" : msg.status === "failed" ? "Falhou" : "Cancelado"}
+                              {msg.status === "sent" ? t("clientDetail.msgSent") : msg.status === "pending" ? t("clientDetail.msgPending") : msg.status === "failed" ? t("clientDetail.msgFailed") : t("clientDetail.msgCancelled")}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-sm">{format(new Date(msg.scheduled_at), "dd/MM/yyyy HH:mm")}</TableCell>
@@ -456,7 +456,7 @@ export default function ClientDetail() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                title="Reenviar"
+                                title={t("clientDetail.resend")}
                                 onClick={() => retryMessage.mutate(msg.id)}
                                 disabled={retryMessage.isPending}
                               >

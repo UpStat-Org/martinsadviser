@@ -152,14 +152,14 @@ export default function CalendarPage() {
       <Card>
         <CardHeader>
           <CardTitle className="font-display text-lg flex items-center gap-2">
-            <CalendarDays className="w-5 h-5 text-primary" /> Heatmap de Vencimentos (12 semanas)
+            <CalendarDays className="w-5 h-5 text-primary" /> {t("calendar.heatmapTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <Skeleton className="h-40 w-full" />
           ) : heatmapMax === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">Sem vencimentos nas próximas 12 semanas.</p>
+            <p className="text-sm text-muted-foreground text-center py-6">{t("calendar.heatmapEmpty")}</p>
           ) : (
             <div className="space-y-2">
               <div className="grid grid-flow-col grid-rows-7 gap-1" style={{ gridAutoColumns: "minmax(14px, 1fr)" }}>
@@ -173,15 +173,15 @@ export default function CalendarPage() {
                 ))}
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
-                <span>Hoje → 12 semanas</span>
+                <span>{t("calendar.heatmapRange")}</span>
                 <div className="flex items-center gap-1">
-                  <span>menos</span>
+                  <span>{t("calendar.less")}</span>
                   <span className="w-3 h-3 rounded-sm bg-muted/40" />
                   <span className="w-3 h-3 rounded-sm bg-success/40" />
                   <span className="w-3 h-3 rounded-sm bg-warning/50" />
                   <span className="w-3 h-3 rounded-sm bg-warning/80" />
                   <span className="w-3 h-3 rounded-sm bg-destructive/80" />
-                  <span>mais</span>
+                  <span>{t("calendar.more")}</span>
                 </div>
               </div>
             </div>

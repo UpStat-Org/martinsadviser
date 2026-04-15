@@ -16,18 +16,17 @@ interface ChatMsg {
   created_at: string;
 }
 
-const SUGGESTIONS = [
-  "Resuma os últimos 30 dias deste cliente",
-  "Quais permits estão em risco?",
-  "Rascunhe email cobrando faturas em atraso",
-  "Qual o nível de risco do cliente?",
-];
-
 export function AIChatPanel({ clientId, clientName }: { clientId: string; clientName: string }) {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
+  const SUGGESTIONS = [
+    t("aichat.suggestion1"),
+    t("aichat.suggestion2"),
+    t("aichat.suggestion3"),
+    t("aichat.suggestion4"),
+  ];
   const qc = useQueryClient();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +60,7 @@ export function AIChatPanel({ clientId, clientName }: { clientId: string; client
       if (data?.error) throw new Error(data.error);
       qc.invalidateQueries({ queryKey: ["ai_chat", clientId] });
     } catch (e: any) {
-      toast({ title: "Erro no assistente", description: e.message, variant: "destructive" });
+      toast({ title: t("aichat.error"), description: e.message, variant: "destructive" });
     } finally {
       setSending(false);
     }
@@ -70,7 +69,7 @@ export function AIChatPanel({ clientId, clientName }: { clientId: string; client
   const clearHistory = async () => {
     const { error } = await (supabase as any).from("ai_chat_messages").delete().eq("client_id", clientId);
     if (error) {
-      toast({ title: "Erro ao limpar", description: error.message, variant: "destructive" });
+      toast({ title: t("aichat.errorClear"), description: error.message, variant: "destructive" });
       return;
     }
     qc.invalidateQueries({ queryKey: ["ai_chat", clientId] });
@@ -81,11 +80,11 @@ export function AIChatPanel({ clientId, clientName }: { clientId: string; client
       <CardHeader className="pb-3 flex flex-row items-center justify-between">
         <CardTitle className="font-display text-lg flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-primary" />
-          Assistente IA — {clientName}
+          {t("aichat.title")} — {clientName}
         </CardTitle>
         {messages?.length ? (
           <Button variant="ghost" size="sm" onClick={clearHistory}>
-            <Trash2 className="w-3 h-3 mr-1" /> Limpar
+            <Trash2 className="w-3 h-3 mr-1" /> {t("aichat.clear")}
           </Button>
         ) : null}
       </CardHeader>
@@ -96,7 +95,7 @@ export function AIChatPanel({ clientId, clientName }: { clientId: string; client
           ) : !messages?.length ? (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground text-center py-2">
-                Pergunte qualquer coisa sobre este cliente.
+                {t("aichat.askAnything")}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {SUGGESTIONS.map((s) => (
@@ -137,7 +136,7 @@ export function AIChatPanel({ clientId, clientName }: { clientId: string; client
           )}
           {sending && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" /> Pensando...
+              <Loader2 className="w-4 h-4 animate-spin" /> {t("aichat.thinking")}
             </div>
           )}
         </div>
@@ -146,7 +145,7 @@ export function AIChatPanel({ clientId, clientName }: { clientId: string; client
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Digite sua pergunta..."
+            placeholder={t("aichat.placeholder")}
             rows={2}
             className="resize-none"
             disabled={sending}

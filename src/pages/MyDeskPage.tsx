@@ -10,10 +10,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAssignedPermits, useAssignedTasks } from "@/hooks/useWorkload";
 import { useScheduledMessages } from "@/hooks/useMessages";
 import { getExpirationStatus } from "@/hooks/usePermits";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function MyDeskPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { data: permits, isLoading: lp } = useAssignedPermits(user?.id);
   const { data: tasks, isLoading: lt } = useAssignedTasks(user?.id);
   const { data: messages } = useScheduledMessages();
@@ -32,10 +34,10 @@ export default function MyDeskPage() {
   }, [permits, tasks, messages]);
 
   const cards = [
-    { label: "Permits vencidos", value: stats.overduePermits, icon: AlertTriangle, color: "text-destructive", bg: "bg-destructive/10" },
-    { label: "Vencendo em 7d", value: stats.next7, icon: Clock, color: "text-warning", bg: "bg-warning/10" },
-    { label: "Tarefas hoje", value: stats.dueToday, icon: ClipboardList, color: "text-primary", bg: "bg-primary/10" },
-    { label: "Mensagens falhas", value: stats.failedMsgs, icon: Mail, color: "text-destructive", bg: "bg-destructive/10" },
+    { label: t("mydesk.overduePermits"), value: stats.overduePermits, icon: AlertTriangle, color: "text-destructive", bg: "bg-destructive/10" },
+    { label: t("mydesk.expiring7d"), value: stats.next7, icon: Clock, color: "text-warning", bg: "bg-warning/10" },
+    { label: t("mydesk.tasksToday"), value: stats.dueToday, icon: ClipboardList, color: "text-primary", bg: "bg-primary/10" },
+    { label: t("mydesk.failedMessages"), value: stats.failedMsgs, icon: Mail, color: "text-destructive", bg: "bg-destructive/10" },
   ];
 
   return (
@@ -45,8 +47,8 @@ export default function MyDeskPage() {
           <Briefcase className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h1 className="font-display text-2xl sm:text-3xl font-bold">Minha Mesa</h1>
-          <p className="text-muted-foreground text-sm">O que precisa da sua atenção hoje</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold">{t("mydesk.title")}</h1>
+          <p className="text-muted-foreground text-sm">{t("mydesk.subtitle")}</p>
         </div>
       </div>
 
@@ -71,7 +73,7 @@ export default function MyDeskPage() {
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-base flex items-center gap-2">
               <FileCheck className="w-4 h-4 text-primary" />
-              Meus Permits
+              {t("mydesk.myPermits")}
               <span className="text-xs font-normal text-muted-foreground">({permits?.length ?? 0})</span>
             </CardTitle>
           </CardHeader>
@@ -79,7 +81,7 @@ export default function MyDeskPage() {
             {lp ? (
               <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-12 w-full" />)}</div>
             ) : !permits?.length ? (
-              <p className="text-sm text-muted-foreground py-6 text-center">Nenhum permit atribuído a você.</p>
+              <p className="text-sm text-muted-foreground py-6 text-center">{t("mydesk.noPermits")}</p>
             ) : (
               <div className="space-y-2 max-h-[480px] overflow-y-auto">
                 {permits.map((p) => {
@@ -112,7 +114,7 @@ export default function MyDeskPage() {
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="font-display text-base flex items-center gap-2">
               <ClipboardList className="w-4 h-4 text-primary" />
-              Minhas Tarefas
+              {t("mydesk.myTasks")}
               <span className="text-xs font-normal text-muted-foreground">({tasks?.length ?? 0})</span>
             </CardTitle>
             <Button variant="ghost" size="sm" onClick={() => navigate("/tasks")}>Kanban <ArrowRight className="w-3 h-3 ml-1" /></Button>
@@ -121,22 +123,22 @@ export default function MyDeskPage() {
             {lt ? (
               <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-12 w-full" />)}</div>
             ) : !tasks?.length ? (
-              <p className="text-sm text-muted-foreground py-6 text-center">Sem tarefas atribuídas.</p>
+              <p className="text-sm text-muted-foreground py-6 text-center">{t("mydesk.noTasks")}</p>
             ) : (
               <div className="space-y-2 max-h-[480px] overflow-y-auto">
-                {tasks.map((t) => {
-                  const overdue = t.due_date && new Date(t.due_date) < new Date();
+                {tasks.map((task) => {
+                  const overdue = task.due_date && new Date(task.due_date) < new Date();
                   return (
-                    <div key={t.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border">
+                    <div key={task.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border">
                       <div>
-                        <div className="text-sm font-medium">{t.name}</div>
+                        <div className="text-sm font-medium">{task.name}</div>
                         <div className="text-xs text-muted-foreground">
-                          {t.clients?.company_name ?? "Sem cliente"}
-                          {t.due_date ? ` • ${format(new Date(t.due_date), "dd/MM")}` : ""}
+                          {task.clients?.company_name ?? t("mydesk.noClient")}
+                          {task.due_date ? ` • ${format(new Date(task.due_date), "dd/MM")}` : ""}
                         </div>
                       </div>
                       <Badge className={overdue ? "bg-destructive text-destructive-foreground" : "bg-muted"}>
-                        {t.priority || t.status}
+                        {task.priority || task.status}
                       </Badge>
                     </div>
                   );

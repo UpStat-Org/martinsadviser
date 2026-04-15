@@ -6,8 +6,10 @@ import { Users, Activity, Clock } from "lucide-react";
 import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from "recharts";
 import { useEmployees, employeeName } from "@/hooks/useEmployees";
 import { useAllAssignments } from "@/hooks/useWorkload";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function WorkloadPage() {
+  const { t } = useLanguage();
   const { data: employees, isLoading: le } = useEmployees();
   const { data: agg, isLoading: la } = useAllAssignments();
 
@@ -49,22 +51,22 @@ export default function WorkloadPage() {
           <Activity className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h1 className="font-display text-2xl sm:text-3xl font-bold">Carga de Trabalho do Time</h1>
-          <p className="text-muted-foreground text-sm">SLA, distribuição e produtividade por funcionário</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold">{t("workload.title")}</h1>
+          <p className="text-muted-foreground text-sm">{t("workload.subtitle")}</p>
         </div>
       </div>
 
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="font-display text-base flex items-center gap-2">
-            <Users className="w-4 h-4 text-primary" /> Distribuição
+            <Users className="w-4 h-4 text-primary" /> {t("workload.distribution")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <Skeleton className="h-[260px] w-full" />
           ) : !chartData.length ? (
-            <p className="text-sm text-muted-foreground text-center py-12">Sem dados de atribuição ainda.</p>
+            <p className="text-sm text-muted-foreground text-center py-12">{t("workload.noAssignments")}</p>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={chartData}>
@@ -82,8 +84,8 @@ export default function WorkloadPage() {
             </ResponsiveContainer>
           )}
           <div className="flex gap-4 text-xs text-muted-foreground mt-3">
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ background: "hsl(var(--chart-1))" }} /> Permits</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ background: "hsl(var(--chart-3))" }} /> Tarefas abertas</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ background: "hsl(var(--chart-1))" }} /> {t("workload.permits")}</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ background: "hsl(var(--chart-3))" }} /> {t("workload.openTasks")}</span>
           </div>
         </CardContent>
       </Card>
@@ -91,24 +93,24 @@ export default function WorkloadPage() {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="font-display text-base flex items-center gap-2">
-            <Clock className="w-4 h-4 text-primary" /> Detalhes por funcionário
+            <Clock className="w-4 h-4 text-primary" /> {t("workload.detailsByEmployee")}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
             <div className="p-4 space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-10 w-full" />)}</div>
           ) : !rows.length ? (
-            <p className="text-sm text-muted-foreground p-8 text-center">Sem funcionários aprovados.</p>
+            <p className="text-sm text-muted-foreground p-8 text-center">{t("workload.noEmployees")}</p>
           ) : (
             <table className="w-full text-sm">
               <thead className="border-b text-xs uppercase text-muted-foreground">
                 <tr>
-                  <th className="text-left p-3">Funcionário</th>
-                  <th className="text-right p-3">Permits</th>
-                  <th className="text-right p-3">Vencidos</th>
-                  <th className="text-right p-3">Tarefas abertas</th>
-                  <th className="text-right p-3">Concluídas</th>
-                  <th className="text-right p-3">SLA médio (dias)</th>
+                  <th className="text-left p-3">{t("workload.employee")}</th>
+                  <th className="text-right p-3">{t("workload.permits")}</th>
+                  <th className="text-right p-3">{t("workload.overdue")}</th>
+                  <th className="text-right p-3">{t("workload.openTasks")}</th>
+                  <th className="text-right p-3">{t("workload.completed")}</th>
+                  <th className="text-right p-3">{t("workload.avgSla")}</th>
                 </tr>
               </thead>
               <tbody>

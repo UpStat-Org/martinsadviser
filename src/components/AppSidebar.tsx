@@ -34,14 +34,14 @@ export function AppSidebar() {
   const sections = useMemo<{ label: string; items: NavItem[] }[]>(() => {
     const base = [
       {
-        label: "Visão Geral",
+        label: t("sidebar.section.overview"),
         items: [
           { to: "/", icon: LayoutDashboard, label: t("nav.dashboard") },
-          { to: "/my", icon: Briefcase, label: "Minha Mesa" },
+          { to: "/my", icon: Briefcase, label: t("mydesk.title") },
         ],
       },
       {
-        label: "Operação",
+        label: t("sidebar.section.operation"),
         items: [
           { to: "/clients", icon: Users, label: t("nav.clients") },
           { to: "/trucks", icon: Truck, label: t("nav.trucks") },
@@ -50,14 +50,14 @@ export function AppSidebar() {
         ],
       },
       {
-        label: "Comunicação",
+        label: t("sidebar.section.communication"),
         items: [
           { to: "/messages", icon: MessageSquare, label: t("nav.messages") },
           { to: "/calendar", icon: CalendarDays, label: t("nav.calendar") },
         ],
       },
       {
-        label: "Análise",
+        label: t("sidebar.section.analysis"),
         items: [
           { to: "/reports", icon: BarChart3, label: t("nav.reports") },
           { to: "/finance", icon: DollarSign, label: t("nav.finance") },
@@ -66,9 +66,9 @@ export function AppSidebar() {
     ];
     if (isAdmin) {
       base.push({
-        label: "Administração",
+        label: t("sidebar.section.administration"),
         items: [
-          { to: "/workload", icon: Activity, label: "Workload" },
+          { to: "/workload", icon: Activity, label: t("sidebar.workload") },
           { to: "/admin/users", icon: ShieldCheck, label: t("nav.users") },
           { to: "/audit", icon: ScrollText, label: t("nav.audit") },
         ],
@@ -87,10 +87,10 @@ export function AppSidebar() {
 
   const showLabel = !collapsed || isMobile;
 
-  const displayName = fullName || user?.email?.split("@")[0] || "Usuário";
+  const displayName = fullName || user?.email?.split("@")[0] || t("role.user");
   const initials = (fullName || user?.email || "U")
     .split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("") || "U";
-  const roleLabel = role === "admin" ? "Admin" : role === "operator" ? "Operador" : role === "viewer" ? "Viewer" : "Usuário";
+  const roleLabel = role === "admin" ? t("role.admin") : role === "operator" ? t("role.operator") : role === "viewer" ? t("role.viewer") : t("role.user");
 
   const renderNavItem = (item: NavItem) => {
     const active = isActive(item.to);
@@ -190,8 +190,8 @@ export function AppSidebar() {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
                 {theme === "dark"
-                  ? <><Sun className="w-3.5 h-3.5 mr-2" /> Modo claro</>
-                  : <><Moon className="w-3.5 h-3.5 mr-2" /> Modo escuro</>}
+                  ? <><Sun className="w-3.5 h-3.5 mr-2" /> {t("sidebar.lightMode")}</>
+                  : <><Moon className="w-3.5 h-3.5 mr-2" /> {t("sidebar.darkMode")}</>}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} className="text-red-500 focus:text-red-500">
@@ -227,7 +227,7 @@ export function AppSidebar() {
             <div className="flex items-center gap-0.5">
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+                title={theme === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode")}
                 className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-colors"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -250,7 +250,7 @@ export function AppSidebar() {
             {!isMobile && (
               <button
                 onClick={() => setCollapsed(true)}
-                title="Recolher"
+                title={t("sidebar.collapse")}
                 className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/40 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-colors"
               >
                 <ChevronsLeft className="w-4 h-4" />
@@ -261,7 +261,7 @@ export function AppSidebar() {
           <div className="flex flex-col items-center gap-1">
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+              title={theme === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode")}
               className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-colors"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -276,7 +276,7 @@ export function AppSidebar() {
             {!isMobile && (
               <button
                 onClick={() => setCollapsed(false)}
-                title="Expandir"
+                title={t("sidebar.expand")}
                 className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/40 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-colors"
               >
                 <ChevronsRight className="w-4 h-4" />

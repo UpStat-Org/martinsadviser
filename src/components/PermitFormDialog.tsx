@@ -24,9 +24,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const formSchema = z.object({
-  client_id: z.string().min(1, "Cliente é obrigatório"),
+  client_id: z.string().min(1),
   truck_id: z.string().optional(),
-  permit_type: z.string().min(1, "Tipo é obrigatório"),
+  permit_type: z.string().min(1),
   permit_number: z.string().optional(),
   state: z.string().optional(),
   expiration_date: z.string().optional(),
@@ -99,7 +99,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
       .upload(filePath, selectedFile, { upsert: true });
 
     if (error) {
-      toast({ title: "Erro ao enviar arquivo", description: error.message, variant: "destructive" });
+      toast({ title: t("documents.uploadError"), description: error.message, variant: "destructive" });
       return permit?.document_url || null;
     }
 
@@ -183,7 +183,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
-            {isEditing ? "Editar Permit" : "Novo Permit"}
+            {isEditing ? t("permits.form.edit") : t("permits.new")}
           </DialogTitle>
         </DialogHeader>
 
@@ -194,10 +194,10 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
               name="client_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cliente *</FormLabel>
+                  <FormLabel>{t("permits.form.clientLabel")}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Selecione o cliente" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("permits.form.selectClient")} /></SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {clients?.map((c) => (
@@ -215,13 +215,13 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
               name="truck_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Caminhão (opcional)</FormLabel>
+                  <FormLabel>{t("permits.form.truckOptional")}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Selecione o caminhão" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("permits.form.selectTruck")} /></SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="none">Nenhum</SelectItem>
+                      <SelectItem value="none">{t("permits.form.none")}</SelectItem>
                       {trucks?.map((t) => (
                         <SelectItem key={t.id} value={t.id}>{t.plate} {t.make ? `- ${t.make} ${t.model || ""}` : ""}</SelectItem>
                       ))}
@@ -238,10 +238,10 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
                 name="permit_type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo *</FormLabel>
+                    <FormLabel>{t("permits.form.typeLabel")}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger><SelectValue placeholder="Tipo do permit" /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder={t("permits.form.typePlaceholder")} /></SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {PERMIT_TYPES.map((t) => (
@@ -258,8 +258,8 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
                 name="permit_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Número</FormLabel>
-                    <FormControl><Input placeholder="Nº do permit" {...field} /></FormControl>
+                    <FormLabel>{t("common.number")}</FormLabel>
+                    <FormControl><Input placeholder={t("permits.form.numberPlaceholder")} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -272,8 +272,8 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
                 name="state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Estado</FormLabel>
-                    <FormControl><Input placeholder="Ex: TX, CA..." {...field} /></FormControl>
+                    <FormLabel>{t("common.state")}</FormLabel>
+                    <FormControl><Input placeholder={t("permits.form.statePlaceholder")} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -283,7 +283,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
                 name="expiration_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Vencimento</FormLabel>
+                    <FormLabel>{t("common.expiration")}</FormLabel>
                     <FormControl><Input type="date" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
@@ -296,13 +296,13 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
               name="assigned_to"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Responsável</FormLabel>
+                  <FormLabel>{t("permits.form.responsible")}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value || "none"}>
                     <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Sem responsável" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("permits.form.noResponsible")} /></SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="none">Sem responsável</SelectItem>
+                      <SelectItem value="none">{t("permits.form.noResponsible")}</SelectItem>
                       {employees?.map((e) => (
                         <SelectItem key={e.id} value={e.id}>{employeeName(e)}</SelectItem>
                       ))}
@@ -318,15 +318,15 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status</FormLabel>
+                  <FormLabel>{t("clients.status")}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="active">Ativo</SelectItem>
-                      <SelectItem value="expired">Vencido</SelectItem>
-                      <SelectItem value="pending">Pendente</SelectItem>
+                      <SelectItem value="active">{t("common.active")}</SelectItem>
+                      <SelectItem value="expired">{t("common.expired")}</SelectItem>
+                      <SelectItem value="pending">{t("common.pending")}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -384,17 +384,17 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Observações</FormLabel>
-                  <FormControl><Textarea rows={2} placeholder="Observações..." {...field} /></FormControl>
+                  <FormLabel>{t("permits.form.notes")}</FormLabel>
+                  <FormControl><Textarea rows={2} placeholder={t("permits.form.notesPlaceholder")} {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
             <div className="flex justify-end gap-3">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Salvando...</> : isEditing ? "Salvar" : "Cadastrar"}
+                {isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t("common.saving")}</> : isEditing ? t("common.save") : t("permits.form.create")}
               </Button>
             </div>
           </form>
