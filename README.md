@@ -1,73 +1,117 @@
-# Welcome to your Lovable project
+# MartinsAdviser
 
-## Project info
+MartinsAdviser é um sistema web para operação e gestão de transportadoras, com foco em controle de caminhões, permits, clientes, mensagens, financeiro, auditoria e acompanhamento do trabalho interno.  
+O projeto também inclui um portal do cliente, uma página de apresentação do sistema e recursos de apoio com automação e análise com IA.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## O que o sistema faz
 
-## How can I edit this code?
+O sistema centraliza a operação em um único lugar para reduzir trabalho manual, dar visibilidade ao time e diminuir risco de perda de prazo.  
+Ele ajuda a organizar:
 
-There are several ways of editing your application.
+- cadastro e acompanhamento de clientes
+- caminhões e dados da frota
+- permits e vencimentos
+- mensagens e comunicações
+- calendário e tarefas
+- financeiro e relatórios
+- auditoria e documentação
+- portal de consulta para clientes
+- análise e apoio com IA
 
-**Use Lovable**
+## Principais módulos
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- `Dashboard` com visão geral da operação
+- `Clientes` com cadastro, detalhe e onboarding
+- `Caminhões` com controle de frota
+- `Permits` com acompanhamento de status e vencimentos
+- `Mensagens` para comunicação operacional
+- `Calendário` para rotina e planejamento
+- `Tarefas` em formato Kanban
+- `Financeiro` para controle financeiro
+- `Relatórios` para visão consolidada
+- `Auditoria` para rastreabilidade
+- `Documentação` para materiais e registros
+- `Minha Mesa` e `Carga de Trabalho` para gestão interna
+- `Administração de usuários` e `Configurações`
+- `Portal do cliente` com acesso restrito e leitura de informações
+- `Apresentação do sistema` com explicação visual e comparativa
 
-Changes made via Lovable will be committed automatically to this repo.
+## Diferenciais
 
-**Use your preferred IDE**
+- interface em português, inglês e espanhol
+- apoio com IA para análise e tomada de decisão
+- automações e alertas para reduzir trabalho repetitivo
+- portal dedicado para o cliente acompanhar informações importantes
+- histórico, auditoria e rastreabilidade
+- organização por módulos, com navegação clara e foco operacional
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Tecnologias
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+O projeto é desenvolvido com:
 
-Follow these steps:
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui
+- Radix UI
+- React Router
+- TanStack Query
+- Supabase
+- React Hook Form
+- Zod
+- Lucide React
+- Recharts
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Internacionalização
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+O sistema suporta:
 
-# Step 3: Install the necessary dependencies.
-npm i
+- Português
+- English
+- Español
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+As traduções ficam centralizadas no arquivo de i18n do projeto.
+
+## Requisitos
+
+- Node.js 18+
+- npm
+
+## Como rodar localmente
+
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Variáveis de ambiente
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Crie um arquivo `.env` na raiz do projeto com:
 
-**Use GitHub Codespaces**
+```bash
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_PUBLISHABLE_KEY=...
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Scripts
 
-## What technologies are used for this project?
+- `npm run dev` inicia o ambiente de desenvolvimento
+- `npm run build` gera a build de produção
+- `npm run preview` visualiza a build gerada
+- `npm run lint` executa a checagem de código
+- `npm run test` executa os testes
+- `npm run test:watch` executa os testes em modo observação
 
-This project is built with:
+## Estrutura geral
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- `src/pages` contém as telas principais
+- `src/components` contém os componentes reutilizáveis
+- `src/hooks` concentra a lógica de consulta e estado
+- `src/contexts` centraliza providers globais
+- `src/integrations/supabase` concentra a integração com o backend
+- `src/lib` reúne utilitários e traduções
 
-## How can I deploy this project?
+## Observação
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+O projeto usa Supabase como backend de autenticação e dados, com persistência de sessão no navegador.
