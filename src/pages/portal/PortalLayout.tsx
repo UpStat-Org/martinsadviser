@@ -3,9 +3,10 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building2, LogOut, Loader2 } from "lucide-react";
+import { Building2, LogOut } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { TruckLoadingScreen } from "@/components/TruckLoadingScreen";
 
 export default function PortalLayout() {
   const [loading, setLoading] = useState(true);
@@ -51,11 +52,7 @@ export default function PortalLayout() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <TruckLoadingScreen />;
   }
 
   return (

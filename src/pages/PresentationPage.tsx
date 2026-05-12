@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/Logo";
+import { HeroScene } from "@/components/hero/HeroScene";
 import { Wordmark } from "@/components/Wordmark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -68,9 +69,32 @@ const employeeBenefits: Item[] = [
 const comparisonRows = [1, 2, 3, 4, 5];
 const rolloutRows = [1, 2, 3];
 
+const demoSteps = [
+  {
+    title: "presentation.demo1.title",
+    desc: "presentation.demo1.desc",
+    icon: Users,
+  },
+  {
+    title: "presentation.demo2.title",
+    desc: "presentation.demo2.desc",
+    icon: Bot,
+  },
+  {
+    title: "presentation.demo3.title",
+    desc: "presentation.demo3.desc",
+    icon: Wand2,
+  },
+  {
+    title: "presentation.demo4.title",
+    desc: "presentation.demo4.desc",
+    icon: ShieldCheck,
+  },
+] as const;
+
 function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-3xl presentation-enter" style={{ ["--delay" as never]: "40ms" }}>
       <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
         {title}
       </h2>
@@ -83,7 +107,7 @@ function FeatureCard({ item }: { item: Item }) {
   const { t } = useLanguage();
   const Icon = item.icon;
   return (
-    <Card className="rounded-lg border-border/60 bg-card/90 shadow-sm">
+    <Card className="rounded-lg border-border/60 bg-card/90 shadow-sm presentation-card-animate">
       <CardContent className="p-5">
         <div className={cn("mb-4 flex h-10 w-10 items-center justify-center rounded-lg border", item.tone)}>
           <Icon className="h-5 w-5" />
@@ -118,7 +142,7 @@ export default function PresentationPage() {
         <section className="relative overflow-hidden border-b border-border/60">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.16),transparent_28%),radial-gradient(circle_at_78%_18%,hsl(158_55%_42%/0.13),transparent_26%),radial-gradient(circle_at_55%_78%,hsl(36_92%_52%/0.12),transparent_30%)]" />
           <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
-            <div className="flex flex-col justify-center">
+            <div className="flex flex-col justify-center presentation-enter" style={{ ["--delay" as never]: "80ms" }}>
               <Badge className="mb-5 w-fit rounded-md bg-primary/10 text-primary hover:bg-primary/10">
                 <Sparkles className="mr-1.5 h-3.5 w-3.5" />
                 {t("presentation.hero.badge")}
@@ -142,7 +166,7 @@ export default function PresentationPage() {
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative presentation-enter-slow" style={{ ["--delay" as never]: "170ms" }}>
               <div className="rounded-lg border border-border/70 bg-card shadow-2xl">
                 <div className="border-b border-border/60 p-4">
                   <div className="flex items-center justify-between gap-3">
@@ -184,6 +208,70 @@ export default function PresentationPage() {
           </div>
         </section>
 
+        <section id="demo" className="border-b border-border/60 bg-muted/25">
+          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+            <SectionTitle
+              title={t("presentation.demo.title")}
+              subtitle={t("presentation.demo.subtitle")}
+            />
+            <div className="mt-8 space-y-6">
+              <div className="relative min-h-[660px] overflow-hidden rounded-[28px] border border-border/60 bg-[#060816] shadow-2xl presentation-enter-slow" style={{ ["--delay" as never]: "120ms" }}>
+                <HeroScene />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,hsl(234_90%_65%/0.16),transparent_34%),linear-gradient(180deg,hsl(234_60%_6%/0.1),hsl(234_60%_5%/0.78))]" />
+                <div className="absolute left-5 top-5 z-10 max-w-[320px] rounded-2xl border border-white/12 bg-white/8 p-4 text-white backdrop-blur-xl presentation-enter" style={{ ["--delay" as never]: "140ms" }}>
+                  <Badge className="rounded-md bg-white/10 text-white hover:bg-white/10">
+                    <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                    {t("presentation.demo.live")}
+                  </Badge>
+                  <h3 className="mt-3 font-display text-xl font-bold">
+                    {t("presentation.demo.liveTitle")}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/72">
+                    {t("presentation.demo.liveDesc")}
+                  </p>
+                </div>
+                <div className="absolute bottom-5 left-5 z-10 max-w-[360px] rounded-2xl border border-white/10 bg-black/25 p-4 text-white backdrop-blur-md presentation-enter" style={{ ["--delay" as never]: "230ms" }}>
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-white/50">
+                    {t("presentation.demo.flowLabel")}
+                  </div>
+                  <div className="mt-2 font-display text-lg font-bold">
+                    {t("presentation.demo.flowTitle")}
+                  </div>
+                  <p className="mt-1 text-sm text-white/70">
+                    {t("presentation.demo.flowDesc")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {demoSteps.map((step, index) => {
+                  const Icon = step.icon;
+                  return (
+                    <Card key={step.title} className="rounded-lg border-border/60 bg-card/90 presentation-card-animate" style={{ ["--delay" as never]: `${100 + index * 100}ms` }}>
+                      <CardContent className="flex gap-4 p-6">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                            {String(index + 1).padStart(2, "0")}
+                          </div>
+                          <h3 className="font-display text-base font-bold">
+                            {t(step.title)}
+                          </h3>
+                          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                            {t(step.desc)}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
@@ -192,7 +280,7 @@ export default function PresentationPage() {
               </p>
               <h2 className="mt-3 font-display text-3xl font-bold">{t("presentation.story.title")}</h2>
             </div>
-            <Card className="rounded-lg border-border/60">
+            <Card className="rounded-lg border-border/60 presentation-enter-slow" style={{ ["--delay" as never]: "120ms" }}>
               <CardContent className="space-y-4 p-6">
                 <p className="text-sm leading-relaxed text-muted-foreground">{t("presentation.story.body1")}</p>
                 <p className="text-sm leading-relaxed text-muted-foreground">{t("presentation.story.body2")}</p>
@@ -208,7 +296,11 @@ export default function PresentationPage() {
           <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
             <SectionTitle title={t("presentation.outcomes.title")} />
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {outcomes.map((item) => <FeatureCard key={item.title} item={item} />)}
+              {outcomes.map((item, index) => (
+                <div key={item.title} style={{ ["--delay" as never]: `${80 + index * 80}ms` }} className="contents">
+                  <FeatureCard item={item} />
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -217,7 +309,7 @@ export default function PresentationPage() {
           <SectionTitle title={t("presentation.workflow.title")} subtitle={t("presentation.workflow.subtitle")} />
           <div className="mt-8 grid gap-4 lg:grid-cols-5">
             {workflow.map((item, index) => (
-              <div key={item.title} className="relative rounded-lg border border-border/60 bg-card p-5">
+              <div key={item.title} className="relative rounded-lg border border-border/60 bg-card p-5 presentation-card-animate" style={{ ["--delay" as never]: `${80 + index * 80}ms` }}>
                 <div className="mb-4 flex items-center justify-between">
                   <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border", item.tone)}>
                     <item.icon className="h-5 w-5" />
@@ -235,7 +327,11 @@ export default function PresentationPage() {
           <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
             <SectionTitle title={t("presentation.differentials.title")} />
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {differentials.map((item) => <FeatureCard key={item.title} item={item} />)}
+              {differentials.map((item, index) => (
+                <div key={item.title} style={{ ["--delay" as never]: `${80 + index * 70}ms` }} className="contents">
+                  <FeatureCard item={item} />
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -243,7 +339,11 @@ export default function PresentationPage() {
         <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
           <SectionTitle title={t("presentation.employees.title")} />
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {employeeBenefits.map((item) => <FeatureCard key={item.title} item={item} />)}
+            {employeeBenefits.map((item, index) => (
+              <div key={item.title} style={{ ["--delay" as never]: `${80 + index * 70}ms` }} className="contents">
+                <FeatureCard item={item} />
+              </div>
+            ))}
           </div>
         </section>
 
@@ -255,8 +355,8 @@ export default function PresentationPage() {
                 <div className="p-4">{t("presentation.compare.old")}</div>
                 <div className="border-l border-border/60 p-4">{t("presentation.compare.new")}</div>
               </div>
-              {comparisonRows.map((n) => (
-                <div key={n} className="grid grid-cols-2 border-b border-border/60 last:border-b-0">
+              {comparisonRows.map((n, index) => (
+                <div key={n} className="grid grid-cols-2 border-b border-border/60 last:border-b-0 presentation-fade-line" style={{ ["--delay" as never]: `${120 + index * 90}ms` }}>
                   <div className="p-4 text-sm leading-relaxed text-muted-foreground">{t(`presentation.compare${n}.old`)}</div>
                   <div className="border-l border-border/60 p-4 text-sm font-medium leading-relaxed">{t(`presentation.compare${n}.new`)}</div>
                 </div>
@@ -268,8 +368,8 @@ export default function PresentationPage() {
         <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
           <SectionTitle title={t("presentation.rollout.title")} subtitle={t("presentation.rollout.subtitle")} />
           <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {rolloutRows.map((n) => (
-              <Card key={n} className="rounded-lg border-border/60">
+            {rolloutRows.map((n, index) => (
+              <Card key={n} className="rounded-lg border-border/60 presentation-card-animate" style={{ ["--delay" as never]: `${90 + index * 90}ms` }}>
                 <CardContent className="p-5">
                   <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
                     <CheckCircle2 className="h-5 w-5" />
