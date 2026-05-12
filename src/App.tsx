@@ -35,6 +35,7 @@ import PortalLogin from "./pages/portal/PortalLogin";
 import PortalLayout from "./pages/portal/PortalLayout";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import LandingPage from "./pages/LandingPage";
+import PresentationPage from "./pages/PresentationPage";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
           <ErrorBoundary>
           <Routes>
             <Route path="/lp" element={<LandingPage />} />
+            <Route path="/presentation" element={<PresentationPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/pending" element={<PendingApproval />} />
