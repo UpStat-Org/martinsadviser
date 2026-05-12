@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
-import { HeroScene } from "@/components/hero/HeroScene";
+import { LandingHeroScene } from "@/components/hero/LandingHeroScene";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Truck,
@@ -113,131 +113,78 @@ export default function LandingPage() {
           className="orb w-[520px] h-[520px] bg-accent/20 bottom-0 -right-40 animate-pulse-glow"
           style={{ animationDelay: "1.5s" }}
         />
-
-        <HeroScene />
-
-        <div className="relative z-10 mx-auto max-w-7xl px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/15 backdrop-blur-md mb-8 animate-fade-in">
-            <Sparkles className="w-3.5 h-3.5 text-white/80" />
-            <span className="text-xs font-medium text-white/80 tracking-wide">
-              {t("lp.hero.badge")}
-            </span>
-          </div>
-
-          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-[84px] font-bold leading-[1.02] gradient-text max-w-5xl mx-auto animate-fade-in">
-            {t("lp.hero.title1")}
-            <br />
-            {t("lp.hero.title2")}
-            <br />
-            <span className="relative inline-block">
-              {t("lp.hero.title3")}
-              <span className="absolute -bottom-2 left-0 right-0 h-[6px] bg-gradient-to-r from-primary via-purple-500 to-accent rounded-full blur-sm opacity-70" />
-            </span>
-          </h1>
-
-          <p
-            className="mt-8 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed animate-fade-in"
-            style={{ animationDelay: "0.1s" }}
-          >
-            {t("lp.hero.subtitle")}
-          </p>
-
-          <div
-            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in"
-            style={{ animationDelay: "0.2s" }}
-          >
-            <Link
-              to="/signup"
-              className="group w-full sm:w-auto h-12 px-7 btn-gradient text-white font-semibold rounded-xl inline-flex items-center justify-center gap-2 transition-all hover:shadow-[0_12px_40px_-10px_hsl(234_75%_58%/0.6)] active:scale-[0.98] relative overflow-hidden"
-            >
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              {t("lp.hero.ctaPrimary")}
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/login"
-              className="w-full sm:w-auto h-12 px-7 rounded-xl inline-flex items-center justify-center gap-2 text-white font-semibold bg-white/5 border border-white/15 backdrop-blur-md hover:bg-white/10 transition-all"
-            >
-              {t("lp.hero.ctaSecondary")}
-            </Link>
-          </div>
-
-          {/* Hero stats */}
-          <div
-            className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-3xl mx-auto animate-fade-in"
-            style={{ animationDelay: "0.3s" }}
-          >
-            {[
-              { v: "99.9%", l: t("lp.hero.stat.uptime") },
-              { v: "24/7", l: t("lp.hero.stat.support") },
-              { v: t("lp.hero.stat.aiValue"), l: t("lp.hero.stat.aiLabel") },
-              { v: "100%", l: t("lp.hero.stat.compliance") },
-            ].map((s) => (
-              <div key={s.l} className="text-center">
-                <div className="font-display text-3xl sm:text-4xl font-bold gradient-text">
-                  {s.v}
-                </div>
-                <div className="text-[11px] uppercase tracking-[0.2em] text-white/60 mt-1">
-                  {s.l}
-                </div>
+        <div className="relative z-10 mx-auto max-w-7xl px-6">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/15 backdrop-blur-md mb-8 animate-fade-in">
+                <Sparkles className="w-3.5 h-3.5 text-white/80" />
+                <span className="text-xs font-medium text-white/80 tracking-wide">
+                  {t("lp.hero.badge")}
+                </span>
               </div>
-            ))}
-          </div>
 
-          {/* Mock preview */}
-          <div
-            className="mt-20 relative max-w-5xl mx-auto animate-fade-in"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 via-purple-500/30 to-accent/30 rounded-3xl blur-2xl opacity-60" />
-            <div className="relative rounded-2xl border border-white/10 bg-[#0b0d2e]/80 backdrop-blur-xl shadow-2xl p-2 overflow-hidden">
-              <div className="flex items-center gap-1.5 px-3 py-2.5 border-b border-white/10">
-                <span className="w-3 h-3 rounded-full bg-red-400/80" />
-                <span className="w-3 h-3 rounded-full bg-yellow-400/80" />
-                <span className="w-3 h-3 rounded-full bg-green-400/80" />
-                <div className="ml-4 flex-1 h-5 rounded bg-white/5 max-w-xs" />
+              <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-[84px] font-bold leading-[1.02] gradient-text max-w-5xl mx-auto lg:mx-0 animate-fade-in">
+                {t("lp.hero.title1")}
+                <br />
+                {t("lp.hero.title2")}
+                <br />
+                <span className="relative inline-block">
+                  {t("lp.hero.title3")}
+                  <span className="absolute -bottom-2 left-0 right-0 h-[6px] bg-gradient-to-r from-primary via-purple-500 to-accent rounded-full blur-sm opacity-70" />
+                </span>
+              </h1>
+
+              <p
+                className="mt-8 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto lg:mx-0 leading-relaxed animate-fade-in"
+                style={{ animationDelay: "0.1s" }}
+              >
+                {t("lp.hero.subtitle")}
+              </p>
+
+              <div
+                className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 animate-fade-in"
+                style={{ animationDelay: "0.2s" }}
+              >
+                <Link
+                  to="/signup"
+                  className="group w-full sm:w-auto h-12 px-7 btn-gradient text-white font-semibold rounded-xl inline-flex items-center justify-center gap-2 transition-all hover:shadow-[0_12px_40px_-10px_hsl(234_75%_58%/0.6)] active:scale-[0.98] relative overflow-hidden"
+                >
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  {t("lp.hero.ctaPrimary")}
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <Link
+                  to="/login"
+                  className="w-full sm:w-auto h-12 px-7 rounded-xl inline-flex items-center justify-center gap-2 text-white font-semibold bg-white/5 border border-white/15 backdrop-blur-md hover:bg-white/10 transition-all"
+                >
+                  {t("lp.hero.ctaSecondary")}
+                </Link>
               </div>
-              <div className="grid grid-cols-12 gap-3 p-4">
-                <div className="col-span-3 space-y-2">
-                  {[...Array(6)].map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-8 rounded-lg ${i === 1 ? "btn-gradient" : "bg-white/5"}`}
-                    />
-                  ))}
-                </div>
-                <div className="col-span-9 space-y-3">
-                  <div className="grid grid-cols-3 gap-3">
-                    {[
-                      { v: "128", l: t("lp.mock.permitsActive"), c: "from-indigo-500 to-violet-500" },
-                      { v: "24", l: t("lp.mock.expiring"), c: "from-amber-500 to-orange-500" },
-                      { v: "96%", l: t("lp.mock.approved"), c: "from-emerald-500 to-teal-500" },
-                    ].map((k) => (
-                      <div
-                        key={k.l}
-                        className="rounded-xl border border-white/10 bg-white/5 p-3"
-                      >
-                        <div
-                          className={`w-8 h-8 rounded-lg bg-gradient-to-br ${k.c} mb-2`}
-                        />
-                        <div className="font-display text-2xl font-bold text-white">
-                          {k.v}
-                        </div>
-                        <div className="text-[11px] text-white/60">{k.l}</div>
-                      </div>
-                    ))}
+
+              <div
+                className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-3xl mx-auto lg:mx-0 animate-fade-in"
+                style={{ animationDelay: "0.3s" }}
+              >
+                {[
+                  { v: "99.9%", l: t("lp.hero.stat.uptime") },
+                  { v: "24/7", l: t("lp.hero.stat.support") },
+                  { v: t("lp.hero.stat.aiValue"), l: t("lp.hero.stat.aiLabel") },
+                  { v: "100%", l: t("lp.hero.stat.compliance") },
+                ].map((s) => (
+                  <div key={s.l} className="text-center lg:text-left">
+                    <div className="font-display text-3xl sm:text-4xl font-bold gradient-text">
+                      {s.v}
+                    </div>
+                    <div className="text-[11px] uppercase tracking-[0.2em] text-white/60 mt-1">
+                      {s.l}
+                    </div>
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-white/5 p-4 h-40 flex items-end gap-2">
-                    {[40, 65, 50, 75, 60, 85, 70, 90, 80, 95, 72, 88].map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 rounded-t-md bg-gradient-to-t from-primary/60 to-accent/60"
-                        style={{ height: `${h}%` }}
-                      />
-                    ))}
-                  </div>
-                </div>
+                ))}
               </div>
+            </div>
+
+            <div className="relative w-full max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.25s" }}>
+              <LandingHeroScene />
             </div>
           </div>
         </div>

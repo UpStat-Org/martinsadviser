@@ -102,13 +102,13 @@ export function AppSidebar() {
         key={item.to}
         to={item.to}
         title={collapsed && !isMobile ? item.label : undefined}
-        className={cn(
-          "group relative flex items-center gap-3 h-9 rounded-md text-[13px] font-medium transition-colors",
-          collapsed && !isMobile ? "justify-center px-0 mx-1" : "px-2.5",
-          active
-            ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-            : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
-        )}
+          className={cn(
+            "group relative flex items-center gap-3 h-9 rounded-md text-[13px] font-medium transition-colors",
+            collapsed && !isMobile ? "justify-center px-0 mx-1" : "px-2.5",
+            active
+            ? "bg-sidebar-accent/75 text-sidebar-accent-foreground font-semibold"
+            : "text-sidebar-foreground/68 hover:bg-sidebar-accent/45 hover:text-sidebar-foreground"
+          )}
       >
         {active && !collapsed && (
           <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-sidebar-primary" />
@@ -152,13 +152,13 @@ export function AppSidebar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className={cn(
-                  "w-full flex items-center gap-2.5 rounded-md hover:bg-sidebar-accent/40 transition-colors group",
-                  collapsed && !isMobile ? "p-1" : "p-1.5"
-                )}
+          className={cn(
+            "w-full flex items-center gap-2.5 rounded-md hover:bg-sidebar-accent/40 transition-colors group",
+            collapsed && !isMobile ? "p-1" : "p-1.5"
+          )}
                 title={collapsed && !isMobile ? displayName : undefined}
               >
-                <div className="relative shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 ring-1 ring-sidebar-border/50 flex items-center justify-center text-[11px] font-semibold text-white shadow-sm">
+                <div className="relative shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-violet-400 ring-1 ring-sidebar-border/50 flex items-center justify-center text-[11px] font-semibold text-white shadow-sm">
                   {initials}
                 </div>
                 {showLabel && (

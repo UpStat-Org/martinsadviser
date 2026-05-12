@@ -140,7 +140,7 @@ export default function PresentationPage() {
 
       <main>
         <section className="relative overflow-hidden border-b border-border/60">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.16),transparent_28%),radial-gradient(circle_at_78%_18%,hsl(158_55%_42%/0.13),transparent_26%),radial-gradient(circle_at_55%_78%,hsl(36_92%_52%/0.12),transparent_30%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.11),transparent_30%),radial-gradient(circle_at_78%_18%,hsl(158_55%_42%/0.09),transparent_28%),radial-gradient(circle_at_55%_78%,hsl(36_92%_52%/0.08),transparent_32%)]" />
           <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
             <div className="flex flex-col justify-center presentation-enter" style={{ ["--delay" as never]: "80ms" }}>
               <Badge className="mb-5 w-fit rounded-md bg-primary/10 text-primary hover:bg-primary/10">
@@ -167,7 +167,7 @@ export default function PresentationPage() {
             </div>
 
             <div className="relative presentation-enter-slow" style={{ ["--delay" as never]: "170ms" }}>
-              <div className="rounded-lg border border-border/70 bg-card shadow-2xl">
+              <div className="rounded-lg border border-border/60 bg-card shadow-lg">
                 <div className="border-b border-border/60 p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
@@ -217,8 +217,8 @@ export default function PresentationPage() {
             <div className="mt-8 space-y-6">
               <div className="relative min-h-[660px] overflow-hidden rounded-[28px] border border-border/60 bg-[#060816] shadow-2xl presentation-enter-slow" style={{ ["--delay" as never]: "120ms" }}>
                 <HeroScene />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,hsl(234_90%_65%/0.16),transparent_34%),linear-gradient(180deg,hsl(234_60%_6%/0.1),hsl(234_60%_5%/0.78))]" />
-                <div className="absolute left-5 top-5 z-10 max-w-[320px] rounded-2xl border border-white/12 bg-white/8 p-4 text-white backdrop-blur-xl presentation-enter" style={{ ["--delay" as never]: "140ms" }}>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,hsl(234_90%_65%/0.11),transparent_36%),linear-gradient(180deg,hsl(234_60%_6%/0.06),hsl(234_60%_5%/0.64))]" />
+                <div className="absolute left-5 top-5 z-10 max-w-[320px] rounded-2xl border border-white/10 bg-white/10 p-4 text-white backdrop-blur-md presentation-enter" style={{ ["--delay" as never]: "140ms" }}>
                   <Badge className="rounded-md bg-white/10 text-white hover:bg-white/10">
                     <Sparkles className="mr-1.5 h-3.5 w-3.5" />
                     {t("presentation.demo.live")}
@@ -230,7 +230,7 @@ export default function PresentationPage() {
                     {t("presentation.demo.liveDesc")}
                   </p>
                 </div>
-                <div className="absolute bottom-5 left-5 z-10 max-w-[360px] rounded-2xl border border-white/10 bg-black/25 p-4 text-white backdrop-blur-md presentation-enter" style={{ ["--delay" as never]: "230ms" }}>
+                <div className="absolute bottom-5 left-5 z-10 max-w-[360px] rounded-2xl border border-white/8 bg-black/18 p-4 text-white backdrop-blur-md presentation-enter" style={{ ["--delay" as never]: "230ms" }}>
                   <div className="text-[11px] uppercase tracking-[0.18em] text-white/50">
                     {t("presentation.demo.flowLabel")}
                   </div>
