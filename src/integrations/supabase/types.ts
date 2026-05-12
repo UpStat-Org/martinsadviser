@@ -760,6 +760,10 @@ export type Database = {
           client_id: string
           created_at: string
           id: string
+          last_error: string | null
+          locked_at: string | null
+          next_retry_at: string | null
+          retry_count: number
           scheduled_at: string
           sent_at: string | null
           status: string
@@ -773,6 +777,10 @@ export type Database = {
           client_id: string
           created_at?: string
           id?: string
+          last_error?: string | null
+          locked_at?: string | null
+          next_retry_at?: string | null
+          retry_count?: number
           scheduled_at: string
           sent_at?: string | null
           status?: string
@@ -786,6 +794,10 @@ export type Database = {
           client_id?: string
           created_at?: string
           id?: string
+          last_error?: string | null
+          locked_at?: string | null
+          next_retry_at?: string | null
+          retry_count?: number
           scheduled_at?: string
           sent_at?: string | null
           status?: string
@@ -945,6 +957,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_pending_messages: {
+        Args: { p_channel?: string; p_limit?: number }
+        Returns: {
+          body: string
+          channel: string
+          client_id: string
+          created_at: string
+          id: string
+          last_error: string | null
+          locked_at: string | null
+          next_retry_at: string | null
+          retry_count: number
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+          subject: string | null
+          template_id: string | null
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "scheduled_messages"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_approval_status: { Args: { _user_id: string }; Returns: string }
       get_portal_client_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
@@ -955,6 +993,7 @@ export type Database = {
         Returns: boolean
       }
       is_portal_user: { Args: { _user_id: string }; Returns: boolean }
+      recover_stuck_sending: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin" | "user" | "operator" | "viewer"

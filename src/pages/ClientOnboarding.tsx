@@ -814,7 +814,7 @@ export default function ClientOnboarding() {
 
             {trucks.length > 0 && (
               <div className="space-y-2">
-                {trucks.map((t, i) => (
+                {trucks.map((truck, i) => (
                   <div
                     key={i}
                     className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border/50"
@@ -823,9 +823,9 @@ export default function ClientOnboarding() {
                       <Truck className="w-4 h-4 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm">{t.plate}</p>
+                      <p className="font-semibold text-sm">{truck.plate}</p>
                       <p className="text-xs text-muted-foreground truncate">
-                        {[t.year, t.make, t.model].filter(Boolean).join(" ") ||
+                        {[truck.year, truck.make, truck.model].filter(Boolean).join(" ") ||
                           t("onboarding.noTruckDetails")}
                       </p>
                     </div>
