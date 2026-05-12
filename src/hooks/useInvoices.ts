@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { tNow } from "@/lib/translations";
 
 export interface Invoice {
   id: string;
@@ -44,7 +45,7 @@ export function useCreateInvoice() {
   return useMutation({
     mutationFn: async (invoice: InvoiceInsert) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase
         .from("invoices")
         .insert({ ...invoice, user_id: user.id } as any)
@@ -55,10 +56,10 @@ export function useCreateInvoice() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      toast({ title: "Fatura criada com sucesso!" });
+      toast({ title: tNow("toast.invoiceCreated") });
     },
     onError: (error: any) => {
-      toast({ title: "Erro ao criar fatura", description: error.message, variant: "destructive" });
+      toast({ title: tNow("toast.invoiceCreateError"), description: error.message, variant: "destructive" });
     },
   });
 }
@@ -80,10 +81,10 @@ export function useUpdateInvoice() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      toast({ title: "Fatura atualizada!" });
+      toast({ title: tNow("toast.invoiceUpdated") });
     },
     onError: (error: any) => {
-      toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" });
+      toast({ title: tNow("toast.updateError"), description: error.message, variant: "destructive" });
     },
   });
 }
@@ -99,10 +100,10 @@ export function useDeleteInvoice() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      toast({ title: "Fatura removida!" });
+      toast({ title: tNow("toast.invoiceRemoved") });
     },
     onError: (error: any) => {
-      toast({ title: "Erro ao remover", description: error.message, variant: "destructive" });
+      toast({ title: tNow("toast.removeError"), description: error.message, variant: "destructive" });
     },
   });
 }

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { tNow } from "@/lib/translations";
 
 export interface AutomationRule {
   id: string;
@@ -36,7 +37,7 @@ export function useCreateAutomationRule() {
   return useMutation({
     mutationFn: async (rule: Omit<AutomationRule, "id" | "user_id" | "created_at" | "updated_at">) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase
         .from("automation_rules")
         .insert({ ...rule, user_id: user.id })
@@ -45,8 +46,8 @@ export function useCreateAutomationRule() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["automation_rules"] }); toast({ title: "Automação criada!" }); },
-    onError: (e) => { toast({ title: "Erro ao criar automação", description: e.message, variant: "destructive" }); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["automation_rules"] }); toast({ title: tNow("toast.automationCreated") }); },
+    onError: (e) => { toast({ title: tNow("toast.automationCreateError"), description: e.message, variant: "destructive" }); },
   });
 }
 
@@ -64,8 +65,8 @@ export function useUpdateAutomationRule() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["automation_rules"] }); toast({ title: "Automação atualizada!" }); },
-    onError: (e) => { toast({ title: "Erro ao atualizar", description: e.message, variant: "destructive" }); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["automation_rules"] }); toast({ title: tNow("toast.automationUpdated") }); },
+    onError: (e) => { toast({ title: tNow("toast.updateError"), description: e.message, variant: "destructive" }); },
   });
 }
 
@@ -77,7 +78,7 @@ export function useDeleteAutomationRule() {
       const { error } = await supabase.from("automation_rules").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["automation_rules"] }); toast({ title: "Automação removida!" }); },
-    onError: (e) => { toast({ title: "Erro ao remover", description: e.message, variant: "destructive" }); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["automation_rules"] }); toast({ title: tNow("toast.automationRemoved") }); },
+    onError: (e) => { toast({ title: tNow("toast.removeError"), description: e.message, variant: "destructive" }); },
   });
 }

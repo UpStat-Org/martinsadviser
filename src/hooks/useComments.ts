@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { tNow } from "@/lib/translations";
 
 export interface Comment {
   id: string;
@@ -35,13 +36,13 @@ export function useCreateComment() {
   return useMutation({
     mutationFn: async (comment: { entity_type: string; entity_id: string; body: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data: profile } = await supabase
         .from("profiles")
         .select("full_name, email")
         .eq("id", user.id)
         .single();
-      const userName = profile?.full_name || profile?.email || user.email || "Usuário";
+      const userName = profile?.full_name || profile?.email || user.email || tNow("admin.user");
       const { data, error } = await supabase
         .from("comments")
         .insert({ ...comment, user_id: user.id, user_name: userName })
@@ -52,10 +53,10 @@ export function useCreateComment() {
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["comments", vars.entity_type, vars.entity_id] });
-      toast({ title: "Comentário adicionado!" });
+      toast({ title: tNow("toast.commentAdded") });
     },
     onError: (e) => {
-      toast({ title: "Erro ao comentar", description: e.message, variant: "destructive" });
+      toast({ title: tNow("toast.commentError"), description: e.message, variant: "destructive" });
     },
   });
 }
@@ -70,10 +71,10 @@ export function useDeleteComment() {
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["comments", vars.entity_type, vars.entity_id] });
-      toast({ title: "Comentário removido!" });
+      toast({ title: tNow("toast.commentRemoved") });
     },
     onError: (e) => {
-      toast({ title: "Erro ao remover", description: e.message, variant: "destructive" });
+      toast({ title: tNow("toast.removeError"), description: e.message, variant: "destructive" });
     },
   });
 }

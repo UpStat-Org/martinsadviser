@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Json } from "@/integrations/supabase/types";
+import { tNow } from "@/lib/translations";
 
 export interface PermitHistoryEntry {
   id: string;
@@ -41,7 +42,7 @@ export function useCreatePermitHistory() {
       notes?: string;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase
         .from("permit_history")
         .insert({ ...entry, changed_by: user.id })

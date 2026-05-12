@@ -165,7 +165,7 @@ export default function CalendarPage() {
             className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
           >
             <CalendarCheck className="w-4 h-4" />
-            Hoje
+            {t("common.today")}
           </button>
         </div>
       </div>
@@ -174,25 +174,25 @@ export default function CalendarPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
-            label: "Vencendo hoje",
+            label: t("calendar.expiringToday"),
             value: stats.today,
             icon: Flame,
             gradient: "from-red-500 to-rose-500",
           },
           {
-            label: "Próximos 7 dias",
+            label: t("calendar.next7"),
             value: stats.next7,
             icon: AlertTriangle,
             gradient: "from-amber-500 to-orange-500",
           },
           {
-            label: "Próximos 30 dias",
+            label: t("calendar.next30"),
             value: stats.next30,
             icon: Clock,
             gradient: "from-sky-500 to-blue-500",
           },
           {
-            label: "Vencidos",
+            label: t("permits.stats.expired"),
             value: stats.expired,
             icon: ShieldAlert,
             gradient: "from-slate-500 to-zinc-500",
@@ -446,7 +446,7 @@ export default function CalendarPage() {
               <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">
                 <CheckCircle className="w-6 h-6 text-emerald-500" />
               </div>
-              <p className="text-sm font-semibold mb-1">Tudo tranquilo! 🎉</p>
+              <p className="text-sm font-semibold mb-1">{t("calendar.allClear")} 🎉</p>
               <p className="text-xs text-muted-foreground">
                 {t("calendar.noUpcoming")}
               </p>

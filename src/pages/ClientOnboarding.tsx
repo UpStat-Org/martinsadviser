@@ -48,6 +48,7 @@ import { useCreateTruck } from "@/hooks/useTrucks";
 import { useCreatePermit, PERMIT_TYPES } from "@/hooks/usePermits";
 import { useToast } from "@/hooks/use-toast";
 import { useFmcsaLookup } from "@/hooks/useFmcsaLookup";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // --- Schemas ---
 const clientSchema = z.object({
@@ -90,16 +91,17 @@ interface PermitEntry {
 }
 
 const steps = [
-  { icon: Building2, label: "Empresa", gradient: "from-indigo-500 to-violet-500" },
-  { icon: Settings2, label: "Serviços", gradient: "from-sky-500 to-blue-500" },
-  { icon: Truck, label: "Caminhões", gradient: "from-emerald-500 to-teal-500" },
-  { icon: FileCheck, label: "Permits", gradient: "from-amber-500 to-orange-500" },
-  { icon: CheckCircle2, label: "Revisão", gradient: "from-fuchsia-500 to-pink-500" },
+  { icon: Building2, labelKey: "onboarding.companyData", gradient: "from-indigo-500 to-violet-500" },
+  { icon: Settings2, labelKey: "onboarding.services", gradient: "from-sky-500 to-blue-500" },
+  { icon: Truck, labelKey: "onboarding.trucksStep", gradient: "from-emerald-500 to-teal-500" },
+  { icon: FileCheck, labelKey: "onboarding.permitsStep", gradient: "from-amber-500 to-orange-500" },
+  { icon: CheckCircle2, labelKey: "onboarding.review", gradient: "from-fuchsia-500 to-pink-500" },
 ];
 
 export default function ClientOnboarding() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const createClient = useCreateClient();
   const createTruck = useCreateTruck();
   const createPermit = useCreatePermit();
@@ -120,7 +122,7 @@ export default function ClientOnboarding() {
       if (data.mc) form.setValue("mc", data.mc);
       if (data.ein) form.setValue("ein", data.ein);
       if (data.dot) form.setValue("dot", data.dot);
-      toast({ title: "Dados carregados do FMCSA", description: "Preencha os campos restantes." });
+      toast({ title: t("onboarding.fmcsaLoaded"), description: t("onboarding.fillRemaining") });
     }
   };
 
@@ -169,7 +171,7 @@ export default function ClientOnboarding() {
   const serviceTemplates = [
     {
       name: "IFTA Only",
-      desc: "Apenas serviço IFTA",
+      desc: t("onboarding.service.iftaOnly"),
       icon: Zap,
       gradient: "from-indigo-500 to-violet-500",
       tags: ["IFTA"],
@@ -177,7 +179,7 @@ export default function ClientOnboarding() {
     },
     {
       name: "CT + NY",
-      desc: "Combustível CT e NY",
+      desc: t("onboarding.service.ctNy"),
       icon: Layers,
       gradient: "from-blue-500 to-cyan-500",
       tags: ["CT", "NY"],
@@ -185,15 +187,15 @@ export default function ClientOnboarding() {
     },
     {
       name: "Full Compliance",
-      desc: "Todos os serviços ativos",
+      desc: t("onboarding.service.full"),
       icon: Sparkles,
       gradient: "from-emerald-500 to-teal-500",
       tags: ["IFTA", "CT", "NY", "KYU", "NM", "Auto"],
       services: { service_ifta: true, service_ct: true, service_ny: true, service_kyu: true, service_nm: true, service_automatic: true },
     },
     {
-      name: "Personalizado",
-      desc: "Escolha manualmente",
+      name: t("onboarding.service.custom"),
+      desc: t("onboarding.service.customDesc"),
       icon: Wand2,
       gradient: "from-fuchsia-500 to-pink-500",
       tags: ["Manual"],
@@ -208,7 +210,7 @@ export default function ClientOnboarding() {
 
   const addTruck = () => {
     if (!truckDraft.plate.trim()) {
-      toast({ title: "Placa é obrigatória", variant: "destructive" });
+      toast({ title: t("onboarding.truckRequired"), variant: "destructive" });
       return;
     }
     setTrucks([...trucks, { ...truckDraft }]);
@@ -232,7 +234,7 @@ export default function ClientOnboarding() {
 
   const addPermit = () => {
     if (!permitDraft.permit_type) {
-      toast({ title: "Tipo do permit é obrigatório", variant: "destructive" });
+      toast({ title: t("onboarding.permitTypeRequired"), variant: "destructive" });
       return;
     }
     setPermits([...permits, { ...permitDraft }]);
@@ -266,7 +268,7 @@ export default function ClientOnboarding() {
       const duplicates = await checkDuplicate(vals.dot, vals.ein);
       if (duplicates.length > 0) {
         toast({
-          title: "Possível duplicata encontrada",
+          title: t("onboarding.possibleDuplicate"),
           description: duplicates.join(". "),
           variant: "destructive",
         });
@@ -317,14 +319,14 @@ export default function ClientOnboarding() {
       }
 
       toast({
-        title: "Cliente cadastrado com sucesso!",
-        description: "Todos os dados foram salvos.",
+        title: t("onboarding.saved"),
+        description: t("onboarding.savedDesc"),
       });
       navigate(`/clients/${client.id}`);
     } catch {
       toast({
-        title: "Erro ao salvar",
-        description: "Tente novamente.",
+        title: t("onboarding.saveError"),
+        description: t("onboarding.tryAgain"),
         variant: "destructive",
       });
     } finally {
@@ -347,20 +349,19 @@ export default function ClientOnboarding() {
               className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/10 border border-white/15 backdrop-blur-md text-white text-xs font-semibold hover:bg-white/15 transition-all mb-6"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              Voltar
+              {t("common.back")}
             </button>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md mb-5">
               <Sparkles className="w-3.5 h-3.5 text-white/80" />
               <span className="text-xs font-semibold text-white/80 uppercase tracking-wider">
-                Onboarding em 5 passos
+                {t("onboarding.stepsCount")}
               </span>
             </div>
             <h1 className="font-display text-4xl sm:text-5xl font-bold gradient-text leading-tight">
-              Novo Cliente
+              {t("clients.new")}
             </h1>
             <p className="text-white/70 mt-3 text-base sm:text-lg max-w-xl mx-auto">
-              Escolha um template para começar. Você poderá personalizar tudo ao longo do
-              fluxo.
+              {t("onboarding.templateIntro")}
             </p>
           </div>
         </div>
@@ -422,16 +423,16 @@ export default function ClientOnboarding() {
             className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/10 border border-white/15 backdrop-blur-md text-white text-xs font-semibold hover:bg-white/15 transition-all mb-5"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Voltar
+            {t("common.back")}
           </button>
 
           <div className="flex items-end justify-between gap-4 mb-8">
             <div>
               <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-1">
-                Passo {step + 1} de {steps.length}
+                {t("onboarding.step")} {step + 1} {t("common.of")} {steps.length}
               </p>
               <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
-                {currentStep.label}
+                {t(currentStep.labelKey)}
               </h1>
             </div>
           </div>
@@ -483,7 +484,7 @@ export default function ClientOnboarding() {
                           : "text-white/40"
                       }`}
                     >
-                      {s.label}
+                      {t(s.labelKey)}
                     </span>
                   </button>
                 );
@@ -506,13 +507,13 @@ export default function ClientOnboarding() {
             <StepIcon className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="font-display text-xl font-bold">{currentStep.label}</h2>
+            <h2 className="font-display text-xl font-bold">{t(currentStep.labelKey)}</h2>
             <p className="text-xs text-muted-foreground">
-              {step === 0 && "Informações básicas da empresa"}
-              {step === 1 && "Selecione os serviços ativos"}
-              {step === 2 && "Cadastre a frota (opcional)"}
-              {step === 3 && "Adicione os permits (opcional)"}
-              {step === 4 && "Confira os dados antes de finalizar"}
+              {step === 0 && t("onboarding.basicInfo")}
+              {step === 1 && t("onboarding.selectActiveServices")}
+              {step === 2 && t("onboarding.fleetOptional")}
+              {step === 3 && t("onboarding.permitsOptional")}
+              {step === 4 && t("onboarding.reviewBeforeFinish")}
             </p>
           </div>
         </div>
@@ -527,13 +528,13 @@ export default function ClientOnboarding() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Nome da Empresa *
+                      {t("onboarding.companyName")} *
                     </FormLabel>
                     <FormControl>
                       <div className="relative input-glow rounded-xl">
                         <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
-                          placeholder="Ex: Martins Transportes LLC"
+                          placeholder={t("common.companyExamplePlaceholder")}
                           className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
                           {...field}
                         />
@@ -549,13 +550,13 @@ export default function ClientOnboarding() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Responsável pelo Cadastro
+                      {t("onboarding.registrationResponsible")}
                     </FormLabel>
                     <FormControl>
                       <div className="relative input-glow rounded-xl">
                         <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
-                          placeholder="Nome do responsável"
+                          placeholder={t("onboarding.registrationResponsiblePlaceholder")}
                           className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
                           {...field}
                         />
@@ -572,7 +573,7 @@ export default function ClientOnboarding() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        Telefone
+                        {t("clients.phone")}
                       </FormLabel>
                       <FormControl>
                         <div className="relative input-glow rounded-xl">
@@ -593,14 +594,14 @@ export default function ClientOnboarding() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        Email
+                        {t("login.email")}
                       </FormLabel>
                       <FormControl>
                         <div className="relative input-glow rounded-xl">
                           <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                           <Input
                             type="email"
-                            placeholder="email@empresa.com"
+                            placeholder={t("common.emailPlaceholder")}
                             className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
                             {...field}
                           />
@@ -618,13 +619,13 @@ export default function ClientOnboarding() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Endereço
+                      {t("common.address")}
                     </FormLabel>
                     <FormControl>
                       <div className="relative input-glow rounded-xl">
                         <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
-                          placeholder="Endereço completo"
+                          placeholder={t("common.addressPlaceholder")}
                           className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
                           {...field}
                         />
@@ -641,9 +642,9 @@ export default function ClientOnboarding() {
                     <Sparkles className="w-3.5 h-3.5 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold">Busca FMCSA</p>
+                    <p className="text-sm font-bold">{t("onboarding.fmcsaLookup")}</p>
                     <p className="text-[11px] text-muted-foreground">
-                      Informe o DOT e puxamos os dados automaticamente
+                      {t("onboarding.fmcsaLookupDesc")}
                     </p>
                   </div>
                 </div>
@@ -661,7 +662,7 @@ export default function ClientOnboarding() {
                             <div className="relative input-glow rounded-xl flex-1">
                               <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                               <Input
-                                placeholder="USDOT Number"
+                                placeholder={t("clients.dotPlaceholder")}
                                 className="h-11 pl-9 rounded-xl bg-background border-border/60"
                                 {...field}
                               />
@@ -695,7 +696,7 @@ export default function ClientOnboarding() {
                           <div className="relative input-glow rounded-xl">
                             <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                             <Input
-                              placeholder="MC Number"
+                              placeholder={t("clients.mcPlaceholder")}
                               className="h-11 pl-9 rounded-xl bg-background border-border/60"
                               {...field}
                             />
@@ -716,7 +717,7 @@ export default function ClientOnboarding() {
                           <div className="relative input-glow rounded-xl">
                             <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                             <Input
-                              placeholder="XX-XXXXXXX"
+                              placeholder={t("common.einPlaceholder")}
                               className="h-11 pl-9 rounded-xl bg-background border-border/60"
                               {...field}
                             />
@@ -734,12 +735,12 @@ export default function ClientOnboarding() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Observações
+                      {t("clients.notes")}
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         rows={3}
-                        placeholder="Notas sobre o cliente..."
+                        placeholder={t("common.notesPlaceholder")}
                         className="rounded-xl bg-muted/40 border-border/60 focus:bg-background"
                         {...field}
                       />
@@ -755,7 +756,7 @@ export default function ClientOnboarding() {
         {step === 1 && (
           <div>
             <p className="text-sm text-muted-foreground mb-5">
-              Selecione os serviços que este cliente utiliza. Você pode alterar depois.
+              {t("onboarding.selectServicesHint")}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {services.map((s) => {
@@ -825,7 +826,7 @@ export default function ClientOnboarding() {
                       <p className="font-semibold text-sm">{t.plate}</p>
                       <p className="text-xs text-muted-foreground truncate">
                         {[t.year, t.make, t.model].filter(Boolean).join(" ") ||
-                          "Sem detalhes"}
+                          t("onboarding.noTruckDetails")}
                       </p>
                     </div>
                     <button
@@ -841,17 +842,17 @@ export default function ClientOnboarding() {
 
             <div className="rounded-2xl border-2 border-dashed border-border/60 bg-muted/20 p-5 space-y-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                Adicionar caminhão
+                {t("onboarding.addTruckTitle")}
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <Input
-                  placeholder="Placa *"
+                  placeholder={`${t("trucks.plate")} *`}
                   value={truckDraft.plate}
                   onChange={(e) => setTruckDraft({ ...truckDraft, plate: e.target.value })}
                   className="h-11 rounded-xl bg-background"
                 />
                 <Input
-                  placeholder="VIN"
+                  placeholder={t("trucks.vin")}
                   value={truckDraft.vin}
                   onChange={(e) => setTruckDraft({ ...truckDraft, vin: e.target.value })}
                   className="h-11 rounded-xl bg-background"
@@ -859,19 +860,19 @@ export default function ClientOnboarding() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <Input
-                  placeholder="Ano"
+                  placeholder={t("trucks.year")}
                   value={truckDraft.year}
                   onChange={(e) => setTruckDraft({ ...truckDraft, year: e.target.value })}
                   className="h-11 rounded-xl bg-background"
                 />
                 <Input
-                  placeholder="Marca"
+                  placeholder={t("trucks.make")}
                   value={truckDraft.make}
                   onChange={(e) => setTruckDraft({ ...truckDraft, make: e.target.value })}
                   className="h-11 rounded-xl bg-background"
                 />
                 <Input
-                  placeholder="Modelo"
+                  placeholder={t("trucks.model")}
                   value={truckDraft.model}
                   onChange={(e) => setTruckDraft({ ...truckDraft, model: e.target.value })}
                   className="h-11 rounded-xl bg-background"
@@ -883,7 +884,7 @@ export default function ClientOnboarding() {
                 className="w-full h-11 btn-gradient text-white border-0 rounded-xl font-semibold"
               >
                 <Plus className="w-4 h-4 mr-1.5" />
-                Adicionar Caminhão
+                {t("onboarding.addTruck")}
               </Button>
             </div>
           </div>
@@ -893,7 +894,7 @@ export default function ClientOnboarding() {
         {step === 3 && (
           <div className="space-y-5">
             <p className="text-sm text-muted-foreground">
-              Adicione os permits do cliente. Este passo é opcional.
+              {t("onboarding.permitsDesc")}
             </p>
 
             {permits.length > 0 && (
@@ -913,9 +914,9 @@ export default function ClientOnboarding() {
                       </p>
                       <p className="text-xs text-muted-foreground truncate">
                         {[
-                          p.state && `Estado ${p.state}`,
+                          p.state && `${t("onboarding.statePrefix")} ${p.state}`,
                           p.truck_index !== null && `🚛 ${trucks[p.truck_index]?.plate}`,
-                          p.expiration_date && `Venc ${p.expiration_date}`,
+                          p.expiration_date && `${t("onboarding.expPrefix")} ${p.expiration_date}`,
                         ]
                           .filter(Boolean)
                           .join(" · ")}
@@ -934,7 +935,7 @@ export default function ClientOnboarding() {
 
             <div className="rounded-2xl border-2 border-dashed border-border/60 bg-muted/20 p-5 space-y-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                Adicionar permit
+                {t("onboarding.addPermitTitle")}
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <Select
@@ -942,7 +943,7 @@ export default function ClientOnboarding() {
                   onValueChange={(v) => setPermitDraft({ ...permitDraft, permit_type: v })}
                 >
                   <SelectTrigger className="h-11 rounded-xl bg-background">
-                    <SelectValue placeholder="Tipo do permit *" />
+                    <SelectValue placeholder={`${t("common.type")} *`} />
                   </SelectTrigger>
                   <SelectContent>
                     {PERMIT_TYPES.map((t) => (
@@ -953,7 +954,7 @@ export default function ClientOnboarding() {
                   </SelectContent>
                 </Select>
                 <Input
-                  placeholder="Nº do permit"
+                  placeholder={t("common.number")}
                   value={permitDraft.permit_number}
                   onChange={(e) =>
                     setPermitDraft({ ...permitDraft, permit_number: e.target.value })
@@ -963,7 +964,7 @@ export default function ClientOnboarding() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <Input
-                  placeholder="Estado"
+                  placeholder={t("common.state")}
                   value={permitDraft.state}
                   onChange={(e) => setPermitDraft({ ...permitDraft, state: e.target.value })}
                   className="h-11 rounded-xl bg-background"
@@ -990,10 +991,10 @@ export default function ClientOnboarding() {
                   }
                 >
                   <SelectTrigger className="h-11 rounded-xl bg-background">
-                    <SelectValue placeholder="Caminhão" />
+                    <SelectValue placeholder={t("common.truck")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Nenhum</SelectItem>
+                    <SelectItem value="none">{t("common.none")}</SelectItem>
                     {trucks.map((t, i) => (
                       <SelectItem key={i} value={String(i)}>
                         {t.plate}
@@ -1008,7 +1009,7 @@ export default function ClientOnboarding() {
                 className="w-full h-11 btn-gradient text-white border-0 rounded-xl font-semibold"
               >
                 <Plus className="w-4 h-4 mr-1.5" />
-                Adicionar Permit
+                {t("onboarding.addPermit")}
               </Button>
             </div>
           </div>
@@ -1020,14 +1021,14 @@ export default function ClientOnboarding() {
             {[
               {
                 icon: Building2,
-                title: "Empresa",
+                title: t("onboarding.company"),
                 gradient: "from-indigo-500 to-violet-500",
                 content: (
                   <>
                     <p className="text-base font-bold">{form.getValues("company_name")}</p>
                     {form.getValues("registration_responsible") && (
                       <p className="text-sm text-muted-foreground">
-                        Responsável: {form.getValues("registration_responsible")}
+                        {t("onboarding.registrationResponsible")}: {form.getValues("registration_responsible")}
                       </p>
                     )}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3 text-xs text-muted-foreground">
@@ -1052,13 +1053,13 @@ export default function ClientOnboarding() {
               },
               {
                 icon: Settings2,
-                title: "Serviços",
+                title: t("onboarding.services"),
                 gradient: "from-sky-500 to-blue-500",
                 content: (
                   <div className="flex flex-wrap gap-1.5">
                     {services.filter((s) => selectedServices[s.key]).length === 0 ? (
                       <span className="text-xs text-muted-foreground">
-                        Nenhum serviço selecionado
+                        {t("onboarding.noService")}
                       </span>
                     ) : (
                       services
@@ -1077,12 +1078,12 @@ export default function ClientOnboarding() {
               },
               {
                 icon: Truck,
-                title: `Caminhões (${trucks.length})`,
+                title: `${t("onboarding.trucksStep")} (${trucks.length})`,
                 gradient: "from-emerald-500 to-teal-500",
                 content:
                   trucks.length === 0 ? (
                     <span className="text-xs text-muted-foreground">
-                      Nenhum caminhão adicionado
+                      {t("onboarding.noTrucksAdded")}
                     </span>
                   ) : (
                     <div className="space-y-1">
@@ -1098,12 +1099,12 @@ export default function ClientOnboarding() {
               },
               {
                 icon: FileCheck,
-                title: `Permits (${permits.length})`,
+                title: `${t("onboarding.permitsStep")} (${permits.length})`,
                 gradient: "from-amber-500 to-orange-500",
                 content:
                   permits.length === 0 ? (
                     <span className="text-xs text-muted-foreground">
-                      Nenhum permit adicionado
+                      {t("onboarding.noPermitsAdded")}
                     </span>
                   ) : (
                     <div className="space-y-1">
@@ -1148,7 +1149,7 @@ export default function ClientOnboarding() {
           className="h-11 px-5 rounded-xl bg-muted/60 hover:bg-muted border border-border/60 text-sm font-semibold inline-flex items-center gap-1.5 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          {step === 0 ? "Cancelar" : "Voltar"}
+          {step === 0 ? t("common.cancel") : t("common.back")}
         </button>
         {step < steps.length - 1 ? (
           <button
@@ -1156,7 +1157,7 @@ export default function ClientOnboarding() {
             className="group h-11 px-6 btn-gradient text-white text-sm font-semibold rounded-xl inline-flex items-center gap-1.5 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all relative overflow-hidden"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-            Próximo
+            {t("common.next")}
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         ) : (
@@ -1169,12 +1170,12 @@ export default function ClientOnboarding() {
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Salvando...
+                {t("common.saving")}
               </>
             ) : (
               <>
                 <CheckCircle2 className="w-4 h-4" />
-                Finalizar Cadastro
+                {t("onboarding.finishRegistration")}
               </>
             )}
           </button>

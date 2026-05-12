@@ -144,25 +144,25 @@ export default function WorkloadPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
-            label: "Colaboradores",
+            label: t("workload.employees"),
             value: stats.totalEmployees,
             icon: Users,
             gradient: "from-indigo-500 to-violet-500",
           },
           {
-            label: "Permits atribuídos",
+            label: t("workload.assignedPermits"),
             value: stats.totalPermits,
             icon: TrendingUp,
             gradient: "from-emerald-500 to-teal-500",
           },
           {
-            label: "Tarefas abertas",
+            label: t("workload.openTasks"),
             value: stats.totalOpenTasks,
             icon: Clock,
             gradient: "from-sky-500 to-blue-500",
           },
           {
-            label: "Permits vencidos",
+            label: t("workload.overduePermits"),
             value: stats.totalOverdue,
             icon: AlertTriangle,
             gradient: "from-red-500 to-rose-500",

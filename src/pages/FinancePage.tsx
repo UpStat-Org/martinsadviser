@@ -360,7 +360,7 @@ export default function FinancePage() {
               className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all disabled:opacity-40"
             >
               <Download className="w-4 h-4" />
-              Exportar CSV
+              {t("reports.exportCsv")}
             </button>
             {!isViewer && (
               <button
@@ -379,7 +379,7 @@ export default function FinancePage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
-            label: "Total de invoices",
+            label: t("finance.totalInvoices"),
             value: stats.count,
             isCurrency: false,
             icon: Receipt,
@@ -448,7 +448,7 @@ export default function FinancePage() {
                     {t("finance.monthlyRevenue")}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Últimos 6 meses
+                    {t("finance.lastSixMonths")}
                   </p>
                 </div>
               </div>
@@ -481,7 +481,7 @@ export default function FinancePage() {
                       border: "1px solid hsl(var(--border))",
                       background: "hsl(var(--popover))",
                     }}
-                    formatter={(v: number) => [fmt(v), "Revenue"]}
+                    formatter={(v: number) => [fmt(v), t("finance.revenue")]}
                   />
                   <Bar dataKey="total" fill="url(#barRevenue)" radius={[6, 6, 0, 0]} />
                 </BarChart>
@@ -501,7 +501,7 @@ export default function FinancePage() {
                     {t("finance.statusDist")}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Distribuição de invoices
+                    {t("finance.invoiceDistribution")}
                   </p>
                 </div>
               </div>
@@ -553,9 +553,9 @@ export default function FinancePage() {
                 </div>
                 <div>
                   <h2 className="font-display font-bold text-base">
-                    Top 10 Clientes
+                    {t("finance.topClients")}
                   </h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">Por receita</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t("finance.byRevenue")}</p>
                 </div>
               </div>
               <ResponsiveContainer width="100%" height={320}>
@@ -595,13 +595,13 @@ export default function FinancePage() {
                     dataKey="paid"
                     stackId="a"
                     fill="hsl(158 55% 42%)"
-                    name="Pago"
+                    name={t("finance.paid")}
                   />
                   <Bar
                     dataKey="pending"
                     stackId="a"
                     fill="hsl(38 92% 50%)"
-                    name="Pendente"
+                    name={t("common.pending")}
                     radius={[0, 6, 6, 0]}
                   />
                 </BarChart>
@@ -619,10 +619,10 @@ export default function FinancePage() {
                   </div>
                   <div>
                     <h2 className="font-display font-bold text-base">
-                      Receita por Cliente
+                      {t("finance.revenueByClient")}
                     </h2>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Detalhamento consolidado
+                      {t("finance.consolidatedDetails")}
                     </p>
                   </div>
                 </div>
@@ -635,7 +635,7 @@ export default function FinancePage() {
                         #
                       </TableHead>
                       <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                        Cliente
+                        {t("common.client")}
                       </TableHead>
                       <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
                         Inv.
@@ -644,10 +644,10 @@ export default function FinancePage() {
                         Ticket
                       </TableHead>
                       <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
-                        Pago
+                        {t("finance.paid")}
                       </TableHead>
                       <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
-                        Pendente
+                        {t("common.pending")}
                       </TableHead>
                       <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
                         Total
@@ -711,10 +711,10 @@ export default function FinancePage() {
                 </div>
                 <div>
                   <h2 className="font-display font-bold text-base text-red-600 dark:text-red-400">
-                    Clientes Inadimplentes
+                    {t("finance.delinquentClients")}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Mais de 30 dias em atraso
+                    {t("finance.overThirtyDays")}
                   </p>
                 </div>
               </div>
@@ -727,13 +727,13 @@ export default function FinancePage() {
                 <TableHeader>
                   <TableRow className="bg-muted/40 hover:bg-muted/40 border-border/50">
                     <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                      Cliente
+                      {t("common.client")}
                     </TableHead>
                     <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
-                      Valor em atraso
+                      {t("finance.overdueAmount")}
                     </TableHead>
                     <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                      Dias
+                      {t("common.days")}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -748,7 +748,7 @@ export default function FinancePage() {
                       </TableCell>
                       <TableCell>
                         <span className="inline-flex items-center h-6 px-2.5 rounded-md text-xs font-bold bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-sm">
-                          {row.maxOverdueDays} dias
+                          {row.maxOverdueDays} {t("common.days")}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -764,7 +764,7 @@ export default function FinancePage() {
       <div className="rounded-2xl bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground px-1">
           <Filter className="w-3.5 h-3.5" />
-          Filtros:
+          {t("common.filters")}:
         </div>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
           <SelectTrigger className="w-full sm:w-44 h-10 rounded-xl bg-muted/40 border-border/60">
@@ -792,7 +792,7 @@ export default function FinancePage() {
           </SelectContent>
         </Select>
         <span className="sm:ml-auto inline-flex items-center gap-1.5 h-7 px-2.5 rounded-lg bg-primary/10 text-primary border border-primary/15 text-xs font-bold">
-          {filtered.length} {filtered.length === 1 ? "invoice" : "invoices"}
+          {filtered.length} {t(filtered.length === 1 ? "finance.invoice" : "finance.invoices")}
         </span>
       </div>
 

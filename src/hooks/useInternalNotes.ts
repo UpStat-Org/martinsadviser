@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { tNow } from "@/lib/translations";
 
 export interface InternalNote {
   id: string;
@@ -36,13 +37,13 @@ export function useCreateInternalNote() {
   return useMutation({
     mutationFn: async (input: { client_id: string; body: string; pinned?: boolean }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data: profile } = await supabase
         .from("profiles")
         .select("full_name, email")
         .eq("id", user.id)
         .single();
-      const user_name = profile?.full_name || profile?.email || user.email || "Usuário";
+      const user_name = profile?.full_name || profile?.email || user.email || tNow("admin.user");
       const { error } = await (supabase as any).from("client_internal_notes").insert({
         client_id: input.client_id,
         body: input.body,
@@ -54,9 +55,9 @@ export function useCreateInternalNote() {
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["internal_notes", vars.client_id] });
-      toast({ title: "Nota interna salva" });
+      toast({ title: tNow("toast.noteSaved") });
     },
-    onError: (e: any) => toast({ title: "Erro ao salvar nota", description: e.message, variant: "destructive" }),
+    onError: (e: any) => toast({ title: tNow("toast.noteSaveError"), description: e.message, variant: "destructive" }),
   });
 }
 
@@ -84,7 +85,7 @@ export function useDeleteInternalNote() {
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["internal_notes", vars.client_id] });
-      toast({ title: "Nota removida" });
+      toast({ title: tNow("toast.noteRemoved") });
     },
   });
 }

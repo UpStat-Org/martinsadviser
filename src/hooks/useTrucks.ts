@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
+import { tNow } from "@/lib/translations";
 
 export type Truck = Tables<"trucks">;
 export type TruckInsert = TablesInsert<"trucks">;
@@ -49,7 +50,7 @@ export function useCreateTruck() {
   return useMutation({
     mutationFn: async (truck: Omit<TruckInsert, "user_id">) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase
         .from("trucks")
         .insert({ ...truck, user_id: user.id })
@@ -60,10 +61,10 @@ export function useCreateTruck() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trucks"] });
-      toast({ title: "Caminhão cadastrado com sucesso!" });
+      toast({ title: tNow("toast.truckCreated") });
     },
     onError: (error) => {
-      toast({ title: "Erro ao cadastrar caminhão", description: error.message, variant: "destructive" });
+      toast({ title: tNow("toast.truckCreateError"), description: error.message, variant: "destructive" });
     },
   });
 }
@@ -85,10 +86,10 @@ export function useUpdateTruck() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trucks"] });
-      toast({ title: "Caminhão atualizado!" });
+      toast({ title: tNow("toast.truckUpdated") });
     },
     onError: (error) => {
-      toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" });
+      toast({ title: tNow("toast.updateError"), description: error.message, variant: "destructive" });
     },
   });
 }
@@ -104,10 +105,10 @@ export function useDeleteTruck() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trucks"] });
-      toast({ title: "Caminhão removido!" });
+      toast({ title: tNow("toast.truckRemoved") });
     },
     onError: (error) => {
-      toast({ title: "Erro ao remover", description: error.message, variant: "destructive" });
+      toast({ title: tNow("toast.removeError"), description: error.message, variant: "destructive" });
     },
   });
 }

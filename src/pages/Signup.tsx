@@ -45,7 +45,13 @@ export default function Signup() {
     return Math.min(score, 4);
   }, [password]);
 
-  const strengthLabels = ["Muito fraca", "Fraca", "Média", "Forte", "Excelente"];
+  const strengthLabels = [
+    t("signup.strength.veryWeak"),
+    t("signup.strength.weak"),
+    t("signup.strength.medium"),
+    t("signup.strength.strong"),
+    t("signup.strength.excellent"),
+  ];
   const strengthColors = [
     "bg-destructive",
     "bg-destructive",
@@ -110,10 +116,10 @@ export default function Signup() {
   }
 
   const benefits = [
-    "Gestão completa de permits e rotas",
-    "Compliance automatizado com IA",
-    "Portal dedicado para clientes",
-    "Relatórios inteligentes em tempo real",
+    t("signup.benefit.permits"),
+    t("signup.benefit.compliance"),
+    t("signup.benefit.portal"),
+    t("signup.benefit.reports"),
   ];
 
   return (
@@ -177,10 +183,10 @@ export default function Signup() {
 
             <div className="grid grid-cols-2 gap-3 max-w-md pt-4">
               {[
-                { icon: Shield, label: "Compliance" },
-                { icon: BarChart3, label: "Relatórios IA" },
-                { icon: Users, label: "Portal do Cliente" },
-                { icon: Clock, label: "Automações" },
+                { icon: Shield, label: t("compliance.title") },
+                { icon: BarChart3, label: t("signup.feature.aiReports") },
+                { icon: Users, label: t("signup.feature.portal") },
+                { icon: Clock, label: t("signup.feature.automations") },
               ].map(({ icon: Icon, label }) => (
                 <div
                   key={label}
@@ -232,7 +238,7 @@ export default function Signup() {
                     id="name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Seu nome"
+                    placeholder={t("common.fullNamePlaceholder")}
                     className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background focus:border-primary/40 transition-all"
                     required
                   />
@@ -250,7 +256,7 @@ export default function Signup() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="seu@email.com"
+                    placeholder={t("common.emailPlaceholder")}
                     className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background focus:border-primary/40 transition-all"
                     required
                   />
@@ -277,7 +283,7 @@ export default function Signup() {
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    aria-label={showPassword ? t("login.hidePassword") : t("login.showPassword")}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -296,7 +302,7 @@ export default function Signup() {
                       ))}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Força da senha:{" "}
+                      {t("signup.passwordStrength")}{" "}
                       <span className="font-medium text-foreground">
                         {strengthLabels[passwordStrength]}
                       </span>
@@ -330,7 +336,7 @@ export default function Signup() {
             >
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
               <span className="text-[10px] text-muted-foreground uppercase tracking-[0.25em] font-semibold">
-                ou
+                {t("login.or")}
               </span>
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
             </div>
@@ -351,7 +357,7 @@ export default function Signup() {
           </div>
 
           <p className="text-center text-xs text-muted-foreground/70 mt-6 animate-fade-in">
-            © {new Date().getFullYear()} MartinsAdviser · Todos os direitos reservados
+            © {new Date().getFullYear()} MartinsAdviser · {t("common.allRightsReserved")}
           </p>
         </div>
       </div>

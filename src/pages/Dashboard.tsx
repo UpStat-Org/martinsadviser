@@ -238,23 +238,11 @@ export default function Dashboard() {
 
   const hour = new Date().getHours();
   const greeting =
-    language === "pt"
-      ? hour < 12
-        ? "Bom dia"
-        : hour < 18
-        ? "Boa tarde"
-        : "Boa noite"
-      : language === "es"
-      ? hour < 12
-        ? "Buenos días"
-        : hour < 18
-        ? "Buenas tardes"
-        : "Buenas noches"
-      : hour < 12
-      ? "Good morning"
+    hour < 12
+      ? t("dashboard.goodMorning")
       : hour < 18
-      ? "Good afternoon"
-      : "Good evening";
+      ? t("dashboard.goodAfternoon")
+      : t("dashboard.goodEvening");
 
   const kpis = [
     {
@@ -321,8 +309,8 @@ export default function Dashboard() {
               {greeting} 👋
             </h1>
             <p className="text-white/70 mt-2 text-base sm:text-lg max-w-xl">
-              {t("dashboard.subtitle")} — {metrics.total} permits monitorados ·{" "}
-              {clients?.length ?? 0} clientes ativos
+              {t("dashboard.subtitle")} — {metrics.total} {t("common.monitoredPermits")} ·{" "}
+              {clients?.length ?? 0} {t("common.activeClients")}
             </p>
           </div>
 
@@ -332,14 +320,14 @@ export default function Dashboard() {
               className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
             >
               <Plus className="w-4 h-4" />
-              Novo cliente
+              {t("common.newClient")}
             </button>
             <button
               onClick={() => navigate("/permits")}
               className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
             >
               <FileCheck className="w-4 h-4" />
-              Ver permits
+              {t("common.viewPermits")}
             </button>
           </div>
         </div>
@@ -393,8 +381,8 @@ export default function Dashboard() {
                   <Activity className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="font-display text-base">Compliance Score</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-0.5">Últimos 6 meses</p>
+                  <CardTitle className="font-display text-base">{t("compliance.score")}</CardTitle>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.lastSixMonths")}</p>
                 </div>
               </div>
               <div className="text-right">
@@ -412,7 +400,7 @@ export default function Dashboard() {
                     <TrendingDown className="w-3 h-3" />
                   )}
                   {complianceDelta >= 0 ? "+" : ""}
-                  {complianceDelta}% vs mês anterior
+                  {complianceDelta}% vs {t("common.previousMonth")}
                 </div>
               </div>
             </div>
@@ -438,7 +426,7 @@ export default function Dashboard() {
                       border: "1px solid hsl(var(--border))",
                       background: "hsl(var(--popover))",
                     }}
-                    formatter={(v: number) => [`${v}%`, "Compliance"]}
+                    formatter={(v: number) => [`${v}%`, t("compliance.title")]}
                   />
                   <Area
                     type="monotone"
@@ -464,8 +452,8 @@ export default function Dashboard() {
                 <TrendingUp className="w-4 h-4 text-white" />
               </div>
               <div>
-                <CardTitle className="font-display text-base">Revenue mensal</CardTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">Este mês</p>
+                <CardTitle className="font-display text-base">{t("dashboard.monthlyRevenue")}</CardTitle>
+                <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.thisMonth")}</p>
               </div>
             </div>
           </CardHeader>
@@ -484,7 +472,7 @@ export default function Dashboard() {
                 <TrendingDown className="w-3 h-3" />
               )}
               {revenueDelta >= 0 ? "+" : ""}
-              {revenueDelta.toFixed(1)}% vs mês anterior
+              {revenueDelta.toFixed(1)}% vs {t("common.previousMonth")}
             </div>
             <div className="mt-4">
               <ResponsiveContainer width="100%" height={120}>
@@ -501,7 +489,7 @@ export default function Dashboard() {
                       border: "1px solid hsl(var(--border))",
                       background: "hsl(var(--popover))",
                     }}
-                    formatter={(v: number) => [`$${v.toFixed(2)}`, "Revenue"]}
+                    formatter={(v: number) => [`$${v.toFixed(2)}`, t("dashboard.revenue")]}
                   />
                   <Area
                     type="monotone"

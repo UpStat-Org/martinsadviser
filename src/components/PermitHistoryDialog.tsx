@@ -4,6 +4,7 @@ import { History, Loader2, FileCheck, RefreshCw, Pencil, Plus } from "lucide-rea
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { usePermitHistory } from "@/hooks/usePermitHistory";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PermitHistoryDialogProps {
   open: boolean;
@@ -12,11 +13,11 @@ interface PermitHistoryDialogProps {
   permitLabel: string;
 }
 
-const changeTypeConfig: Record<string, { label: string; icon: typeof History; color: string }> = {
-  created: { label: "Criado", icon: Plus, color: "bg-success/10 text-success" },
-  updated: { label: "Atualizado", icon: Pencil, color: "bg-primary/10 text-primary" },
-  renewed: { label: "Renovado", icon: RefreshCw, color: "bg-warning/10 text-warning" },
-  expired: { label: "Expirado", icon: FileCheck, color: "bg-destructive/10 text-destructive" },
+const changeTypeConfig: Record<string, { labelKey: string; icon: typeof History; color: string }> = {
+  created: { labelKey: "history.created", icon: Plus, color: "bg-success/10 text-success" },
+  updated: { labelKey: "history.updated", icon: Pencil, color: "bg-primary/10 text-primary" },
+  renewed: { labelKey: "history.renewed", icon: RefreshCw, color: "bg-warning/10 text-warning" },
+  expired: { labelKey: "history.expired", icon: FileCheck, color: "bg-destructive/10 text-destructive" },
 };
 
 function formatChanges(values: Record<string, any> | null): string[] {
@@ -38,6 +39,7 @@ function formatChanges(values: Record<string, any> | null): string[] {
 
 export function PermitHistoryDialog({ open, onOpenChange, permitId, permitLabel }: PermitHistoryDialogProps) {
   const { data: history, isLoading } = usePermitHistory(open ? permitId : undefined);
+  const { t } = useLanguage();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -45,7 +47,7 @@ export function PermitHistoryDialog({ open, onOpenChange, permitId, permitLabel 
         <DialogHeader>
           <DialogTitle className="font-display flex items-center gap-2">
             <History className="w-5 h-5 text-muted-foreground" />
-            Histórico — {permitLabel}
+            {t("history.title")} — {permitLabel}
           </DialogTitle>
         </DialogHeader>
 
@@ -54,7 +56,7 @@ export function PermitHistoryDialog({ open, onOpenChange, permitId, permitLabel 
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           </div>
         ) : !history?.length ? (
-          <p className="text-sm text-muted-foreground text-center py-8">Nenhum histórico registrado.</p>
+          <p className="text-sm text-muted-foreground text-center py-8">{t("history.empty")}</p>
         ) : (
           <div className="relative">
             {/* Timeline line */}
@@ -77,7 +79,7 @@ export function PermitHistoryDialog({ open, onOpenChange, permitId, permitLabel 
                     <div className="rounded-lg border p-3 space-y-1.5">
                       <div className="flex items-center justify-between">
                         <Badge variant="outline" className={config.color}>
-                          {config.label}
+                          {t(config.labelKey)}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
                           {format(new Date(entry.created_at), "dd/MM/yyyy HH:mm", { locale: pt })}
@@ -90,7 +92,7 @@ export function PermitHistoryDialog({ open, onOpenChange, permitId, permitLabel 
 
                       {oldLines.length > 0 && (
                         <div className="text-xs space-y-0.5">
-                          <span className="font-medium text-destructive/80">Anterior:</span>
+                          <span className="font-medium text-destructive/80">{t("history.previous")}:</span>
                           {oldLines.map((line, i) => (
                             <div key={i} className="text-muted-foreground pl-2">{line}</div>
                           ))}
@@ -99,7 +101,7 @@ export function PermitHistoryDialog({ open, onOpenChange, permitId, permitLabel 
 
                       {newLines.length > 0 && (
                         <div className="text-xs space-y-0.5">
-                          <span className="font-medium text-success/80">Novo:</span>
+                          <span className="font-medium text-success/80">{t("history.new")}:</span>
                           {newLines.map((line, i) => (
                             <div key={i} className="text-muted-foreground pl-2">{line}</div>
                           ))}

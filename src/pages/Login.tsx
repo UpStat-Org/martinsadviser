@@ -156,7 +156,7 @@ export default function Login() {
             <div className="mb-8">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4">
                 <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-semibold text-primary">Acesso seguro</span>
+                <span className="text-xs font-semibold text-primary">{t("login.secureAccess")}</span>
               </div>
               <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
                 {t("login.welcome")}
@@ -179,7 +179,7 @@ export default function Login() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="seu@email.com"
+                    placeholder={t("common.emailPlaceholder")}
                     className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background focus:border-primary/40 transition-all"
                     required
                   />
@@ -196,12 +196,12 @@ export default function Login() {
                     className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
                     onClick={() =>
                       toast({
-                        title: "Recuperação de senha",
-                        description: "Entre em contato com o administrador do sistema.",
+                        title: t("login.passwordRecovery"),
+                        description: t("login.contactAdmin"),
                       })
                     }
                   >
-                    Esqueceu?
+                    {t("login.forgot")}
                   </button>
                 </div>
                 <div className="relative input-glow rounded-xl transition-all">
@@ -219,7 +219,7 @@ export default function Login() {
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    aria-label={showPassword ? t("login.hidePassword") : t("login.showPassword")}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -252,7 +252,7 @@ export default function Login() {
             >
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
               <span className="text-[10px] text-muted-foreground uppercase tracking-[0.25em] font-semibold">
-                ou
+                {t("login.or")}
               </span>
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
             </div>
@@ -274,7 +274,7 @@ export default function Login() {
           </div>
 
           <p className="text-center text-xs text-muted-foreground/70 mt-6 animate-fade-in">
-            © {new Date().getFullYear()} MartinsAdviser · Todos os direitos reservados
+            © {new Date().getFullYear()} MartinsAdviser · {t("common.allRightsReserved")}
           </p>
         </div>
       </div>

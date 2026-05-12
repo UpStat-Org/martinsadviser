@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useCreateTruck, useUpdateTruck, type Truck } from "@/hooks/useTrucks";
 import { useClients } from "@/hooks/useClients";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const formSchema = z.object({
   client_id: z.string().min(1, "Cliente é obrigatório"),
@@ -41,6 +42,7 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
   const createTruck = useCreateTruck();
   const updateTruck = useUpdateTruck();
   const { data: clients } = useClients();
+  const { t } = useLanguage();
   const isEditing = !!truck;
 
   const form = useForm<FormValues>({
@@ -124,7 +126,7 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
-            {isEditing ? "Editar Caminhão" : "Novo Caminhão"}
+            {isEditing ? t("trucks.edit") : t("trucks.new")}
           </DialogTitle>
         </DialogHeader>
 
@@ -135,11 +137,11 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
               name="client_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cliente *</FormLabel>
+                  <FormLabel>{t("permits.form.clientLabel")}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o cliente" />
+                        <SelectValue placeholder={t("permits.form.selectClient")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -159,8 +161,8 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
                 name="plate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Placa *</FormLabel>
-                    <FormControl><Input placeholder="ABC-1234" {...field} /></FormControl>
+                    <FormLabel>{t("trucks.plate")} *</FormLabel>
+                    <FormControl><Input placeholder={t("trucks.platePlaceholder")} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -170,8 +172,8 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
                 name="vin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>VIN</FormLabel>
-                    <FormControl><Input placeholder="VIN Number" {...field} /></FormControl>
+                    <FormLabel>{t("trucks.vin")}</FormLabel>
+                    <FormControl><Input placeholder={t("trucks.vinPlaceholder")} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -184,8 +186,8 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
                 name="year"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Ano</FormLabel>
-                    <FormControl><Input type="number" placeholder="2024" {...field} /></FormControl>
+                    <FormLabel>{t("trucks.year")}</FormLabel>
+                    <FormControl><Input type="number" placeholder={t("trucks.yearPlaceholder")} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -195,8 +197,8 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
                 name="make"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Marca</FormLabel>
-                    <FormControl><Input placeholder="Freightliner" {...field} /></FormControl>
+                    <FormLabel>{t("trucks.make")}</FormLabel>
+                    <FormControl><Input placeholder={t("trucks.makePlaceholder")} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -206,8 +208,8 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
                 name="model"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Modelo</FormLabel>
-                    <FormControl><Input placeholder="Cascadia" {...field} /></FormControl>
+                    <FormLabel>{t("trucks.model")}</FormLabel>
+                    <FormControl><Input placeholder={t("trucks.modelPlaceholder")} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -219,14 +221,14 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status</FormLabel>
+                  <FormLabel>{t("clients.status")}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="active">Ativo</SelectItem>
-                      <SelectItem value="inactive">Inativo</SelectItem>
+                      <SelectItem value="active">{t("common.active")}</SelectItem>
+                      <SelectItem value="inactive">{t("common.inactive")}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -239,17 +241,17 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Observações</FormLabel>
-                  <FormControl><Textarea rows={2} placeholder="Observações..." {...field} /></FormControl>
+                  <FormLabel>{t("clients.notes")}</FormLabel>
+                  <FormControl><Textarea rows={2} placeholder={t("common.notesPlaceholder")} {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
             <div className="flex justify-end gap-3">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Salvando..." : isEditing ? "Salvar" : "Cadastrar"}
+                {isPending ? t("common.saving") : isEditing ? t("common.save") : t("common.create")}
               </Button>
             </div>
           </form>

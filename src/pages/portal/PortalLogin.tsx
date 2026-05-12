@@ -33,7 +33,7 @@ export default function PortalLogin() {
 
       if (!portalLink) {
         await supabase.auth.signOut();
-        toast({ title: t("portal.error"), description: "No portal access found.", variant: "destructive" });
+        toast({ title: t("portal.error"), description: t("toast.portalAccessNotFound"), variant: "destructive" });
         return;
       }
 

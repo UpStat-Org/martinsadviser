@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Json } from "@/integrations/supabase/types";
+import { tNow } from "@/lib/translations";
 
 export interface SavedFilter {
   id: string;
@@ -33,7 +34,7 @@ export function useCreateSavedFilter() {
   return useMutation({
     mutationFn: async (filter: { name: string; page: string; filters: Record<string, any> }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase
         .from("saved_filters")
         .insert({ ...filter, user_id: user.id })
@@ -44,10 +45,10 @@ export function useCreateSavedFilter() {
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["saved_filters", vars.page] });
-      toast({ title: "Filtro salvo!" });
+      toast({ title: tNow("toast.filterSaved") });
     },
     onError: (e) => {
-      toast({ title: "Erro ao salvar filtro", description: e.message, variant: "destructive" });
+      toast({ title: tNow("toast.filterSaveError"), description: e.message, variant: "destructive" });
     },
   });
 }
@@ -62,10 +63,10 @@ export function useDeleteSavedFilter() {
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["saved_filters", vars.page] });
-      toast({ title: "Filtro removido!" });
+      toast({ title: tNow("toast.filterRemoved") });
     },
     onError: (e) => {
-      toast({ title: "Erro ao remover", description: e.message, variant: "destructive" });
+      toast({ title: tNow("toast.removeError"), description: e.message, variant: "destructive" });
     },
   });
 }

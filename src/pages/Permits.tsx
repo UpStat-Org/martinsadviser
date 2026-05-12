@@ -138,7 +138,7 @@ export default function Permits() {
           change_type: "renewed",
           old_values: { expiration_date: permit.expiration_date, status: permit.status },
           new_values: { expiration_date: newExpDate, status: "active" },
-          notes: `Renovação em lote — validade anterior: ${permit.expiration_date || "—"}`,
+        notes: `${t("permits.bulkRenewNote")} ${permit.expiration_date || "—"}`,
         });
         await updatePermit.mutateAsync({
           id,
@@ -152,7 +152,7 @@ export default function Permits() {
     }
     setBulkRenewing(false);
     setSelected(new Set());
-    toast({ title: `${success} permit(s) renovado(s) com sucesso!` });
+    toast({ title: t("permits.bulkRenewSuccess").replace("{count}", String(success)) });
   };
 
   const statusFilters = [
@@ -221,7 +221,7 @@ export default function Permits() {
                 className="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:shadow-lg transition-all disabled:opacity-60"
               >
                 <RefreshCw className={`w-4 h-4 ${bulkRenewing ? "animate-spin" : ""}`} />
-                Renovar {selected.size} selecionado(s)
+                {t("permits.bulkRenew").replace("{count}", String(selected.size))}
               </button>
             )}
             <button
@@ -229,7 +229,7 @@ export default function Permits() {
               className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
             >
               <Upload className="w-4 h-4" />
-              Importar
+              {t("common.import")}
             </button>
             <button
               onClick={handleNew}
@@ -246,25 +246,25 @@ export default function Permits() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
-            label: "Total de permits",
+            label: t("permits.stats.total"),
             value: stats.total,
             icon: FileCheck,
             gradient: "from-indigo-500 to-violet-500",
           },
           {
-            label: "Válidos (>30d)",
+            label: t("permits.stats.valid"),
             value: stats.active,
             icon: ShieldCheck,
             gradient: "from-emerald-500 to-teal-500",
           },
           {
-            label: "Vencendo (≤30d)",
+            label: t("permits.stats.expiring"),
             value: stats.expiring,
             icon: Clock,
             gradient: "from-amber-500 to-orange-500",
           },
           {
-            label: "Vencidos",
+            label: t("permits.stats.expired"),
             value: stats.expired,
             icon: AlertTriangle,
             gradient: "from-red-500 to-rose-500",
@@ -311,7 +311,7 @@ export default function Permits() {
         <div className="flex items-center gap-1.5 flex-wrap">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground mr-1">
             <Filter className="w-3.5 h-3.5" />
-            Status:
+            {t("clients.status")}:
           </div>
           {statusFilters.map((f) => {
             const active = statusFilter === f.value;
@@ -354,12 +354,12 @@ export default function Permits() {
               <FileCheck className="w-9 h-9 text-emerald-500" />
             </div>
             <p className="font-display text-lg font-semibold text-foreground mb-1">
-              {search ? "Nenhum permit encontrado" : t("permits.empty")}
+              {search ? t("permits.noResults") : t("permits.empty")}
             </p>
             <p className="text-sm text-muted-foreground mb-6">
               {search
-                ? "Tente ajustar a busca ou o filtro."
-                : "Cadastre o primeiro permit para começar."}
+                ? t("permits.adjustSearch")
+                : t("permits.createFirst")}
             </p>
             {!search && (
               <button
@@ -499,8 +499,8 @@ export default function Permits() {
                                 }`}
                               >
                                 {diff < 0
-                                  ? `${Math.abs(diff)}d atrasado`
-                                  : `${diff}d restantes`}
+                                  ? t("common.daysOverdue").replace("{days}", String(Math.abs(diff)))
+                                  : t("common.daysRemaining").replace("{days}", String(diff))}
                               </span>
                             )}
                           </div>
@@ -547,7 +547,7 @@ export default function Permits() {
                               );
                             }}
                             className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
-                            title="Histórico"
+                            title={t("history.title")}
                           >
                             <History className="w-3.5 h-3.5 text-muted-foreground" />
                           </button>

@@ -150,7 +150,7 @@ export default function AdminUsers() {
       toast({ title: t("admin.statusUpdated") });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("toast.error"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -167,7 +167,7 @@ export default function AdminUsers() {
       toast({ title: t("admin.roleUpdated") });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("toast.error"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -186,7 +186,7 @@ export default function AdminUsers() {
       setDeleteUserId(null);
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("toast.error"), description: error.message, variant: "destructive" });
       setDeleteUserId(null);
     },
   });
@@ -249,25 +249,29 @@ export default function AdminUsers() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
-            label: "Total",
+            label: t("admin.total"),
+            filter: "all",
             value: stats.total,
             icon: Users,
             gradient: "from-indigo-500 to-violet-500",
           },
           {
-            label: "Aprovados",
+            label: t("admin.approved"),
+            filter: "approved",
             value: stats.approved,
             icon: CheckCircle2,
             gradient: "from-emerald-500 to-teal-500",
           },
           {
-            label: "Pendentes",
+            label: t("admin.pending"),
+            filter: "pending",
             value: stats.pending,
             icon: Clock,
             gradient: "from-amber-500 to-orange-500",
           },
           {
-            label: "Rejeitados",
+            label: t("admin.rejected"),
+            filter: "rejected",
             value: stats.rejected,
             icon: XCircle,
             gradient: "from-red-500 to-rose-500",
@@ -276,15 +280,7 @@ export default function AdminUsers() {
           <button
             key={s.label}
             onClick={() =>
-              setFilterStatus(
-                s.label === "Total"
-                  ? "all"
-                  : s.label === "Aprovados"
-                  ? "approved"
-                  : s.label === "Pendentes"
-                  ? "pending"
-                  : "rejected"
-              )
+              setFilterStatus(s.filter)
             }
             className="group relative text-left overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
           >
@@ -315,7 +311,7 @@ export default function AdminUsers() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar por nome ou email..."
+            placeholder={t("admin.search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-xl"
@@ -324,10 +320,10 @@ export default function AdminUsers() {
         <div className="hidden sm:block h-8 w-px bg-border/60" />
         <div className="flex items-center gap-1.5 flex-wrap">
           {[
-            { value: "all", label: "Todos" },
-            { value: "pending", label: "Pendentes" },
-            { value: "approved", label: "Aprovados" },
-            { value: "rejected", label: "Rejeitados" },
+            { value: "all", label: t("permits.all") },
+            { value: "pending", label: t("admin.pending") },
+            { value: "approved", label: t("admin.approved") },
+            { value: "rejected", label: t("admin.rejected") },
           ].map((f) => {
             const active = filterStatus === f.value;
             return (
@@ -447,7 +443,7 @@ export default function AdminUsers() {
                           </div>
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="admin">{t("admin.roleAdmin")}</SelectItem>
                           <SelectItem value="operator">
                             {t("admin.operator")}
                           </SelectItem>

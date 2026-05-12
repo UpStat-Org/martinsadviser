@@ -168,7 +168,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
           >
             <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">{t("import.dragDrop")}</p>
-            <p className="text-xs text-muted-foreground mt-1">.xlsx, .xls, .csv</p>
+            <p className="text-xs text-muted-foreground mt-1">{t("import.fileTypes")}</p>
             <input id="import-file-input" type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleInput} />
           </div>
         )}

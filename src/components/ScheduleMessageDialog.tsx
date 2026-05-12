@@ -85,7 +85,7 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
           try {
             await supabase.functions.invoke("send-emails");
           } catch {
-            toast({ title: t("messages.sendError") || "Mensagem agendada, mas o envio imediato falhou. Será reenviada automaticamente.", variant: "destructive" });
+            toast({ title: t("messages.immediateSendFailed"), variant: "destructive" });
           }
         }
         onOpenChange(false);
@@ -124,7 +124,7 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
           </div>
 
           <div className="space-y-2">
-            <Label>Template</Label>
+            <Label>{t("messages.template")}</Label>
             <Select value={templateId} onValueChange={handleTemplateChange}>
               <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
               <SelectContent>
@@ -141,9 +141,9 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
             <Select value={channel} onValueChange={setChannel}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="sms">SMS</SelectItem>
-                <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                <SelectItem value="email">{t("channel.email")}</SelectItem>
+                <SelectItem value="sms">{t("channel.sms")}</SelectItem>
+                <SelectItem value="whatsapp">{t("channel.whatsapp")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -186,7 +186,7 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
                 </Popover>
               </div>
               <div className="space-y-2">
-                <Label>{t("common.time") || "Hora"}</Label>
+                <Label>{t("common.time")}</Label>
                 <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
               </div>
             </div>

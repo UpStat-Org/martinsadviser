@@ -20,7 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock, UserPlus, Sparkles, PenLine, Map, FileDown, MessageSquare } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock, UserPlus, Sparkles, PenLine, Map, FileDown, MessageSquare, Wand2 } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CommentsSection } from "@/components/CommentsSection";
 import { InternalNotesSection } from "@/components/InternalNotesSection";
 import { AIChatPanel } from "@/components/AIChatPanel";
+import { ComplianceAutopilotDialog } from "@/components/ComplianceAutopilotDialog";
 import { Lock } from "lucide-react";
 import { useClientMessages, useRetryMessage } from "@/hooks/useMessages";
 import { useInvoices } from "@/hooks/useInvoices";
@@ -76,13 +77,13 @@ export default function ClientDetail() {
       return new Date(p.expiration_date) > new Date();
     });
     const score = permits.length > 0 ? Math.round((validPermits.length / permits.length) * 100) : 0;
-    const healthLabel = score >= 80 ? "Saudável" : score >= 50 ? "Atenção" : "Crítico";
+    const healthLabel = score >= 80 ? t("compliance.healthy") : score >= 50 ? t("compliance.warning") : t("compliance.critical");
     const healthColor = score >= 80 ? "#16a34a" : score >= 50 ? "#d97706" : "#dc2626";
 
     const rows = permits.map((p) => {
       const exp = p.expiration_date ? new Date(p.expiration_date) : null;
       const diff = exp ? Math.ceil((exp.getTime() - Date.now()) / 86400000) : null;
-      const status = !exp ? "Sem data" : diff! < 0 ? "Vencido" : diff! <= 30 ? `${diff}d restantes` : diff! <= 90 ? `${diff}d restantes` : "Válido";
+      const status = !exp ? t("compliance.noDate") : diff! < 0 ? t("common.expired") : diff! <= 30 ? t("common.daysRemaining").replace("{days}", String(diff)) : diff! <= 90 ? t("common.daysRemaining").replace("{days}", String(diff)) : t("common.valid");
       return `<tr>
         <td>${escapeHtml(p.permit_type)}</td>
         <td>${escapeHtml(p.permit_number || "—")}</td>
@@ -92,7 +93,7 @@ export default function ClientDetail() {
       </tr>`;
     }).join("");
 
-    const html = `<!DOCTYPE html><html><head><title>Compliance Report - ${escapeHtml(client.company_name)}</title>
+    const html = `<!DOCTYPE html><html><head><title>${escapeHtml(t("compliance.report"))} - ${escapeHtml(client.company_name)}</title>
       <style>
         body{font-family:Arial,sans-serif;margin:40px;color:#1a1a1a}
         h1{font-size:22px;margin-bottom:4px}
@@ -107,7 +108,7 @@ export default function ClientDetail() {
         .info span{color:#666}
         .footer{margin-top:24px;font-size:10px;color:#999;text-align:right}
       </style></head><body>
-      <h1>Relatório de Compliance</h1>
+      <h1>${escapeHtml(t("compliance.report"))}</h1>
       <div class="meta">${escapeHtml(client.company_name)} — ${new Date().toLocaleDateString()}</div>
       <div class="info">
         ${client.dot ? `<div><span>DOT:</span> ${escapeHtml(client.dot)}</div>` : ""}
@@ -115,12 +116,12 @@ export default function ClientDetail() {
         ${client.ein ? `<div><span>EIN:</span> ${escapeHtml(client.ein)}</div>` : ""}
       </div>
       <div class="score-box"><div class="number">${score}%</div><div class="label">${healthLabel}</div></div>
-      <p style="font-size:13px;color:#666">${validPermits.length} de ${permits.length} permits em dia</p>
+      <p style="font-size:13px;color:#666">${escapeHtml(t("compliance.upToDateCount").replace("{valid}", String(validPermits.length)).replace("{total}", String(permits.length)))}</p>
       <table>
-        <thead><tr><th>Tipo</th><th>Número</th><th>Estado</th><th>Validade</th><th>Status</th></tr></thead>
+        <thead><tr><th>${escapeHtml(t("common.type"))}</th><th>${escapeHtml(t("common.number"))}</th><th>${escapeHtml(t("common.state"))}</th><th>${escapeHtml(t("common.expiration"))}</th><th>${escapeHtml(t("clients.status"))}</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
-      <div class="footer">MartinsAdviser — Compliance Report</div>
+      <div class="footer">MartinsAdviser — ${escapeHtml(t("compliance.reportFooter"))}</div>
     </body></html>`;
 
     const win = window.open("", "_blank");
@@ -148,6 +149,7 @@ export default function ClientDetail() {
   const [viewDocTitle, setViewDocTitle] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
   const [signatureOpen, setSignatureOpen] = useState(false);
+  const [autopilotOpen, setAutopilotOpen] = useState(false);
   const [aiReport, setAiReport] = useState<string | null>(null);
   const [aiReportOpen, setAiReportOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -291,6 +293,15 @@ export default function ClientDetail() {
             </div>
 
             <div className="flex flex-wrap gap-2">
+              {!isViewer && (
+                <button
+                  onClick={() => setAutopilotOpen(true)}
+                  className="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-500 text-[#06131f] text-sm font-bold inline-flex items-center gap-1.5 hover:shadow-xl transition-all shadow-lg"
+                >
+                  <Wand2 className="w-4 h-4" />
+                  {t("autopilot.run")}
+                </button>
+              )}
               <button
                 onClick={handleGenerateReport}
                 disabled={aiLoading}
@@ -352,10 +363,10 @@ export default function ClientDetail() {
           {/* Quick metric pills */}
           <div className="relative mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: "Permits", value: permits?.length ?? 0, icon: FileCheck, tint: "from-emerald-400 to-teal-400" },
-              { label: "Trucks", value: trucks?.length ?? 0, icon: TruckIcon, tint: "from-sky-400 to-blue-400" },
-              { label: "Compliance", value: `${complianceScore}%`, icon: Sparkles, tint: "from-fuchsia-400 to-pink-400" },
-              { label: "Faturado", value: currency(financeSummary.total), icon: DollarSign, tint: "from-amber-400 to-orange-400" },
+              { label: t("permits.title"), value: permits?.length ?? 0, icon: FileCheck, tint: "from-emerald-400 to-teal-400" },
+              { label: t("trucks.title"), value: trucks?.length ?? 0, icon: TruckIcon, tint: "from-sky-400 to-blue-400" },
+              { label: t("compliance.title"), value: `${complianceScore}%`, icon: Sparkles, tint: "from-fuchsia-400 to-pink-400" },
+              { label: t("clientDetail.totalBilled"), value: currency(financeSummary.total), icon: DollarSign, tint: "from-amber-400 to-orange-400" },
             ].map((m) => (
               <div
                 key={m.label}
@@ -571,7 +582,7 @@ export default function ClientDetail() {
               ) : (
                 <Table>
                   <TableHeader><TableRow>
-                    <TableHead>{t("trucks.plate")}</TableHead><TableHead>{t("trucks.makeModel")}</TableHead><TableHead>{t("trucks.year")}</TableHead><TableHead>VIN</TableHead><TableHead>{t("clients.status")}</TableHead><TableHead className="w-24">{t("common.actions")}</TableHead>
+                    <TableHead>{t("trucks.plate")}</TableHead><TableHead>{t("trucks.makeModel")}</TableHead><TableHead>{t("trucks.year")}</TableHead><TableHead>{t("trucks.vin")}</TableHead><TableHead>{t("clients.status")}</TableHead><TableHead className="w-24">{t("common.actions")}</TableHead>
                   </TableRow></TableHeader>
                   <TableBody>
                     {trucks.map((truck) => (
@@ -764,6 +775,15 @@ export default function ClientDetail() {
       )}
       <InvitePortalDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={client.id} clientName={client.company_name} />
       <SignatureDialog open={signatureOpen} onOpenChange={setSignatureOpen} clientId={client.id} />
+      <ComplianceAutopilotDialog
+        open={autopilotOpen}
+        onOpenChange={setAutopilotOpen}
+        client={client}
+        permits={permits}
+        trucks={trucks}
+        invoices={clientInvoices}
+        messages={clientMessages}
+      />
 
       {/* AI Report Dialog */}
       <Dialog open={aiReportOpen} onOpenChange={setAiReportOpen}>

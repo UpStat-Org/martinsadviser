@@ -10,6 +10,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const typeConfig: Record<
   string,
@@ -45,6 +46,7 @@ export function NotificationCenter() {
   const { data: notifications, unreadCount, isLoading } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
+  const { t } = useLanguage();
 
   return (
     <Popover>
@@ -66,7 +68,7 @@ export function NotificationCenter() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-70" />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-gradient-to-br from-destructive to-rose-500 ring-2 ring-background" />
               </span>
-              <span className="sr-only">{unreadCount} não lidas</span>
+              <span className="sr-only">{t("notifications.unreadCount").replace("{count}", String(unreadCount))}</span>
             </>
           )}
         </Button>
@@ -85,11 +87,11 @@ export function NotificationCenter() {
                 <Bell className="h-4 w-4 text-white" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">Notificações</h3>
+                <h3 className="text-sm font-bold text-white">{t("notifications.title")}</h3>
                 <p className="text-[11px] text-white/70">
                   {unreadCount > 0
-                    ? `${unreadCount} não ${unreadCount === 1 ? "lida" : "lidas"}`
-                    : "Você está em dia"}
+                    ? t(unreadCount === 1 ? "notifications.unreadOne" : "notifications.unreadMany").replace("{count}", String(unreadCount))
+                    : t("notifications.allCaughtUp")}
                 </p>
               </div>
             </div>
@@ -101,7 +103,7 @@ export function NotificationCenter() {
                 onClick={() => markAllRead.mutate()}
               >
                 <CheckCheck className="mr-1 h-3.5 w-3.5" />
-                Marcar todas
+                {t("notifications.markAll")}
               </Button>
             )}
           </div>
@@ -125,9 +127,9 @@ export function NotificationCenter() {
               <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
                 <Sparkles className="h-7 w-7 text-emerald-500" />
               </div>
-              <p className="text-sm font-semibold text-foreground mb-1">Tudo em dia! 🎉</p>
+              <p className="text-sm font-semibold text-foreground mb-1">{t("notifications.emptyTitle")}</p>
               <p className="text-xs text-muted-foreground max-w-[240px] mx-auto">
-                Você não tem nenhuma notificação pendente. Volte mais tarde para novidades.
+                {t("notifications.emptyDesc")}
               </p>
             </div>
           ) : (
@@ -169,7 +171,7 @@ export function NotificationCenter() {
                         </span>
                         {!n.read && (
                           <span className="mt-1 flex-shrink-0 inline-flex items-center px-1.5 h-4 rounded-full text-[9px] font-bold uppercase tracking-wider bg-primary text-primary-foreground">
-                            Nova
+                            {t("notifications.new")}
                           </span>
                         )}
                       </div>
@@ -201,10 +203,10 @@ export function NotificationCenter() {
           <div className="border-t border-border/60 px-4 py-2.5 bg-muted/30 flex items-center justify-between">
             <span className="text-[11px] text-muted-foreground flex items-center gap-1.5">
               <BellOff className="w-3 h-3" />
-              Sincronizado agora
+              {t("notifications.syncedNow")}
             </span>
             <span className="text-[11px] font-semibold text-muted-foreground">
-              {notifications.length} {notifications.length === 1 ? "item" : "itens"}
+              {notifications.length} {t(notifications.length === 1 ? "common.item" : "common.items")}
             </span>
           </div>
         )}

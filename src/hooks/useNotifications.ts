@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
+import { tNow } from "@/lib/translations";
 
 export interface Notification {
   id: string;
@@ -71,7 +72,7 @@ export function useMarkAllNotificationsRead() {
   return useMutation({
     mutationFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { error } = await supabase
         .from("notifications")
         .update({ read: true } as any)

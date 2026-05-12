@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useSavedFilters, useCreateSavedFilter, useDeleteSavedFilter } from "@/hooks/useSavedFilters";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SavedFiltersBarProps {
   page: string;
@@ -16,6 +17,7 @@ export function SavedFiltersBar({ page, currentFilters, onApply }: SavedFiltersB
   const { data: filters } = useSavedFilters(page);
   const createFilter = useCreateSavedFilter();
   const deleteFilter = useDeleteSavedFilter();
+  const { t } = useLanguage();
   const [name, setName] = useState("");
   const [popoverOpen, setPopoverOpen] = useState(false);
 
@@ -65,13 +67,13 @@ export function SavedFiltersBar({ page, currentFilters, onApply }: SavedFiltersB
           <PopoverTrigger asChild>
             <Button variant="ghost" size="sm" className="h-7 text-xs gap-1">
               <Plus className="w-3 h-3" />
-              Salvar filtro
+              {t("filters.saveFilter")}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-3" align="start">
             <div className="space-y-2">
               <Input
-                placeholder="Nome do filtro"
+                placeholder={t("filters.namePlaceholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSave()}
@@ -86,7 +88,7 @@ export function SavedFiltersBar({ page, currentFilters, onApply }: SavedFiltersB
                 {createFilter.isPending ? (
                   <Loader2 className="w-3 h-3 animate-spin mr-1" />
                 ) : null}
-                Salvar
+                {t("common.save")}
               </Button>
             </div>
           </PopoverContent>

@@ -56,11 +56,11 @@ export function InvitePortalDialog({ open, onOpenChange, clientId, clientName }:
         <form onSubmit={handleInvite} className="space-y-4">
           <div className="space-y-2">
             <Label>{t("portal.inviteEmail")}</Label>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="cliente@empresa.com" />
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder={t("common.emailPlaceholder")} />
           </div>
           <div className="space-y-2">
             <Label>{t("portal.invitePassword")}</Label>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} placeholder="Min. 6 caracteres" />
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} placeholder={t("common.passwordMinPlaceholder")} />
           </div>
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>

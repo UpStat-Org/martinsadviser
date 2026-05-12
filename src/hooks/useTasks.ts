@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { tNow } from "@/lib/translations";
 
 export interface Task {
   id: string;
@@ -39,12 +40,12 @@ export function useCreateTask() {
   return useMutation({
     mutationFn: async (task: { name: string; task_type?: string; client_id?: string; operator?: string; tags?: string[]; notes?: string; status?: string; due_date?: string; priority?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { error } = await supabase.from("tasks").insert({ ...task, user_id: user.id } as any);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tasks"] }); toast({ title: "Tarefa criada" }); },
-    onError: (e: any) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tasks"] }); toast({ title: tNow("toast.taskCreated") }); },
+    onError: (e: any) => toast({ title: tNow("toast.error"), description: e.message, variant: "destructive" }),
   });
 }
 
@@ -67,6 +68,6 @@ export function useDeleteTask() {
       const { error } = await supabase.from("tasks").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tasks"] }); toast({ title: "Tarefa removida" }); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tasks"] }); toast({ title: tNow("toast.taskRemoved") }); },
   });
 }

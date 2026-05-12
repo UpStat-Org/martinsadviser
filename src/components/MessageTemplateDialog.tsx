@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateTemplate, useUpdateTemplate, type MessageTemplate } from "@/hooks/useMessages";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   open: boolean;
@@ -22,6 +23,7 @@ export default function MessageTemplateDialog({ open, onOpenChange, template }: 
   const create = useCreateTemplate();
   const update = useUpdateTemplate();
   const isEdit = !!template;
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (template) {
@@ -49,33 +51,33 @@ export default function MessageTemplateDialog({ open, onOpenChange, template }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Editar Template" : "Novo Template"}</DialogTitle>
+          <DialogTitle>{isEdit ? t("messages.template.edit") : t("messages.template.new")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Nome</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Aviso de vencimento" />
+            <Label>{t("common.name")}</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("messages.template.namePlaceholder")} />
           </div>
           <div className="space-y-2">
-            <Label>Canal</Label>
+            <Label>{t("messages.channel")}</Label>
             <Select value={channel} onValueChange={setChannel}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="sms">SMS</SelectItem>
-                <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                <SelectItem value="email">{t("channel.email")}</SelectItem>
+                <SelectItem value="sms">{t("channel.sms")}</SelectItem>
+                <SelectItem value="whatsapp">{t("channel.whatsapp")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           {channel === "email" && (
             <div className="space-y-2">
-              <Label>Assunto</Label>
-              <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Assunto do email" />
+              <Label>{t("messages.subject")}</Label>
+              <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder={t("messages.subjectPlaceholder")} />
             </div>
           )}
           <div className="space-y-2">
-            <Label>Corpo da mensagem</Label>
-            <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={5} placeholder="Use placeholders como {company_name}..." />
+            <Label>{t("messages.body")}</Label>
+            <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={5} placeholder={t("messages.bodyPlaceholder")} />
             <div className="flex flex-wrap gap-1">
               {placeholders.map((p) => (
                 <Button key={p} type="button" variant="outline" size="sm" className="text-xs h-6"
@@ -87,9 +89,9 @@ export default function MessageTemplateDialog({ open, onOpenChange, template }: 
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
           <Button onClick={handleSubmit} disabled={!name || !body || create.isPending || update.isPending}>
-            {isEdit ? "Salvar" : "Criar"}
+            {isEdit ? t("common.save") : t("common.create")}
           </Button>
         </DialogFooter>
       </DialogContent>

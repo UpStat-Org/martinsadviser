@@ -72,28 +72,28 @@ export default function MyDeskPage() {
       value: stats.overduePermits,
       icon: AlertTriangle,
       gradient: "from-red-500 to-rose-500",
-      desc: "Ação imediata",
+      desc: t("mydesk.immediateAction"),
     },
     {
       label: t("mydesk.expiring7d"),
       value: stats.next7,
       icon: Clock,
       gradient: "from-amber-500 to-orange-500",
-      desc: "Próximos 7 dias",
+      desc: t("calendar.next7"),
     },
     {
       label: t("mydesk.tasksToday"),
       value: stats.dueToday,
       icon: ClipboardList,
       gradient: "from-indigo-500 to-violet-500",
-      desc: "Para hoje",
+      desc: t("kanban.stats.today"),
     },
     {
       label: t("mydesk.failedMessages"),
       value: stats.failedMsgs,
       icon: Mail,
       gradient: "from-fuchsia-500 to-pink-500",
-      desc: "Requer reenvio",
+      desc: t("mydesk.requiresRetry"),
     },
   ];
 

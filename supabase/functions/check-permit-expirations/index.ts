@@ -6,17 +6,51 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+function computeTargetDate(daysBefore: number): string {
+  // Trabalha em UTC+0 de forma explícita para bater com DATE armazenado no banco.
+  // expiration_date é DATE (sem hora) — comparamos YYYY-MM-DD em UTC.
+  const now = new Date();
+  const target = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() + daysBefore,
+  ));
+  return target.toISOString().slice(0, 10);
+}
+
+function makeReplacer(client: Record<string, unknown>, permit: Record<string, unknown>, daysBefore: number) {
+  const map: Record<string, string> = {
+    "{company_name}": String(client?.company_name ?? ""),
+    "{dot}": String(client?.dot ?? ""),
+    "{mc}": String(client?.mc ?? ""),
+    "{ein}": String(client?.ein ?? ""),
+    "{email}": String(client?.email ?? ""),
+    "{phone}": String(client?.phone ?? ""),
+    "{permit_type}": String(permit?.permit_type ?? ""),
+    "{permit_number}": String(permit?.permit_number ?? ""),
+    "{expiration_date}": String(permit?.expiration_date ?? ""),
+    "{state}": String(permit?.state ?? ""),
+    "{days_before}": String(daysBefore),
+  };
+  return (text: string) =>
+    text.replace(/\{[a-z_]+\}/g, (m) => (m in map ? map[m] : m));
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, serviceRoleKey);
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Get all enabled automation rules
+  const runId = crypto.randomUUID();
+  const log = (level: "info" | "warn" | "error", msg: string, extra?: unknown) => {
+    console.log(JSON.stringify({ runId, level, msg, extra, ts: new Date().toISOString() }));
+  };
+
+  try {
     const { data: rules, error: rulesErr } = await supabase
       .from("automation_rules")
       .select("*")
@@ -24,20 +58,18 @@ Deno.serve(async (req) => {
 
     if (rulesErr) throw rulesErr;
     if (!rules?.length) {
-      return new Response(JSON.stringify({ message: "No active rules", created: 0 }), {
+      return new Response(JSON.stringify({ runId, message: "No active rules", created: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     let totalCreated = 0;
+    let totalSkipped = 0;
+    let totalErrors = 0;
 
     for (const rule of rules) {
-      const today = new Date();
-      const targetDate = new Date(today);
-      targetDate.setDate(today.getDate() + rule.days_before);
-      const targetStr = targetDate.toISOString().split("T")[0];
+      const targetStr = computeTargetDate(rule.days_before);
 
-      // Find permits expiring on exactly that date for this user's clients
       const { data: permits, error: permitsErr } = await supabase
         .from("permits")
         .select("*, clients(company_name, dot, mc, ein, email, phone)")
@@ -46,42 +78,35 @@ Deno.serve(async (req) => {
         .eq("expiration_date", targetStr);
 
       if (permitsErr) {
-        console.error("Error fetching permits for rule", rule.id, permitsErr);
+        log("error", "fetch_permits_failed", { ruleId: rule.id, error: permitsErr.message });
+        totalErrors++;
         continue;
       }
       if (!permits?.length) continue;
 
       for (const permit of permits) {
-        // Check if we already created a message for this rule+permit
-        const { data: existing } = await supabase
+        // DEDUPE-FIRST: insere automation_log antes da mensagem.
+        // UNIQUE(rule_id, permit_id) garante idempotência mesmo em execução concorrente.
+        const { error: logErr } = await supabase
           .from("automation_log")
-          .select("id")
-          .eq("rule_id", rule.id)
-          .eq("permit_id", permit.id)
-          .maybeSingle();
+          .insert({ rule_id: rule.id, permit_id: permit.id });
 
-        if (existing) continue;
+        if (logErr) {
+          // 23505 = unique_violation → já processado, pular silenciosamente.
+          if ((logErr as { code?: string }).code === "23505") {
+            totalSkipped++;
+            continue;
+          }
+          log("error", "automation_log_insert_failed", { ruleId: rule.id, permitId: permit.id, error: logErr.message });
+          totalErrors++;
+          continue;
+        }
 
-        const client = permit.clients as any;
-        // Replace placeholders in body and subject
-        const replacePlaceholders = (text: string) =>
-          text
-            .replace(/\{company_name\}/g, client?.company_name || "")
-            .replace(/\{dot\}/g, client?.dot || "")
-            .replace(/\{mc\}/g, client?.mc || "")
-            .replace(/\{ein\}/g, client?.ein || "")
-            .replace(/\{email\}/g, client?.email || "")
-            .replace(/\{phone\}/g, client?.phone || "")
-            .replace(/\{permit_type\}/g, permit.permit_type || "")
-            .replace(/\{permit_number\}/g, permit.permit_number || "")
-            .replace(/\{expiration_date\}/g, permit.expiration_date || "")
-            .replace(/\{state\}/g, permit.state || "")
-            .replace(/\{days_before\}/g, String(rule.days_before));
+        const client = permit.clients as Record<string, unknown> | null;
+        const replace = makeReplacer(client ?? {}, permit, rule.days_before);
+        const body = replace(rule.body);
+        const subject = rule.subject ? replace(rule.subject) : null;
 
-        const body = replacePlaceholders(rule.body);
-        const subject = rule.subject ? replacePlaceholders(rule.subject) : null;
-
-        // Create scheduled message for now (immediate send queue)
         const { error: insertErr } = await supabase
           .from("scheduled_messages")
           .insert({
@@ -96,30 +121,34 @@ Deno.serve(async (req) => {
           });
 
         if (insertErr) {
-          console.error("Error creating message", insertErr);
+          // Reverte o automation_log para permitir retry no próximo tick.
+          await supabase
+            .from("automation_log")
+            .delete()
+            .eq("rule_id", rule.id)
+            .eq("permit_id", permit.id);
+          log("error", "scheduled_message_insert_failed", { ruleId: rule.id, permitId: permit.id, error: insertErr.message });
+          totalErrors++;
           continue;
         }
 
-        // Log to avoid duplicates
-        await supabase
-          .from("automation_log")
-          .insert({ rule_id: rule.id, permit_id: permit.id });
-
-        // Create renewal task in Kanban
-        const taskName = `Renovar ${permit.permit_type} - ${client?.company_name || ""}`;
+        // Cria tarefa no Kanban se ainda não existir.
+        const taskName = `Renovar ${permit.permit_type} - ${client?.company_name ?? ""}`;
         const priority = rule.days_before <= 15 ? "high" : rule.days_before <= 30 ? "medium" : "low";
 
-        // Check if task already exists for this permit
-        const { data: existingTask } = await supabase
+        const { data: existingTask, error: taskLookupErr } = await supabase
           .from("tasks")
           .select("id")
+          .eq("user_id", rule.user_id)
           .eq("client_id", permit.client_id)
-          .ilike("name", `%Renovar ${permit.permit_type}%`)
+          .eq("task_type", permit.permit_type)
           .in("status", ["not_started", "waiting", "in_progress"])
           .maybeSingle();
 
-        if (!existingTask) {
-          await supabase.from("tasks").insert({
+        if (taskLookupErr) {
+          log("warn", "task_lookup_failed", { permitId: permit.id, error: taskLookupErr.message });
+        } else if (!existingTask) {
+          const { error: taskErr } = await supabase.from("tasks").insert({
             user_id: rule.user_id,
             client_id: permit.client_id,
             name: taskName,
@@ -129,34 +158,42 @@ Deno.serve(async (req) => {
             due_date: permit.expiration_date,
             notes: `[Auto] Task criada automaticamente. Permit #${permit.permit_number || "—"} vence em ${permit.expiration_date}.`,
           });
+          if (taskErr) {
+            log("warn", "task_insert_failed", { permitId: permit.id, error: taskErr.message });
+          }
         }
 
         totalCreated++;
       }
     }
 
-    // Trigger send-emails function after creating messages
     if (totalCreated > 0) {
       try {
-        await fetch(`${supabaseUrl}/functions/v1/send-emails`, {
+        const r = await fetch(`${supabaseUrl}/functions/v1/send-emails`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${serviceRoleKey}`,
           },
+          body: "{}",
         });
+        if (!r.ok) {
+          log("warn", "send_emails_trigger_non_2xx", { status: r.status });
+        }
       } catch (e) {
-        console.error("Error triggering send-emails:", e);
+        log("warn", "send_emails_trigger_failed", { error: (e as Error).message });
       }
     }
 
+    log("info", "run_complete", { created: totalCreated, skipped: totalSkipped, errors: totalErrors });
+
     return new Response(
-      JSON.stringify({ message: "Done", created: totalCreated }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ runId, message: "Done", created: totalCreated, skipped: totalSkipped, errors: totalErrors }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(JSON.stringify({ error: (error as Error).message }), {
+    log("error", "run_failed", { error: (error as Error).message });
+    return new Response(JSON.stringify({ runId, error: (error as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

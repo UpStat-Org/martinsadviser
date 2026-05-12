@@ -68,7 +68,7 @@ export function SignatureDialog({ open, onOpenChange, clientId, permitId }: Sign
     try {
       const signatureData = canvas.toDataURL("image/png");
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(t("toast.authRequired"));
 
       const { error } = await supabase.from("document_signatures").insert({
         user_id: user.id,
@@ -105,11 +105,11 @@ export function SignatureDialog({ open, onOpenChange, clientId, permitId }: Sign
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>{t("signature.signerName")}</Label>
-              <Input value={signerName} onChange={(e) => setSignerName(e.target.value)} placeholder="John Doe" />
+              <Input value={signerName} onChange={(e) => setSignerName(e.target.value)} placeholder={t("signature.signerNamePlaceholder")} />
             </div>
             <div>
               <Label>{t("signature.signerEmail")}</Label>
-              <Input value={signerEmail} onChange={(e) => setSignerEmail(e.target.value)} placeholder="john@email.com" type="email" />
+              <Input value={signerEmail} onChange={(e) => setSignerEmail(e.target.value)} placeholder={t("common.emailPlaceholder")} type="email" />
             </div>
           </div>
           <div>

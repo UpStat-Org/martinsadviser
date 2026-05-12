@@ -10,6 +10,7 @@ import { useCreateAutomationRule, useUpdateAutomationRule } from "@/hooks/useAut
 import type { AutomationRule } from "@/hooks/useAutomationRules";
 import { useMessageTemplates } from "@/hooks/useMessages";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   open: boolean;
@@ -36,6 +37,7 @@ export default function AutomationRuleDialog({ open, onOpenChange, rule }: Props
   const { data: templates } = useMessageTemplates();
   const createRule = useCreateAutomationRule();
   const updateRule = useUpdateAutomationRule();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (rule) {
@@ -93,45 +95,45 @@ export default function AutomationRuleDialog({ open, onOpenChange, rule }: Props
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{rule ? "Editar Automação" : "Nova Automação de Vencimento"}</DialogTitle>
+          <DialogTitle>{rule ? t("messages.automation.edit") : t("messages.automation.newExpiration")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label>Nome da regra</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Alerta 30 dias - Email" />
+            <Label>{t("messages.automation.ruleName")}</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("messages.automation.ruleNamePlaceholder")} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Dias antes do vencimento</Label>
+              <Label>{t("messages.daysBeforeExpiration")}</Label>
               <Select value={String(daysBefore)} onValueChange={(v) => setDaysBefore(Number(v))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {DAYS_OPTIONS.map((d) => (
-                    <SelectItem key={d} value={String(d)}>{d} dias</SelectItem>
+                    <SelectItem key={d} value={String(d)}>{d} {t("common.days")}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Canal</Label>
+              <Label>{t("messages.channel")}</Label>
               <Select value={channel} onValueChange={setChannel}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="email">Email</SelectItem>
-                  <SelectItem value="sms">SMS</SelectItem>
-                  <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                  <SelectItem value="email">{t("channel.email")}</SelectItem>
+                  <SelectItem value="sms">{t("channel.sms")}</SelectItem>
+                  <SelectItem value="whatsapp">{t("channel.whatsapp")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div>
-            <Label>Template (opcional)</Label>
+            <Label>{t("messages.template.optional")}</Label>
             <Select value={templateId || "none"} onValueChange={handleTemplateSelect}>
-              <SelectTrigger><SelectValue placeholder="Nenhum" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={t("common.none")} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Nenhum</SelectItem>
+                <SelectItem value="none">{t("common.none")}</SelectItem>
                 {templates?.map((t) => (
                   <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
                 ))}
@@ -141,13 +143,13 @@ export default function AutomationRuleDialog({ open, onOpenChange, rule }: Props
 
           {channel === "email" && (
             <div>
-              <Label>Assunto</Label>
-              <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Assunto do email" />
+              <Label>{t("messages.subject")}</Label>
+              <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder={t("messages.subjectPlaceholder")} />
             </div>
           )}
 
           <div>
-            <Label>Corpo da mensagem</Label>
+            <Label>{t("messages.body")}</Label>
             <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={5} />
             <div className="flex flex-wrap gap-1 mt-2">
               {PLACEHOLDERS.map((p) => (
@@ -161,13 +163,13 @@ export default function AutomationRuleDialog({ open, onOpenChange, rule }: Props
 
           <div className="flex items-center gap-2">
             <Switch checked={enabled} onCheckedChange={setEnabled} />
-            <Label>Ativa</Label>
+            <Label>{t("common.enabled")}</Label>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
           <Button onClick={handleSave} disabled={!name.trim() || !body.trim()}>
-            {rule ? "Salvar" : "Criar Automação"}
+            {rule ? t("common.save") : t("messages.createAutomation")}
           </Button>
         </DialogFooter>
       </DialogContent>

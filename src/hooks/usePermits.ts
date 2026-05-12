@@ -6,6 +6,7 @@ import type {
   TablesUpdate,
 } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
+import { tNow } from "@/lib/translations";
 
 export type Permit = Tables<"permits">;
 export type PermitInsert = TablesInsert<"permits">;
@@ -66,7 +67,7 @@ export function useCreatePermit() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase
         .from("permits")
         .insert({ ...permit, user_id: user.id })
@@ -77,11 +78,11 @@ export function useCreatePermit() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["permits"] });
-      toast({ title: "Permit cadastrado com sucesso!" });
+      toast({ title: tNow("toast.permitCreated") });
     },
     onError: (error) => {
       toast({
-        title: "Erro ao cadastrar permit",
+        title: tNow("toast.createError"),
         description: error.message,
         variant: "destructive",
       });
@@ -106,11 +107,11 @@ export function useUpdatePermit() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["permits"] });
-      toast({ title: "Permit atualizado!" });
+      toast({ title: tNow("toast.permitUpdated") });
     },
     onError: (error) => {
       toast({
-        title: "Erro ao atualizar",
+        title: tNow("toast.updateError"),
         description: error.message,
         variant: "destructive",
       });
@@ -129,11 +130,11 @@ export function useDeletePermit() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["permits"] });
-      toast({ title: "Permit removido!" });
+      toast({ title: tNow("toast.permitRemoved") });
     },
     onError: (error) => {
       toast({
-        title: "Erro ao remover",
+        title: tNow("toast.removeError"),
         description: error.message,
         variant: "destructive",
       });
@@ -143,7 +144,7 @@ export function useDeletePermit() {
 
 export function getExpirationStatus(expirationDate: string | null) {
   if (!expirationDate)
-    return { label: "Sem data", color: "bg-muted text-muted-foreground" };
+    return { label: tNow("compliance.noDate"), color: "bg-muted text-muted-foreground" };
   const now = new Date();
   const exp = new Date(expirationDate);
   const diffDays = Math.ceil(
@@ -152,23 +153,23 @@ export function getExpirationStatus(expirationDate: string | null) {
 
   if (diffDays < 0)
     return {
-      label: "Vencido",
+      label: tNow("common.expired"),
       color: "bg-destructive text-destructive-foreground",
     };
   if (diffDays <= 30)
     return {
-      label: `${diffDays}d restantes`,
+      label: tNow("common.daysRemaining").replace("{days}", String(diffDays)),
       color: "bg-destructive text-destructive-foreground",
     };
   if (diffDays <= 60)
     return {
-      label: `${diffDays}d restantes`,
+      label: tNow("common.daysRemaining").replace("{days}", String(diffDays)),
       color: "bg-warning text-warning-foreground",
     };
   if (diffDays <= 90)
     return {
-      label: `${diffDays}d restantes`,
+      label: tNow("common.daysRemaining").replace("{days}", String(diffDays)),
       color: "bg-warning text-warning-foreground",
     };
-  return { label: "Válido", color: "bg-success text-success-foreground" };
+  return { label: tNow("common.valid"), color: "bg-success text-success-foreground" };
 }

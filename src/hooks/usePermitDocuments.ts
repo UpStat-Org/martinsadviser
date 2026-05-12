@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { tNow } from "@/lib/translations";
 
 export interface PermitDocument {
   id: string;
@@ -92,10 +93,10 @@ export function useAddPermitDocument() {
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["permit_documents", vars.permitId] });
       qc.invalidateQueries({ queryKey: ["permits"] });
-      toast({ title: "Documento adicionado!" });
+      toast({ title: tNow("toast.documentAdded") });
     },
     onError: (e) => {
-      toast({ title: "Erro ao adicionar documento", description: e.message, variant: "destructive" });
+      toast({ title: tNow("toast.documentAddError"), description: e.message, variant: "destructive" });
     },
   });
 }
@@ -115,10 +116,10 @@ export function useDeletePermitDocument() {
     },
     onSuccess: (permitId) => {
       qc.invalidateQueries({ queryKey: ["permit_documents", permitId] });
-      toast({ title: "Versão removida!" });
+      toast({ title: tNow("toast.versionRemoved") });
     },
     onError: (e) => {
-      toast({ title: "Erro ao remover", description: e.message, variant: "destructive" });
+      toast({ title: tNow("toast.removeError"), description: e.message, variant: "destructive" });
     },
   });
 }

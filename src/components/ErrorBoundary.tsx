@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { tNow } from "@/lib/translations";
 
 interface Props {
   children: ReactNode;
@@ -28,9 +29,9 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
               <AlertTriangle className="w-8 h-8 text-destructive" />
             </div>
-            <h2 className="font-display text-xl font-bold text-foreground">Algo deu errado</h2>
+            <h2 className="font-display text-xl font-bold text-foreground">{tNow("errorBoundary.title")}</h2>
             <p className="text-sm text-muted-foreground">
-              Ocorreu um erro inesperado. Tente recarregar a página.
+              {tNow("errorBoundary.description")}
             </p>
             {this.state.error && (
               <p className="text-xs text-muted-foreground font-mono bg-muted p-2 rounded">
@@ -42,7 +43,7 @@ export class ErrorBoundary extends Component<Props, State> {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
-              Recarregar página
+              {tNow("errorBoundary.reload")}
             </button>
           </div>
         </div>

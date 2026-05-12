@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { tNow } from "@/lib/translations";
 
 const FMCSA_WEB_KEY = import.meta.env.VITE_FMCSA_WEB_KEY || "";
 
@@ -23,7 +24,7 @@ export function useFmcsaLookup() {
   const lookup = async (dotNumber: string): Promise<FmcsaResult | null> => {
     const trimmed = dotNumber?.trim();
     if (!trimmed) {
-      toast.error("Digite o número DOT primeiro");
+      toast.error(tNow("toast.enterDotFirst"));
       return null;
     }
 
@@ -43,7 +44,7 @@ export function useFmcsaLookup() {
       const carrier = data?.content?.carrier;
 
       if (!carrier) {
-        throw new Error("Carrier not found for DOT " + trimmed);
+        throw new Error(`${tNow("toast.carrierNotFound")} ${trimmed}`);
       }
 
       const result: FmcsaResult = {
@@ -67,13 +68,13 @@ export function useFmcsaLookup() {
         statusCode: carrier.statusCode || "",
       };
 
-      toast.success("Dados FMCSA importados!", {
-        description: `${result.company_name} — ${result.totalPowerUnits} veículos, ${result.totalDrivers} motoristas`,
+      toast.success(tNow("toast.fmcsaImported"), {
+        description: `${result.company_name} — ${result.totalPowerUnits} ${tNow("toast.vehicles")}, ${result.totalDrivers} ${tNow("toast.drivers")}`,
       });
 
       return result;
     } catch (err: any) {
-      toast.error("Erro ao buscar DOT", { description: err.message });
+      toast.error(tNow("toast.dotLookupError"), { description: err.message });
       return null;
     } finally {
       setLoading(false);

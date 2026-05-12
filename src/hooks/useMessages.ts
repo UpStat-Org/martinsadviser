@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { tNow } from "@/lib/translations";
 
 // Types based on DB schema
 export interface MessageTemplate {
@@ -26,6 +27,9 @@ export interface ScheduledMessage {
   status: string;
   sent_at: string | null;
   created_at: string;
+  last_error?: string | null;
+  retry_count?: number | null;
+  next_retry_at?: string | null;
   clients?: { company_name: string; dot?: string | null; mc?: string | null; ein?: string | null; email?: string | null; phone?: string | null } | null;
 }
 
@@ -51,7 +55,7 @@ export function useCreateTemplate() {
   return useMutation({
     mutationFn: async (t: Omit<MessageTemplate, "id" | "user_id" | "created_at" | "updated_at">) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase
         .from("message_templates")
         .insert({ ...t, user_id: user.id })
@@ -60,8 +64,8 @@ export function useCreateTemplate() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["message_templates"] }); toast({ title: "Template criado!" }); },
-    onError: (e) => { toast({ title: "Erro ao criar template", description: e.message, variant: "destructive" }); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["message_templates"] }); toast({ title: tNow("toast.templateCreated") }); },
+    onError: (e) => { toast({ title: tNow("toast.templateCreateError"), description: e.message, variant: "destructive" }); },
   });
 }
 
@@ -79,8 +83,8 @@ export function useUpdateTemplate() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["message_templates"] }); toast({ title: "Template atualizado!" }); },
-    onError: (e) => { toast({ title: "Erro ao atualizar", description: e.message, variant: "destructive" }); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["message_templates"] }); toast({ title: tNow("toast.templateUpdated") }); },
+    onError: (e) => { toast({ title: tNow("toast.updateError"), description: e.message, variant: "destructive" }); },
   });
 }
 
@@ -92,8 +96,8 @@ export function useDeleteTemplate() {
       const { error } = await supabase.from("message_templates").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["message_templates"] }); toast({ title: "Template removido!" }); },
-    onError: (e) => { toast({ title: "Erro ao remover", description: e.message, variant: "destructive" }); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["message_templates"] }); toast({ title: tNow("toast.templateRemoved") }); },
+    onError: (e) => { toast({ title: tNow("toast.removeError"), description: e.message, variant: "destructive" }); },
   });
 }
 
@@ -121,7 +125,7 @@ export function useCreateScheduledMessage() {
   return useMutation({
     mutationFn: async (m: { client_id: string; template_id?: string | null; channel: string; subject?: string | null; body: string; scheduled_at: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase
         .from("scheduled_messages")
         .insert({ ...m, user_id: user.id })
@@ -130,8 +134,8 @@ export function useCreateScheduledMessage() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["scheduled_messages"] }); toast({ title: "Mensagem agendada!" }); },
-    onError: (e) => { toast({ title: "Erro ao agendar", description: e.message, variant: "destructive" }); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["scheduled_messages"] }); toast({ title: tNow("toast.messageScheduled") }); },
+    onError: (e) => { toast({ title: tNow("toast.scheduleError"), description: e.message, variant: "destructive" }); },
   });
 }
 
@@ -158,16 +162,16 @@ export function useRetryMessage() {
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("scheduled_messages")
-        .update({ status: "pending", sent_at: null })
+        .update({ status: "pending", sent_at: null, retry_count: 0, last_error: null, next_retry_at: null })
         .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["client_messages"] });
       qc.invalidateQueries({ queryKey: ["scheduled_messages"] });
-      toast({ title: "Mensagem reenviada para a fila!" });
+      toast({ title: tNow("toast.messageRequeued") });
     },
-    onError: (e) => { toast({ title: "Erro ao reenviar", description: e.message, variant: "destructive" }); },
+    onError: (e) => { toast({ title: tNow("toast.retryError"), description: e.message, variant: "destructive" }); },
   });
 }
 
@@ -182,7 +186,7 @@ export function useCancelScheduledMessage() {
         .eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["scheduled_messages"] }); toast({ title: "Mensagem cancelada!" }); },
-    onError: (e) => { toast({ title: "Erro ao cancelar", description: e.message, variant: "destructive" }); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["scheduled_messages"] }); toast({ title: tNow("toast.messageCancelled") }); },
+    onError: (e) => { toast({ title: tNow("toast.cancelError"), description: e.message, variant: "destructive" }); },
   });
 }

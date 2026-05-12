@@ -1,6 +1,9 @@
 import { FileCheck, Truck, Sparkles, ShieldCheck } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function HeroScene() {
+  const { t } = useLanguage();
+
   return (
     <div
       className="hero3d-stage pointer-events-none absolute inset-0 z-0 overflow-hidden"
@@ -24,7 +27,7 @@ export function HeroScene() {
         <div className="hero3d-card hero3d-card-1">
           <div className="hero3d-card-head">
             <FileCheck className="w-3.5 h-3.5" />
-            <span>Permit #A-2048</span>
+            <span>{t("hero.scene.permit")}</span>
           </div>
           <div className="hero3d-card-bar" />
           <div className="hero3d-card-lines">
@@ -34,14 +37,14 @@ export function HeroScene() {
           </div>
           <div className="hero3d-card-badge hero3d-badge-green">
             <ShieldCheck className="w-3 h-3" />
-            Aprovado
+            {t("hero.scene.approved")}
           </div>
         </div>
 
         <div className="hero3d-card hero3d-card-2">
           <div className="hero3d-card-head hero3d-card-head-amber">
             <Truck className="w-3.5 h-3.5" />
-            <span>Oversize Load</span>
+            <span>{t("hero.scene.oversize")}</span>
           </div>
           <div className="hero3d-card-bar hero3d-card-bar-amber" />
           <div className="hero3d-card-lines">
@@ -50,14 +53,14 @@ export function HeroScene() {
           </div>
           <div className="hero3d-card-badge hero3d-badge-amber">
             <Sparkles className="w-3 h-3" />
-            Em análise
+            {t("hero.scene.reviewing")}
           </div>
         </div>
 
         <div className="hero3d-card hero3d-card-3">
           <div className="hero3d-card-head hero3d-card-head-purple">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Compliance OK</span>
+            <span>{t("hero.scene.complianceOk")}</span>
           </div>
           <div className="hero3d-card-bar hero3d-card-bar-purple" />
           <div className="hero3d-card-lines">
@@ -74,7 +77,7 @@ export function HeroScene() {
         <div className="hero3d-card hero3d-card-4">
           <div className="hero3d-card-head">
             <FileCheck className="w-3.5 h-3.5" />
-            <span>Route #127</span>
+            <span>{t("hero.scene.route")}</span>
           </div>
           <div className="hero3d-card-bar" />
           <div className="hero3d-card-lines">
@@ -83,7 +86,7 @@ export function HeroScene() {
           </div>
           <div className="hero3d-card-badge hero3d-badge-blue">
             <Truck className="w-3 h-3" />
-            Em trânsito
+            {t("hero.scene.inTransit")}
           </div>
         </div>
       </div>

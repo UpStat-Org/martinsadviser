@@ -46,7 +46,7 @@ export function DocumentViewer({ open, onOpenChange, url, title, versions }: Doc
               {title || t("documents.viewer")}
             </DialogTitle>
             {activeVersion?.is_current && (
-              <Badge className="bg-success text-success-foreground shrink-0">Atual</Badge>
+              <Badge className="bg-success text-success-foreground shrink-0">{t("documents.current")}</Badge>
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -56,13 +56,13 @@ export function DocumentViewer({ open, onOpenChange, url, title, versions }: Doc
                 onValueChange={setSelectedVersionId}
               >
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Versão" />
+                  <SelectValue placeholder={t("documents.version")} />
                 </SelectTrigger>
                 <SelectContent>
                   {versions.map((v) => (
                     <SelectItem key={v.id} value={v.id}>
                       v{v.version} — {format(new Date(v.created_at), "dd/MM/yy")}
-                      {v.is_current ? " (atual)" : ""}
+                      {v.is_current ? ` (${t("documents.current").toLowerCase()})` : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>

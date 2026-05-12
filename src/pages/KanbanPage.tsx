@@ -58,7 +58,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const COLUMNS = [
   {
     id: "not_started",
-    label: "Not Started",
+    labelKey: "kanban.column.notStarted",
     icon: Circle,
     gradient: "from-slate-500 to-zinc-500",
     tint: "bg-slate-500/5",
@@ -67,7 +67,7 @@ const COLUMNS = [
   },
   {
     id: "waiting",
-    label: "Waiting",
+    labelKey: "kanban.column.waiting",
     icon: PauseCircle,
     gradient: "from-amber-500 to-orange-500",
     tint: "bg-amber-500/5",
@@ -76,7 +76,7 @@ const COLUMNS = [
   },
   {
     id: "in_progress",
-    label: "In Progress",
+    labelKey: "kanban.column.inProgress",
     icon: PlayCircle,
     gradient: "from-indigo-500 to-violet-500",
     tint: "bg-indigo-500/5",
@@ -85,7 +85,7 @@ const COLUMNS = [
   },
   {
     id: "completed",
-    label: "Completed",
+    labelKey: "kanban.column.completed",
     icon: CheckCircle2,
     gradient: "from-emerald-500 to-teal-500",
     tint: "bg-emerald-500/5",
@@ -94,7 +94,7 @@ const COLUMNS = [
   },
   {
     id: "discarded",
-    label: "Discarded",
+    labelKey: "kanban.column.discarded",
     icon: XCircle,
     gradient: "from-rose-500 to-red-500",
     tint: "bg-rose-500/5",
@@ -107,21 +107,21 @@ const TASK_TYPES = [
   "IFTA", "CT", "NY", "KYU", "NM", "Automatic", "UCR", "BOC-3", "MCS-150", "Other",
 ];
 
-const PRIORITY_STYLES: Record<string, { bar: string; badge: string; label: string }> = {
+const PRIORITY_STYLES: Record<string, { bar: string; badge: string; labelKey: string }> = {
   high: {
     bar: "bg-gradient-to-b from-red-500 to-rose-500",
     badge: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
-    label: "Alta",
+    labelKey: "priority.high",
   },
   medium: {
     bar: "bg-gradient-to-b from-amber-400 to-orange-400",
     badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    label: "Média",
+    labelKey: "priority.medium",
   },
   low: {
     bar: "bg-gradient-to-b from-sky-400 to-blue-400",
     badge: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
-    label: "Baixa",
+    labelKey: "priority.low",
   },
 };
 
@@ -310,10 +310,10 @@ export default function KanbanPage() {
       {/* ============ QUICK STATS ============ */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
-          { label: "Total de tarefas", value: stats.total, icon: KanbanIcon, gradient: "from-indigo-500 to-violet-500" },
-          { label: "Para hoje", value: stats.dueToday, icon: CalendarIcon, gradient: "from-sky-500 to-blue-500" },
-          { label: "Atrasadas", value: stats.overdue, icon: Flame, gradient: "from-red-500 to-rose-500" },
-          { label: "Concluídas", value: stats.completed, icon: CheckCircle2, gradient: "from-emerald-500 to-teal-500" },
+          { label: t("kanban.stats.total"), value: stats.total, icon: KanbanIcon, gradient: "from-indigo-500 to-violet-500" },
+          { label: t("kanban.stats.today"), value: stats.dueToday, icon: CalendarIcon, gradient: "from-sky-500 to-blue-500" },
+          { label: t("kanban.stats.overdue"), value: stats.overdue, icon: Flame, gradient: "from-red-500 to-rose-500" },
+          { label: t("kanban.stats.completed"), value: stats.completed, icon: CheckCircle2, gradient: "from-emerald-500 to-teal-500" },
         ].map((s) => (
           <div
             key={s.label}
@@ -367,10 +367,10 @@ export default function KanbanPage() {
                     </div>
                     <div className="min-w-0">
                       <h2 className="font-display font-bold text-sm truncate">
-                        {col.label}
+                        {t(col.labelKey)}
                       </h2>
                       <span className="text-[10px] text-muted-foreground">
-                        {colTasks.length} {colTasks.length === 1 ? "tarefa" : "tarefas"}
+                        {colTasks.length} {t(colTasks.length === 1 ? "kanban.taskSingular" : "kanban.taskPlural")}
                       </span>
                     </div>
                   </div>
@@ -397,7 +397,7 @@ export default function KanbanPage() {
                       <Icon className="w-4 h-4 text-muted-foreground/60" />
                     </div>
                     <p className="text-[11px] text-muted-foreground/70">
-                      Arraste tarefas aqui
+                      {t("kanban.dragHere")}
                     </p>
                   </div>
                 )}
@@ -549,8 +549,8 @@ export default function KanbanPage() {
                               >
                                 <CalendarIcon className="w-2.5 h-2.5" />
                                 {format(new Date(task.due_date), "dd MMM")}
-                                {overdue && " · atrasada"}
-                                {today && !overdue && " · hoje"}
+                                {overdue && ` · ${t("kanban.overdue")}`}
+                                {today && !overdue && ` · ${t("common.today").toLowerCase()}`}
                               </span>
                             ) : (
                               <span />
@@ -559,7 +559,7 @@ export default function KanbanPage() {
                               <span
                                 className={`inline-flex items-center h-4 px-1.5 rounded text-[9px] font-bold border ${prioStyle.badge}`}
                               >
-                                {prioStyle.label}
+                                {t(prioStyle.labelKey)}
                               </span>
                             )}
                           </div>
@@ -595,12 +595,12 @@ export default function KanbanPage() {
           <div className="space-y-4">
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Name *
+                {t("kanban.taskTitle")} *
               </label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Task name"
+                placeholder={t("kanban.taskTitlePlaceholder")}
                 className="h-11 rounded-xl mt-1.5"
               />
             </div>
@@ -608,11 +608,11 @@ export default function KanbanPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Type
+                  {t("common.type")}
                 </label>
                 <Select value={taskType} onValueChange={setTaskType}>
                   <SelectTrigger className="h-11 rounded-xl mt-1.5">
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder={t("kanban.selectType")} />
                   </SelectTrigger>
                   <SelectContent>
                     {TASK_TYPES.map((t) => (
@@ -625,14 +625,14 @@ export default function KanbanPage() {
               </div>
               <div>
                 <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Client
+                  {t("common.client")}
                 </label>
                 <Select value={clientId} onValueChange={setClientId}>
                   <SelectTrigger className="h-11 rounded-xl mt-1.5">
-                    <SelectValue placeholder="None" />
+                    <SelectValue placeholder={t("common.none")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="none">{t("common.none")}</SelectItem>
                     {clients?.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         {c.company_name}
@@ -646,7 +646,7 @@ export default function KanbanPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Prazo
+                  {t("kanban.dueDate")}
                 </label>
                 <Input
                   type="date"
@@ -657,16 +657,16 @@ export default function KanbanPage() {
               </div>
               <div>
                 <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Prioridade
+                  {t("kanban.priority")}
                 </label>
                 <Select value={priority} onValueChange={setPriority}>
                   <SelectTrigger className="h-11 rounded-xl mt-1.5">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Baixa</SelectItem>
-                    <SelectItem value="medium">Média</SelectItem>
-                    <SelectItem value="high">Alta</SelectItem>
+                    <SelectItem value="low">{t("priority.low")}</SelectItem>
+                    <SelectItem value="medium">{t("priority.medium")}</SelectItem>
+                    <SelectItem value="high">{t("priority.high")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -674,12 +674,12 @@ export default function KanbanPage() {
 
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Operator
+                {t("kanban.operator")}
               </label>
               <Input
                 value={operator}
                 onChange={(e) => setOperator(e.target.value)}
-                placeholder="Responsible person"
+                placeholder={t("kanban.operatorPlaceholder")}
                 className="h-11 rounded-xl mt-1.5"
               />
             </div>
@@ -692,7 +692,7 @@ export default function KanbanPage() {
                 <Input
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
-                  placeholder="Add tag and press Enter"
+                  placeholder={t("kanban.tagPlaceholder")}
                   className="h-10 rounded-xl"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -707,7 +707,7 @@ export default function KanbanPage() {
                   onClick={handleAddTag}
                   className="h-10 rounded-xl"
                 >
-                  Add
+                  {t("common.add")}
                 </Button>
               </div>
               {tags.length > 0 && (
@@ -733,13 +733,13 @@ export default function KanbanPage() {
 
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Notes
+                {t("clients.notes")}
               </label>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                placeholder="Additional notes..."
+                placeholder={t("kanban.notesPlaceholder")}
                 className="rounded-xl mt-1.5"
               />
             </div>
@@ -759,7 +759,7 @@ export default function KanbanPage() {
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 {createTask.isPending || updateTask.isPending
-                  ? "Saving..."
+                  ? t("common.saving")
                   : editingTask
                   ? t("common.save")
                   : t("kanban.create")}
@@ -782,7 +782,7 @@ export default function KanbanPage() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center">
                 <MessageSquare className="w-4 h-4 text-white" />
               </div>
-              Comentários da Tarefa
+              {t("kanban.taskComments")}
             </DialogTitle>
           </DialogHeader>
           {showComments && <CommentsSection entityType="task" entityId={showComments} />}

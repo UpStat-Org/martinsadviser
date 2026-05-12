@@ -31,6 +31,7 @@ import { useCreateClient, useUpdateClient, useCheckClientDuplicate, type Client 
 import { useToast } from "@/hooks/use-toast";
 import { useFmcsaLookup } from "@/hooks/useFmcsaLookup";
 import { Loader2, Search } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const formSchema = z.object({
   company_name: z.string().min(1, "Nome da empresa é obrigatório"),
@@ -74,6 +75,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
   const checkDuplicate = useCheckClientDuplicate();
   const { lookup, loading: lookingUp } = useFmcsaLookup();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const isEditing = !!client;
 
   const handleDotLookup = async () => {
@@ -201,7 +203,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
     );
     if (duplicates.length > 0) {
       toast({
-        title: "Possível duplicata encontrada",
+        title: t("clients.duplicateFound"),
         description: duplicates.join(". "),
         variant: "destructive",
       });
@@ -224,7 +226,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
-            {isEditing ? "Editar Cliente" : "Novo Cliente"}
+            {isEditing ? t("clients.edit") : t("clients.new")}
           </DialogTitle>
         </DialogHeader>
 
@@ -237,9 +239,9 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 name="company_name"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel>Company Name *</FormLabel>
+                    <FormLabel>{t("clients.company")} *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome da empresa" {...field} />
+                      <Input placeholder={t("clients.companyPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -251,9 +253,9 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 name="registration_responsible"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel>Nome do Responsável do Cadastro</FormLabel>
+                    <FormLabel>{t("clients.registrationResponsible")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome do responsável" {...field} />
+                      <Input placeholder={t("clients.responsiblePlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -265,7 +267,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
+                    <FormLabel>{t("clients.phone")}</FormLabel>
                     <FormControl>
                       <Input placeholder="(555) 123-4567" {...field} />
                     </FormControl>
@@ -279,9 +281,9 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("login.email")}</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="email@empresa.com" {...field} />
+                      <Input type="email" placeholder={t("common.emailPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -293,9 +295,9 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 name="address"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>{t("common.address")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Endereço completo" {...field} />
+                      <Input placeholder={t("common.addressPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -307,9 +309,9 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 name="ein"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>EIN</FormLabel>
+                    <FormLabel>{t("clients.ein")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="XX-XXXXXXX" {...field} />
+                      <Input placeholder={t("common.einPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -321,10 +323,10 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 name="dot"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>DOT #</FormLabel>
+                    <FormLabel>{t("clients.dot")}</FormLabel>
                     <div className="flex gap-2">
                       <FormControl>
-                        <Input placeholder="USDOT Number" {...field} />
+                        <Input placeholder={t("clients.dotPlaceholder")} {...field} />
                       </FormControl>
                       <Button
                         type="button"
@@ -332,7 +334,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                         size="icon"
                         onClick={handleDotLookup}
                         disabled={lookingUp}
-                        title="Buscar dados FMCSA"
+                        title={t("clients.fmcsaLookup")}
                       >
                         {lookingUp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                       </Button>
@@ -347,9 +349,9 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 name="mc"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>MC #</FormLabel>
+                    <FormLabel>{t("clients.mc")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="MC Number" {...field} />
+                      <Input placeholder={t("clients.mcPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -361,17 +363,17 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>{t("clients.status")}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Status" />
+                          <SelectValue placeholder={t("clients.status")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="active">Ativo</SelectItem>
-                        <SelectItem value="inactive">Inativo</SelectItem>
-                        <SelectItem value="pending">Pendente</SelectItem>
+                        <SelectItem value="active">{t("common.active")}</SelectItem>
+                        <SelectItem value="inactive">{t("common.inactive")}</SelectItem>
+                        <SelectItem value="pending">{t("common.pending")}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -382,7 +384,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
 
             {/* Services */}
             <div>
-              <h3 className="text-sm font-medium mb-3">Serviços</h3>
+              <h3 className="text-sm font-medium mb-3">{t("clients.services")}</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {services.map((service) => (
                   <FormField
@@ -413,9 +415,9 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes</FormLabel>
+                  <FormLabel>{t("clients.notes")}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Observações sobre o cliente..." rows={3} {...field} />
+                    <Textarea placeholder={t("clients.notesPlaceholder")} rows={3} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -424,10 +426,10 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
 
             <div className="flex justify-end gap-3">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancelar
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Salvando..." : isEditing ? "Salvar" : "Criar Cliente"}
+                {isPending ? t("common.saving") : isEditing ? t("common.save") : t("clients.create")}
               </Button>
             </div>
           </form>

@@ -119,7 +119,7 @@ export default function PortalDashboard() {
                       <TableHead>{t("trucks.plate")}</TableHead>
                       <TableHead>{t("trucks.makeModel")}</TableHead>
                       <TableHead>{t("trucks.year")}</TableHead>
-                      <TableHead>VIN</TableHead>
+                      <TableHead>{t("trucks.vin")}</TableHead>
                       <TableHead>{t("clients.status")}</TableHead>
                     </TableRow>
                   </TableHeader>

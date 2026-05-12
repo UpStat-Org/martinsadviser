@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
+import { tNow } from "@/lib/translations";
 
 export type Client = Tables<"clients">;
 export type ClientInsert = TablesInsert<"clients">;
@@ -56,7 +57,7 @@ export function useCheckClientDuplicate() {
       if (excludeId) query = query.neq("id", excludeId);
       const { data } = await query;
       if (data?.length) {
-        duplicates.push(`DOT "${dot}" já cadastrado em: ${data[0].company_name}`);
+        duplicates.push(`DOT "${dot}" ${tNow("clients.duplicateRegisteredIn")}: ${data[0].company_name}`);
       }
     }
 
@@ -65,7 +66,7 @@ export function useCheckClientDuplicate() {
       if (excludeId) query = query.neq("id", excludeId);
       const { data } = await query;
       if (data?.length) {
-        duplicates.push(`EIN "${ein}" já cadastrado em: ${data[0].company_name}`);
+        duplicates.push(`EIN "${ein}" ${tNow("clients.duplicateRegisteredIn")}: ${data[0].company_name}`);
       }
     }
 
@@ -80,7 +81,7 @@ export function useCreateClient() {
   return useMutation({
     mutationFn: async (client: Omit<ClientInsert, "user_id">) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase
         .from("clients")
         .insert({ ...client, user_id: user.id })
@@ -91,10 +92,10 @@ export function useCreateClient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({ title: "Cliente criado com sucesso!" });
+      toast({ title: tNow("toast.clientCreated") });
     },
     onError: (error) => {
-      toast({ title: "Erro ao criar cliente", description: error.message, variant: "destructive" });
+      toast({ title: tNow("toast.clientCreateError"), description: error.message, variant: "destructive" });
     },
   });
 }
@@ -116,10 +117,10 @@ export function useUpdateClient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({ title: "Cliente atualizado!" });
+      toast({ title: tNow("toast.clientUpdated") });
     },
     onError: (error) => {
-      toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" });
+      toast({ title: tNow("toast.updateError"), description: error.message, variant: "destructive" });
     },
   });
 }
@@ -135,10 +136,10 @@ export function useDeleteClient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({ title: "Cliente removido!" });
+      toast({ title: tNow("toast.clientRemoved") });
     },
     onError: (error) => {
-      toast({ title: "Erro ao remover", description: error.message, variant: "destructive" });
+      toast({ title: tNow("toast.removeError"), description: error.message, variant: "destructive" });
     },
   });
 }

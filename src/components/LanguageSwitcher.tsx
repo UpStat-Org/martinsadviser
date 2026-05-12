@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 const languages: Language[] = ["pt", "en", "es"];
 
 export function LanguageSwitcher() {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const btnRefs = useRef<Record<Language, HTMLButtonElement | null>>({
     pt: null,
@@ -29,7 +29,7 @@ export function LanguageSwitcher() {
       <div
         ref={containerRef}
         role="radiogroup"
-        aria-label="Language"
+        aria-label={t("ui.language")}
         className="relative flex items-center gap-0.5 p-1 rounded-full
                    bg-background/70 backdrop-blur-xl
                    border border-border/60

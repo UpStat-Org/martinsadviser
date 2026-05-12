@@ -80,7 +80,7 @@ function escapeHtml(str: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function exportToPdf(rows: Record<string, any>[], title: string, filename: string) {
+function exportToPdf(rows: Record<string, any>[], title: string, filename: string, recordsLabel: string, footerLabel: string) {
   if (!rows.length) return;
   const headers = Object.keys(rows[0]);
   const safeTitle = escapeHtml(title);
@@ -100,12 +100,12 @@ function exportToPdf(rows: Record<string, any>[], title: string, filename: strin
       </style>
     </head><body>
       <h1>${safeTitle}</h1>
-      <div class="meta">${new Date().toLocaleDateString()} — ${rows.length} registros</div>
+      <div class="meta">${new Date().toLocaleDateString()} — ${rows.length} ${escapeHtml(recordsLabel)}</div>
       <table>
         <thead><tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr></thead>
         <tbody>${rows.map((row) => `<tr>${headers.map((h) => `<td>${escapeHtml(String(row[h] ?? "—"))}</td>`).join("")}</tr>`).join("")}</tbody>
       </table>
-      <div class="footer">MartinsAdviser Report</div>
+      <div class="footer">${escapeHtml(footerLabel)}</div>
     </body></html>
   `;
   const win = window.open("", "_blank");
@@ -179,11 +179,11 @@ export default function ReportsPage() {
     const success = generateBatchCompliancePdf(clientsWithPermits);
     if (!success) {
       toast({
-        title: "Popup bloqueado. Permita popups para gerar o PDF.",
+        title: t("reports.popupBlockedGenerate"),
         variant: "destructive",
       });
     } else {
-      toast({ title: "Relatório de compliance gerado!" });
+      toast({ title: t("reports.complianceGenerated") });
       setBatchOpen(false);
     }
     setBatchGenerating(false);
@@ -238,11 +238,13 @@ export default function ReportsPage() {
     const success = exportToPdf(
       exportRows,
       t("reports.title"),
-      `permits-report-${format(new Date(), "yyyy-MM-dd")}`
+      `permits-report-${format(new Date(), "yyyy-MM-dd")}`,
+      t("reports.records"),
+      t("reports.footer")
     );
     if (success === false) {
       toast({
-        title: "Popup bloqueado. Permita popups para exportar o PDF.",
+        title: t("reports.popupBlockedExport"),
         variant: "destructive",
       });
     } else {
@@ -350,25 +352,25 @@ export default function ReportsPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
-            label: "Registros no filtro",
+            label: t("reports.filteredRecords"),
             value: stats.total,
             icon: BarChart3,
             gradient: "from-indigo-500 to-violet-500",
           },
           {
-            label: "Válidos (>30d)",
+            label: t("permits.stats.valid"),
             value: stats.valid,
             icon: ShieldCheck,
             gradient: "from-emerald-500 to-teal-500",
           },
           {
-            label: "Vencendo (≤30d)",
+            label: t("permits.stats.expiring"),
             value: stats.expiring,
             icon: CalendarIcon,
             gradient: "from-amber-500 to-orange-500",
           },
           {
-            label: "Vencidos",
+            label: t("permits.stats.expired"),
             value: stats.expired,
             icon: FileText,
             gradient: "from-red-500 to-rose-500",
@@ -410,11 +412,11 @@ export default function ReportsPage() {
                 <Filter className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h2 className="font-display font-bold text-base">Filtros</h2>
+                <h2 className="font-display font-bold text-base">{t("common.filters")}</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {activeFilters > 0
                     ? `${activeFilters} filtro(s) aplicado(s)`
-                    : "Refine os resultados do relatório"}
+                    : t("reports.refineResults")}
                 </p>
               </div>
             </div>
@@ -631,7 +633,7 @@ export default function ReportsPage() {
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar cliente..."
+                placeholder={t("reports.searchClient")}
                 value={clientSearch}
                 onChange={(e) => setClientSearch(e.target.value)}
                 className="pl-10 h-10 rounded-xl bg-muted/40 border-border/60"
@@ -713,7 +715,7 @@ export default function ReportsPage() {
                 <>
                   <FileText className="w-4 h-4" />
                   Gerar PDF ({selectedClients.size}{" "}
-                  {selectedClients.size === 1 ? "cliente" : "clientes"})
+                  {t(selectedClients.size === 1 ? "common.client" : "reports.clients")})
                 </>
               )}
             </button>

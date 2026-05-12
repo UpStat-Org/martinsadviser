@@ -208,25 +208,25 @@ export default function Messages() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
-            label: "Pendentes",
+            label: t("common.pending"),
             value: stats.pending,
             icon: Clock,
             gradient: "from-amber-500 to-orange-500",
           },
           {
-            label: "Enviadas",
+            label: t("common.sent"),
             value: stats.sent,
             icon: CheckCircle2,
             gradient: "from-emerald-500 to-teal-500",
           },
           {
-            label: "Falharam",
+            label: t("common.failed"),
             value: stats.failed,
             icon: AlertTriangle,
             gradient: "from-red-500 to-rose-500",
           },
           {
-            label: "Automações ativas",
+            label: t("messages.activeAutomations"),
             value: stats.automations,
             icon: Zap,
             gradient: "from-fuchsia-500 to-pink-500",
@@ -303,7 +303,7 @@ export default function Messages() {
                   {t("messages.noScheduled")}
                 </p>
                 <p className="text-sm text-muted-foreground mb-6">
-                  Agende sua primeira mensagem para clientes.
+                  {t("messages.scheduleFirst")}
                 </p>
                 <button
                   onClick={() => setScheduleOpen(true)}

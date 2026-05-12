@@ -247,7 +247,7 @@ export default function AuditPage() {
                 <Filter className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h2 className="font-display font-bold text-base">Filtros</h2>
+                <h2 className="font-display font-bold text-base">{t("common.filters")}</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {activeFilters > 0
                     ? `${activeFilters} filtro(s) aplicado(s)`

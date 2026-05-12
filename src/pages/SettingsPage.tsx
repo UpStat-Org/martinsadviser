@@ -70,7 +70,7 @@ export default function SettingsPage() {
         if (error) throw error;
         setNewPassword("");
       }
-      toast({ title: "Perfil atualizado!" });
+      toast({ title: t("settings.profileUpdated") });
     } catch (e: any) {
       toast({
         title: "Erro ao salvar",
@@ -261,7 +261,7 @@ export default function SettingsPage() {
                     <Input
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Seu nome"
+                      placeholder={t("common.fullNamePlaceholder")}
                       className="h-11 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
                     />
                   </div>
@@ -287,7 +287,7 @@ export default function SettingsPage() {
                     <Key className="w-3.5 h-3.5 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold">Alterar senha</p>
+                    <p className="text-sm font-bold">{t("settings.changePassword")}</p>
                     <p className="text-[11px] text-muted-foreground">
                       Deixe em branco para manter a atual
                     </p>
@@ -299,7 +299,7 @@ export default function SettingsPage() {
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Nova senha"
+                    placeholder={t("common.newPasswordPlaceholder")}
                     className="h-11 pl-10 rounded-xl bg-background border-border/60"
                   />
                 </div>
