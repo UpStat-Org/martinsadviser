@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
   Settings, LogOut, ChevronsLeft, ChevronsRight, ShieldCheck, BarChart3,
   ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen, Sun, Moon,
-  Briefcase, Activity, MoreHorizontal, MonitorPlay,
+  Briefcase, Activity, MoreHorizontal, MonitorPlay, Server,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type NavItem = { to: string; icon: any; label: string };
+type NavItem = { to: string; icon: any; label: string; external?: boolean };
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -41,6 +41,7 @@ export function AppSidebar() {
           { to: "/", icon: LayoutDashboard, label: t("nav.dashboard") },
           { to: "/my", icon: Briefcase, label: t("mydesk.title") },
           { to: "/presentation", icon: MonitorPlay, label: t("nav.presentation") },
+          { to: "https://status.martinsadviser.com", icon: Server, label: t("sidebar.systemStatus"), external: true },
         ],
       },
       {
@@ -96,20 +97,16 @@ export function AppSidebar() {
   const roleLabel = role === "admin" ? t("role.admin") : role === "operator" ? t("role.operator") : role === "viewer" ? t("role.viewer") : t("role.user");
 
   const renderNavItem = (item: NavItem) => {
-    const active = isActive(item.to);
-    return (
-      <NavLink
-        key={item.to}
-        to={item.to}
-        title={collapsed && !isMobile ? item.label : undefined}
-          className={cn(
-            "group relative flex items-center gap-3 h-9 rounded-md text-[13px] font-medium transition-colors",
-            collapsed && !isMobile ? "justify-center px-0 mx-1" : "px-2.5",
-            active
-            ? "bg-sidebar-accent/75 text-sidebar-accent-foreground font-semibold"
-            : "text-sidebar-foreground/68 hover:bg-sidebar-accent/45 hover:text-sidebar-foreground"
-          )}
-      >
+    const active = !item.external && isActive(item.to);
+    const className = cn(
+      "group relative flex items-center gap-3 h-9 rounded-md text-[13px] font-medium transition-colors",
+      collapsed && !isMobile ? "justify-center px-0 mx-1" : "px-2.5",
+      active
+        ? "bg-sidebar-accent/75 text-sidebar-accent-foreground font-semibold"
+        : "text-sidebar-foreground/68 hover:bg-sidebar-accent/45 hover:text-sidebar-foreground"
+    );
+    const content = (
+      <>
         {active && !collapsed && (
           <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-sidebar-primary" />
         )}
@@ -120,6 +117,30 @@ export function AppSidebar() {
           )}
         />
         {showLabel && <span className="truncate">{item.label}</span>}
+      </>
+    );
+
+    if (item.external) {
+      return (
+        <a
+          key={item.to}
+          href={item.to}
+          title={collapsed && !isMobile ? item.label : undefined}
+          className={className}
+        >
+          {content}
+        </a>
+      );
+    }
+
+    return (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        title={collapsed && !isMobile ? item.label : undefined}
+        className={className}
+      >
+        {content}
       </NavLink>
     );
   };
