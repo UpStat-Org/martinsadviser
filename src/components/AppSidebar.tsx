@@ -125,6 +125,8 @@ export function AppSidebar() {
         <a
           key={item.to}
           href={item.to}
+          target="_blank"
+          rel="noopener noreferrer"
           title={collapsed && !isMobile ? item.label : undefined}
           className={className}
         >
