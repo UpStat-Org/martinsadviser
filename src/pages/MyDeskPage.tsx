@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,18 +12,25 @@ import {
   Clock,
   ArrowRight,
   Mail,
+  DollarSign,
   ArrowUpRight,
   Sparkles,
   CheckCircle2,
   Target,
   Flame,
+  RotateCcw,
+  Check,
+  FileWarning,
 } from "lucide-react";
 import { format } from "date-fns";
 import { pt, enUS, es } from "date-fns/locale";
 import { useAuth } from "@/hooks/useAuth";
 import { useAssignedPermits, useAssignedTasks } from "@/hooks/useWorkload";
 import { useScheduledMessages } from "@/hooks/useMessages";
+import { useRetryMessage } from "@/hooks/useMessages";
 import { getExpirationStatus } from "@/hooks/usePermits";
+import { useInvoices } from "@/hooks/useInvoices";
+import { useUpdateTask } from "@/hooks/useTasks";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const dateLocales = { pt, en: enUS, es };
@@ -34,13 +41,40 @@ const PRIORITY_STYLES: Record<string, string> = {
   low: "bg-gradient-to-r from-sky-500 to-blue-500 text-white border-0",
 };
 
+type ActionKind = "all" | "compliance" | "tasks" | "messages" | "finance";
+type ActionSeverity = "critical" | "high" | "medium" | "low";
+
+interface ActionItem {
+  id: string;
+  kind: Exclude<ActionKind, "all">;
+  severity: ActionSeverity;
+  title: string;
+  subtitle: string;
+  meta: string;
+  route: string;
+  icon: typeof AlertTriangle;
+  actionLabel?: string;
+  onAction?: () => void;
+}
+
+const severityStyles: Record<ActionSeverity, string> = {
+  critical: "bg-red-500/10 text-red-600 border-red-500/20",
+  high: "bg-orange-500/10 text-orange-600 border-orange-500/20",
+  medium: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+  low: "bg-sky-500/10 text-sky-600 border-sky-500/20",
+};
+
 export default function MyDeskPage() {
+  const [activeKind, setActiveKind] = useState<ActionKind>("all");
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t, language } = useLanguage();
   const { data: permits, isLoading: lp } = useAssignedPermits(user?.id);
   const { data: tasks, isLoading: lt } = useAssignedTasks(user?.id);
   const { data: messages } = useScheduledMessages();
+  const { data: invoices } = useInvoices();
+  const retryMessage = useRetryMessage();
+  const updateTask = useUpdateTask();
 
   const userName = (user?.user_metadata as any)?.full_name?.split(" ")[0] ?? "";
 
@@ -60,11 +94,12 @@ export default function MyDeskPage() {
       (t) => t.due_date && t.due_date === now.toISOString().slice(0, 10)
     ).length;
     const failedMsgs = (messages ?? []).filter((m) => m.status === "failed").length;
-    return { overduePermits, next7, dueToday, failedMsgs };
-  }, [permits, tasks, messages]);
+    const overdueInvoices = (invoices ?? []).filter((i) => i.status === "overdue").length;
+    return { overduePermits, next7, dueToday, failedMsgs, overdueInvoices };
+  }, [permits, tasks, messages, invoices]);
 
   const totalAttention =
-    stats.overduePermits + stats.next7 + stats.dueToday + stats.failedMsgs;
+    stats.overduePermits + stats.next7 + stats.dueToday + stats.failedMsgs + stats.overdueInvoices;
 
   const cards = [
     {
@@ -96,6 +131,125 @@ export default function MyDeskPage() {
       desc: t("mydesk.requiresRetry"),
     },
   ];
+
+  const actionItems = useMemo<ActionItem[]>(() => {
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
+    const items: ActionItem[] = [];
+
+    (permits ?? []).forEach((permit) => {
+      if (!permit.expiration_date) {
+        items.push({
+          id: `permit-nodate-${permit.id}`,
+          kind: "compliance",
+          severity: "medium",
+          title: `${permit.permit_type} sem vencimento`,
+          subtitle: permit.clients?.company_name ?? t("mydesk.noClient"),
+          meta: t("mydesk.validateDate"),
+          route: `/permits/${permit.id}`,
+          icon: FileWarning,
+        });
+        return;
+      }
+
+      const diff = Math.ceil((new Date(permit.expiration_date).getTime() - now.getTime()) / 86400000);
+      if (diff < 0 || diff <= 7) {
+        items.push({
+          id: `permit-${permit.id}`,
+          kind: "compliance",
+          severity: diff < 0 ? "critical" : "high",
+          title: diff < 0 ? `${permit.permit_type} vencido` : `${permit.permit_type} vence em ${diff}d`,
+          subtitle: permit.clients?.company_name ?? t("mydesk.noClient"),
+          meta: format(new Date(permit.expiration_date), "dd/MM/yyyy"),
+          route: `/permits/${permit.id}`,
+          icon: AlertTriangle,
+        });
+      }
+
+      if (!permit.document_url) {
+        items.push({
+          id: `permit-doc-${permit.id}`,
+          kind: "compliance",
+          severity: "low",
+          title: `${permit.permit_type} sem documento`,
+          subtitle: permit.clients?.company_name ?? t("mydesk.noClient"),
+          meta: t("mydesk.attachDocument"),
+          route: `/permits/${permit.id}`,
+          icon: FileWarning,
+        });
+      }
+    });
+
+    (tasks ?? []).forEach((task) => {
+      if (!task.due_date) return;
+      const overdue = task.due_date < today;
+      const dueToday = task.due_date === today;
+      if (!overdue && !dueToday) return;
+      items.push({
+        id: `task-${task.id}`,
+        kind: "tasks",
+        severity: overdue ? "high" : "medium",
+        title: task.name,
+        subtitle: task.clients?.company_name ?? t("mydesk.noClient"),
+        meta: overdue ? t("mydesk.overdueTask") : t("mydesk.dueToday"),
+        route: "/tasks",
+        icon: ClipboardList,
+        actionLabel: t("mydesk.complete"),
+        onAction: () => updateTask.mutate({ id: task.id, status: "completed" }),
+      });
+    });
+
+    (messages ?? [])
+      .filter((message) => message.status === "failed")
+      .forEach((message) => {
+        items.push({
+          id: `message-${message.id}`,
+          kind: "messages",
+          severity: "high",
+          title: message.subject || t("mydesk.failedMessage"),
+          subtitle: message.clients?.company_name ?? t("mydesk.noClient"),
+          meta: message.last_error || t("mydesk.requiresRetry"),
+          route: "/messages",
+          icon: Mail,
+          actionLabel: t("mydesk.retry"),
+          onAction: () => retryMessage.mutate(message.id),
+        });
+      });
+
+    (invoices ?? [])
+      .filter((invoice) => invoice.status === "overdue")
+      .forEach((invoice) => {
+        const overdueDays = Math.max(
+          0,
+          Math.ceil((now.getTime() - new Date(invoice.due_date).getTime()) / 86400000)
+        );
+        items.push({
+          id: `invoice-${invoice.id}`,
+          kind: "finance",
+          severity: overdueDays > 30 ? "critical" : "high",
+          title: `${t("finance.overdue")} ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(invoice.amount))}`,
+          subtitle: invoice.clients?.company_name ?? t("mydesk.noClient"),
+          meta: `${overdueDays} ${t("common.days")}`,
+          route: `/finance/${invoice.id}`,
+          icon: DollarSign,
+        });
+      });
+
+    const order: Record<ActionSeverity, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+    return items.sort((a, b) => order[a.severity] - order[b.severity]);
+  }, [permits, tasks, messages, invoices, retryMessage, updateTask, t]);
+
+  const filteredActions = activeKind === "all"
+    ? actionItems
+    : actionItems.filter((item) => item.kind === activeKind);
+
+  const actionCounts = {
+    all: actionItems.length,
+    compliance: actionItems.filter((item) => item.kind === "compliance").length,
+    tasks: actionItems.filter((item) => item.kind === "tasks").length,
+    messages: actionItems.filter((item) => item.kind === "messages").length,
+    finance: actionItems.filter((item) => item.kind === "finance").length,
+  };
 
   const hour = new Date().getHours();
   const greeting =
@@ -205,6 +359,102 @@ export default function MyDeskPage() {
           );
         })}
       </div>
+
+      {/* ============ ACTION CENTER ============ */}
+      <Card className="border-border/50 overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-amber-500 to-emerald-500" />
+        <CardHeader className="pb-3">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-amber-500 flex items-center justify-center shadow-md">
+                <Flame className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <CardTitle className="font-display text-base">
+                  {t("mydesk.actionCenter")}
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {actionItems.length} {t(actionItems.length === 1 ? "common.item" : "common.items")}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { key: "all", label: t("search.all"), count: actionCounts.all },
+                { key: "compliance", label: t("nav.permits"), count: actionCounts.compliance },
+                { key: "tasks", label: t("nav.tasks"), count: actionCounts.tasks },
+                { key: "messages", label: t("nav.messages"), count: actionCounts.messages },
+                { key: "finance", label: t("nav.finance"), count: actionCounts.finance },
+              ].map((filter) => (
+                <button
+                  key={filter.key}
+                  onClick={() => setActiveKind(filter.key as ActionKind)}
+                  className={`h-8 px-3 rounded-lg text-xs font-semibold transition-colors ${
+                    activeKind === filter.key
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                >
+                  {filter.label} {filter.count > 0 && <span className="ml-1 opacity-80">{filter.count}</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {!filteredActions.length ? (
+            <div className="text-center py-10">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-3">
+                <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+              </div>
+              <p className="text-sm font-semibold">{t("mydesk.noActions")}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("mydesk.noActionsDesc")}</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-border/60 rounded-xl border border-border/50 overflow-hidden">
+              {filteredActions.slice(0, 18).map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 hover:bg-muted/40 transition-colors">
+                    <button
+                      onClick={() => navigate(item.route)}
+                      className="flex items-center gap-3 min-w-0 flex-1 text-left"
+                    >
+                      <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${severityStyles[item.severity]}`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold truncate">{item.title}</div>
+                        <div className="text-xs text-muted-foreground truncate">{item.subtitle}</div>
+                      </div>
+                    </button>
+                    <div className="flex items-center gap-2 sm:justify-end">
+                      <Badge variant="outline" className={`${severityStyles[item.severity]} whitespace-nowrap`}>
+                        {item.meta}
+                      </Badge>
+                      {item.actionLabel && item.onAction && (
+                        <button
+                          onClick={item.onAction}
+                          className="h-8 px-2.5 rounded-lg bg-muted hover:bg-muted/80 text-xs font-semibold inline-flex items-center gap-1.5"
+                        >
+                          {item.kind === "messages" ? <RotateCcw className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
+                          {item.actionLabel}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => navigate(item.route)}
+                        className="h-8 px-2.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold"
+                      >
+                        {t("common.open")}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* ============ LISTS ============ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

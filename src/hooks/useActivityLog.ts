@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 
 export interface ActivityLog {
   id: string;
@@ -8,7 +9,7 @@ export interface ActivityLog {
   entity_type: string;
   entity_id: string | null;
   action: string;
-  details: Record<string, any>;
+  details: Json | null;
   created_at: string;
 }
 

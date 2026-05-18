@@ -6,6 +6,7 @@ export interface AssignedPermitRow {
   permit_type: string;
   state: string | null;
   expiration_date: string | null;
+  document_url: string | null;
   status: string;
   assigned_to: string | null;
   client_id: string;
@@ -31,7 +32,7 @@ export function useAssignedPermits(userId: string | undefined) {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("permits")
-        .select("id, permit_type, state, expiration_date, status, assigned_to, client_id, clients(company_name)")
+        .select("id, permit_type, state, expiration_date, document_url, status, assigned_to, client_id, clients(company_name)")
         .eq("assigned_to", userId!)
         .order("expiration_date", { ascending: true });
       if (error) throw error;

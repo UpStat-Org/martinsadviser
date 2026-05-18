@@ -7,6 +7,7 @@ import { tNow } from "@/lib/translations";
 export type Truck = Tables<"trucks">;
 export type TruckInsert = TablesInsert<"trucks">;
 export type TruckUpdate = TablesUpdate<"trucks">;
+export type TruckWithClient = Truck & { clients?: { company_name: string } | null };
 
 export function useTrucks(search?: string, clientId?: string) {
   return useQuery({
@@ -22,7 +23,7 @@ export function useTrucks(search?: string, clientId?: string) {
       }
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data as TruckWithClient[];
     },
   });
 }
@@ -38,7 +39,7 @@ export function useTruck(id: string | undefined) {
         .eq("id", id!)
         .single();
       if (error) throw error;
-      return data;
+      return data as TruckWithClient;
     },
   });
 }

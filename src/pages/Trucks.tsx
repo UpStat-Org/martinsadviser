@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -31,11 +32,15 @@ import {
   XCircle,
   Calendar,
   Hash,
+  Eye,
 } from "lucide-react";
 import { useTrucks, useDeleteTruck } from "@/hooks/useTrucks";
 import { TruckFormDialog } from "@/components/TruckFormDialog";
-import type { Truck } from "@/hooks/useTrucks";
+import type { Truck, TruckWithClient } from "@/hooks/useTrucks";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { EmptyState } from "@/components/EmptyState";
+import { TablePreferencesToolbar, type Density } from "@/components/TablePreferencesToolbar";
+import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 
 const PLATE_GRADIENTS = [
   "from-indigo-500 to-violet-500",
@@ -47,6 +52,14 @@ const PLATE_GRADIENTS = [
   "from-sky-500 to-blue-500",
   "from-purple-500 to-indigo-500",
 ];
+
+const defaultTruckColumns = {
+  client: true,
+  makeModel: true,
+  year: true,
+  vin: true,
+  status: true,
+};
 
 function gradientFor(id: string) {
   let h = 0;
@@ -61,6 +74,15 @@ export default function Trucks() {
   const { data: trucks, isLoading } = useTrucks(search || undefined);
   const deleteTruck = useDeleteTruck();
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [density, setDensity] = useLocalStorageState<Density>(
+    "trucks-table-density",
+    "comfortable"
+  );
+  const [columns, setColumns] = useLocalStorageState(
+    "trucks-table-columns",
+    defaultTruckColumns
+  );
 
   const handleEdit = (truck: Truck) => {
     setEditingTruck(truck);
@@ -169,7 +191,7 @@ export default function Trucks() {
       </div>
 
       {/* ============ SEARCH ============ */}
-      <div className="rounded-2xl bg-card border border-border/50 p-3 flex items-center gap-3">
+      <div className="rounded-2xl bg-card border border-border/50 p-3 flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -177,6 +199,21 @@ export default function Trucks() {
             className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-xl transition-colors"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="sm:ml-auto">
+          <TablePreferencesToolbar
+            density={density}
+            onDensityChange={setDensity}
+            columns={columns}
+            onColumnsChange={setColumns}
+            columnOptions={[
+              { key: "client", label: t("common.client") },
+              { key: "makeModel", label: t("trucks.makeModel") },
+              { key: "year", label: t("trucks.year") },
+              { key: "vin", label: "VIN" },
+              { key: "status", label: t("clients.status") },
+            ]}
           />
         </div>
       </div>
@@ -187,20 +224,16 @@ export default function Trucks() {
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
       ) : !trucks?.length ? (
-        <Card className="border-border/50">
-          <CardContent className="p-16 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
-              <TruckIcon className="w-9 h-9 text-indigo-500" />
-            </div>
-            <p className="font-display text-lg font-semibold text-foreground mb-1">
-              {search ? "Nenhum caminhão encontrado" : t("trucks.empty")}
-            </p>
-            <p className="text-sm text-muted-foreground mb-6">
-              {search
-                ? "Tente ajustar a busca."
-                : "Cadastre o primeiro caminhão da frota."}
-            </p>
-            {!search && (
+        <EmptyState
+          icon={<TruckIcon className="w-9 h-9 text-indigo-500" />}
+          title={search ? t("trucks.noResults") : t("trucks.empty")}
+          description={
+            search
+              ? t("trucks.emptyFilteredDesc")
+              : t("trucks.emptyCreateDesc")
+          }
+          action={
+            !search ? (
               <button
                 onClick={handleNew}
                 className="h-11 px-6 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-2 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
@@ -208,34 +241,57 @@ export default function Trucks() {
                 <Plus className="w-4 h-4" />
                 {t("trucks.registerFirst")}
               </button>
-            )}
-          </CardContent>
-        </Card>
+            ) : (
+              <button
+                onClick={() => setSearch("")}
+                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold"
+              >
+                {t("common.clearSearch")}
+              </button>
+            )
+          }
+          secondaryAction={
+            !search ? (
+              <button
+                onClick={() => navigate("/clients")}
+                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold"
+              >
+                {t("common.viewClients")}
+              </button>
+            ) : undefined
+          }
+        />
       ) : (
-        <Card className="overflow-hidden border-border/50 shadow-sm">
-          <CardContent className="p-0">
-            <Table>
+        <Card
+          className={`overflow-hidden border-border/50 shadow-sm ${
+            density === "compact"
+              ? "[&_td]:!py-2 [&_td]:text-xs [&_th]:!h-9 [&_th]:!py-2"
+              : "[&_td]:!py-3 [&_th]:!h-11"
+          }`}
+        >
+          <CardContent className="p-0 overflow-x-auto">
+            <Table className="min-w-[980px] table-fixed">
               <TableHeader>
                 <TableRow className="bg-muted/40 hover:bg-muted/40 border-border/50">
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <TableHead className="w-[190px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("trucks.plate")}
                   </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  {columns.client !== false && <TableHead className="w-[240px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("common.client")}
-                  </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  {columns.makeModel !== false && <TableHead className="w-[180px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("trucks.makeModel")}
-                  </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  {columns.year !== false && <TableHead className="w-[95px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("trucks.year")}
-                  </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  {columns.vin !== false && <TableHead className="w-[190px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     VIN
-                  </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  {columns.status !== false && <TableHead className="w-[120px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("clients.status")}
-                  </TableHead>
-                  <TableHead className="w-24 font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  <TableHead className="w-[140px] text-center font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("common.actions")}
                   </TableHead>
                 </TableRow>
@@ -248,7 +304,7 @@ export default function Trucks() {
                       key={truck.id}
                       className="group hover:bg-muted/40 transition-colors border-border/50"
                     >
-                      <TableCell className="py-3">
+                      <TableCell className={density === "compact" ? "py-2" : "py-3"}>
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientFor(
@@ -269,13 +325,15 @@ export default function Trucks() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm">
-                        {(truck as any).clients?.company_name || "—"}
-                      </TableCell>
-                      <TableCell className="text-sm font-medium">
+                      {columns.client !== false && <TableCell className="text-sm">
+                        <Link to={`/clients/${truck.client_id}`} className="block truncate font-medium hover:text-primary">
+                          {(truck as TruckWithClient).clients?.company_name || "—"}
+                        </Link>
+                      </TableCell>}
+                      {columns.makeModel !== false && <TableCell className="text-sm font-medium">
                         {[truck.make, truck.model].filter(Boolean).join(" ") || "—"}
-                      </TableCell>
-                      <TableCell>
+                      </TableCell>}
+                      {columns.year !== false && <TableCell>
                         {truck.year ? (
                           <span className="inline-flex items-center gap-1 h-6 px-2 rounded-md bg-muted/60 text-xs font-semibold">
                             <Hash className="w-3 h-3 text-muted-foreground" />
@@ -284,19 +342,19 @@ export default function Trucks() {
                         ) : (
                           <span className="text-xs text-muted-foreground">—</span>
                         )}
-                      </TableCell>
-                      <TableCell className="text-xs font-mono text-muted-foreground">
+                      </TableCell>}
+                      {columns.vin !== false && <TableCell className="text-xs font-mono text-muted-foreground">
                         {truck.vin ? (
-                          <span className="inline-flex items-center h-6 px-2 rounded-md bg-muted/40 border border-border/50">
+                          <span className="inline-flex items-center h-6 max-w-[170px] px-2 rounded-md bg-muted/40 border border-border/50 truncate">
                             {truck.vin}
                           </span>
                         ) : (
                           "—"
                         )}
-                      </TableCell>
-                      <TableCell>
+                      </TableCell>}
+                      {columns.status !== false && <TableCell>
                         <span
-                          className={`inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-semibold border ${
+                          className={`inline-flex items-center gap-1.5 h-6 min-w-[82px] justify-center whitespace-nowrap px-2.5 rounded-md text-xs font-semibold border ${
                             active
                               ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                               : "bg-muted text-muted-foreground border-border"
@@ -309,9 +367,16 @@ export default function Trucks() {
                           />
                           {active ? t("common.active") : t("common.inactive")}
                         </span>
-                      </TableCell>
+                      </TableCell>}
                       <TableCell>
-                        <div className="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <Link
+                            to={`/trucks/${truck.id}`}
+                            className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                            title={t("common.openTruck")}
+                          >
+                            <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                          </Link>
                           <button
                             onClick={() => handleEdit(truck)}
                             className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"

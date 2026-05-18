@@ -38,6 +38,22 @@ export function useInvoices(clientId?: string) {
   });
 }
 
+export function useInvoice(id: string | undefined) {
+  return useQuery({
+    queryKey: ["invoices", "detail", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("invoices")
+        .select("*, clients(company_name)")
+        .eq("id", id!)
+        .single();
+      if (error) throw error;
+      return data as Invoice & { clients: { company_name: string } | null };
+    },
+  });
+}
+
 export function useCreateInvoice() {
   const queryClient = useQueryClient();
   const { toast } = useToast();

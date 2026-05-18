@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +52,7 @@ import {
   BarChart3,
   Wallet,
   Receipt,
+  Eye,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -76,6 +78,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { EmptyState } from "@/components/EmptyState";
+import { TablePreferencesToolbar, type Density } from "@/components/TablePreferencesToolbar";
+import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 
 const STATUS_STYLES: Record<string, string> = {
   pending:
@@ -94,7 +99,16 @@ const PIE_COLORS = [
   "hsl(220, 16%, 60%)",
 ];
 
+const defaultInvoiceColumns = {
+  client: true,
+  description: true,
+  amount: true,
+  dueDate: true,
+  status: true,
+};
+
 export default function FinancePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useLanguage();
   const { role } = useAuth();
   const { data: invoices, isLoading } = useInvoices();
@@ -107,8 +121,16 @@ export default function FinancePage() {
   const [editing, setEditing] = useState<
     (Invoice & { clients: { company_name: string } }) | null
   >(null);
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [filterClient, setFilterClient] = useState("all");
+  const [filterStatus, setFilterStatus] = useLocalStorageState("finance-status-filter", "all");
+  const [filterClient, setFilterClient] = useLocalStorageState("finance-client-filter", "all");
+  const [density, setDensity] = useLocalStorageState<Density>(
+    "finance-table-density",
+    "comfortable"
+  );
+  const [columns, setColumns] = useLocalStorageState(
+    "finance-table-columns",
+    defaultInvoiceColumns
+  );
 
   const [form, setForm] = useState({
     client_id: "",
@@ -120,6 +142,25 @@ export default function FinancePage() {
   });
 
   const isViewer = role === "viewer";
+
+  useEffect(() => {
+    const action = searchParams.get("action");
+    const clientId = searchParams.get("client");
+    if (action !== "new" || !clientId || isViewer) return;
+    setEditing(null);
+    setForm({
+      client_id: clientId,
+      amount: "",
+      due_date: "",
+      description: "",
+      status: "pending",
+      paid_date: "",
+    });
+    setDialogOpen(true);
+    const next = new URLSearchParams(searchParams);
+    next.delete("action");
+    setSearchParams(next);
+  }, [searchParams, setSearchParams, isViewer]);
 
   const openNew = () => {
     setEditing(null);
@@ -302,7 +343,7 @@ export default function FinancePage() {
       headers.join(","),
       ...rows.map((r) =>
         headers
-          .map((h) => `"${String((r as any)[h]).replace(/"/g, '""')}"`)
+          .map((h) => `"${String(r[h as keyof typeof r]).replace(/"/g, '""')}"`)
           .join(",")
       ),
     ].join("\n");
@@ -794,6 +835,19 @@ export default function FinancePage() {
         <span className="sm:ml-auto inline-flex items-center gap-1.5 h-7 px-2.5 rounded-lg bg-primary/10 text-primary border border-primary/15 text-xs font-bold">
           {filtered.length} {t(filtered.length === 1 ? "finance.invoice" : "finance.invoices")}
         </span>
+        <TablePreferencesToolbar
+          density={density}
+          onDensityChange={setDensity}
+          columns={columns}
+          onColumnsChange={setColumns}
+          columnOptions={[
+            { key: "client", label: t("common.client") },
+            { key: "description", label: t("finance.description") },
+            { key: "amount", label: t("finance.amount") },
+            { key: "dueDate", label: t("finance.dueDate") },
+            { key: "status", label: t("clients.status") },
+          ]}
+        />
       </div>
 
       {/* ============ TABLE ============ */}
@@ -802,39 +856,66 @@ export default function FinancePage() {
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
       ) : !filtered.length ? (
-        <Card className="border-border/50">
-          <CardContent className="p-16 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
-              <Receipt className="w-9 h-9 text-emerald-500" />
-            </div>
-            <p className="text-muted-foreground">{t("finance.noInvoices")}</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<Receipt className="w-9 h-9 text-emerald-500" />}
+          title={t("finance.noInvoices")}
+          description={
+            filterStatus !== "all" || filterClient !== "all"
+              ? t("finance.emptyFilteredDesc")
+              : t("finance.emptyCreateDesc")
+          }
+          action={
+            filterStatus !== "all" || filterClient !== "all" ? (
+              <button
+                onClick={() => {
+                  setFilterStatus("all");
+                  setFilterClient("all");
+                }}
+                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold"
+              >
+                {t("common.clearFilters")}
+              </button>
+            ) : !isViewer ? (
+              <button
+                onClick={openNew}
+                className="h-11 px-6 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                {t("finance.newInvoice")}
+              </button>
+            ) : undefined
+          }
+        />
       ) : (
-        <Card className="overflow-hidden border-border/50 shadow-sm">
-          <Table>
+        <Card
+          className={`overflow-hidden border-border/50 shadow-sm ${
+            density === "compact"
+              ? "[&_td]:!py-2 [&_td]:text-xs [&_th]:!h-9 [&_th]:!py-2"
+              : "[&_td]:!py-3 [&_th]:!h-11"
+          }`}
+        >
+          <CardContent className="p-0 overflow-x-auto">
+          <Table className="min-w-[920px] table-fixed">
             <TableHeader>
               <TableRow className="bg-muted/40 hover:bg-muted/40 border-border/50">
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                {columns.client !== false && <TableHead className="w-[240px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("common.client")}
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                </TableHead>}
+                {columns.description !== false && <TableHead className="w-[260px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("finance.description")}
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
+                </TableHead>}
+                {columns.amount !== false && <TableHead className="w-[140px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
                   {t("finance.amount")}
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                </TableHead>}
+                {columns.dueDate !== false && <TableHead className="w-[130px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("finance.dueDate")}
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                </TableHead>}
+                {columns.status !== false && <TableHead className="w-[130px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("clients.status")}
+                </TableHead>}
+                <TableHead className="w-[140px] text-center font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  {t("common.actions")}
                 </TableHead>
-                {!isViewer && (
-                  <TableHead className="w-24 font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                    {t("common.actions")}
-                  </TableHead>
-                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -843,28 +924,38 @@ export default function FinancePage() {
                   key={inv.id}
                   className="group hover:bg-muted/40 transition-colors border-border/50"
                 >
-                  <TableCell className="text-sm font-semibold">
-                    {inv.clients?.company_name || "—"}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-[240px] truncate">
+                  {columns.client !== false && <TableCell className={`text-sm font-semibold ${density === "compact" ? "py-2" : ""}`}>
+                    <Link to={`/clients/${inv.client_id}`} className="block truncate hover:text-primary">
+                      {inv.clients?.company_name || "—"}
+                    </Link>
+                  </TableCell>}
+                  {columns.description !== false && <TableCell className="text-sm text-muted-foreground max-w-[240px] truncate">
                     {inv.description || "—"}
-                  </TableCell>
-                  <TableCell className="font-mono font-bold text-sm text-right">
+                  </TableCell>}
+                  {columns.amount !== false && <TableCell className="font-mono font-bold text-sm text-right">
                     {fmt(Number(inv.amount))}
-                  </TableCell>
-                  <TableCell className="text-sm">
+                  </TableCell>}
+                  {columns.dueDate !== false && <TableCell className="text-sm">
                     {format(new Date(inv.due_date), "dd/MM/yyyy")}
-                  </TableCell>
-                  <TableCell>
+                  </TableCell>}
+                  {columns.status !== false && <TableCell>
                     <span
-                      className={`inline-flex items-center h-6 px-2.5 rounded-md text-xs font-semibold border ${STATUS_STYLES[inv.status]}`}
+                      className={`inline-flex items-center justify-center h-6 min-w-[92px] whitespace-nowrap px-2.5 rounded-md text-xs font-semibold border ${STATUS_STYLES[inv.status]}`}
                     >
                       {statusLabel(inv.status)}
                     </span>
-                  </TableCell>
-                  {!isViewer && (
-                    <TableCell>
-                      <div className="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                  </TableCell>}
+                  <TableCell>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <Link
+                        to={`/finance/${inv.id}`}
+                        className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                        title={t("common.openInvoice")}
+                      >
+                        <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                      </Link>
+                      {!isViewer && (
+                        <>
                         <button
                           onClick={() => openEdit(inv)}
                           className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
@@ -898,13 +989,15 @@ export default function FinancePage() {
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
-                      </div>
-                    </TableCell>
-                  )}
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          </CardContent>
         </Card>
       )}
 

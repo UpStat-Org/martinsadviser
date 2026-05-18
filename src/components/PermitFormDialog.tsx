@@ -13,12 +13,12 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { useCreatePermit, useUpdatePermit, PERMIT_TYPES, type Permit } from "@/hooks/usePermits";
+import { useCreatePermit, useUpdatePermit, PERMIT_TYPES, type Permit, type PermitInsert } from "@/hooks/usePermits";
 import { useClients } from "@/hooks/useClients";
 import { useTrucks } from "@/hooks/useTrucks";
 import { useEmployees, employeeName } from "@/hooks/useEmployees";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Upload, FileText, X, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -42,9 +42,10 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   permit?: Permit | null;
   defaultClientId?: string;
+  defaultTruckId?: string;
 }
 
-export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }: Props) {
+export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, defaultTruckId }: Props) {
   const createPermit = useCreatePermit();
   const updatePermit = useUpdatePermit();
   const { data: clients } = useClients();
@@ -70,11 +71,11 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
           expiration_date: permit.expiration_date || "",
           status: permit.status,
           notes: permit.notes || "",
-          assigned_to: (permit as any).assigned_to || "",
+          assigned_to: permit.assigned_to || "",
         }
       : {
           client_id: defaultClientId || "",
-          truck_id: "",
+          truck_id: defaultTruckId || "",
           permit_type: "",
           permit_number: "",
           state: "",
@@ -87,6 +88,35 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
 
   const selectedClientId = form.watch("client_id");
   const { data: trucks } = useTrucks(undefined, selectedClientId || undefined);
+
+  useEffect(() => {
+    if (!open) return;
+    form.reset(
+      permit
+        ? {
+            client_id: permit.client_id,
+            truck_id: permit.truck_id || "",
+            permit_type: permit.permit_type,
+            permit_number: permit.permit_number || "",
+            state: permit.state || "",
+            expiration_date: permit.expiration_date || "",
+            status: permit.status,
+            notes: permit.notes || "",
+            assigned_to: permit.assigned_to || "",
+          }
+        : {
+            client_id: defaultClientId || "",
+            truck_id: defaultTruckId || "",
+            permit_type: "",
+            permit_number: "",
+            state: "",
+            expiration_date: "",
+            status: "active",
+            notes: "",
+            assigned_to: "",
+          }
+    );
+  }, [open, permit, defaultClientId, defaultTruckId, form]);
 
   const uploadFile = async (permitId: string): Promise<string | null> => {
     if (!selectedFile) return permit?.document_url || null;
@@ -113,7 +143,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
   const onSubmit = async (values: FormValues) => {
     setUploading(true);
     try {
-      const payload = {
+      const payload: Omit<PermitInsert, "user_id"> = {
         client_id: values.client_id,
         truck_id: values.truck_id && values.truck_id !== "none" ? values.truck_id : null,
         permit_type: values.permit_type,
@@ -123,7 +153,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId }
         status: values.status,
         notes: values.notes || null,
         assigned_to: values.assigned_to && values.assigned_to !== "none" ? values.assigned_to : null,
-      } as any;
+      };
 
       let savedPermit: Permit;
       if (isEditing) {

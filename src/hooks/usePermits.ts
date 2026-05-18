@@ -58,6 +58,22 @@ export function usePermits(
   });
 }
 
+export function usePermit(id: string | undefined) {
+  return useQuery({
+    queryKey: ["permits", "detail", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("permits")
+        .select("*, clients(company_name), trucks(plate)")
+        .eq("id", id!)
+        .single();
+      if (error) throw error;
+      return data as PermitWithRelations;
+    },
+  });
+}
+
 export function useCreatePermit() {
   const queryClient = useQueryClient();
   const { toast } = useToast();

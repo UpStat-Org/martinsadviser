@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,6 +37,8 @@ import {
   AlertTriangle,
   Clock,
   CheckCircle2,
+  Eye,
+  X,
 } from "lucide-react";
 import { usePermits, useDeletePermit, getExpirationStatus } from "@/hooks/usePermits";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
@@ -52,6 +55,9 @@ import { PermitHistoryDialog } from "@/components/PermitHistoryDialog";
 import { useToast } from "@/hooks/use-toast";
 import { SavedFiltersBar } from "@/components/SavedFiltersBar";
 import { PermitImportDialog } from "@/components/PermitImportDialog";
+import { EmptyState } from "@/components/EmptyState";
+import { TablePreferencesToolbar, type Density } from "@/components/TablePreferencesToolbar";
+import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 
 const TYPE_GRADIENTS = [
   "from-indigo-500 to-violet-500",
@@ -64,6 +70,16 @@ const TYPE_GRADIENTS = [
   "from-purple-500 to-indigo-500",
 ];
 
+const defaultPermitColumns = {
+  number: true,
+  client: true,
+  truck: true,
+  state: true,
+  expiration: true,
+  status: true,
+  doc: true,
+};
+
 function gradientForType(type: string) {
   let h = 0;
   for (let i = 0; i < type.length; i++) h = (h * 31 + type.charCodeAt(i)) >>> 0;
@@ -71,8 +87,9 @@ function gradientForType(type: string) {
 }
 
 export default function Permits() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useLocalStorageState("permits-status-filter", "all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPermit, setEditingPermit] = useState<Permit | null>(null);
   const [viewDocUrl, setViewDocUrl] = useState<string | null>(null);
@@ -88,15 +105,27 @@ export default function Permits() {
   const [historyPermitLabel, setHistoryPermitLabel] = useState("");
   const [bulkRenewing, setBulkRenewing] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [density, setDensity] = useLocalStorageState<Density>(
+    "permits-table-density",
+    "comfortable"
+  );
+  const [columns, setColumns] = useLocalStorageState(
+    "permits-table-columns",
+    defaultPermitColumns
+  );
+  const truckFilter = searchParams.get("truck");
 
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
-  const totalPages = Math.ceil((permits?.length || 0) / PAGE_SIZE);
-  const paginatedPermits = useMemo(() => {
+  const visiblePermits = useMemo(() => {
     if (!permits) return [];
+    return truckFilter ? permits.filter((permit) => permit.truck_id === truckFilter) : permits;
+  }, [permits, truckFilter]);
+  const totalPages = Math.ceil((visiblePermits.length || 0) / PAGE_SIZE);
+  const paginatedPermits = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
-    return permits.slice(start, start + PAGE_SIZE);
-  }, [permits, page]);
+    return visiblePermits.slice(start, start + PAGE_SIZE);
+  }, [visiblePermits, page]);
 
   useEffect(() => {
     setPage(1);
@@ -112,11 +141,11 @@ export default function Permits() {
   };
 
   const toggleAll = () => {
-    if (!permits) return;
-    if (selected.size === permits.length) {
+    if (!visiblePermits.length) return;
+    if (selected.size === visiblePermits.length) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(permits.map((p) => p.id)));
+      setSelected(new Set(visiblePermits.map((p) => p.id)));
     }
   };
 
@@ -329,7 +358,33 @@ export default function Permits() {
                 {f.label}
               </button>
             );
-          })}
+            })}
+          {truckFilter && (
+            <button
+              onClick={() => setSearchParams({})}
+              className="h-8 px-2.5 rounded-lg text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex items-center gap-1"
+            >
+              <X className="w-3 h-3" />
+              {t("common.truck")}
+            </button>
+          )}
+        </div>
+        <div className="sm:ml-auto">
+          <TablePreferencesToolbar
+            density={density}
+            onDensityChange={setDensity}
+            columns={columns}
+            onColumnsChange={setColumns}
+            columnOptions={[
+              { key: "number", label: t("common.number") },
+              { key: "client", label: t("common.client") },
+              { key: "truck", label: t("common.truck") },
+              { key: "state", label: t("common.state") },
+              { key: "expiration", label: t("common.expiration") },
+              { key: "status", label: t("clients.status") },
+              { key: "doc", label: t("common.doc") },
+            ]}
+          />
         </div>
       </div>
 
@@ -347,21 +402,17 @@ export default function Permits() {
         <div className="flex justify-center py-20">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
-      ) : !permits?.length ? (
-        <Card className="border-border/50">
-          <CardContent className="p-16 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
-              <FileCheck className="w-9 h-9 text-emerald-500" />
-            </div>
-            <p className="font-display text-lg font-semibold text-foreground mb-1">
-              {search ? t("permits.noResults") : t("permits.empty")}
-            </p>
-            <p className="text-sm text-muted-foreground mb-6">
-              {search
-                ? t("permits.adjustSearch")
-                : t("permits.createFirst")}
-            </p>
-            {!search && (
+      ) : !visiblePermits.length ? (
+        <EmptyState
+          icon={<FileCheck className="w-9 h-9 text-emerald-500" />}
+          title={search || truckFilter ? t("permits.noResults") : t("permits.empty")}
+          description={
+            search || truckFilter
+              ? t("permits.adjustSearch")
+              : t("permits.createFirst")
+          }
+          action={
+            !search && !truckFilter ? (
               <button
                 onClick={handleNew}
                 className="h-11 px-6 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-2 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
@@ -369,48 +420,74 @@ export default function Permits() {
                 <Plus className="w-4 h-4" />
                 {t("permits.registerFirst")}
               </button>
-            )}
-          </CardContent>
-        </Card>
+            ) : (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setStatusFilter("all");
+                  setSearchParams({});
+                }}
+                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold"
+              >
+                {t("common.clearFilters")}
+              </button>
+            )
+          }
+          secondaryAction={
+            !search && !truckFilter ? (
+              <button
+                onClick={() => setImportOpen(true)}
+                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold inline-flex items-center gap-2"
+              >
+                <Upload className="w-4 h-4" />
+                {t("common.import")}
+              </button>
+            ) : undefined
+          }
+        />
       ) : (
-        <Card className="overflow-hidden border-border/50 shadow-sm">
-          <CardContent className="p-0">
-            <Table>
+        <Card
+          className={`overflow-hidden border-border/50 shadow-sm ${
+            density === "compact"
+              ? "[&_td]:!py-2 [&_td]:text-xs [&_th]:!h-9 [&_th]:!py-2"
+              : "[&_td]:!py-3 [&_th]:!h-11"
+          }`}
+        >
+          <CardContent className="p-0 overflow-x-auto">
+            <Table className="min-w-[1120px] table-fixed">
               <TableHeader>
                 <TableRow className="bg-muted/40 hover:bg-muted/40 border-border/50">
-                  <TableHead className="w-10">
+                  <TableHead className="w-12 text-center">
                     <Checkbox
-                      checked={
-                        permits?.length ? selected.size === permits.length : false
-                      }
+                      checked={visiblePermits.length ? selected.size === visiblePermits.length : false}
                       onCheckedChange={toggleAll}
                     />
                   </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <TableHead className="w-[220px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("common.type")}
                   </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  {columns.number !== false && <TableHead className="w-[120px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("common.number")}
-                  </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  {columns.client !== false && <TableHead className="w-[220px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("common.client")}
-                  </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  {columns.truck !== false && <TableHead className="w-[110px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("common.truck")}
-                  </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  {columns.state !== false && <TableHead className="w-[90px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("common.state")}
-                  </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  {columns.expiration !== false && <TableHead className="w-[130px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("common.expiration")}
-                  </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  {columns.status !== false && <TableHead className="w-[150px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("clients.status")}
-                  </TableHead>
-                  <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  {columns.doc !== false && <TableHead className="w-[80px] text-center font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("common.doc")}
-                  </TableHead>
-                  <TableHead className="w-24 font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  </TableHead>}
+                  <TableHead className="w-[150px] text-center font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                     {t("common.actions")}
                   </TableHead>
                 </TableRow>
@@ -433,13 +510,15 @@ export default function Permits() {
                         isSelected ? "bg-primary/[0.04]" : ""
                       }`}
                     >
-                      <TableCell>
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => toggleSelect(permit.id)}
-                        />
+                      <TableCell className="text-center">
+                        <div className="flex justify-center">
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => toggleSelect(permit.id)}
+                          />
+                        </div>
                       </TableCell>
-                      <TableCell className="py-3">
+                      <TableCell className={density === "compact" ? "py-2" : "py-3"}>
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientForType(
@@ -449,7 +528,7 @@ export default function Permits() {
                             <FileCheck className="w-4 h-4 text-white" />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-sm font-semibold truncate">
+                            <div className="text-sm font-semibold truncate max-w-[150px]">
                               {permit.permit_type}
                             </div>
                             {permit.state && (
@@ -460,7 +539,7 @@ export default function Permits() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="font-mono text-xs text-muted-foreground">
+                      {columns.number !== false && <TableCell className="font-mono text-xs text-muted-foreground">
                         {permit.permit_number ? (
                           <span className="inline-flex items-center h-6 px-2 rounded-md bg-muted/50 border border-border/50">
                             {permit.permit_number}
@@ -468,21 +547,26 @@ export default function Permits() {
                         ) : (
                           "—"
                         )}
-                      </TableCell>
-                      <TableCell className="text-sm font-medium">
-                        {permit.clients?.company_name || "—"}
-                      </TableCell>
-                      <TableCell className="text-sm">
+                      </TableCell>}
+                      {columns.client !== false && <TableCell className="text-sm font-medium">
+                        <Link
+                          to={`/clients/${permit.client_id}`}
+                          className="block truncate hover:text-primary"
+                        >
+                          {permit.clients?.company_name || "—"}
+                        </Link>
+                      </TableCell>}
+                      {columns.truck !== false && <TableCell className="text-sm">
                         {permit.trucks?.plate ? (
-                          <span className="font-mono text-xs">
+                          <Link to={`/trucks/${permit.truck_id}`} className="font-mono text-xs hover:text-primary">
                             {permit.trucks.plate}
-                          </span>
+                          </Link>
                         ) : (
                           "—"
                         )}
-                      </TableCell>
-                      <TableCell className="text-sm">{permit.state || "—"}</TableCell>
-                      <TableCell>
+                      </TableCell>}
+                      {columns.state !== false && <TableCell className="text-sm">{permit.state || "—"}</TableCell>}
+                      {columns.expiration !== false && <TableCell>
                         {permit.expiration_date ? (
                           <div className="flex flex-col">
                             <span className="text-sm font-medium">
@@ -507,15 +591,15 @@ export default function Permits() {
                         ) : (
                           "—"
                         )}
-                      </TableCell>
-                      <TableCell>
+                      </TableCell>}
+                      {columns.status !== false && <TableCell>
                         <span
-                          className={`inline-flex items-center h-6 px-2.5 rounded-md text-xs font-semibold border ${expStatus.color}`}
+                          className={`inline-flex items-center justify-center h-7 min-w-[112px] whitespace-nowrap px-3 rounded-md text-xs font-semibold border ${expStatus.color}`}
                         >
                           {expStatus.label}
                         </span>
-                      </TableCell>
-                      <TableCell>
+                      </TableCell>}
+                      {columns.doc !== false && <TableCell className="text-center">
                         {permit.document_url ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -526,7 +610,7 @@ export default function Permits() {
                                     `${permit.permit_type} - ${permit.permit_number || ""}`
                                   );
                                 }}
-                                className="w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 flex items-center justify-center transition-colors"
+                                className="mx-auto w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 flex items-center justify-center transition-colors"
                               >
                                 <FileText className="w-3.5 h-3.5 text-primary" />
                               </button>
@@ -536,9 +620,16 @@ export default function Permits() {
                         ) : (
                           <span className="text-muted-foreground text-xs">—</span>
                         )}
-                      </TableCell>
+                      </TableCell>}
                       <TableCell>
-                        <div className="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <Link
+                            to={`/permits/${permit.id}`}
+                            className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                            title={t("common.openPermit")}
+                          >
+                            <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                          </Link>
                           <button
                             onClick={() => {
                               setHistoryPermitId(permit.id);

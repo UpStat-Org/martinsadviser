@@ -18,7 +18,9 @@ import Clients from "./pages/Clients";
 import ClientDetail from "./pages/ClientDetail";
 import ClientOnboarding from "./pages/ClientOnboarding";
 import Trucks from "./pages/Trucks";
+import TruckDetail from "./pages/TruckDetail";
 import Permits from "./pages/Permits";
+import PermitDetail from "./pages/PermitDetail";
 import Messages from "./pages/Messages";
 import CalendarPage from "./pages/CalendarPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -27,6 +29,7 @@ import NotFound from "./pages/NotFound";
 import ReportsPage from "./pages/ReportsPage";
 import KanbanPage from "./pages/KanbanPage";
 import FinancePage from "./pages/FinancePage";
+import InvoiceDetail from "./pages/InvoiceDetail";
 import AuditPage from "./pages/AuditPage";
 import DocumentationPage from "./pages/DocumentationPage";
 import MyDeskPage from "./pages/MyDeskPage";
@@ -74,13 +77,16 @@ const App = () => (
               <Route path="/clients/onboarding" element={<ClientOnboarding />} />
               <Route path="/clients/:id" element={<ClientDetail />} />
               <Route path="/trucks" element={<Trucks />} />
+              <Route path="/trucks/:id" element={<TruckDetail />} />
               <Route path="/permits" element={<Permits />} />
+              <Route path="/permits/:id" element={<PermitDetail />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/tasks" element={<KanbanPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/finance" element={<FinancePage />} />
+              <Route path="/finance/:id" element={<InvoiceDetail />} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/audit" element={<AuditPage />} />
               <Route path="/docs" element={<DocumentationPage />} />

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ import {
   X,
   Filter,
   TrendingUp,
+  Eye,
 } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
 import { ClientFormDialog } from "@/components/ClientFormDialog";
@@ -34,6 +35,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermits } from "@/hooks/usePermits";
 import { useTrucks } from "@/hooks/useTrucks";
+import { EmptyState } from "@/components/EmptyState";
+import { TablePreferencesToolbar, type Density } from "@/components/TablePreferencesToolbar";
+import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -43,6 +47,19 @@ const serviceLabels = [
   { key: "service_nm", label: "NM" },
   { key: "service_automatic", label: "Auto" },
 ] as const;
+
+type ServiceKey = (typeof serviceLabels)[number]["key"];
+
+const defaultClientColumns = {
+  dot: true,
+  mc: true,
+  phone: true,
+  services: true,
+  permits: true,
+  trucks: true,
+  risk: true,
+  status: true,
+};
 
 const AVATAR_GRADIENTS = [
   "from-indigo-500 to-violet-500",
@@ -80,7 +97,18 @@ export default function Clients() {
   const { role } = useAuth();
   const isViewer = role === "viewer";
 
-  const [serviceFilter, setServiceFilter] = useState<string | null>(null);
+  const [serviceFilter, setServiceFilter] = useLocalStorageState<ServiceKey | null>(
+    "clients-service-filter",
+    null
+  );
+  const [density, setDensity] = useLocalStorageState<Density>(
+    "clients-table-density",
+    "comfortable"
+  );
+  const [columns, setColumns] = useLocalStorageState(
+    "clients-table-columns",
+    defaultClientColumns
+  );
   const { data: allPermits } = usePermits();
   const { data: allTrucks } = useTrucks();
 
@@ -119,7 +147,7 @@ export default function Clients() {
 
   const filteredClients = useMemo(() => {
     if (!clients || !serviceFilter) return clients;
-    return clients.filter((c) => (c as any)[serviceFilter] === true);
+    return clients.filter((c) => c[serviceFilter] === true);
   }, [clients, serviceFilter]);
 
   const [page, setPage] = useState(1);
@@ -304,6 +332,24 @@ export default function Clients() {
             </button>
           )}
         </div>
+        <div className="sm:ml-auto">
+          <TablePreferencesToolbar
+            density={density}
+            onDensityChange={setDensity}
+            columns={columns}
+            onColumnsChange={setColumns}
+            columnOptions={[
+              { key: "dot", label: "DOT" },
+              { key: "mc", label: "MC" },
+              { key: "phone", label: t("clients.phone") },
+              { key: "services", label: t("clients.services") },
+              { key: "permits", label: "Permits" },
+              { key: "trucks", label: "Trucks" },
+              { key: "risk", label: t("common.risk") },
+              { key: "status", label: t("clients.status") },
+            ]}
+          />
+        </div>
       </div>
 
       {/* ============ TABLE ============ */}
@@ -312,20 +358,16 @@ export default function Clients() {
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
       ) : !filteredClients?.length ? (
-        <Card className="border-border/50">
-          <CardContent className="p-16 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
-              <Users className="w-9 h-9 text-indigo-500" />
-            </div>
-            <p className="font-display text-lg font-semibold text-foreground mb-1">
-              {search || serviceFilter ? t("clients.noResults") : t("clients.empty")}
-            </p>
-            <p className="text-sm text-muted-foreground mb-6">
-              {search || serviceFilter
-                ? "Tente ajustar os filtros ou a busca."
-                : "Cadastre seu primeiro cliente para começar."}
-            </p>
-            {!search && !serviceFilter && (
+        <EmptyState
+          icon={<Users className="w-9 h-9 text-indigo-500" />}
+          title={search || serviceFilter ? t("clients.noResults") : t("clients.empty")}
+          description={
+            search || serviceFilter
+              ? t("clients.emptyFilteredDesc")
+              : t("clients.emptyCreateDesc")
+          }
+          action={
+            !search && !serviceFilter ? (
               <button
                 onClick={() => navigate("/clients/onboarding")}
                 className="h-11 px-6 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-2 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
@@ -333,40 +375,71 @@ export default function Clients() {
                 <Plus className="w-4 h-4" />
                 {t("clients.registerFirst")}
               </button>
-            )}
-          </CardContent>
-        </Card>
+            ) : undefined
+          }
+          secondaryAction={
+            search || serviceFilter ? (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setServiceFilter(null);
+                }}
+                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold"
+              >
+                {t("common.clearFilters")}
+              </button>
+            ) : (
+              <button
+                onClick={() => setImportOpen(true)}
+                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold inline-flex items-center gap-2"
+              >
+                <Upload className="w-4 h-4" />
+                {t("import.title")}
+              </button>
+            )
+          }
+        />
       ) : (
-        <Card className="overflow-hidden border-border/50 shadow-sm">
-          <Table>
+        <Card
+          className={`overflow-hidden border-border/50 shadow-sm ${
+            density === "compact"
+              ? "[&_td]:!py-2 [&_td]:text-xs [&_th]:!h-9 [&_th]:!py-2"
+              : "[&_td]:!py-3 [&_th]:!h-11"
+          }`}
+        >
+          <CardContent className="p-0 overflow-x-auto">
+          <Table className="min-w-[1180px] table-fixed">
             <TableHeader>
               <TableRow className="bg-muted/40 hover:bg-muted/40 border-border/50">
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                <TableHead className="w-[250px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("clients.company")}
                 </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                {columns.dot !== false && <TableHead className="w-[120px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   DOT
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                </TableHead>}
+                {columns.mc !== false && <TableHead className="w-[110px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   MC
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                </TableHead>}
+                {columns.phone !== false && <TableHead className="w-[150px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("clients.phone")}
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                </TableHead>}
+                {columns.services !== false && <TableHead className="w-[180px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("clients.services")}
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
+                </TableHead>}
+                {columns.permits !== false && <TableHead className="w-[95px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
                   Permits
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
+                </TableHead>}
+                {columns.trucks !== false && <TableHead className="w-[95px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
                   Trucks
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Risco
-                </TableHead>
-                <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                </TableHead>}
+                {columns.risk !== false && <TableHead className="w-[130px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  {t("common.risk")}
+                </TableHead>}
+                {columns.status !== false && <TableHead className="w-[120px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("clients.status")}
+                </TableHead>}
+                <TableHead className="w-[80px] text-center font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  {t("common.open")}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -382,7 +455,7 @@ export default function Clients() {
                     className="group cursor-pointer hover:bg-muted/40 transition-colors border-border/50"
                     onClick={() => navigate(`/clients/${client.id}`)}
                   >
-                    <TableCell className="py-3">
+                    <TableCell className={density === "compact" ? "py-2" : "py-3"}>
                       <div className="flex items-center gap-3">
                         <div
                           className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientFor(
@@ -392,7 +465,7 @@ export default function Clients() {
                           {initials(client.company_name)}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-sm font-semibold truncate">
+                          <div className="text-sm font-semibold truncate max-w-[170px]">
                             {client.company_name}
                           </div>
                           <div className="text-xs text-muted-foreground truncate">
@@ -401,16 +474,16 @@ export default function Clients() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-muted-foreground font-mono text-xs">
+                    {columns.dot !== false && <TableCell className="text-muted-foreground font-mono text-xs">
                       {client.dot || "—"}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground font-mono text-xs">
+                    </TableCell>}
+                    {columns.mc !== false && <TableCell className="text-muted-foreground font-mono text-xs">
                       {client.mc || "—"}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
+                    </TableCell>}
+                    {columns.phone !== false && <TableCell className="text-muted-foreground text-sm">
                       {client.phone || "—"}
-                    </TableCell>
-                    <TableCell>
+                    </TableCell>}
+                    {columns.services !== false && <TableCell>
                       <div className="flex gap-1 flex-wrap">
                         {activeServices.length > 0 ? (
                           activeServices.map((s) => (
@@ -425,27 +498,27 @@ export default function Clients() {
                           <span className="text-xs text-muted-foreground">—</span>
                         )}
                       </div>
-                    </TableCell>
-                    <TableCell className="text-center">
+                    </TableCell>}
+                    {columns.permits !== false && <TableCell className="text-center">
                       <div className="inline-flex items-center gap-1.5 px-2 h-6 rounded-md bg-muted/60 text-xs font-semibold">
                         <FileCheck className="w-3 h-3 text-emerald-500" />
                         {permitCount}
                       </div>
-                    </TableCell>
-                    <TableCell className="text-center">
+                    </TableCell>}
+                    {columns.trucks !== false && <TableCell className="text-center">
                       <div className="inline-flex items-center gap-1.5 px-2 h-6 rounded-md bg-muted/60 text-xs font-semibold">
                         <TruckIcon className="w-3 h-3 text-sky-500" />
                         {truckCount}
                       </div>
-                    </TableCell>
-                    <TableCell>
+                    </TableCell>}
+                    {columns.risk !== false && <TableCell>
                       {riskByClient[client.id] === "danger" ? (
                         <Badge
                           className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20 gap-1"
                           variant="outline"
                         >
                           <ShieldAlert className="w-3 h-3" />
-                          Urgente
+                          {t("common.urgent")}
                         </Badge>
                       ) : riskByClient[client.id] === "warning" ? (
                         <Badge
@@ -453,7 +526,7 @@ export default function Clients() {
                           variant="outline"
                         >
                           <ShieldAlert className="w-3 h-3" />
-                          Atenção
+                          {t("common.attention")}
                         </Badge>
                       ) : permitCount > 0 ? (
                         <Badge
@@ -466,17 +539,28 @@ export default function Clients() {
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
-                    </TableCell>
-                    <TableCell>
+                    </TableCell>}
+                    {columns.status !== false && <TableCell>
                       <Badge variant="outline" className={status.className}>
                         {status.label}
                       </Badge>
+                    </TableCell>}
+                    <TableCell className="text-center">
+                      <Link
+                        to={`/clients/${client.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="mx-auto w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                        title={t("common.openClient")}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </Link>
                     </TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
           </Table>
+          </CardContent>
         </Card>
       )}
 
