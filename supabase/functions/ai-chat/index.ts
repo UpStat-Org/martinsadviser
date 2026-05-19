@@ -106,8 +106,8 @@ Data de hoje: ${new Date().toISOString().split("T")[0]}`;
 
     // Persist user msg + assistant reply
     await supabase.from("ai_chat_messages").insert([
-      { client_id, user_id: userId, role: "user", content: message },
-      { client_id, user_id: userId, role: "assistant", content: reply },
+      { client_id, org_id: client.org_id, user_id: userId, role: "user", content: message },
+      { client_id, org_id: client.org_id, user_id: userId, role: "assistant", content: reply },
     ]);
 
     return new Response(JSON.stringify({ reply }), {
