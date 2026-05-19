@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
         // UNIQUE(rule_id, permit_id) garante idempotência mesmo em execução concorrente.
         const { error: logErr } = await supabase
           .from("automation_log")
-          .insert({ rule_id: rule.id, permit_id: permit.id });
+          .insert({ rule_id: rule.id, permit_id: permit.id, org_id: permit.org_id });
 
         if (logErr) {
           // 23505 = unique_violation → já processado, pular silenciosamente.
@@ -150,6 +150,7 @@ Deno.serve(async (req) => {
         } else if (!existingTask) {
           const { error: taskErr } = await supabase.from("tasks").insert({
             user_id: rule.user_id,
+            org_id: permit.org_id,
             client_id: permit.client_id,
             name: taskName,
             task_type: permit.permit_type,

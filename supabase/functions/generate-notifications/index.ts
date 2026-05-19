@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
   // 1. Permits expiring in 30 days or already expired
   const { data: permits } = await supabase
     .from("permits")
-    .select("id, user_id, permit_type, state, expiration_date, clients(company_name)")
+    .select("id, user_id, org_id, permit_type, state, expiration_date, clients(company_name)")
     .not("expiration_date", "is", null)
     .lte("expiration_date", new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0]);
 
@@ -44,6 +44,7 @@ Deno.serve(async (req) => {
     if (!existing?.length) {
       await supabase.from("notifications").insert({
         user_id: p.user_id,
+        org_id: p.org_id,
         type,
         title,
         body,
@@ -57,7 +58,7 @@ Deno.serve(async (req) => {
   const today = new Date().toISOString().split("T")[0];
   const { data: invoices } = await supabase
     .from("invoices")
-    .select("id, user_id, amount, due_date, clients(company_name)")
+    .select("id, user_id, org_id, amount, due_date, clients(company_name)")
     .eq("status", "pending")
     .lt("due_date", today);
 
@@ -74,6 +75,7 @@ Deno.serve(async (req) => {
     if (!existing?.length) {
       await supabase.from("notifications").insert({
         user_id: inv.user_id,
+        org_id: inv.org_id,
         type: "invoice_overdue",
         title: "Fatura atrasada",
         body: `${clientName} — $${inv.amount} venceu em ${inv.due_date}`,
@@ -87,7 +89,7 @@ Deno.serve(async (req) => {
   const staleDate = new Date(Date.now() - 7 * 86400000).toISOString();
   const { data: tasks } = await supabase
     .from("tasks")
-    .select("id, user_id, name, created_at")
+    .select("id, user_id, org_id, name, created_at")
     .eq("status", "not_started")
     .lt("created_at", staleDate);
 
@@ -103,6 +105,7 @@ Deno.serve(async (req) => {
     if (!existing?.length) {
       await supabase.from("notifications").insert({
         user_id: t.user_id,
+        org_id: t.org_id,
         type: "task_stale",
         title: "Tarefa parada",
         body: `"${t.name}" está pendente há mais de 7 dias`,
