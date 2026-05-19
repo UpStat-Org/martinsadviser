@@ -71,6 +71,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          org_id: string
           role: string
           user_id: string | null
         }
@@ -79,6 +80,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          org_id?: string
           role?: string
           user_id?: string | null
         }
@@ -87,6 +89,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          org_id?: string
           role?: string
           user_id?: string | null
         }
@@ -96,6 +99,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_chat_messages_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
