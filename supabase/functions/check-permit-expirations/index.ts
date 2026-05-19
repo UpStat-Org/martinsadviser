@@ -111,6 +111,7 @@ Deno.serve(async (req) => {
           .from("scheduled_messages")
           .insert({
             user_id: rule.user_id,
+            org_id: permit.org_id,
             client_id: permit.client_id,
             template_id: rule.template_id,
             channel: rule.channel,
