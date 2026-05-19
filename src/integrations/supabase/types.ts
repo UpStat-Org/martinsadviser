@@ -222,18 +222,21 @@ export type Database = {
           client_id: string
           created_at: string
           id: string
+          org_id: string
           user_id: string
         }
         Insert: {
           client_id: string
           created_at?: string
           id?: string
+          org_id?: string
           user_id: string
         }
         Update: {
           client_id?: string
           created_at?: string
           id?: string
+          org_id?: string
           user_id?: string
         }
         Relationships: [
@@ -242,6 +245,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_portal_users_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -363,6 +373,7 @@ export type Database = {
           document_name: string
           id: string
           ip_address: string | null
+          org_id: string
           permit_id: string | null
           signature_data: string
           signed_at: string
@@ -376,6 +387,7 @@ export type Database = {
           document_name: string
           id?: string
           ip_address?: string | null
+          org_id?: string
           permit_id?: string | null
           signature_data: string
           signed_at?: string
@@ -389,6 +401,7 @@ export type Database = {
           document_name?: string
           id?: string
           ip_address?: string | null
+          org_id?: string
           permit_id?: string | null
           signature_data?: string
           signed_at?: string
@@ -402,6 +415,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_signatures_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
           {
@@ -454,6 +474,7 @@ export type Database = {
           description: string | null
           due_date: string
           id: string
+          org_id: string
           paid_date: string | null
           status: string
           updated_at: string
@@ -466,6 +487,7 @@ export type Database = {
           description?: string | null
           due_date: string
           id?: string
+          org_id?: string
           paid_date?: string | null
           status?: string
           updated_at?: string
@@ -478,6 +500,7 @@ export type Database = {
           description?: string | null
           due_date?: string
           id?: string
+          org_id?: string
           paid_date?: string | null
           status?: string
           updated_at?: string
@@ -489,6 +512,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -982,6 +1012,7 @@ export type Database = {
           name: string
           notes: string | null
           operator: string | null
+          org_id: string
           priority: string | null
           status: string
           tags: string[] | null
@@ -998,6 +1029,7 @@ export type Database = {
           name: string
           notes?: string | null
           operator?: string | null
+          org_id?: string
           priority?: string | null
           status?: string
           tags?: string[] | null
@@ -1014,6 +1046,7 @@ export type Database = {
           name?: string
           notes?: string | null
           operator?: string | null
+          org_id?: string
           priority?: string | null
           status?: string
           tags?: string[] | null
@@ -1027,6 +1060,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
