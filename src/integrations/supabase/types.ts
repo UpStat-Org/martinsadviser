@@ -757,6 +757,7 @@ export type Database = {
           created_at: string
           feature_flags: Json
           id: string
+          is_master_org: boolean
           name: string
           slug: string
           stripe_customer_id: string | null
@@ -770,6 +771,7 @@ export type Database = {
           created_at?: string
           feature_flags?: Json
           id?: string
+          is_master_org?: boolean
           name: string
           slug: string
           stripe_customer_id?: string | null
@@ -783,6 +785,7 @@ export type Database = {
           created_at?: string
           feature_flags?: Json
           id?: string
+          is_master_org?: boolean
           name?: string
           slug?: string
           stripe_customer_id?: string | null
