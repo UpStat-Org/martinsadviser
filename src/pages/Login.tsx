@@ -67,6 +67,8 @@ export default function Login() {
     app_name: brandingApp,
     tagline: brandingTagline,
     logo_url: brandingLogo,
+    primary_color: brandingPrimary,
+    accent_color: brandingAccent,
   });
 
   // Subdomain points at a slug we don't have an org for → 404-ish state.

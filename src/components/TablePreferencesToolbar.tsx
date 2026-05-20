@@ -22,7 +22,7 @@ interface TablePreferencesToolbarProps {
   onDensityChange: (density: Density) => void;
   columns: Record<string, boolean>;
   columnOptions: ColumnOption[];
-  onColumnsChange: (columns: Record<string, boolean>) => void;
+  onColumnsChange: (columns: any) => void;
 }
 
 export function TablePreferencesToolbar({
