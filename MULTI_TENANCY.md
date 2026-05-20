@@ -57,7 +57,7 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 | **Week 2** — org_id rollout             | 19 tabelas com `org_id` + policies reescritas             | ✅ Done                                                     |
 | **Week 3** — Frontend                   | OrgContext, JWT hook (deferred), signup trigger           | ✅ Done                                                     |
 | **Week 4** — Hardening                  | Edge functions restantes + testes isolamento cross-tenant | ✅ Done (38/38 asserções de isolamento passaram em 2026-05-20)        |
-| **Mês 2** — Modularização + white-label | Feature flags por org, branding por org, subdomínio       | 🟡 Em andamento (flags ✅ 2026-05-20; branding/subdomínio ⬜)|
+| **Mês 2** — Modularização + white-label | Feature flags por org, branding por org, subdomínio       | 🟡 Em andamento (flags ✅, branding ✅ 2026-05-20; subdomínio ⬜)|
 | **Mês 3** — Onboarding + billing        | Stripe, signup self-serve org, super-admin panel          | ⬜ Futuro                                                   |
 | **Mês 4** — Polimento + launch          | Landing page, docs, testes de carga                       | ⬜ Futuro                                                   |
 
@@ -177,7 +177,7 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 | Quando                        | Decisão                                                                                      |
 | ----------------------------- | -------------------------------------------------------------------------------------------- |
 | Antes de onboardar 2º cliente | Conseguir acesso ao Supabase Dashboard pra registrar JWT hook                                |
-| Antes de Phase 2              | Refatorar `useAuth.isAdmin` pra ler do `OrgContext.isOrgAdmin` (hoje lê legacy `user_roles`) |
+| ~~Antes de Phase 2~~          | ~~Refatorar `useAuth.isAdmin` → `useOrg().isOrgAdmin`~~ ✅ Feito 2026-05-20                  |
 | Antes de Phase 2              | Definir pricing (por seat? por permit? flat?)                                                |
 | Mês 2                         | Quais módulos viram opt-in via `feature_flags` (AI? portal? calendar?)                       |
 | Mês 2                         | Subdomínio por org (`acme.app.com`) — DNS strategy no Netlify/CDN                            |

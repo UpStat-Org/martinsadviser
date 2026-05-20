@@ -37,6 +37,46 @@ const FLAG_DEFAULTS: Record<FeatureFlag, boolean> = {
   audit_log: true,
 };
 
+export interface OrgBranding {
+  app_name: string;
+  tagline: string;
+  logo_url: string | null;
+}
+
+// Safe defaults used both when the org row has an empty `branding` jsonb
+// (new tenants) and as the fallback before OrgContext finishes loading.
+// We default to the MartinsAdviser brand so the public/loading state still
+// has something to show.
+const BRANDING_DEFAULTS: OrgBranding = {
+  app_name: "MartinsAdviser",
+  tagline: "Adviser",
+  logo_url: null,
+};
+
+function parseBranding(raw: unknown): OrgBranding {
+  const obj = (raw && typeof raw === "object") ? raw as Record<string, unknown> : {};
+  return {
+    app_name: typeof obj.app_name === "string" && obj.app_name.length > 0 ? obj.app_name : BRANDING_DEFAULTS.app_name,
+    tagline: typeof obj.tagline === "string" ? obj.tagline : BRANDING_DEFAULTS.tagline,
+    logo_url: typeof obj.logo_url === "string" && obj.logo_url.length > 0 ? obj.logo_url : null,
+  };
+}
+
+/**
+ * Splits the app name into a 2-line wordmark when the tagline is a suffix
+ * of the app name (e.g. "MartinsAdviser" + "Adviser" → "Martins" / "Adviser").
+ * For orgs that just set app_name without a tagline, returns the name as
+ * primary and an empty secondary — the Wordmark will render a single line.
+ */
+export function splitWordmark(branding: OrgBranding): { primary: string; secondary: string } {
+  const { app_name, tagline } = branding;
+  if (tagline && app_name.toLowerCase().endsWith(tagline.toLowerCase()) && app_name.length > tagline.length) {
+    const primary = app_name.slice(0, app_name.length - tagline.length).trim();
+    return { primary: primary || app_name, secondary: tagline };
+  }
+  return { primary: app_name, secondary: tagline };
+}
+
 export interface Organization {
   id: string;
   slug: string;
@@ -57,6 +97,7 @@ interface OrgContextValue {
   isOrgAdmin: boolean;
   features: Record<FeatureFlag, boolean>;
   hasFeature: (flag: FeatureFlag) => boolean;
+  branding: OrgBranding;
   loading: boolean;
   switchOrg: (orgId: string) => Promise<void>;
   refresh: () => Promise<void>;
@@ -146,9 +187,20 @@ export function OrgProvider({ children }: { children: ReactNode }) {
 
   const hasFeature = (flag: FeatureFlag) => features[flag];
 
+  const branding = parseBranding(currentOrg?.branding);
+
+  // Mirror the org's app_name into the browser tab. Keeping this in the
+  // provider (rather than on every page) means it stays in sync after
+  // switchOrg without each consumer remembering to update.
+  useEffect(() => {
+    if (typeof document !== "undefined" && currentOrg) {
+      document.title = branding.app_name;
+    }
+  }, [branding.app_name, currentOrg]);
+
   return (
     <OrgContext.Provider
-      value={{ currentOrg, memberships, isOrgOwner, isOrgAdmin, features, hasFeature, loading, switchOrg, refresh }}
+      value={{ currentOrg, memberships, isOrgOwner, isOrgAdmin, features, hasFeature, branding, loading, switchOrg, refresh }}
     >
       {children}
     </OrgContext.Provider>

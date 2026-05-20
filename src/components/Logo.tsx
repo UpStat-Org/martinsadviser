@@ -1,9 +1,25 @@
 interface LogoProps {
   className?: string;
   title?: string;
+  /**
+   * When set, renders an <img> from the URL instead of the built-in SVG.
+   * Used by white-labeled orgs to bring their own logo without us hosting
+   * arbitrary uploads. Fits the same square box, so callers should pass a
+   * className that constrains the size (default w-10 h-10).
+   */
+  src?: string | null;
 }
 
-export function Logo({ className = "w-10 h-10", title = "MartinsAdviser" }: LogoProps) {
+export function Logo({ className = "w-10 h-10", title = "MartinsAdviser", src }: LogoProps) {
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={title}
+        className={`${className} object-cover`}
+      />
+    );
+  }
   return (
     <svg
       viewBox="0 0 48 48"

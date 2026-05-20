@@ -5,7 +5,9 @@ import type { User } from "@supabase/supabase-js";
 interface AuthState {
   user: User | null;
   loading: boolean;
-  isAdmin: boolean;
+  // Legacy fine-grained role from user_roles (admin / operator / viewer / user).
+  // Used for "can mutate?" UI gates (isViewer pattern). Admin-vs-not should
+  // come from useOrg().isOrgAdmin (membership-based, multi-tenant aware).
   role: "admin" | "operator" | "viewer" | "user" | null;
   approvalStatus: string | null;
   fullName: string | null;
@@ -15,7 +17,6 @@ export function useAuth() {
   const [state, setState] = useState<AuthState>({
     user: null,
     loading: true,
-    isAdmin: false,
     role: null,
     approvalStatus: null,
     fullName: null,
@@ -24,7 +25,7 @@ export function useAuth() {
   useEffect(() => {
     const fetchProfile = async (user: User | null) => {
       if (!user) {
-        setState({ user: null, loading: false, isAdmin: false, role: null, approvalStatus: null, fullName: null });
+        setState({ user: null, loading: false, role: null, approvalStatus: null, fullName: null });
         return;
       }
 
@@ -41,13 +42,11 @@ export function useAuth() {
         .select("role")
         .eq("user_id", user.id);
 
-      const isAdmin = roles?.some((r) => r.role === "admin") ?? false;
       const userRole = roles?.length ? (roles[0].role as AuthState["role"]) : "user";
 
       setState({
         user,
         loading: false,
-        isAdmin,
         role: userRole,
         approvalStatus: profile?.approval_status ?? "pending",
         fullName: profile?.full_name ?? null,

@@ -7,6 +7,10 @@ interface WordmarkProps {
   size?: Size;
   tone?: Tone;
   className?: string;
+  /** Main brand word. Defaults to "Martins" to preserve the original look. */
+  primary?: string;
+  /** Secondary word after the gold bar. Defaults to "Adviser". */
+  secondary?: string;
 }
 
 const sizeMap: Record<Size, { main: string; sub: string; gap: string; bar: string }> = {
@@ -16,11 +20,18 @@ const sizeMap: Record<Size, { main: string; sub: string; gap: string; bar: strin
   xl: { main: "text-[28px]", sub: "text-[11px]", gap: "gap-[5px]", bar: "w-6 h-[2.5px]" },
 };
 
-export function Wordmark({ size = "md", tone = "dark", className }: WordmarkProps) {
+export function Wordmark({
+  size = "md",
+  tone = "dark",
+  className,
+  primary = "Martins",
+  secondary = "Adviser",
+}: WordmarkProps) {
   const s = sizeMap[size];
   const mainColor = tone === "light" ? "text-white" : "text-foreground";
   const subColor = tone === "light" ? "text-white/55" : "text-muted-foreground";
   const barColor = "bg-gradient-to-r from-[#F59E0B] to-[#FCD34D]";
+  const hasSecondary = secondary && secondary.length > 0;
 
   return (
     <div className={cn("flex flex-col leading-none select-none", s.gap, className)}>
@@ -32,21 +43,23 @@ export function Wordmark({ size = "md", tone = "dark", className }: WordmarkProp
         )}
         style={{ letterSpacing: "-0.045em" }}
       >
-        Martins
+        {primary}
       </span>
-      <div className="flex items-center gap-1.5">
-        <span className={cn("rounded-full shrink-0", s.bar, barColor)} />
-        <span
-          className={cn(
-            "font-sans font-semibold uppercase",
-            s.sub,
-            subColor,
-          )}
-          style={{ letterSpacing: "0.32em" }}
-        >
-          Adviser
-        </span>
-      </div>
+      {hasSecondary && (
+        <div className="flex items-center gap-1.5">
+          <span className={cn("rounded-full shrink-0", s.bar, barColor)} />
+          <span
+            className={cn(
+              "font-sans font-semibold uppercase",
+              s.sub,
+              subColor,
+            )}
+            style={{ letterSpacing: "0.32em" }}
+          >
+            {secondary}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

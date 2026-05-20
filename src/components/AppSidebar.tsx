@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { OrgSwitcher } from "@/components/OrgSwitcher";
-import { useOrg, type FeatureFlag } from "@/contexts/OrgContext";
+import { useOrg, splitWordmark, type FeatureFlag } from "@/contexts/OrgContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Logo } from "@/components/Logo";
@@ -30,8 +30,9 @@ export function AppSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAdmin, user, fullName, role } = useAuth();
-  const { hasFeature } = useOrg();
+  const { user, fullName, role } = useAuth();
+  const { hasFeature, branding, isOrgAdmin } = useOrg();
+  const wordmark = splitWordmark(branding);
   const { t } = useLanguage();
   const isMobile = useIsMobile();
   const { theme, setTheme } = useTheme();
@@ -76,7 +77,7 @@ export function AppSidebar() {
         ]),
       },
     ];
-    if (isAdmin) {
+    if (isOrgAdmin) {
       base.push({
         label: t("sidebar.section.administration"),
         items: filterByFeature([
@@ -88,7 +89,7 @@ export function AppSidebar() {
     }
     // Drop sections that became empty after filtering (e.g. communication off entirely)
     return base.filter((section) => section.items.length > 0);
-  }, [t, isAdmin, hasFeature]);
+  }, [t, isOrgAdmin, hasFeature]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -164,10 +165,22 @@ export function AppSidebar() {
         collapsed && !isMobile ? "justify-center px-2" : "px-4"
       )}>
         <div className="relative shrink-0">
-          <Logo className="w-8 h-8 rounded-lg shadow-sm" />
+          <Logo
+            src={branding.logo_url}
+            title={branding.app_name}
+            className="w-8 h-8 rounded-lg shadow-sm"
+          />
           <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 ring-1 ring-sidebar-background" />
         </div>
-        {showLabel && <Wordmark size="sm" tone="dark" className="min-w-0" />}
+        {showLabel && (
+          <Wordmark
+            size="sm"
+            tone="dark"
+            className="min-w-0"
+            primary={wordmark.primary}
+            secondary={wordmark.secondary}
+          />
+        )}
         {isMobile && (
           <button onClick={() => setMobileOpen(false)} className="ml-auto text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors">
             <X className="w-4 h-4" />
