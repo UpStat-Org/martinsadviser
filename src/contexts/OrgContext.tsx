@@ -49,23 +49,25 @@ export interface OrgBranding {
   accent_color: string | null;
 }
 
-// Safe defaults used both when the org row has an empty `branding` jsonb
-// (new tenants) and as the fallback before OrgContext finishes loading.
-// We default to the MartinsAdviser brand so the public/loading state still
-// has something to show.
-const BRANDING_DEFAULTS: OrgBranding = {
-  app_name: "MartinsAdviser",
-  tagline: "Adviser",
-  logo_url: null,
-  primary_color: null,
-  accent_color: null,
-};
+// Fallback brand used when:
+//   - there's no org loaded yet (apex, pre-auth)
+//   - an org row has empty branding AND we have no other name to use
+// New orgs DON'T default to MartinsAdviser anymore — see parseBranding.
+const FALLBACK_APP_NAME = "MartinsAdviser";
+const FALLBACK_TAGLINE = "Adviser";
 
-function parseBranding(raw: unknown): OrgBranding {
+function parseBranding(raw: unknown, fallbackName?: string | null): OrgBranding {
   const obj = (raw && typeof raw === "object") ? raw as Record<string, unknown> : {};
+  const storedAppName = typeof obj.app_name === "string" && obj.app_name.length > 0 ? obj.app_name : null;
+  const storedTagline = typeof obj.tagline === "string" ? obj.tagline : null;
+  // When we fall back to the org's company name, use a blank tagline so
+  // the wordmark renders single-line. Only the operator brand (no
+  // fallbackName at all) gets the "Adviser" subtitle by default.
+  const usingOrgName = !storedAppName && !!fallbackName;
+
   return {
-    app_name: typeof obj.app_name === "string" && obj.app_name.length > 0 ? obj.app_name : BRANDING_DEFAULTS.app_name,
-    tagline: typeof obj.tagline === "string" ? obj.tagline : BRANDING_DEFAULTS.tagline,
+    app_name: storedAppName ?? fallbackName ?? FALLBACK_APP_NAME,
+    tagline: storedTagline ?? (usingOrgName ? "" : FALLBACK_TAGLINE),
     logo_url: typeof obj.logo_url === "string" && obj.logo_url.length > 0 ? obj.logo_url : null,
     primary_color: typeof obj.primary_color === "string" && obj.primary_color.length > 0 ? obj.primary_color : null,
     accent_color: typeof obj.accent_color === "string" && obj.accent_color.length > 0 ? obj.accent_color : null,
@@ -235,7 +237,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
 
   const hasFeature = (flag: FeatureFlag) => features[flag];
 
-  const branding = parseBranding(currentOrg?.branding);
+  const branding = parseBranding(currentOrg?.branding, currentOrg?.name);
 
   // Mirror the org's app_name into the browser tab. Keeping this in the
   // provider (rather than on every page) means it stays in sync after
