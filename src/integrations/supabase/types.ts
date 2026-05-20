@@ -310,6 +310,7 @@ export type Database = {
         Row: {
           address: string | null
           company_name: string
+          country: string
           created_at: string
           dot: string | null
           ein: string | null
@@ -333,6 +334,7 @@ export type Database = {
         Insert: {
           address?: string | null
           company_name: string
+          country?: string
           created_at?: string
           dot?: string | null
           ein?: string | null
@@ -356,6 +358,7 @@ export type Database = {
         Update: {
           address?: string | null
           company_name?: string
+          country?: string
           created_at?: string
           dot?: string | null
           ein?: string | null
@@ -756,7 +759,10 @@ export type Database = {
           id: string
           name: string
           slug: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           subscription_status: string
+          trial_ends_at: string | null
           updated_at: string
         }
         Insert: {
@@ -766,7 +772,10 @@ export type Database = {
           id?: string
           name: string
           slug: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           subscription_status?: string
+          trial_ends_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -776,7 +785,10 @@ export type Database = {
           id?: string
           name?: string
           slug?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           subscription_status?: string
+          trial_ends_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1302,6 +1314,15 @@ export type Database = {
       current_org_id: { Args: never; Returns: string }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       get_approval_status: { Args: { _user_id: string }; Returns: string }
+      get_org_by_slug: {
+        Args: { p_slug: string }
+        Returns: {
+          branding: Json
+          id: string
+          name: string
+          slug: string
+        }[]
+      }
       get_portal_client_id: { Args: { _user_id: string }; Returns: string }
       has_org_role: {
         Args: {
@@ -1320,7 +1341,37 @@ export type Database = {
       is_org_admin: { Args: { _org_id: string }; Returns: boolean }
       is_org_member: { Args: { _org_id: string }; Returns: boolean }
       is_portal_user: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: never; Returns: boolean }
       recover_stuck_sending: { Args: never; Returns: number }
+      super_admin_create_org: {
+        Args: { p_name: string; p_slug: string }
+        Returns: string
+      }
+      super_admin_list_orgs: {
+        Args: never
+        Returns: {
+          branding: Json
+          client_count: number
+          created_at: string
+          feature_flags: Json
+          id: string
+          member_count: number
+          name: string
+          permit_count: number
+          slug: string
+          subscription_status: string
+          truck_count: number
+        }[]
+      }
+      super_admin_org_details: { Args: { p_org_id: string }; Returns: Json }
+      super_admin_set_owner: {
+        Args: { p_email: string; p_org_id: string }
+        Returns: string
+      }
+      super_admin_update_org: {
+        Args: { p_org_id: string; p_patch: Json }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "operator" | "viewer"
