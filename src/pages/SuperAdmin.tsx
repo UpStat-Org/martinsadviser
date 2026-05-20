@@ -275,7 +275,7 @@ function OrgDetailsDrawer({
     queryFn: async (): Promise<OrgDetails> => {
       const { data, error } = await supabase.rpc("super_admin_org_details", { p_org_id: orgId });
       if (error) throw error;
-      return data as OrgDetails;
+      return data as unknown as OrgDetails;
     },
     enabled: !!orgId,
   });
