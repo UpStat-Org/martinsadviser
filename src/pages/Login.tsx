@@ -329,19 +329,30 @@ export default function Login() {
             </div>
 
             {/* Footer */}
-            <p
-              className="text-center text-sm text-muted-foreground animate-fade-in"
+            <div
+              className="space-y-2 text-center animate-fade-in"
               style={{ animationDelay: "0.3s" }}
             >
-              {t("login.noAccount")}{" "}
-              <Link
-                to="/signup"
-                className="text-primary hover:text-primary/80 font-semibold transition-colors inline-flex items-center gap-1"
-              >
-                {t("login.requestAccess")}
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </p>
+              <p className="text-sm text-muted-foreground">
+                {t("login.noAccount")}{" "}
+                <Link
+                  to="/signup"
+                  className="text-primary hover:text-primary/80 font-semibold transition-colors inline-flex items-center gap-1"
+                >
+                  {t("login.requestAccess")}
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </p>
+              <p className="text-xs text-muted-foreground/80">
+                Quer criar uma nova organização?{" "}
+                <Link
+                  to="/start"
+                  className="text-primary hover:text-primary/80 font-semibold transition-colors"
+                >
+                  Comece aqui
+                </Link>
+              </p>
+            </div>
           </div>
 
           <p className="text-center text-xs text-muted-foreground/70 mt-6 animate-fade-in">

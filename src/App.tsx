@@ -37,6 +37,7 @@ import AuditPage from "./pages/AuditPage";
 import DocumentationPage from "./pages/DocumentationPage";
 import MyDeskPage from "./pages/MyDeskPage";
 import SuperAdmin from "./pages/SuperAdmin";
+import StartOrg from "./pages/StartOrg";
 import WorkloadPage from "./pages/WorkloadPage";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalLayout from "./pages/portal/PortalLayout";
@@ -62,6 +63,7 @@ const App = () => (
             <Route path="/presentation" element={<PresentationPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/start" element={<StartOrg />} />
             <Route path="/pending" element={<PendingApproval />} />
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route path="/portal" element={<PortalLayout />}>
