@@ -964,6 +964,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          active_org_id: string | null
           approval_status: string
           created_at: string
           email: string | null
@@ -972,6 +973,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          active_org_id?: string | null
           approval_status?: string
           created_at?: string
           email?: string | null
@@ -980,6 +982,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          active_org_id?: string | null
           approval_status?: string
           created_at?: string
           email?: string | null
@@ -987,7 +990,15 @@ export type Database = {
           id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_active_org_id_fkey"
+            columns: ["active_org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_filters: {
         Row: {
@@ -1289,6 +1300,7 @@ export type Database = {
         }
       }
       current_org_id: { Args: never; Returns: string }
+      custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       get_approval_status: { Args: { _user_id: string }; Returns: string }
       get_portal_client_id: { Args: { _user_id: string }; Returns: string }
       has_org_role: {
