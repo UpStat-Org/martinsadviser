@@ -23,6 +23,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ArrowLeft, Pencil, Trash2, Loader2, Phone, Mail, MapPin, Plus, Truck as TruckIcon, FileCheck, FileText, Eye, Clock, UserPlus, Sparkles, PenLine, Map, FileDown, MessageSquare, Wand2 } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOrg } from "@/contexts/OrgContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -69,6 +70,7 @@ export default function ClientDetail() {
     return { total, paid, pending };
   }, [clientInvoices]);
   const { t, language } = useLanguage();
+  const { hasFeature } = useOrg();
 
   const generateCompliancePdf = () => {
     if (!client || !permits) return;
@@ -293,7 +295,7 @@ export default function ClientDetail() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {!isViewer && (
+              {!isViewer && hasFeature("automations") && (
                 <button
                   onClick={() => setAutopilotOpen(true)}
                   className="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-500 text-[#06131f] text-sm font-bold inline-flex items-center gap-1.5 hover:shadow-xl transition-all shadow-lg"
@@ -302,18 +304,20 @@ export default function ClientDetail() {
                   {t("autopilot.run")}
                 </button>
               )}
-              <button
-                onClick={handleGenerateReport}
-                disabled={aiLoading}
-                className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg disabled:opacity-60"
-              >
-                {aiLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Sparkles className="w-4 h-4" />
-                )}
-                {t("ai.generateReport")}
-              </button>
+              {hasFeature("ai_reports") && (
+                <button
+                  onClick={handleGenerateReport}
+                  disabled={aiLoading}
+                  className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg disabled:opacity-60"
+                >
+                  {aiLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4" />
+                  )}
+                  {t("ai.generateReport")}
+                </button>
+              )}
               <button
                 onClick={generateCompliancePdf}
                 disabled={!permits?.length}
@@ -562,12 +566,18 @@ export default function ClientDetail() {
         <TabsList className="h-auto p-1.5 bg-muted/50 rounded-2xl flex-wrap gap-1">
           <TabsTrigger value="trucks" className="gap-2"><TruckIcon className="w-4 h-4" />{t("trucks.title")} ({trucks?.length || 0})</TabsTrigger>
           <TabsTrigger value="permits" className="gap-2"><FileCheck className="w-4 h-4" />{t("permits.title")} ({permits?.length || 0})</TabsTrigger>
-          <TabsTrigger value="signatures" className="gap-2"><PenLine className="w-4 h-4" />{t("signature.tab")} </TabsTrigger>
-          <TabsTrigger value="messages" className="gap-2"><Send className="w-4 h-4" />{t("clientDetail.messagesTab")} ({clientMessages?.length || 0})</TabsTrigger>
+          {hasFeature("portal") && (
+            <TabsTrigger value="signatures" className="gap-2"><PenLine className="w-4 h-4" />{t("signature.tab")} </TabsTrigger>
+          )}
+          {hasFeature("messages") && (
+            <TabsTrigger value="messages" className="gap-2"><Send className="w-4 h-4" />{t("clientDetail.messagesTab")} ({clientMessages?.length || 0})</TabsTrigger>
+          )}
           <TabsTrigger value="activity" className="gap-2"><Clock className="w-4 h-4" />{t("activity.title")}</TabsTrigger>
             <TabsTrigger value="comments" className="gap-2"><MessageSquare className="w-4 h-4" />{t("clientDetail.commentsTab")}</TabsTrigger>
             <TabsTrigger value="notes" className="gap-2"><Lock className="w-4 h-4" />{t("clientDetail.notesTab")}</TabsTrigger>
-            <TabsTrigger value="ai" className="gap-2"><Sparkles className="w-4 h-4" />{t("clientDetail.aiTab")}</TabsTrigger>
+            {hasFeature("ai_chat") && (
+              <TabsTrigger value="ai" className="gap-2"><Sparkles className="w-4 h-4" />{t("clientDetail.aiTab")}</TabsTrigger>
+            )}
         </TabsList>
 
         <TabsContent value="trucks" className="mt-4">
@@ -756,9 +766,11 @@ export default function ClientDetail() {
           <TabsContent value="notes" className="mt-4">
             <InternalNotesSection clientId={id!} />
           </TabsContent>
-          <TabsContent value="ai" className="mt-4">
-            <AIChatPanel clientId={id!} clientName={client.company_name} />
-          </TabsContent>
+          {hasFeature("ai_chat") && (
+            <TabsContent value="ai" className="mt-4">
+              <AIChatPanel clientId={id!} clientName={client.company_name} />
+            </TabsContent>
+          )}
       </Tabs>
 
       <ClientFormDialog open={editOpen} onOpenChange={setEditOpen} client={client} />

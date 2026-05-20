@@ -10,12 +10,39 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type OrgRole = "owner" | "admin" | "member";
 
+export const FEATURE_FLAGS = [
+  "messages",
+  "calendar",
+  "ai_chat",
+  "ai_reports",
+  "finance",
+  "portal",
+  "automations",
+  "audit_log",
+] as const;
+
+export type FeatureFlag = (typeof FEATURE_FLAGS)[number];
+
+// Safe defaults when a flag is missing from organizations.feature_flags.
+// Matches the column DEFAULT (all on) so an org that predates a newly
+// introduced flag still behaves as expected.
+const FLAG_DEFAULTS: Record<FeatureFlag, boolean> = {
+  messages: true,
+  calendar: true,
+  ai_chat: true,
+  ai_reports: true,
+  finance: true,
+  portal: true,
+  automations: true,
+  audit_log: true,
+};
+
 export interface Organization {
   id: string;
   slug: string;
   name: string;
   branding: Record<string, unknown>;
-  feature_flags: Record<string, unknown>;
+  feature_flags: Partial<Record<FeatureFlag, boolean>>;
 }
 
 export interface Membership {
@@ -28,6 +55,8 @@ interface OrgContextValue {
   memberships: Membership[];
   isOrgOwner: boolean;
   isOrgAdmin: boolean;
+  features: Record<FeatureFlag, boolean>;
+  hasFeature: (flag: FeatureFlag) => boolean;
   loading: boolean;
   switchOrg: (orgId: string) => Promise<void>;
   refresh: () => Promise<void>;
@@ -109,13 +138,30 @@ export function OrgProvider({ children }: { children: ReactNode }) {
   const isOrgOwner = currentMembership?.role === "owner";
   const isOrgAdmin = currentMembership?.role === "owner" || currentMembership?.role === "admin";
 
+  const features = FEATURE_FLAGS.reduce((acc, flag) => {
+    const raw = currentOrg?.feature_flags?.[flag];
+    acc[flag] = typeof raw === "boolean" ? raw : FLAG_DEFAULTS[flag];
+    return acc;
+  }, {} as Record<FeatureFlag, boolean>);
+
+  const hasFeature = (flag: FeatureFlag) => features[flag];
+
   return (
     <OrgContext.Provider
-      value={{ currentOrg, memberships, isOrgOwner, isOrgAdmin, loading, switchOrg, refresh }}
+      value={{ currentOrg, memberships, isOrgOwner, isOrgAdmin, features, hasFeature, loading, switchOrg, refresh }}
     >
       {children}
     </OrgContext.Provider>
   );
+}
+
+// Shortcut hook: returns whether the given feature is enabled for the
+// current org. While org is still loading or there's no active org, returns
+// `false` to fail closed.
+export function useFeatureFlag(flag: FeatureFlag): boolean {
+  const { hasFeature, currentOrg, loading } = useOrg();
+  if (loading || !currentOrg) return false;
+  return hasFeature(flag);
 }
 
 export function useOrg() {

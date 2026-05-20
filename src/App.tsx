@@ -10,6 +10,7 @@ import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import { AppLayout } from "./components/AppLayout";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { FeatureGate } from "./components/FeatureGate";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PendingApproval from "./pages/PendingApproval";
@@ -82,15 +83,15 @@ const App = () => (
               <Route path="/trucks/:id" element={<TruckDetail />} />
               <Route path="/permits" element={<Permits />} />
               <Route path="/permits/:id" element={<PermitDetail />} />
-              <Route path="/messages" element={<Messages />} />
+              <Route path="/messages" element={<FeatureGate flag="messages"><Messages /></FeatureGate>} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/tasks" element={<KanbanPage />} />
-              <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/calendar" element={<FeatureGate flag="calendar"><CalendarPage /></FeatureGate>} />
               <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/finance" element={<FinancePage />} />
-              <Route path="/finance/:id" element={<InvoiceDetail />} />
+              <Route path="/finance" element={<FeatureGate flag="finance"><FinancePage /></FeatureGate>} />
+              <Route path="/finance/:id" element={<FeatureGate flag="finance"><InvoiceDetail /></FeatureGate>} />
               <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/audit" element={<AuditPage />} />
+              <Route path="/audit" element={<FeatureGate flag="audit_log"><AuditPage /></FeatureGate>} />
               <Route path="/docs" element={<DocumentationPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />

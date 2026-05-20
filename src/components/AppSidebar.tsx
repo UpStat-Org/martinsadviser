@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { OrgSwitcher } from "@/components/OrgSwitcher";
+import { useOrg, type FeatureFlag } from "@/contexts/OrgContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Logo } from "@/components/Logo";
@@ -22,7 +23,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type NavItem = { to: string; icon: LucideIcon; label: string; external?: boolean };
+type NavItem = { to: string; icon: LucideIcon; label: string; external?: boolean; feature?: FeatureFlag };
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useLocalStorageState("martins-sidebar-collapsed", false);
@@ -30,6 +31,7 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAdmin, user, fullName, role } = useAuth();
+  const { hasFeature } = useOrg();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
   const { theme, setTheme } = useTheme();
@@ -37,52 +39,56 @@ export function AppSidebar() {
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   const sections = useMemo<{ label: string; items: NavItem[] }[]>(() => {
-    const base = [
+    const filterByFeature = (items: NavItem[]) =>
+      items.filter((it) => !it.feature || hasFeature(it.feature));
+
+    const base: { label: string; items: NavItem[] }[] = [
       {
         label: t("sidebar.section.overview"),
-        items: [
+        items: filterByFeature([
           { to: "/", icon: LayoutDashboard, label: t("nav.dashboard") },
           { to: "/my", icon: Briefcase, label: t("mydesk.title") },
           { to: "/presentation", icon: MonitorPlay, label: t("nav.presentation") },
           { to: "https://status.martinsadviser.com", icon: Server, label: t("sidebar.systemStatus"), external: true },
-        ],
+        ]),
       },
       {
         label: t("sidebar.section.operation"),
-        items: [
+        items: filterByFeature([
           { to: "/clients", icon: Users, label: t("nav.clients") },
           { to: "/trucks", icon: Truck, label: t("nav.trucks") },
           { to: "/permits", icon: FileCheck, label: t("nav.permits") },
           { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
-        ],
+        ]),
       },
       {
         label: t("sidebar.section.communication"),
-        items: [
-          { to: "/messages", icon: MessageSquare, label: t("nav.messages") },
-          { to: "/calendar", icon: CalendarDays, label: t("nav.calendar") },
-        ],
+        items: filterByFeature([
+          { to: "/messages", icon: MessageSquare, label: t("nav.messages"), feature: "messages" },
+          { to: "/calendar", icon: CalendarDays, label: t("nav.calendar"), feature: "calendar" },
+        ]),
       },
       {
         label: t("sidebar.section.analysis"),
-        items: [
+        items: filterByFeature([
           { to: "/reports", icon: BarChart3, label: t("nav.reports") },
-          { to: "/finance", icon: DollarSign, label: t("nav.finance") },
-        ],
+          { to: "/finance", icon: DollarSign, label: t("nav.finance"), feature: "finance" },
+        ]),
       },
     ];
     if (isAdmin) {
       base.push({
         label: t("sidebar.section.administration"),
-        items: [
+        items: filterByFeature([
           { to: "/workload", icon: Activity, label: t("sidebar.workload") },
           { to: "/admin/users", icon: ShieldCheck, label: t("nav.users") },
-          { to: "/audit", icon: ScrollText, label: t("nav.audit") },
-        ],
+          { to: "/audit", icon: ScrollText, label: t("nav.audit"), feature: "audit_log" },
+        ]),
       });
     }
-    return base;
-  }, [t, isAdmin]);
+    // Drop sections that became empty after filtering (e.g. communication off entirely)
+    return base.filter((section) => section.items.length > 0);
+  }, [t, isAdmin, hasFeature]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

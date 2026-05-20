@@ -1,7 +1,7 @@
 # Multi-Tenancy Migration Plan
 
 **Iniciado:** 2026-05-19
-**Status atual:** Week 4 (hardening — em andamento)
+**Status atual:** Mês 2 em andamento (2026-05-20). Feature flags por org concluídas; restam branding, refactor isAdmin, subdomínio.
 
 ## Contexto e visão
 
@@ -56,8 +56,8 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 | **Week 1** — Foundation                 | Tabelas de tenancy + helpers + seed MartinsAdviser        | ✅ Done                                                     |
 | **Week 2** — org_id rollout             | 19 tabelas com `org_id` + policies reescritas             | ✅ Done                                                     |
 | **Week 3** — Frontend                   | OrgContext, JWT hook (deferred), signup trigger           | ✅ Done                                                     |
-| **Week 4** — Hardening                  | Edge functions restantes + testes isolamento cross-tenant | 🟡 Em andamento                                             |
-| **Mês 2** — Modularização + white-label | Feature flags por org, branding por org, subdomínio       | ⬜ Futuro                                                   |
+| **Week 4** — Hardening                  | Edge functions restantes + testes isolamento cross-tenant | ✅ Done (38/38 asserções de isolamento passaram em 2026-05-20)        |
+| **Mês 2** — Modularização + white-label | Feature flags por org, branding por org, subdomínio       | 🟡 Em andamento (flags ✅ 2026-05-20; branding/subdomínio ⬜)|
 | **Mês 3** — Onboarding + billing        | Stripe, signup self-serve org, super-admin panel          | ⬜ Futuro                                                   |
 | **Mês 4** — Polimento + launch          | Landing page, docs, testes de carga                       | ⬜ Futuro                                                   |
 
@@ -137,30 +137,40 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 
 3. Deploy do frontend (Netlify auto-build via push pro repo).
 
-## Próximo passo: Week 4
+## Week 4 — Hardening (concluído 2026-05-20)
 
-Foco em fechar a base como 100% robusta antes de partir pro Mês 2 (white-label, branding, billing).
+### Edge functions auditadas/patchadas
 
-**Auditoria de edge functions restantes:**
+| Function                  | Patch                                                                                               | Status     |
+| ------------------------- | --------------------------------------------------------------------------------------------------- | ---------- |
+| `ai-report`               | Adicionou auth check (`getClaims`) + valida `is_org_member(client.org_id)` antes de gerar relatório | ✅ deployed |
+| `delete-user`             | Substituiu `has_role` global por checagem de admin/owner na `active_org_id`. Limpa membership.       | ✅ deployed |
+| `create-portal-user`      | Substituiu `has_role` global, busca `clients.org_id`, valida caller, passa `org_id` explícito       | ✅ deployed |
+| `google-calendar-sync`    | Filtra permits por `profiles.active_org_id` em vez de `user_id`                                     | ✅ deployed |
+| `send-emails`             | Auditado — `claim_pending_messages` é seguro (cada msg carrega `org_id` próprio)                    | ✅ no patch |
+| `google-calendar-callback`/`google-calendar-auth`/`fmcsa-lookup`/`health` | Não tocam dados org-scoped — OK                                          | ✅ no patch |
 
-- `delete-user` — precisa validar que o admin só deleta users da própria org
-- `create-portal-user` — precisa criar portal user na org certa
-- `send-emails` — só faz UPDATE em `scheduled_messages` (service_role bypassa RLS), mas validar o flow
-- `google-calendar-sync` — usar tokens da org correta
-- `google-calendar-callback` — quando multi-org de fato, precisa passar `org_id` via OAuth state
+### Realtime, Storage, Audit log
 
-**Testes de isolamento cross-tenant:**
+| Área                   | Mudança                                                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Realtime               | `useNotifications.ts` — channel filtrado por `org_id` (postgres_changes filter), queryKey inclui orgId                              |
+| Storage policies       | 4 policies de `storage.objects` reescritas pra exigir prefix do path = `org_id` membership (migration `20260520120000`)              |
+| Storage upload         | `PermitFormDialog.tsx` — uploads agora em `${orgId}/${permitId}/${ts}.${ext}`                                                       |
+| Storage backfill       | Migration move arquivos legacy pro prefix `00000000-0000-0000-0000-000000000001/`, reescreve `permits.document_url` para casar      |
+| Audit log triggers     | 5 trigger functions (clients/permits/trucks/invoices/tasks) reescritas pra passar `NEW.org_id` (migration `20260520115000`)         |
 
-- Criar Org #2 temporária + user #2
-- Pra cada uma das 19 tabelas migradas: confirmar que user #2 NÃO consegue SELECT/UPDATE/DELETE dados da Org #1
-- Suite automatizada (pgTAP ou TS via Vitest) que roda em CI
-- Mínimo aceitável: 1 teste de isolamento por tabela
+### Suite de testes
 
-**Hardening adicional:**
+`supabase/tests/cross_tenant_isolation.sql` — script standalone que cria Org B + 2 users sintéticos, semeia 1 row por org em cada tabela (19), e via `SET LOCAL ROLE authenticated` + `request.jwt.claims` confirma que cada user NÃO vê rows da outra org. Roda em transação com `ROLLBACK` no final, sem persistir nada. 38 asserções (19 tabelas × 2 direções) + happy-path sanity check.
 
-- Auditar realtime subscriptions (`supabase.channel(...)`) — precisam de filter por `org_id`
-- Auditar Storage buckets (uploads de `permit_documents`) — paths e storage policies
-- Audit log com `org_id` nos eventos
+### Pendências conhecidas (follow-ups)
+
+| Item                                                                          | Quando atacar                                                              |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Bucket `permit-documents` ainda é PUBLIC — URLs vazadas seguem baixáveis      | Mês 2 (junto com signed URLs). Exige regerar todos os `permits.document_url`. |
+| JWT Custom Access Token Hook não registrado (sem Dashboard Supabase)          | Antes de onboardar 2º cliente                                              |
+| `useAuth.isAdmin` ainda lê `user_roles` legacy                                | Phase 2 — migrar pra `useOrg().isOrgAdmin`                                 |
 
 ## Próximas decisões pendentes
 

@@ -14,17 +14,21 @@ import {
   ShieldCheck,
   Zap,
   Sparkles,
+  Building2,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOrg } from "@/contexts/OrgContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OrgFeatureFlagsPanel } from "@/components/OrgFeatureFlagsPanel";
 
 export default function SettingsPage() {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const { isOrgOwner } = useOrg();
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -230,6 +234,12 @@ export default function SettingsPage() {
             <Zap className="w-3.5 h-3.5" />
             Integrações
           </TabsTrigger>
+          {isOrgOwner && (
+            <TabsTrigger value="organization" className="rounded-xl gap-1.5">
+              <Building2 className="w-3.5 h-3.5" />
+              Organização
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* ============ PROFILE ============ */}
@@ -462,6 +472,13 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* ============ ORGANIZATION ============ */}
+        {isOrgOwner && (
+          <TabsContent value="organization" className="mt-4 space-y-4">
+            <OrgFeatureFlagsPanel />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
