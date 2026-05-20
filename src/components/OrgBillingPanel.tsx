@@ -8,13 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { CreditCard, ExternalLink, Loader2, Lock, Sparkles } from "lucide-react";
+import { CreditCard, ExternalLink, Loader2, Lock, Sparkles, ShieldCheck } from "lucide-react";
 
 interface BillingInfo {
   subscription_status: string;
   stripe_subscription_id: string | null;
   stripe_customer_id: string | null;
   trial_ends_at: string | null;
+  is_master_org: boolean;
 }
 
 const STATUS_BADGE: Record<string, { label: string; tone: "default" | "secondary" | "outline" | "destructive" }> = {
@@ -48,7 +49,7 @@ export function OrgBillingPanel() {
       if (!currentOrg) return null;
       const { data, error } = await supabase
         .from("organizations")
-        .select("subscription_status, stripe_subscription_id, stripe_customer_id, trial_ends_at")
+        .select("subscription_status, stripe_subscription_id, stripe_customer_id, trial_ends_at, is_master_org")
         .eq("id", currentOrg.id)
         .maybeSingle();
       if (error) throw error;
@@ -108,6 +109,29 @@ export function OrgBillingPanel() {
   const status = info?.subscription_status ?? currentOrg.subscription_status ?? "trialing";
   const badge = STATUS_BADGE[status] ?? { label: status, tone: "outline" as const };
   const hasSubscription = !!info?.stripe_subscription_id;
+
+  // Master orgs (cliente 0) don't go through Stripe — show a different
+  // panel that explains the status and hides the action buttons.
+  if (info?.is_master_org) {
+    return (
+      <Card className="border-border/50 bg-gradient-to-br from-primary/5 via-transparent to-transparent">
+        <CardContent className="p-6 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-semibold">Conta principal</h3>
+              <Badge variant="default">Sem cobrança</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Esta organização opera a plataforma e tem acesso permanente. Nenhuma assinatura Stripe é necessária.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-border/50">

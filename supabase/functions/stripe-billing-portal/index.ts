@@ -50,9 +50,12 @@ Deno.serve(async (req) => {
 
     const { data: org } = await admin
       .from("organizations")
-      .select("stripe_customer_id")
+      .select("stripe_customer_id, is_master_org")
       .eq("id", org_id)
       .maybeSingle();
+    if ((org as { is_master_org?: boolean } | null)?.is_master_org) {
+      throw new Error("This organization is the platform operator and does not have billing.");
+    }
     if (!org?.stripe_customer_id) {
       throw new Error("This organization has no Stripe customer yet. Start a subscription first.");
     }

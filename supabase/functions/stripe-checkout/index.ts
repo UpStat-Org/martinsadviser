@@ -57,10 +57,16 @@ Deno.serve(async (req) => {
 
     const { data: org } = await admin
       .from("organizations")
-      .select("id, name, stripe_customer_id, stripe_subscription_id")
+      .select("id, name, stripe_customer_id, stripe_subscription_id, is_master_org")
       .eq("id", org_id)
       .maybeSingle();
     if (!org) throw new Error("Organization not found");
+
+    // Master orgs (e.g. cliente 0) are exempt from billing — refuse politely
+    // so the UI can show its "no charge" card without surprises.
+    if ((org as { is_master_org?: boolean }).is_master_org) {
+      throw new Error("This organization is the platform operator and does not require a subscription.");
+    }
 
     if (org.stripe_subscription_id) {
       throw new Error("This organization already has an active subscription. Use the billing portal to manage it.");

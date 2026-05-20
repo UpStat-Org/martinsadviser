@@ -28,35 +28,51 @@ function mapSubscriptionStatus(stripeStatus: string): string {
   }
 }
 
-async function applySubscription(
+// Resolves the org row for a given subscription via metadata.org_id or
+// (fallback) the customer id. Returns null if neither leads to a row, or
+// if the resolved org is a master org — in that case the caller skips the
+// update entirely, preserving the master org's permanent 'active' state.
+async function resolveOrgForSubscription(
   admin: ReturnType<typeof createClient>,
   subscription: Stripe.Subscription,
-) {
+): Promise<{ id: string; is_master_org: boolean } | null> {
   const orgId = (subscription.metadata?.org_id as string | undefined) ?? null;
   const customerId = typeof subscription.customer === "string"
     ? subscription.customer
     : subscription.customer?.id;
 
-  // Prefer the org_id metadata; fall back to customer_id lookup if the
-  // metadata is missing (e.g. subscription created outside our flow).
-  let query = admin.from("organizations").update({
+  let query = admin.from("organizations").select("id, is_master_org");
+  if (orgId) query = query.eq("id", orgId);
+  else if (customerId) query = query.eq("stripe_customer_id", customerId);
+  else return null;
+
+  const { data } = await query.maybeSingle();
+  return (data as { id: string; is_master_org: boolean } | null) ?? null;
+}
+
+async function applySubscription(
+  admin: ReturnType<typeof createClient>,
+  subscription: Stripe.Subscription,
+) {
+  const org = await resolveOrgForSubscription(admin, subscription);
+  if (!org) {
+    console.error("Subscription has no resolvable org", subscription.id);
+    return;
+  }
+  if (org.is_master_org) {
+    // Master orgs are exempt from billing — refuse to overwrite their
+    // 'active' status no matter what Stripe says about the subscription.
+    console.log("Ignoring subscription update for master org", org.id, subscription.id);
+    return;
+  }
+
+  const { error } = await admin.from("organizations").update({
     stripe_subscription_id: subscription.id,
     subscription_status: mapSubscriptionStatus(subscription.status),
     trial_ends_at: subscription.trial_end
       ? new Date(subscription.trial_end * 1000).toISOString()
       : null,
-  } as any);
-
-  if (orgId) {
-    query = query.eq("id", orgId);
-  } else if (customerId) {
-    query = query.eq("stripe_customer_id", customerId);
-  } else {
-    console.error("Subscription has no org_id metadata or customer id", subscription.id);
-    return;
-  }
-
-  const { error } = await query;
+  } as any).eq("id", org.id);
   if (error) console.error("Failed to apply subscription update:", error.message);
 }
 
@@ -114,27 +130,30 @@ Deno.serve(async (req) => {
       }
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription;
-        const orgId = (sub.metadata?.org_id as string | undefined) ?? null;
-        const updates = {
+        const org = await resolveOrgForSubscription(admin, sub);
+        if (!org || org.is_master_org) break;
+        await admin.from("organizations").update({
           subscription_status: "canceled",
           stripe_subscription_id: null,
-        };
-        if (orgId) {
-          await admin.from("organizations").update(updates as any).eq("id", orgId);
-        } else if (typeof sub.customer === "string") {
-          await admin.from("organizations").update(updates as any).eq("stripe_customer_id", sub.customer);
-        }
+        } as any).eq("id", org.id);
         break;
       }
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
-        if (customerId) {
-          await admin
-            .from("organizations")
-            .update({ subscription_status: "past_due" } as any)
-            .eq("stripe_customer_id", customerId);
-        }
+        if (!customerId) break;
+        // Same master-org guard as elsewhere — explicit lookup by customer.
+        const { data: org } = await admin
+          .from("organizations")
+          .select("id, is_master_org")
+          .eq("stripe_customer_id", customerId)
+          .maybeSingle();
+        const row = org as { id: string; is_master_org: boolean } | null;
+        if (!row || row.is_master_org) break;
+        await admin
+          .from("organizations")
+          .update({ subscription_status: "past_due" } as any)
+          .eq("id", row.id);
         break;
       }
       case "invoice.payment_succeeded": {
