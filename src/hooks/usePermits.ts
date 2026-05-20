@@ -13,7 +13,7 @@ export type PermitInsert = TablesInsert<"permits">;
 export type PermitUpdate = TablesUpdate<"permits">;
 
 export type PermitWithRelations = Permit & {
-  clients?: { company_name: string } | null;
+  clients?: { company_name: string; country?: string } | null;
   trucks?: { plate: string } | null;
 };
 
@@ -40,7 +40,7 @@ export function usePermits(
     queryFn: async () => {
       let query = supabase
         .from("permits")
-        .select("*, clients(company_name), trucks(plate)")
+        .select("*, clients(company_name, country), trucks(plate)")
         .order("expiration_date", { ascending: true });
       if (clientId) query = query.eq("client_id", clientId);
       if (search) {
@@ -65,7 +65,7 @@ export function usePermit(id: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("permits")
-        .select("*, clients(company_name), trucks(plate)")
+        .select("*, clients(company_name, country), trucks(plate)")
         .eq("id", id!)
         .single();
       if (error) throw error;

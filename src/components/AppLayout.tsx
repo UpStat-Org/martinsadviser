@@ -2,8 +2,28 @@ import { Outlet } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationCenter } from "./NotificationCenter";
+import { SubscriptionBlockedScreen, isSubscriptionBlocked } from "./SubscriptionGate";
+import { useOrg } from "@/contexts/OrgContext";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 
 export function AppLayout() {
+  const { currentOrg, loading: orgLoading } = useOrg();
+  const { data: isSuperAdmin } = useSuperAdmin();
+
+  // When the active org's subscription is hard-blocked and the user isn't a
+  // super-admin, swap the entire shell for the block screen — no sidebar,
+  // no search, no notifications. Super-admins still see the full chrome so
+  // they can navigate to /super-admin and unblock the tenant.
+  const blocked =
+    !orgLoading &&
+    !!currentOrg &&
+    !isSuperAdmin &&
+    isSubscriptionBlocked(currentOrg.subscription_status);
+
+  if (blocked) {
+    return <SubscriptionBlockedScreen org={currentOrg} />;
+  }
+
   return (
     <div className="flex h-screen overflow-hidden">
       <AppSidebar />

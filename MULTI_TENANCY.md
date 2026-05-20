@@ -1,7 +1,7 @@
 # Multi-Tenancy Migration Plan
 
 **Iniciado:** 2026-05-19
-**Status atual:** Mês 2 em andamento (2026-05-20). Feature flags por org concluídas; restam branding, refactor isAdmin, subdomínio.
+**Status atual:** Mês 2 concluído no código (2026-05-20). Aguardando DNS wildcard no Netlify pra ativar subdomínios em produção.
 
 ## Contexto e visão
 
@@ -51,15 +51,15 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 
 ## Roadmap 3-4 meses
 
-| Fase                                    | Escopo                                                    | Status                                                      |
-| --------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------- |
-| **Week 1** — Foundation                 | Tabelas de tenancy + helpers + seed MartinsAdviser        | ✅ Done                                                     |
-| **Week 2** — org_id rollout             | 19 tabelas com `org_id` + policies reescritas             | ✅ Done                                                     |
-| **Week 3** — Frontend                   | OrgContext, JWT hook (deferred), signup trigger           | ✅ Done                                                     |
-| **Week 4** — Hardening                  | Edge functions restantes + testes isolamento cross-tenant | ✅ Done (38/38 asserções de isolamento passaram em 2026-05-20)        |
-| **Mês 2** — Modularização + white-label | Feature flags por org, branding por org, subdomínio       | 🟡 Em andamento (flags ✅, branding ✅ 2026-05-20; subdomínio ⬜)|
-| **Mês 3** — Onboarding + billing        | Stripe, signup self-serve org, super-admin panel          | ⬜ Futuro                                                   |
-| **Mês 4** — Polimento + launch          | Landing page, docs, testes de carga                       | ⬜ Futuro                                                   |
+| Fase                                    | Escopo                                                    | Status                                                         |
+| --------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------- |
+| **Week 1** — Foundation                 | Tabelas de tenancy + helpers + seed MartinsAdviser        | ✅ Done                                                        |
+| **Week 2** — org_id rollout             | 19 tabelas com `org_id` + policies reescritas             | ✅ Done                                                        |
+| **Week 3** — Frontend                   | OrgContext, JWT hook (deferred), signup trigger           | ✅ Done                                                        |
+| **Week 4** — Hardening                  | Edge functions restantes + testes isolamento cross-tenant | ✅ Done (38/38 asserções de isolamento passaram em 2026-05-20) |
+| **Mês 2** — Modularização + white-label | Feature flags por org, branding por org, subdomínio       | ✅ Code done 2026-05-20 (DNS wildcard no Netlify pendente)     |
+| **Mês 3** — Onboarding + billing        | Stripe, signup self-serve org, super-admin panel          | ⬜ Futuro                                                      |
+| **Mês 4** — Polimento + launch          | Landing page, docs, testes de carga                       | ⬜ Futuro                                                      |
 
 ## Histórico de execução (Weeks 1-3)
 
@@ -141,48 +141,141 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 
 ### Edge functions auditadas/patchadas
 
-| Function                  | Patch                                                                                               | Status     |
-| ------------------------- | --------------------------------------------------------------------------------------------------- | ---------- |
-| `ai-report`               | Adicionou auth check (`getClaims`) + valida `is_org_member(client.org_id)` antes de gerar relatório | ✅ deployed |
-| `delete-user`             | Substituiu `has_role` global por checagem de admin/owner na `active_org_id`. Limpa membership.       | ✅ deployed |
-| `create-portal-user`      | Substituiu `has_role` global, busca `clients.org_id`, valida caller, passa `org_id` explícito       | ✅ deployed |
-| `google-calendar-sync`    | Filtra permits por `profiles.active_org_id` em vez de `user_id`                                     | ✅ deployed |
-| `send-emails`             | Auditado — `claim_pending_messages` é seguro (cada msg carrega `org_id` próprio)                    | ✅ no patch |
-| `google-calendar-callback`/`google-calendar-auth`/`fmcsa-lookup`/`health` | Não tocam dados org-scoped — OK                                          | ✅ no patch |
+| Function                                                                  | Patch                                                                                               | Status      |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ----------- |
+| `ai-report`                                                               | Adicionou auth check (`getClaims`) + valida `is_org_member(client.org_id)` antes de gerar relatório | ✅ deployed |
+| `delete-user`                                                             | Substituiu `has_role` global por checagem de admin/owner na `active_org_id`. Limpa membership.      | ✅ deployed |
+| `create-portal-user`                                                      | Substituiu `has_role` global, busca `clients.org_id`, valida caller, passa `org_id` explícito       | ✅ deployed |
+| `google-calendar-sync`                                                    | Filtra permits por `profiles.active_org_id` em vez de `user_id`                                     | ✅ deployed |
+| `send-emails`                                                             | Auditado — `claim_pending_messages` é seguro (cada msg carrega `org_id` próprio)                    | ✅ no patch |
+| `google-calendar-callback`/`google-calendar-auth`/`fmcsa-lookup`/`health` | Não tocam dados org-scoped — OK                                                                     | ✅ no patch |
 
 ### Realtime, Storage, Audit log
 
-| Área                   | Mudança                                                                                                                            |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Realtime               | `useNotifications.ts` — channel filtrado por `org_id` (postgres_changes filter), queryKey inclui orgId                              |
-| Storage policies       | 4 policies de `storage.objects` reescritas pra exigir prefix do path = `org_id` membership (migration `20260520120000`)              |
-| Storage upload         | `PermitFormDialog.tsx` — uploads agora em `${orgId}/${permitId}/${ts}.${ext}`                                                       |
-| Storage backfill       | Migration move arquivos legacy pro prefix `00000000-0000-0000-0000-000000000001/`, reescreve `permits.document_url` para casar      |
-| Audit log triggers     | 5 trigger functions (clients/permits/trucks/invoices/tasks) reescritas pra passar `NEW.org_id` (migration `20260520115000`)         |
+| Área               | Mudança                                                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Realtime           | `useNotifications.ts` — channel filtrado por `org_id` (postgres_changes filter), queryKey inclui orgId                         |
+| Storage policies   | 4 policies de `storage.objects` reescritas pra exigir prefix do path = `org_id` membership (migration `20260520120000`)        |
+| Storage upload     | `PermitFormDialog.tsx` — uploads agora em `${orgId}/${permitId}/${ts}.${ext}`                                                  |
+| Storage backfill   | Migration move arquivos legacy pro prefix `00000000-0000-0000-0000-000000000001/`, reescreve `permits.document_url` para casar |
+| Audit log triggers | 5 trigger functions (clients/permits/trucks/invoices/tasks) reescritas pra passar `NEW.org_id` (migration `20260520115000`)    |
 
 ### Suite de testes
 
 `supabase/tests/cross_tenant_isolation.sql` — script standalone que cria Org B + 2 users sintéticos, semeia 1 row por org em cada tabela (19), e via `SET LOCAL ROLE authenticated` + `request.jwt.claims` confirma que cada user NÃO vê rows da outra org. Roda em transação com `ROLLBACK` no final, sem persistir nada. 38 asserções (19 tabelas × 2 direções) + happy-path sanity check.
 
+## Mês 2 — Subdomínio por org (2026-05-20)
+
+### Convenção de roteamento
+
+| Hostname                                               | Org resolvida                                                          |
+| ------------------------------------------------------ | ---------------------------------------------------------------------- |
+| `martinsadviser.com`                                   | MartinsAdviser (cliente 0)                                             |
+| `www.martinsadviser.com`                               | MartinsAdviser (alias)                                                 |
+| `app.martinsadviser.com`                               | MartinsAdviser (alias reservado)                                       |
+| `<slug>.martinsadviser.com`                            | Org com `slug` correspondente                                          |
+| `localhost`, `*.lovable.app`, `*.netlify.app`, IPs raw | Modo dev — sem subdomain routing, fallback pro `profile.active_org_id` |
+
+### Como o frontend resolve
+
+1. `src/lib/orgHost.ts::parseHostnameOrg(hostname)` extrai o slug do host (com lista de reservados `www/app/api/admin/status`).
+2. `src/hooks/useHostnameOrg.ts` chama a RPC `public.get_org_by_slug(slug)` — SECURITY DEFINER pública (anon+authenticated) que retorna só `{id, slug, name, branding}`. **NÃO expõe** `feature_flags` nem `subscription_status`.
+3. `OrgProvider` consome esse slug:
+   - Se user é membro da org do host → fixa essa org como `currentOrg`, sincroniza `profile.active_org_id`.
+   - Se user **não** é membro → `auth.signOut()` + redirect pra `/login?error=cross_org&host=<slug>`.
+4. `Login.tsx` mostra o branding (logo + wordmark) da org do host **antes** do auth, pela mesma RPC.
+
+### Setup DNS — TBD
+
+**Atenção:** o Netlify Free **não aceita** `*.dominio.com` no campo "Add domain alias" — wildcard custom domain é restrito ao plano Pro. O setup correto depende da estratégia escolhida, que ainda **não foi finalizada**. Opções:
+
+1. **Cloudflare DNS na frente do Netlify**: zona DNS no Cloudflare com CNAME `*.martinsadviser.com` proxied (modo laranja). Cloudflare termina SSL wildcard (grátis) e proxia para o site Netlify. É a abordagem mais comum no plano free.
+2. **Adicionar cada subdomain manualmente** no Netlify quando uma org nova for criada (`acme.martinsadviser.com`, `bob.martinsadviser.com`, ...). DNS CNAME individual. Funciona pros primeiros 5-10 clientes (sales-led), não escala.
+3. **Migrar pra Vercel**: wildcard SSL nativo no plano free, mas exige redeploy/redirect dos usuários atuais.
+4. **Upgrade Netlify Pro** ($19/mês): wildcard nativo.
+
+Reaproveitar o setup de outro projeto interno (TBD validar). Até definirmos, o app continua funcionando em `martinsadviser.com` raiz como hoje — `orgHost.ts` trata isso como cliente 0.
+
+### Testar local sem DNS configurado
+
+Editar `/etc/hosts`:
+
+```
+127.0.0.1   acme.martinsadviser.com
+127.0.0.1   martinsadviser.com
+```
+
+E rodar `bun run dev`. Acessar `http://acme.martinsadviser.com:5173` simulará o tenant Acme. **Limitação:** Vite dev server precisa do flag `--host` ou ajuste em `vite.config.ts` para escutar em todos os hosts. Em produção (build estático no Netlify) isso não é problema.
+
+## Mês 3 — Stripe billing (2026-05-20)
+
+### Arquitetura
+
+- **Modelo:** 1 plano flat por org/mês. Sem tiers, sem usage-based — todo cliente assinante vê todas as features (`feature_flags` segue editável por org pelo admin/super-admin, mas Stripe não interfere).
+- **Stripe knobs por org:** `stripe_customer_id`, `stripe_subscription_id`, `trial_ends_at` (migration `20260520190000`). Index unique parcial em `stripe_customer_id` pro webhook fazer lookup O(log n).
+- **Edge functions:**
+  - `stripe-checkout` (JWT-protected) — owner clica → Stripe Checkout Session com `metadata.org_id`
+  - `stripe-webhook` (`verify_jwt = false`) — Stripe → atualiza `organizations.subscription_status` via signature validation
+  - `stripe-billing-portal` (JWT-protected) — owner clica → Stripe Billing Portal Session
+- **UI:** `OrgBillingPanel` no Settings → Organização. Botão "Iniciar assinatura" (sem sub) ou "Gerenciar pagamento" (com sub). Poll de 3s após `?billing=success` redirect até webhook chegar.
+- **Status mapping (Stripe → nosso `subscription_status`):**
+
+  | Stripe                  | Nosso       | Comportamento UI |
+  | ----------------------- | ----------- | ---------------- |
+  | trialing                | trialing    | App normal       |
+  | active                  | active      | App normal       |
+  | past_due, incomplete    | past_due    | App normal (sem warning ainda) |
+  | unpaid, paused, incomplete_expired | suspended | SubscriptionGate bloqueia |
+  | canceled                | canceled    | SubscriptionGate bloqueia |
+
+### Setup no Stripe Dashboard
+
+1. **Product**: `Dashboard → Products → Add product`. Nome: "MartinsAdviser SaaS" (ou similar).
+2. **Price** (recurring): mensal, em USD ou BRL conforme decidido. Anotar o `price_id` (ex.: `price_1Q...`).
+3. **Customer Portal**: `Dashboard → Settings → Billing → Customer portal`. Habilitar pelo menos: "Update payment method", "Cancel subscription", "View invoices". Salvar.
+4. **Webhook endpoint**: `Dashboard → Developers → Webhooks → Add endpoint`.
+   - URL: `https://zidfrlzgftaqhnvedpnm.supabase.co/functions/v1/stripe-webhook`
+   - Events: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `customer.subscription.trial_will_end`, `invoice.payment_failed`, `invoice.payment_succeeded`
+   - Após criar, copiar o **Signing secret** (`whsec_...`).
+5. **API keys**: `Dashboard → Developers → API keys`. Copiar **Secret key** (`sk_test_...` em test mode).
+
+### Env vars no Supabase (Dashboard → Edge Functions → Secrets)
+
+| Nome                       | Valor                                              |
+| -------------------------- | -------------------------------------------------- |
+| `STRIPE_SECRET_KEY`        | `sk_test_...` ou `sk_live_...`                      |
+| `STRIPE_WEBHOOK_SECRET`    | `whsec_...` do endpoint criado acima               |
+| `STRIPE_PRICE_ID`          | `price_...` do Price recorrente                    |
+| `APP_URL`                  | `https://martinsadviser.com` (success/cancel redirect base) |
+
+### Testar end-to-end
+
+1. **Test mode**: usar keys `sk_test_...` e `whsec_...` do test environment do Stripe.
+2. No app, logar como owner de uma org sem subscription. Settings → Organização → Assinatura → "Iniciar assinatura".
+3. Stripe Checkout abre → usar cartão de teste `4242 4242 4242 4242`, qualquer data futura, qualquer CVV/zip.
+4. Após pagamento, redirect pra `/settings?billing=success`. O painel faz poll até o webhook atualizar `subscription_status` pra `active`.
+5. Tentar **Gerenciar pagamento** → abre portal Stripe-hosted. Cancelar lá dentro → webhook `customer.subscription.deleted` → `subscription_status = canceled` → SubscriptionGate bloqueia o app.
+
 ### Pendências conhecidas (follow-ups)
 
-| Item                                                                          | Quando atacar                                                              |
-| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Bucket `permit-documents` ainda é PUBLIC — URLs vazadas seguem baixáveis      | Mês 2 (junto com signed URLs). Exige regerar todos os `permits.document_url`. |
-| JWT Custom Access Token Hook não registrado (sem Dashboard Supabase)          | Antes de onboardar 2º cliente                                              |
-| `useAuth.isAdmin` ainda lê `user_roles` legacy                                | Phase 2 — migrar pra `useOrg().isOrgAdmin`                                 |
+| Item                                                                     | Quando atacar                                                                 |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| ~~Bucket `permit-documents` ainda é PUBLIC~~                             | ✅ Migrado pra privado + signed URLs 2026-05-20 (migration `20260520170000`)   |
+| JWT Custom Access Token Hook não registrado (sem Dashboard Supabase)     | Antes de onboardar 2º cliente                                                 |
+| ~~`useAuth.isAdmin` ainda lê `user_roles` legacy~~                       | ✅ Refatorado 2026-05-20 (`useOrg().isOrgAdmin`)                              |
+| DNS strategy pra subdomínios (Netlify free não aceita wildcard alias)    | Antes de testar subdomínio em produção — opções na seção "Setup DNS — TBD"    |
 
 ## Próximas decisões pendentes
 
-| Quando                        | Decisão                                                                                      |
-| ----------------------------- | -------------------------------------------------------------------------------------------- |
-| Antes de onboardar 2º cliente | Conseguir acesso ao Supabase Dashboard pra registrar JWT hook                                |
-| ~~Antes de Phase 2~~          | ~~Refatorar `useAuth.isAdmin` → `useOrg().isOrgAdmin`~~ ✅ Feito 2026-05-20                  |
-| Antes de Phase 2              | Definir pricing (por seat? por permit? flat?)                                                |
-| Mês 2                         | Quais módulos viram opt-in via `feature_flags` (AI? portal? calendar?)                       |
-| Mês 2                         | Subdomínio por org (`acme.app.com`) — DNS strategy no Netlify/CDN                            |
-| Mês 3                         | Stripe (planos, trial, billing portal, webhooks)                                             |
-| Mês 3                         | Super-admin panel pra gerenciar orgs                                                         |
+| Quando                        | Decisão                                                                     |
+| ----------------------------- | --------------------------------------------------------------------------- |
+| Antes de onboardar 2º cliente | Conseguir acesso ao Supabase Dashboard pra registrar JWT hook               |
+| ~~Antes de Phase 2~~          | ~~Refatorar `useAuth.isAdmin` → `useOrg().isOrgAdmin`~~ ✅ Feito 2026-05-20 |
+| Antes de Phase 2              | Definir pricing (por seat? por permit? flat?)                               |
+| Mês 2                         | Quais módulos viram opt-in via `feature_flags` (AI? portal? calendar?)      |
+| Mês 2                         | Subdomínio por org (`acme.app.com`) — DNS strategy no Netlify/CDN           |
+| Mês 3                         | Stripe (planos, trial, billing portal, webhooks)                            |
+| Mês 3                         | Super-admin panel pra gerenciar orgs                                        |
 
 ## Riscos conhecidos
 

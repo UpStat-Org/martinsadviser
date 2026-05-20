@@ -11,6 +11,7 @@ import { AppLayout } from "./components/AppLayout";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { FeatureGate } from "./components/FeatureGate";
+import { SuperAdminRoute } from "./components/SuperAdminRoute";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PendingApproval from "./pages/PendingApproval";
@@ -35,6 +36,7 @@ import InvoiceDetail from "./pages/InvoiceDetail";
 import AuditPage from "./pages/AuditPage";
 import DocumentationPage from "./pages/DocumentationPage";
 import MyDeskPage from "./pages/MyDeskPage";
+import SuperAdmin from "./pages/SuperAdmin";
 import WorkloadPage from "./pages/WorkloadPage";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalLayout from "./pages/portal/PortalLayout";
@@ -93,6 +95,7 @@ const App = () => (
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/audit" element={<FeatureGate flag="audit_log"><AuditPage /></FeatureGate>} />
               <Route path="/docs" element={<DocumentationPage />} />
+              <Route path="/super-admin" element={<SuperAdminRoute><SuperAdmin /></SuperAdminRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -1,9 +1,12 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useHostnameOrg } from "@/hooks/useHostnameOrg";
+import { splitWordmark } from "@/contexts/OrgContext";
+import { applyBrandingColors } from "@/lib/color";
 import {
   Truck,
   Mail,
@@ -30,6 +33,70 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const [searchParams] = useSearchParams();
+  const { hostOrg, slug, isDev, loading: orgLoading } = useHostnameOrg();
+
+  // Branding shown on this Login page. When the URL points at a tenant
+  // subdomain we render that org's logo/name; in dev mode (no subdomain
+  // routing) we fall back to the default look.
+  const brandingApp = hostOrg
+    ? ((hostOrg.branding as { app_name?: string })?.app_name ?? hostOrg.name)
+    : "MartinsAdviser";
+  const brandingTagline = hostOrg
+    ? ((hostOrg.branding as { tagline?: string })?.tagline ?? "")
+    : "Adviser";
+  const brandingLogo = hostOrg
+    ? ((hostOrg.branding as { logo_url?: string | null })?.logo_url ?? null)
+    : null;
+  const brandingPrimary = hostOrg
+    ? ((hostOrg.branding as { primary_color?: string | null })?.primary_color ?? null)
+    : null;
+  const brandingAccent = hostOrg
+    ? ((hostOrg.branding as { accent_color?: string | null })?.accent_color ?? null)
+    : null;
+
+  // Apply the tenant's brand colors while the Login page is mounted so the
+  // shadcn-themed surfaces (button, focus ring, accent badges) match the
+  // rest of the tenant's UI even before the user signs in. OrgProvider
+  // re-applies the same values post-auth, so there's no visual jump.
+  useEffect(() => {
+    applyBrandingColors({ primary: brandingPrimary, accent: brandingAccent });
+    return () => applyBrandingColors({ primary: null, accent: null });
+  }, [brandingPrimary, brandingAccent]);
+  const wordmark = splitWordmark({
+    app_name: brandingApp,
+    tagline: brandingTagline,
+    logo_url: brandingLogo,
+  });
+
+  // Subdomain points at a slug we don't have an org for → 404-ish state.
+  const subdomainNotFound = !isDev && !!slug && !orgLoading && !hostOrg;
+
+  // Surface cross-org redirect from OrgProvider as a toast on first paint.
+  useEffect(() => {
+    if (searchParams.get("error") === "cross_org") {
+      const host = searchParams.get("host") ?? "";
+      toast({
+        title: "Acesso negado",
+        description: host
+          ? `Você não pertence à organização "${host}". Acesse o subdomínio da sua organização.`
+          : "Você não pertence a essa organização.",
+        variant: "destructive",
+      });
+    }
+  }, [searchParams, toast]);
+
+  // Subdomain doesn't match any org → warn once and let the user proceed
+  // anyway (the auth will still work; OrgProvider will then redirect them).
+  useEffect(() => {
+    if (subdomainNotFound) {
+      toast({
+        title: "Organização não encontrada",
+        description: `Não existe organização com slug "${slug}". Verifique o endereço.`,
+        variant: "destructive",
+      });
+    }
+  }, [subdomainNotFound, slug, toast]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,10 +141,14 @@ export default function Login() {
           {/* Logo */}
           <div className="flex items-center gap-3 animate-slide-in-left">
             <div className="relative shrink-0">
-              <Logo className="w-12 h-12 rounded-2xl shadow-xl ring-1 ring-white/20" />
+              <Logo
+                src={brandingLogo}
+                title={brandingApp}
+                className="w-12 h-12 rounded-2xl shadow-xl ring-1 ring-white/20"
+              />
               <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gradient-to-br from-emerald-300 to-emerald-500 ring-2 ring-[#0b0d2e]" />
             </div>
-            <Wordmark size="xl" tone="light" />
+            <Wordmark size="xl" tone="light" primary={wordmark.primary} secondary={wordmark.secondary} accentColor={brandingAccent} />
           </div>
 
           {/* Headline */}
@@ -146,8 +217,8 @@ export default function Login() {
         <div className="w-full max-w-[440px]">
           {/* Mobile logo */}
           <div className="flex items-center justify-center gap-3 mb-10 lg:hidden animate-fade-in">
-            <Logo className="w-10 h-10 rounded-xl shadow-md" />
-            <Wordmark size="lg" tone="dark" />
+            <Logo src={brandingLogo} title={brandingApp} className="w-10 h-10 rounded-xl shadow-md" />
+            <Wordmark size="lg" tone="dark" primary={wordmark.primary} secondary={wordmark.secondary} accentColor={brandingAccent} />
           </div>
 
           {/* Card */}
@@ -274,7 +345,7 @@ export default function Login() {
           </div>
 
           <p className="text-center text-xs text-muted-foreground/70 mt-6 animate-fade-in">
-            © {new Date().getFullYear()} MartinsAdviser · {t("common.allRightsReserved")}
+            © {new Date().getFullYear()} {brandingApp} · {t("common.allRightsReserved")}
           </p>
         </div>
       </div>

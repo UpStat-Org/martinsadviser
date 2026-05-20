@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTruck } from "@/hooks/useTrucks";
+import { DocumentLink } from "@/components/DocumentLink";
 import { usePermits } from "@/hooks/usePermits";
 import { useInvoices } from "@/hooks/useInvoices";
 import { useActivityLog } from "@/hooks/useActivityLog";
@@ -152,16 +153,14 @@ export default function TruckDetail() {
           <CardContent className="space-y-2">
             {relatedDocs.length ? (
               relatedDocs.map((permit) => (
-                <a
+                <DocumentLink
                   key={permit.id}
-                  href={permit.document_url!}
-                  target="_blank"
-                  rel="noreferrer"
+                  path={permit.document_url}
                   className="flex items-center justify-between rounded-xl border border-border/50 p-3 hover:bg-muted/40"
                 >
                   <span className="text-sm font-semibold">{permit.permit_type}</span>
                   <span className="text-xs text-muted-foreground">Abrir documento</span>
-                </a>
+                </DocumentLink>
               ))
             ) : (
               <p className="text-sm text-muted-foreground">Nenhum documento vinculado aos permits deste caminhão.</p>

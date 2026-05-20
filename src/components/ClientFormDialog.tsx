@@ -42,6 +42,7 @@ const formSchema = z.object({
   ein: z.string().optional(),
   dot: z.string().optional(),
   mc: z.string().optional(),
+  country: z.enum(["US", "BR", "ES"]).default("US"),
   status: z.string().default("active"),
   service_ifta: z.boolean().default(false),
   service_ct: z.boolean().default(false),
@@ -103,6 +104,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
           ein: client.ein || "",
           dot: client.dot || "",
           mc: client.mc || "",
+          country: (((client as unknown as { country?: string }).country) ?? "US") as "US" | "BR" | "ES",
           status: client.status,
           service_ifta: client.service_ifta,
           service_ct: client.service_ct,
@@ -121,6 +123,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
           ein: "",
           dot: "",
           mc: "",
+          country: "US",
           status: "active",
           service_ifta: false,
           service_ct: false,
@@ -145,6 +148,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
               ein: client.ein || "",
               dot: client.dot || "",
               mc: client.mc || "",
+              country: (((client as unknown as { country?: string }).country) ?? "US") as "US" | "BR" | "ES",
               status: client.status,
               service_ifta: client.service_ifta,
               service_ct: client.service_ct,
@@ -163,6 +167,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
               ein: "",
               dot: "",
               mc: "",
+              country: "US",
               status: "active",
               service_ifta: false,
               service_ct: false,
@@ -180,6 +185,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
     const payload = {
       company_name: values.company_name,
       registration_responsible: values.registration_responsible || null,
+      country: values.country,
       status: values.status,
       service_ifta: values.service_ifta,
       service_ct: values.service_ct,
@@ -194,7 +200,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
       dot: values.dot || null,
       mc: values.mc || null,
       notes: values.notes || null,
-    };
+    } as Record<string, unknown>;
 
     const duplicates = await checkDuplicate(
       values.dot,
@@ -374,6 +380,29 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                         <SelectItem value="active">{t("common.active")}</SelectItem>
                         <SelectItem value="inactive">{t("common.inactive")}</SelectItem>
                         <SelectItem value="pending">{t("common.pending")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>País</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="US">🇺🇸 Estados Unidos</SelectItem>
+                        <SelectItem value="BR">🇧🇷 Brasil</SelectItem>
+                        <SelectItem value="ES">🇪🇸 Espanha</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

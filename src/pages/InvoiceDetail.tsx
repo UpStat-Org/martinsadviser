@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DocumentLink } from "@/components/DocumentLink";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -165,16 +166,14 @@ export default function InvoiceDetail() {
           <CardContent className="space-y-2">
             {relatedDocs.length ? (
               relatedDocs.map((permit) => (
-                <a
+                <DocumentLink
                   key={permit.id}
-                  href={permit.document_url!}
-                  target="_blank"
-                  rel="noreferrer"
+                  path={permit.document_url}
                   className="flex items-center justify-between rounded-xl border border-border/50 p-3 hover:bg-muted/40"
                 >
                   <span className="text-sm font-semibold">{permit.permit_type}</span>
                   <span className="text-xs text-muted-foreground">Abrir documento</span>
-                </a>
+                </DocumentLink>
               ))
             ) : (
               <p className="text-sm text-muted-foreground">Nenhum documento de permit encontrado para este cliente.</p>

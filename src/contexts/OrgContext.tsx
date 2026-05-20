@@ -7,6 +7,8 @@ import {
   type ReactNode,
 } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getHostnameOrg } from "@/lib/orgHost";
+import { applyBrandingColors } from "@/lib/color";
 
 export type OrgRole = "owner" | "admin" | "member";
 
@@ -41,6 +43,10 @@ export interface OrgBranding {
   app_name: string;
   tagline: string;
   logo_url: string | null;
+  /** Hex like "#5B7BFF". Null means use the default theme. */
+  primary_color: string | null;
+  /** Hex like "#F59E0B". Drives the amber highlight + wordmark bar. */
+  accent_color: string | null;
 }
 
 // Safe defaults used both when the org row has an empty `branding` jsonb
@@ -51,6 +57,8 @@ const BRANDING_DEFAULTS: OrgBranding = {
   app_name: "MartinsAdviser",
   tagline: "Adviser",
   logo_url: null,
+  primary_color: null,
+  accent_color: null,
 };
 
 function parseBranding(raw: unknown): OrgBranding {
@@ -59,8 +67,11 @@ function parseBranding(raw: unknown): OrgBranding {
     app_name: typeof obj.app_name === "string" && obj.app_name.length > 0 ? obj.app_name : BRANDING_DEFAULTS.app_name,
     tagline: typeof obj.tagline === "string" ? obj.tagline : BRANDING_DEFAULTS.tagline,
     logo_url: typeof obj.logo_url === "string" && obj.logo_url.length > 0 ? obj.logo_url : null,
+    primary_color: typeof obj.primary_color === "string" && obj.primary_color.length > 0 ? obj.primary_color : null,
+    accent_color: typeof obj.accent_color === "string" && obj.accent_color.length > 0 ? obj.accent_color : null,
   };
 }
+
 
 /**
  * Splits the app name into a 2-line wordmark when the tagline is a suffix
@@ -83,6 +94,7 @@ export interface Organization {
   name: string;
   branding: Record<string, unknown>;
   feature_flags: Partial<Record<FeatureFlag, boolean>>;
+  subscription_status?: string;
 }
 
 export interface Membership {
@@ -140,7 +152,43 @@ export function OrgProvider({ children }: { children: ReactNode }) {
         role: r.role as OrgRole,
       }));
 
-    const active = profile?.active_org_id ?? mlist[0]?.organization.id ?? null;
+    // Host-based routing: when the URL points at a tenant subdomain (or the
+    // root, which maps to the cliente 0 slug), that's the only org the user
+    // can be in for this session. Cross-tenant access is denied even if the
+    // user has memberships in other orgs.
+    const hostInfo = getHostnameOrg();
+    let active: string | null = null;
+
+    if (hostInfo.slug && !hostInfo.isDev) {
+      const matched = mlist.find((m) => m.organization.slug === hostInfo.slug);
+      if (matched) {
+        active = matched.organization.id;
+        // Keep profile.active_org_id in sync so OrgSwitcher and other surfaces
+        // agree with the URL. Fire-and-forget — failing this isn't fatal.
+        if (profile?.active_org_id !== matched.organization.id) {
+          supabase.from("profiles")
+            .update({ active_org_id: matched.organization.id })
+            .eq("id", user.id)
+            .then(() => undefined);
+        }
+      } else {
+        // User is signed in but not a member of the org this URL serves.
+        // Sign them out so they don't see a half-loaded UI, then send them
+        // to /login on the same host with an explanatory query param.
+        await supabase.auth.signOut();
+        if (typeof window !== "undefined") {
+          window.location.assign(`/login?error=cross_org&host=${encodeURIComponent(hostInfo.slug)}`);
+        }
+        setMemberships([]);
+        setCurrentOrgId(null);
+        setLoading(false);
+        return;
+      }
+    } else {
+      // Dev / preview host: fall back to the profile's preferred org.
+      active = profile?.active_org_id ?? mlist[0]?.organization.id ?? null;
+    }
+
     setMemberships(mlist);
     setCurrentOrgId(active);
     setLoading(false);
@@ -197,6 +245,14 @@ export function OrgProvider({ children }: { children: ReactNode }) {
       document.title = branding.app_name;
     }
   }, [branding.app_name, currentOrg]);
+
+  // Override the shadcn theme variables when the org sets custom colors.
+  // Cleanup runs on unmount so toggling back to null restores the stylesheet
+  // defaults without a page reload.
+  useEffect(() => {
+    applyBrandingColors({ primary: branding.primary_color, accent: branding.accent_color });
+    return () => applyBrandingColors({ primary: null, accent: null });
+  }, [branding.primary_color, branding.accent_color]);
 
   return (
     <OrgContext.Provider

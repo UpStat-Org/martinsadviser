@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { OrgSwitcher } from "@/components/OrgSwitcher";
 import { useOrg, splitWordmark, type FeatureFlag } from "@/contexts/OrgContext";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Logo } from "@/components/Logo";
@@ -32,6 +33,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { user, fullName, role } = useAuth();
   const { hasFeature, branding, isOrgAdmin } = useOrg();
+  const { data: isSuperAdmin } = useSuperAdmin();
   const wordmark = splitWordmark(branding);
   const { t } = useLanguage();
   const isMobile = useIsMobile();
@@ -87,9 +89,17 @@ export function AppSidebar() {
         ]),
       });
     }
+    if (isSuperAdmin) {
+      base.push({
+        label: "Super-admin",
+        items: [
+          { to: "/super-admin", icon: ShieldCheck, label: "Organizações" },
+        ],
+      });
+    }
     // Drop sections that became empty after filtering (e.g. communication off entirely)
     return base.filter((section) => section.items.length > 0);
-  }, [t, isOrgAdmin, hasFeature]);
+  }, [t, isOrgAdmin, isSuperAdmin, hasFeature]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -179,6 +189,7 @@ export function AppSidebar() {
             className="min-w-0"
             primary={wordmark.primary}
             secondary={wordmark.secondary}
+            accentColor={branding.accent_color}
           />
         )}
         {isMobile && (

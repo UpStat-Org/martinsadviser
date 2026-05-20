@@ -11,6 +11,11 @@ interface WordmarkProps {
   primary?: string;
   /** Secondary word after the gold bar. Defaults to "Adviser". */
   secondary?: string;
+  /**
+   * Hex color overriding the amber gradient on the bar between primary and
+   * secondary. Default keeps the original MartinsAdviser amber.
+   */
+  accentColor?: string | null;
 }
 
 const sizeMap: Record<Size, { main: string; sub: string; gap: string; bar: string }> = {
@@ -26,12 +31,23 @@ export function Wordmark({
   className,
   primary = "Martins",
   secondary = "Adviser",
+  accentColor,
 }: WordmarkProps) {
   const s = sizeMap[size];
   const mainColor = tone === "light" ? "text-white" : "text-foreground";
   const subColor = tone === "light" ? "text-white/55" : "text-muted-foreground";
-  const barColor = "bg-gradient-to-r from-[#F59E0B] to-[#FCD34D]";
   const hasSecondary = secondary && secondary.length > 0;
+
+  // The bar between the two lines is the wordmark's visual signature. When
+  // the org overrides the accent color, swap the amber gradient for a solid
+  // (it doesn't look great as a gradient unless we know the shade variant);
+  // otherwise keep the original amber → gold gradient.
+  const barStyle = accentColor
+    ? { background: accentColor }
+    : undefined;
+  const barClass = accentColor
+    ? "rounded-full shrink-0"
+    : "rounded-full shrink-0 bg-gradient-to-r from-[#F59E0B] to-[#FCD34D]";
 
   return (
     <div className={cn("flex flex-col leading-none select-none", s.gap, className)}>
@@ -47,7 +63,7 @@ export function Wordmark({
       </span>
       {hasSecondary && (
         <div className="flex items-center gap-1.5">
-          <span className={cn("rounded-full shrink-0", s.bar, barColor)} />
+          <span className={cn(barClass, s.bar)} style={barStyle} />
           <span
             className={cn(
               "font-sans font-semibold uppercase",

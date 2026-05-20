@@ -3,10 +3,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, ExternalLink } from "lucide-react";
+import { Download, ExternalLink, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
 import type { PermitDocument } from "@/hooks/usePermitDocuments";
+import { useDocumentUrl } from "@/hooks/useDocumentUrl";
 
 interface DocumentViewerProps {
   open: boolean;
@@ -28,14 +29,22 @@ export function DocumentViewer({ open, onOpenChange, url, title, versions }: Doc
   const { t } = useLanguage();
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
 
-  const activeUrl = versions && selectedVersionId
+  // The incoming `url` and the version rows store the storage *path*
+  // ("<org>/<permit>/<ts>.<ext>") now that the bucket is private. We mint
+  // a signed URL per-render via React Query — the hook also accepts legacy
+  // absolute URLs for backward compatibility during the cutover.
+  const activePath = versions && selectedVersionId
     ? versions.find((v) => v.id === selectedVersionId)?.document_url || url
     : url;
+  const { data: resolvedUrl, isLoading: resolving } = useDocumentUrl(activePath);
+  const activeUrl = resolvedUrl ?? "";
 
   const activeVersion = versions?.find((v) => v.id === selectedVersionId);
 
-  const pdf = isPdf(activeUrl);
-  const image = isImage(activeUrl);
+  // Detection runs on the original path (which preserves the extension)
+  // instead of the signed URL (which has query params).
+  const pdf = isPdf(activePath);
+  const image = isImage(activePath);
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) setSelectedVersionId(null); onOpenChange(v); }}>
@@ -68,21 +77,38 @@ export function DocumentViewer({ open, onOpenChange, url, title, versions }: Doc
                 </SelectContent>
               </Select>
             )}
-            <Button variant="outline" size="sm" asChild>
-              <a href={activeUrl} download target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" size="sm" asChild disabled={!activeUrl}>
+              <a
+                href={activeUrl || "#"}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-disabled={!activeUrl}
+                onClick={(e) => { if (!activeUrl) e.preventDefault(); }}
+              >
                 <Download className="w-4 h-4 mr-2" />
                 {t("documents.download")}
               </a>
             </Button>
-            <Button variant="outline" size="sm" asChild>
-              <a href={activeUrl} target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" size="sm" asChild disabled={!activeUrl}>
+              <a
+                href={activeUrl || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-disabled={!activeUrl}
+                onClick={(e) => { if (!activeUrl) e.preventDefault(); }}
+              >
                 <ExternalLink className="w-4 h-4" />
               </a>
             </Button>
           </div>
         </DialogHeader>
         <div className="flex-1 overflow-hidden bg-muted/30">
-          {pdf ? (
+          {resolving || !activeUrl ? (
+            <div className="w-full h-full flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : pdf ? (
             <iframe
               src={`${activeUrl}#toolbar=1&navpanes=0`}
               className="w-full h-full border-0"

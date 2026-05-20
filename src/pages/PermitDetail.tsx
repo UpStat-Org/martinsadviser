@@ -13,6 +13,7 @@ import { useActivityLog } from "@/hooks/useActivityLog";
 import { CommentsSection } from "@/components/CommentsSection";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { DocumentViewer } from "@/components/DocumentViewer";
+import { DocumentLink } from "@/components/DocumentLink";
 
 export default function PermitDetail() {
   const { id } = useParams();
@@ -140,16 +141,14 @@ export default function PermitDetail() {
                   </div>
                 </button>
                 {documents?.slice(0, 4).map((doc) => (
-                  <a
+                  <DocumentLink
                     key={doc.id}
-                    href={doc.document_url}
-                    target="_blank"
-                    rel="noreferrer"
+                    path={doc.document_url}
                     className="flex items-center justify-between rounded-xl bg-muted/40 border border-border/50 p-3 hover:bg-muted"
                   >
                     <span className="text-sm font-semibold">v{doc.version}</span>
                     <span className="text-xs text-muted-foreground">{format(new Date(doc.created_at), "dd/MM/yyyy")}</span>
-                  </a>
+                  </DocumentLink>
                 ))}
               </>
             ) : (

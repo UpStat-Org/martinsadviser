@@ -140,11 +140,9 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
       return permit?.document_url || null;
     }
 
-    const { data: urlData } = supabase.storage
-      .from("permit-documents")
-      .getPublicUrl(filePath);
-
-    return urlData.publicUrl;
+    // Store just the path; the bucket is private and we mint a short-lived
+    // signed URL on the read side via useDocumentUrl.
+    return filePath;
   };
 
   const onSubmit = async (values: FormValues) => {
