@@ -24,18 +24,63 @@ Deno.serve(async (req) => {
 
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
-    const { data: isAdmin } = await adminClient.rpc("has_role", { _user_id: caller.id, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden: admin role required");
-
     const { user_id } = await req.json();
     if (!user_id) throw new Error("user_id is required");
     if (user_id === caller.id) throw new Error("Cannot delete yourself");
 
-    // Delete profile, roles, and auth user
-    await adminClient.from("user_roles").delete().eq("user_id", user_id);
-    await adminClient.from("profiles").delete().eq("id", user_id);
-    const { error } = await adminClient.auth.admin.deleteUser(user_id);
-    if (error) throw error;
+    // Resolve caller's active org (the one the action is scoped to)
+    const { data: callerProfile } = await adminClient
+      .from("profiles")
+      .select("active_org_id")
+      .eq("id", caller.id)
+      .maybeSingle();
+    const orgId = callerProfile?.active_org_id;
+    if (!orgId) throw new Error("Caller has no active organization");
+
+    // Caller must be admin/owner of that org
+    const { data: callerMembership } = await adminClient
+      .from("organization_members")
+      .select("role")
+      .eq("organization_id", orgId)
+      .eq("user_id", caller.id)
+      .eq("approval_status", "approved")
+      .maybeSingle();
+    if (!callerMembership || !["owner", "admin"].includes(callerMembership.role)) {
+      throw new Error("Forbidden: org admin role required");
+    }
+
+    // Target user must belong to the same org
+    const { data: targetMembership } = await adminClient
+      .from("organization_members")
+      .select("user_id, role")
+      .eq("organization_id", orgId)
+      .eq("user_id", user_id)
+      .maybeSingle();
+    if (!targetMembership) throw new Error("Target user is not a member of this organization");
+    // Prevent deleting the org owner
+    if (targetMembership.role === "owner") throw new Error("Cannot delete the organization owner");
+
+    // Delete membership for this org first (explicit, not relying on cascade ordering)
+    await adminClient
+      .from("organization_members")
+      .delete()
+      .eq("organization_id", orgId)
+      .eq("user_id", user_id);
+
+    // If the user has no other memberships, remove profile + auth user.
+    // Otherwise keep their global identity intact (they still belong to another org).
+    const { data: otherMemberships } = await adminClient
+      .from("organization_members")
+      .select("organization_id")
+      .eq("user_id", user_id)
+      .limit(1);
+
+    if (!otherMemberships || otherMemberships.length === 0) {
+      await adminClient.from("user_roles").delete().eq("user_id", user_id);
+      await adminClient.from("profiles").delete().eq("id", user_id);
+      const { error } = await adminClient.auth.admin.deleteUser(user_id);
+      if (error) throw error;
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

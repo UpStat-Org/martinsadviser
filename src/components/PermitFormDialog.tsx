@@ -22,6 +22,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Upload, FileText, X, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOrg } from "@/contexts/OrgContext";
 
 const formSchema = z.object({
   client_id: z.string().min(1),
@@ -52,6 +53,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
   const { data: employees } = useEmployees();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { currentOrg } = useOrg();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -120,9 +122,14 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
 
   const uploadFile = async (permitId: string): Promise<string | null> => {
     if (!selectedFile) return permit?.document_url || null;
+    if (!currentOrg?.id) {
+      toast({ title: t("documents.uploadError"), description: "No active organization", variant: "destructive" });
+      return permit?.document_url || null;
+    }
 
     const fileExt = selectedFile.name.split(".").pop();
-    const filePath = `${permitId}/${Date.now()}.${fileExt}`;
+    // Org_id prefix is enforced by storage policies — uploading without it will be rejected.
+    const filePath = `${currentOrg.id}/${permitId}/${Date.now()}.${fileExt}`;
 
     const { error } = await supabase.storage
       .from("permit-documents")

@@ -29,12 +29,28 @@ Deno.serve(async (req) => {
 
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
-    // Check admin role
-    const { data: isAdmin } = await adminClient.rpc("has_role", { _user_id: callerId, _role: "admin" });
-    if (!isAdmin) throw new Error("Not authorized");
-
     const { email, password, client_id } = await req.json();
     if (!email || !password || !client_id) throw new Error("Missing required fields");
+
+    // Resolve the client's org (the source of truth for the portal user's tenancy)
+    const { data: client, error: clientErr } = await adminClient
+      .from("clients")
+      .select("org_id")
+      .eq("id", client_id)
+      .maybeSingle();
+    if (clientErr || !client) throw new Error("Client not found");
+
+    // Caller must be an admin/owner of the client's org
+    const { data: callerMembership } = await adminClient
+      .from("organization_members")
+      .select("role")
+      .eq("organization_id", client.org_id)
+      .eq("user_id", callerId)
+      .eq("approval_status", "approved")
+      .maybeSingle();
+    if (!callerMembership || !["owner", "admin"].includes(callerMembership.role)) {
+      throw new Error("Not authorized");
+    }
 
     // Create auth user with auto-confirm
     const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
@@ -44,10 +60,11 @@ Deno.serve(async (req) => {
     });
     if (createError) throw createError;
 
-    // Link to client
+    // Link to client (org_id must be passed explicitly — current_org_id() default
+    // resolves via auth.uid()/JWT, which is unavailable under service_role).
     const { error: linkError } = await adminClient
       .from("client_portal_users")
-      .insert({ user_id: newUser.user.id, client_id });
+      .insert({ user_id: newUser.user.id, client_id, org_id: client.org_id });
     if (linkError) throw linkError;
 
     return new Response(JSON.stringify({ success: true, user_id: newUser.user.id }), {

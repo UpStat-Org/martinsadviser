@@ -83,11 +83,22 @@ Deno.serve(async (req) => {
 
     const accessToken = await refreshTokenIfNeeded(supabase, tokenRow);
 
-    // Get active permits with expiration dates
+    // Resolve user's active org — sync is scoped to that org's permits only.
+    // Avoids leaking permits from another org into the user's calendar once
+    // multi-org membership exists.
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("active_org_id")
+      .eq("id", userId)
+      .maybeSingle();
+    const activeOrgId = profile?.active_org_id;
+    if (!activeOrgId) throw new Error("User has no active organization");
+
+    // Get active permits with expiration dates, scoped to the active org
     const { data: permits, error: permitsErr } = await supabase
       .from("permits")
       .select("*, clients(company_name)")
-      .eq("user_id", userId)
+      .eq("org_id", activeOrgId)
       .eq("status", "active")
       .not("expiration_date", "is", null);
 

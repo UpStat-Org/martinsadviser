@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { tNow } from "@/lib/translations";
+import { useOrg } from "@/contexts/OrgContext";
 
 export interface Notification {
   id: string;
@@ -16,9 +17,11 @@ export interface Notification {
 
 export function useNotifications() {
   const queryClient = useQueryClient();
+  const { currentOrg } = useOrg();
+  const orgId = currentOrg?.id;
 
   const query = useQuery({
-    queryKey: ["notifications"],
+    queryKey: ["notifications", orgId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("notifications")
@@ -28,17 +31,21 @@ export function useNotifications() {
       if (error) throw error;
       return data as unknown as Notification[];
     },
+    enabled: !!orgId,
   });
 
-  // Realtime subscription
+  // Realtime subscription scoped to the current org. RLS already prevents
+  // cross-org reads via REST, but realtime postgres_changes publishes without
+  // RLS — filtering server-side keeps WS noise (and refetches) inside the tenant.
   useEffect(() => {
+    if (!orgId) return;
     const channel = supabase
-      .channel("notifications-realtime")
+      .channel(`notifications-realtime-${orgId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "notifications" },
+        { event: "*", schema: "public", table: "notifications", filter: `org_id=eq.${orgId}` },
         () => {
-          queryClient.invalidateQueries({ queryKey: ["notifications"] });
+          queryClient.invalidateQueries({ queryKey: ["notifications", orgId] });
         }
       )
       .subscribe();
@@ -46,7 +53,7 @@ export function useNotifications() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient]);
+  }, [queryClient, orgId]);
 
   const unreadCount = query.data?.filter((n) => !n.read).length ?? 0;
 

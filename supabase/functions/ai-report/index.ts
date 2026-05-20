@@ -10,6 +10,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) throw new Error("Missing authorization header");
+
     const { client_id, language } = await req.json();
     if (!client_id) throw new Error("client_id is required");
 
@@ -18,16 +21,36 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Verify caller
+    const callerClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsErr } = await callerClient.auth.getClaims(token);
+    if (claimsErr || !claimsData?.claims) throw new Error("Not authenticated");
+    const callerId = claimsData.claims.sub as string;
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Fetch client data
+    // Fetch client data (includes org_id for isolation check)
     const { data: client } = await supabase.from("clients").select("*").eq("id", client_id).single();
     if (!client) throw new Error("Client not found");
 
-    const { data: permits } = await supabase.from("permits").select("*").eq("client_id", client_id);
-    const { data: trucks } = await supabase.from("trucks").select("*").eq("client_id", client_id);
-    const { data: tasks } = await supabase.from("tasks").select("*").eq("client_id", client_id);
-    const { data: invoices } = await supabase.from("invoices").select("*").eq("client_id", client_id);
+    // Authorization: caller must be an approved member of the client's org
+    const { data: membership } = await supabase
+      .from("organization_members")
+      .select("user_id")
+      .eq("organization_id", client.org_id)
+      .eq("user_id", callerId)
+      .eq("approval_status", "approved")
+      .maybeSingle();
+    if (!membership) throw new Error("Forbidden: not a member of this client's organization");
+
+    const { data: permits } = await supabase.from("permits").select("*").eq("client_id", client_id).eq("org_id", client.org_id);
+    const { data: trucks } = await supabase.from("trucks").select("*").eq("client_id", client_id).eq("org_id", client.org_id);
+    const { data: tasks } = await supabase.from("tasks").select("*").eq("client_id", client_id).eq("org_id", client.org_id);
+    const { data: invoices } = await supabase.from("invoices").select("*").eq("client_id", client_id).eq("org_id", client.org_id);
 
     const langMap: Record<string, string> = {
       pt: "Responda em Português do Brasil.",

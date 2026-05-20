@@ -1,7 +1,7 @@
 # Multi-Tenancy Migration Plan
 
 **Iniciado:** 2026-05-19
-**Status atual:** Week 3 (concluída — aguardando aplicação da última migration e teste local)
+**Status atual:** Week 4 (hardening — em andamento)
 
 ## Contexto e visão
 
@@ -55,8 +55,8 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 | --------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------- |
 | **Week 1** — Foundation                 | Tabelas de tenancy + helpers + seed MartinsAdviser        | ✅ Done                                                     |
 | **Week 2** — org_id rollout             | 19 tabelas com `org_id` + policies reescritas             | ✅ Done                                                     |
-| **Week 3** — Frontend                   | OrgContext, JWT hook (deferred), signup trigger           | ✅ Done (aguardando aplicar última migration + teste local) |
-| **Week 4** — Hardening                  | Edge functions restantes + testes isolamento cross-tenant | ⬜ Próximo                                                  |
+| **Week 3** — Frontend                   | OrgContext, JWT hook (deferred), signup trigger           | ✅ Done                                                     |
+| **Week 4** — Hardening                  | Edge functions restantes + testes isolamento cross-tenant | 🟡 Em andamento                                             |
 | **Mês 2** — Modularização + white-label | Feature flags por org, branding por org, subdomínio       | ⬜ Futuro                                                   |
 | **Mês 3** — Onboarding + billing        | Stripe, signup self-serve org, super-admin panel          | ⬜ Futuro                                                   |
 | **Mês 4** — Polimento + launch          | Landing page, docs, testes de carga                       | ⬜ Futuro                                                   |
@@ -76,7 +76,7 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 | `20260519185000_aux_tables_multitenancy.sql`        | org_id em `comments`, `saved_filters`, `message_templates`, `scheduled_messages`, `client_internal_notes` | ✅                                         |
 | `20260519186000_ai_chat_multitenancy.sql`           | org_id em `ai_chat_messages`                                                                              | ✅                                         |
 | `20260519190000_jwt_org_claim_hook.sql`             | `custom_access_token_hook`, `profiles.active_org_id`                                                      | ✅ (função dormante — hook não registrado) |
-| `20260519191000_signup_membership.sql`              | Trigger `handle_new_user` cria membership                                                                 | ⬜ **Pendente aplicar**                    |
+| `20260519191000_signup_membership.sql`              | Trigger `handle_new_user` cria membership                                                                 | ✅                                         |
 
 **Total: 19 tabelas com `org_id NOT NULL` + RLS org-scoped.**
 
