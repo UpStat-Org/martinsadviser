@@ -168,13 +168,14 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 
 ### Convenção de roteamento
 
-| Hostname                                               | Org resolvida                                                          |
+| Hostname                                               | Resolução                                                              |
 | ------------------------------------------------------ | ---------------------------------------------------------------------- |
-| `martinsadviser.com`                                   | MartinsAdviser (cliente 0)                                             |
-| `www.martinsadviser.com`                               | MartinsAdviser (alias)                                                 |
-| `app.martinsadviser.com`                               | MartinsAdviser (alias reservado)                                       |
-| `<slug>.martinsadviser.com`                            | Org com `slug` correspondente                                          |
-| `localhost`, `*.lovable.app`, `*.netlify.app`, IPs raw | Modo dev — sem subdomain routing, fallback pro `profile.active_org_id` |
+| `<slug>.martinsadviser.com`                            | **Strict**: enforça org `<slug>`, signs out se user não for membro     |
+| `martinsadviser.com` (apex)                            | **Permissivo**: usa `profile.active_org_id`, nunca expulsa por host    |
+| `www` / `app` / `api` / `admin` / `status` subdomains  | Tratados como apex (permissivo)                                        |
+| `localhost`, `*.lovable.app`, `*.netlify.app`, IPs raw | Modo dev — mesma lógica permissiva                                     |
+
+Apex foi flexibilizado em 2026-05-20 porque sem o wildcard DNS configurado, owners de orgs não-MartinsAdviser ficavam presos no `cross_org` redirect. Quando o wildcard estiver ativo e a estratégia mudar pra "apex = landing/marketing only", basta restaurar o branch que retornava ROOT_ORG_SLUG no apex em `orgHost.ts`.
 
 ### Como o frontend resolve
 
