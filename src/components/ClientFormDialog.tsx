@@ -217,9 +217,9 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
     }
 
     if (isEditing) {
-      await updateClient.mutateAsync({ id: client.id, ...payload });
+      await updateClient.mutateAsync({ id: client.id, ...payload } as any);
     } else {
-      await createClient.mutateAsync(payload);
+      await createClient.mutateAsync(payload as any);
     }
     onOpenChange(false);
     form.reset();
