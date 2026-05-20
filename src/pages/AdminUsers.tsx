@@ -139,11 +139,19 @@ export default function AdminUsers() {
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
+      const { error: profErr } = await supabase
         .from("profiles")
         .update({ approval_status: status })
         .eq("id", id);
-      if (error) throw error;
+      if (profErr) throw profErr;
+
+      // Mirror status to all org memberships of this user so RLS allows access.
+      // In multi-org future, scope by current org instead of all memberships.
+      const { error: memErr } = await supabase
+        .from("organization_members")
+        .update({ approval_status: status })
+        .eq("user_id", id);
+      if (memErr) throw memErr;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-profiles"] });

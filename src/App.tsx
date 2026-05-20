@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { OrgProvider } from "./contexts/OrgContext";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import { AppLayout } from "./components/AppLayout";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -46,6 +47,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="light" storageKey="martins-theme">
     <LanguageProvider>
+      <OrgProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -96,6 +98,7 @@ const App = () => (
           </ErrorBoundary>
         </BrowserRouter>
       </TooltipProvider>
+      </OrgProvider>
     </LanguageProvider>
     </ThemeProvider>
   </QueryClientProvider>

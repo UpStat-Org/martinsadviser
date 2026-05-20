@@ -10,6 +10,7 @@ import { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { OrgSwitcher } from "@/components/OrgSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Logo } from "@/components/Logo";
@@ -222,6 +223,9 @@ export function AppSidebar() {
           </DropdownMenu>
         </div>
       )}
+
+      {/* Org switcher (renders nothing if user belongs to <=1 org) */}
+      <OrgSwitcher collapsed={collapsed && !isMobile} />
 
       {/* Navigation */}
       <nav className="flex-1 py-3 overflow-y-auto sidebar-scrollbar">
