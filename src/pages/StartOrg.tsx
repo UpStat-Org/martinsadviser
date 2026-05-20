@@ -25,6 +25,25 @@ function suggestSlug(name: string): string {
     .slice(0, 30);
 }
 
+// Sends the user to the new tenant's subdomain after a successful provision.
+// In dev (localhost, lovable/netlify previews) there's no subdomain to use,
+// so we bounce to /settings on the same host.
+function redirectToOrg(slug: string, navigate: (to: string) => void) {
+  const host = window.location.hostname;
+  const isDev =
+    host === "localhost" ||
+    host.endsWith(".lovable.app") ||
+    host.endsWith(".lovableproject.com") ||
+    host.endsWith(".netlify.app");
+  if (isDev) {
+    navigate("/settings?welcome=1");
+  } else {
+    const parts = host.split(".");
+    const apex = parts.length >= 2 ? parts.slice(-2).join(".") : host;
+    window.location.assign(`https://${slug}.${apex}/settings?welcome=1`);
+  }
+}
+
 const SLUG_REGEX = /^[a-z0-9][a-z0-9-]*$/;
 const RESERVED = new Set(["www", "app", "api", "admin", "status", "martinsadviser"]);
 
@@ -33,7 +52,7 @@ export default function StartOrg() {
   const { toast } = useToast();
   const { refresh } = useOrg();
 
-  const [step, setStep] = useState<"form" | "creating" | "done">("form");
+  const [step, setStep] = useState<"form" | "creating" | "done" | "confirm-email">("form");
   const [companyName, setCompanyName] = useState("");
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
@@ -71,8 +90,12 @@ export default function StartOrg() {
     setStep("creating");
 
     try {
-      // 1) Auth signup — intent flag tells handle_new_user not to enroll
-      // this user in the cliente 0 org.
+      // The trigger handle_new_user reads these metadata fields and
+      // provisions the org + owner membership + profile.active_org_id in
+      // the same transaction as the auth.users insert. So we don't need
+      // a session before the org exists — even if the project requires
+      // email confirmation, the org is already there when the user clicks
+      // the link and lands on /login.
       const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
         email,
         password,
@@ -80,54 +103,26 @@ export default function StartOrg() {
           data: {
             full_name: fullName,
             intent: "new-org",
+            slug,
+            org_name: companyName,
+            country,
           },
         },
       });
       if (signUpErr) throw signUpErr;
 
-      // Email confirmation is project-dependent. If confirmation is required
-      // by the Supabase project, signUpData.session is null — surface a
-      // friendlier error message in that case so we don't silently fail.
-      if (!signUpData.session) {
-        throw new Error(
-          "Verifique seu email para confirmar a conta antes de continuar. " +
-          "Depois faça login que terminamos a criação da organização.",
-        );
+      // Path A: project doesn't require email confirmation → session ready
+      // immediately. Refresh org context and redirect to the new subdomain.
+      if (signUpData.session) {
+        await refresh();
+        setStep("done");
+        setTimeout(() => redirectToOrg(slug, navigate), 900);
+        return;
       }
 
-      // 2) Provision the org. RPC validates slug, creates org + owner
-      // membership, sets profile.active_org_id.
-      const { data: orgId, error: rpcErr } = await supabase.rpc(
-        "public_create_org_with_owner",
-        { p_slug: slug, p_name: companyName, p_country: country },
-      );
-      if (rpcErr) throw rpcErr;
-      if (!orgId) throw new Error("Falha ao criar organização");
-
-      // 3) Refresh org context so the rest of the app sees the new org.
-      await refresh();
-
-      setStep("done");
-
-      // 4) Redirect to the new tenant's subdomain. In dev (localhost /
-      // lovable preview / netlify preview) we don't have one, so we just
-      // bounce to /settings on the root.
-      setTimeout(() => {
-        const host = window.location.hostname;
-        const isDev =
-          host === "localhost" ||
-          host.endsWith(".lovable.app") ||
-          host.endsWith(".lovableproject.com") ||
-          host.endsWith(".netlify.app");
-        if (isDev) {
-          navigate("/settings?welcome=1");
-        } else {
-          // Replace the leading subdomain (or apex) with the new slug.
-          const parts = host.split(".");
-          const apex = parts.length >= 2 ? parts.slice(-2).join(".") : host;
-          window.location.assign(`https://${slug}.${apex}/settings?welcome=1`);
-        }
-      }, 900);
+      // Path B: email confirmation pending. The org already exists — we
+      // just need the user to confirm and come back.
+      setStep("confirm-email");
     } catch (e: any) {
       toast({ title: "Não foi possível criar a organização", description: e.message, variant: "destructive" });
       setStep("form");
@@ -193,6 +188,34 @@ export default function StartOrg() {
                   <p className="text-sm text-muted-foreground mt-1">Redirecionando você…</p>
                 </div>
                 <Loader2 className="w-4 h-4 animate-spin text-muted-foreground mx-auto" />
+              </CardContent>
+            </Card>
+          ) : step === "confirm-email" ? (
+            <Card className="border-border/50">
+              <CardContent className="p-8 text-center space-y-4">
+                <div className="w-12 h-12 mx-auto rounded-2xl bg-primary/15 text-primary flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <div className="space-y-2">
+                  <h1 className="font-display text-2xl font-bold">Organização criada!</h1>
+                  <p className="text-sm text-muted-foreground">
+                    Enviamos um email pra <strong className="text-foreground">{email}</strong>.
+                    Confirme sua conta clicando no link e depois faça login pra entrar na sua nova org.
+                  </p>
+                </div>
+                <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-left text-xs space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-muted-foreground">Subdomínio</span>
+                    <span className="font-mono font-semibold">{slug}.martinsadviser.com</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-muted-foreground">Status</span>
+                    <span className="font-semibold text-primary">Aguardando confirmação</span>
+                  </div>
+                </div>
+                <Button asChild className="w-full">
+                  <Link to="/login">Ir pro login</Link>
+                </Button>
               </CardContent>
             </Card>
           ) : (
