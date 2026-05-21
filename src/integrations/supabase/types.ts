@@ -317,6 +317,7 @@ export type Database = {
           email: string | null
           id: string
           mc: string | null
+          mcs_150_last_filed_at: string | null
           notes: string | null
           org_id: string
           phone: string | null
@@ -341,6 +342,7 @@ export type Database = {
           email?: string | null
           id?: string
           mc?: string | null
+          mcs_150_last_filed_at?: string | null
           notes?: string | null
           org_id?: string
           phone?: string | null
@@ -365,6 +367,7 @@ export type Database = {
           email?: string | null
           id?: string
           mc?: string | null
+          mcs_150_last_filed_at?: string | null
           notes?: string | null
           org_id?: string
           phone?: string | null
@@ -497,6 +500,279 @@ export type Database = {
           },
         ]
       }
+      driver_documents: {
+        Row: {
+          created_at: string
+          document_url: string | null
+          driver_id: string
+          expires_on: string | null
+          id: string
+          issued_on: string | null
+          kind: string
+          notes: string | null
+          org_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_url?: string | null
+          driver_id: string
+          expires_on?: string | null
+          id?: string
+          issued_on?: string | null
+          kind: string
+          notes?: string | null
+          org_id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_url?: string | null
+          driver_id?: string
+          expires_on?: string | null
+          id?: string
+          issued_on?: string | null
+          kind?: string
+          notes?: string | null
+          org_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_documents_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_documents_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drivers: {
+        Row: {
+          cdl_class: string | null
+          cdl_endorsements: string | null
+          cdl_expires_on: string | null
+          cdl_issued_on: string | null
+          cdl_number: string | null
+          cdl_state: string | null
+          client_id: string
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          full_name: string
+          hire_date: string | null
+          id: string
+          medical_card_expires_on: string | null
+          medical_examiner_name: string | null
+          notes: string | null
+          org_id: string
+          phone: string | null
+          ssn_last4: string | null
+          status: string
+          termination_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cdl_class?: string | null
+          cdl_endorsements?: string | null
+          cdl_expires_on?: string | null
+          cdl_issued_on?: string | null
+          cdl_number?: string | null
+          cdl_state?: string | null
+          client_id: string
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          full_name: string
+          hire_date?: string | null
+          id?: string
+          medical_card_expires_on?: string | null
+          medical_examiner_name?: string | null
+          notes?: string | null
+          org_id?: string
+          phone?: string | null
+          ssn_last4?: string | null
+          status?: string
+          termination_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cdl_class?: string | null
+          cdl_endorsements?: string | null
+          cdl_expires_on?: string | null
+          cdl_issued_on?: string | null
+          cdl_number?: string | null
+          cdl_state?: string | null
+          client_id?: string
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          full_name?: string
+          hire_date?: string | null
+          id?: string
+          medical_card_expires_on?: string | null
+          medical_examiner_name?: string | null
+          notes?: string | null
+          org_id?: string
+          phone?: string | null
+          ssn_last4?: string | null
+          status?: string
+          termination_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drivers_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drivers_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drug_test_events: {
+        Row: {
+          collected_at: string | null
+          created_at: string
+          driver_id: string
+          id: string
+          mro_reviewed_at: string | null
+          notes: string | null
+          org_id: string
+          result: string | null
+          scheduled_for: string | null
+          selection_for_quarter: string | null
+          substance: string
+          test_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          collected_at?: string | null
+          created_at?: string
+          driver_id: string
+          id?: string
+          mro_reviewed_at?: string | null
+          notes?: string | null
+          org_id?: string
+          result?: string | null
+          scheduled_for?: string | null
+          selection_for_quarter?: string | null
+          substance?: string
+          test_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          collected_at?: string | null
+          created_at?: string
+          driver_id?: string
+          id?: string
+          mro_reviewed_at?: string | null
+          notes?: string | null
+          org_id?: string
+          result?: string | null
+          scheduled_for?: string | null
+          selection_for_quarter?: string | null
+          substance?: string
+          test_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drug_test_events_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drug_test_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fmcsa_snapshots: {
+        Row: {
+          carrier_operation: string | null
+          client_id: string
+          dot: string
+          fetched_at: string
+          id: string
+          org_id: string
+          raw: Json | null
+          safety_rating: string | null
+          status_code: string | null
+          total_drivers: number | null
+          total_power_units: number | null
+        }
+        Insert: {
+          carrier_operation?: string | null
+          client_id: string
+          dot: string
+          fetched_at?: string
+          id?: string
+          org_id: string
+          raw?: Json | null
+          safety_rating?: string | null
+          status_code?: string | null
+          total_drivers?: number | null
+          total_power_units?: number | null
+        }
+        Update: {
+          carrier_operation?: string | null
+          client_id?: string
+          dot?: string
+          fetched_at?: string
+          id?: string
+          org_id?: string
+          raw?: Json | null
+          safety_rating?: string | null
+          status_code?: string | null
+          total_drivers?: number | null
+          total_power_units?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fmcsa_snapshots_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fmcsa_snapshots_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       google_calendar_tokens: {
         Row: {
           access_token: string
@@ -529,6 +805,332 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      hvut_filings: {
+        Row: {
+          client_id: string
+          created_at: string
+          filed_at: string | null
+          first_used_month: string | null
+          id: string
+          irs_confirmation: string | null
+          notes: string | null
+          org_id: string
+          schedule_1_url: string | null
+          status: string
+          suspended: boolean
+          tax_amount: number | null
+          tax_year: number
+          taxable_gross_weight_lbs: number | null
+          truck_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          filed_at?: string | null
+          first_used_month?: string | null
+          id?: string
+          irs_confirmation?: string | null
+          notes?: string | null
+          org_id?: string
+          schedule_1_url?: string | null
+          status?: string
+          suspended?: boolean
+          tax_amount?: number | null
+          tax_year: number
+          taxable_gross_weight_lbs?: number | null
+          truck_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          filed_at?: string | null
+          first_used_month?: string | null
+          id?: string
+          irs_confirmation?: string | null
+          notes?: string | null
+          org_id?: string
+          schedule_1_url?: string | null
+          status?: string
+          suspended?: boolean
+          tax_amount?: number | null
+          tax_year?: number
+          taxable_gross_weight_lbs?: number | null
+          truck_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hvut_filings_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hvut_filings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hvut_filings_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ifta_filings: {
+        Row: {
+          breakdown_by_jurisdiction: Json | null
+          client_id: string
+          created_at: string
+          filed_at: string | null
+          fleet_mpg: number | null
+          id: string
+          notes: string | null
+          org_id: string
+          quarter: string
+          status: string
+          total_gallons: number | null
+          total_miles: number | null
+          total_tax_due: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          breakdown_by_jurisdiction?: Json | null
+          client_id: string
+          created_at?: string
+          filed_at?: string | null
+          fleet_mpg?: number | null
+          id?: string
+          notes?: string | null
+          org_id?: string
+          quarter: string
+          status?: string
+          total_gallons?: number | null
+          total_miles?: number | null
+          total_tax_due?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          breakdown_by_jurisdiction?: Json | null
+          client_id?: string
+          created_at?: string
+          filed_at?: string | null
+          fleet_mpg?: number | null
+          id?: string
+          notes?: string | null
+          org_id?: string
+          quarter?: string
+          status?: string
+          total_gallons?: number | null
+          total_miles?: number | null
+          total_tax_due?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ifta_filings_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ifta_filings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ifta_fuel_purchases: {
+        Row: {
+          client_id: string
+          created_at: string
+          gallons: number
+          gross_price: number | null
+          id: string
+          jurisdiction: string
+          notes: string | null
+          org_id: string
+          purchase_date: string
+          quarter: string
+          receipt_url: string | null
+          truck_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          gallons: number
+          gross_price?: number | null
+          id?: string
+          jurisdiction: string
+          notes?: string | null
+          org_id?: string
+          purchase_date: string
+          quarter: string
+          receipt_url?: string | null
+          truck_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          gallons?: number
+          gross_price?: number | null
+          id?: string
+          jurisdiction?: string
+          notes?: string | null
+          org_id?: string
+          purchase_date?: string
+          quarter?: string
+          receipt_url?: string | null
+          truck_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ifta_fuel_purchases_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ifta_fuel_purchases_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ifta_fuel_purchases_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ifta_tax_rates: {
+        Row: {
+          created_at: string
+          id: string
+          jurisdiction: string
+          org_id: string
+          quarter: string
+          rate_per_gallon: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          jurisdiction: string
+          org_id?: string
+          quarter: string
+          rate_per_gallon: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          jurisdiction?: string
+          org_id?: string
+          quarter?: string
+          rate_per_gallon?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ifta_tax_rates_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ifta_trips: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          miles_by_jurisdiction: Json
+          notes: string | null
+          org_id: string
+          quarter: string
+          total_miles: number
+          trip_date: string
+          truck_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          miles_by_jurisdiction?: Json
+          notes?: string | null
+          org_id?: string
+          quarter: string
+          total_miles?: number
+          trip_date: string
+          truck_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          miles_by_jurisdiction?: Json
+          notes?: string | null
+          org_id?: string
+          quarter?: string
+          total_miles?: number
+          trip_date?: string
+          truck_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ifta_trips_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ifta_trips_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ifta_trips_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invoices: {
         Row: {
@@ -1212,6 +1814,7 @@ export type Database = {
           org_id: string
           plate: string
           status: string
+          taxable_gross_weight_lbs: number | null
           updated_at: string
           user_id: string
           vin: string | null
@@ -1227,6 +1830,7 @@ export type Database = {
           org_id?: string
           plate: string
           status?: string
+          taxable_gross_weight_lbs?: number | null
           updated_at?: string
           user_id: string
           vin?: string | null
@@ -1242,6 +1846,7 @@ export type Database = {
           org_id?: string
           plate?: string
           status?: string
+          taxable_gross_weight_lbs?: number | null
           updated_at?: string
           user_id?: string
           vin?: string | null
