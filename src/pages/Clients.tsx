@@ -37,6 +37,13 @@ import { usePermits } from "@/hooks/usePermits";
 import { useTrucks } from "@/hooks/useTrucks";
 import { EmptyState } from "@/components/EmptyState";
 import { TablePreferencesToolbar, type Density } from "@/components/TablePreferencesToolbar";
+import { SavedViewsToolbar } from "@/components/SavedViewsToolbar";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { EditableCell } from "@/components/EditableCell";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { ScoreBadge } from "@/components/ComplianceScorecard";
 
@@ -103,6 +110,74 @@ export default function Clients() {
     "clients-service-filter",
     null
   );
+  const [tagFilter, setTagFilter] = useLocalStorageState<string | null>(
+    "clients-tag-filter",
+    null
+  );
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const queryClientForBulk = useQueryClient();
+  const { toast: toastBulk } = useToast();
+
+  const toggleSelected = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  const bulkUpdateStatus = async (status: "active" | "inactive" | "pending") => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    const { error } = await supabase.from("clients").update({ status }).in("id", ids);
+    if (error) {
+      toastBulk({ title: t("common.error"), description: error.message, variant: "destructive" });
+      return;
+    }
+    queryClientForBulk.invalidateQueries({ queryKey: ["clients"] });
+    toastBulk({ title: t("bulk.toastUpdated").replace("{count}", String(ids.length)) });
+    clearSelection();
+  };
+
+  const bulkApplyTag = async () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    const input = window.prompt(t("bulk.applyTagPrompt"));
+    if (!input) return;
+    const newTags = input.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+    if (newTags.length === 0) return;
+    // Merge into each client's existing tags individually since Postgres
+    // doesn't have a native bulk "append tags" path via supabase-js — we
+    // batch these in parallel.
+    const targets = (clients ?? []).filter((c) => ids.includes(c.id));
+    await Promise.all(
+      targets.map((c) => {
+        const existing = (c as typeof c & { tags?: string[] | null }).tags ?? [];
+        const merged = Array.from(new Set([...existing, ...newTags]));
+        return supabase.from("clients").update({ tags: merged } as never).eq("id", c.id);
+      }),
+    );
+    queryClientForBulk.invalidateQueries({ queryKey: ["clients"] });
+    toastBulk({ title: t("bulk.toastUpdated").replace("{count}", String(ids.length)) });
+    clearSelection();
+  };
+
+  const bulkDelete = async () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    if (!window.confirm(t("bulk.confirmDelete").replace("{count}", String(ids.length)))) return;
+    const { error } = await supabase.from("clients").delete().in("id", ids);
+    if (error) {
+      toastBulk({ title: t("common.error"), description: error.message, variant: "destructive" });
+      return;
+    }
+    queryClientForBulk.invalidateQueries({ queryKey: ["clients"] });
+    toastBulk({ title: t("bulk.toastDeleted").replace("{count}", String(ids.length)) });
+    clearSelection();
+  };
   const [density, setDensity] = useLocalStorageState<Density>(
     "clients-table-density",
     "comfortable"
@@ -163,10 +238,27 @@ export default function Clients() {
     return map;
   }, [allPermits]);
 
+  // Union of all tags across the org — used by the filter dropdown.
+  const availableTags = useMemo(() => {
+    const set = new Set<string>();
+    for (const c of clients ?? []) {
+      const tags = (c as typeof c & { tags?: string[] | null }).tags ?? [];
+      for (const tag of tags) set.add(tag);
+    }
+    return Array.from(set).sort();
+  }, [clients]);
+
   const filteredClients = useMemo(() => {
-    if (!clients || !serviceFilter) return clients;
-    return clients.filter((c) => c[serviceFilter] === true);
-  }, [clients, serviceFilter]);
+    if (!clients) return clients;
+    return clients.filter((c) => {
+      if (serviceFilter && !c[serviceFilter]) return false;
+      if (tagFilter) {
+        const tags = (c as typeof c & { tags?: string[] | null }).tags ?? [];
+        if (!tags.includes(tagFilter)) return false;
+      }
+      return true;
+    });
+  }, [clients, serviceFilter, tagFilter]);
 
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 15;
@@ -350,7 +442,53 @@ export default function Clients() {
             </button>
           )}
         </div>
-        <div className="sm:ml-auto">
+        {availableTags.length > 0 && (
+          <>
+            <div className="hidden sm:block h-8 w-px bg-border/60" />
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground mr-1">
+                <Filter className="w-3.5 h-3.5" />
+                {t("tags.filterBy")}:
+              </div>
+              {availableTags.map((tg) => {
+                const active = tagFilter === tg;
+                return (
+                  <button
+                    key={tg}
+                    onClick={() => setTagFilter(active ? null : tg)}
+                    className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all ${
+                      active
+                        ? "btn-gradient text-white shadow-md"
+                        : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    }`}
+                  >
+                    {tg}
+                  </button>
+                );
+              })}
+              {tagFilter && (
+                <button
+                  onClick={() => setTagFilter(null)}
+                  className="h-8 px-2.5 rounded-lg text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex items-center gap-1"
+                >
+                  <X className="w-3 h-3" />
+                  Limpar
+                </button>
+              )}
+            </div>
+          </>
+        )}
+        <div className="sm:ml-auto flex items-center gap-2">
+          <SavedViewsToolbar
+            scope="clients"
+            currentFilters={{ search, serviceFilter, tagFilter }}
+            onApply={(f) => {
+              const filters = f as { search?: string; serviceFilter?: ServiceKey | null; tagFilter?: string | null };
+              setSearch(filters.search ?? "");
+              setServiceFilter(filters.serviceFilter ?? null);
+              setTagFilter(filters.tagFilter ?? null);
+            }}
+          />
           <TablePreferencesToolbar
             density={density}
             onDensityChange={setDensity}
@@ -430,6 +568,17 @@ export default function Clients() {
           <Table className="min-w-[1180px] table-fixed">
             <TableHeader>
               <TableRow className="bg-muted/40 hover:bg-muted/40 border-border/50">
+                <TableHead className="w-[40px]">
+                  <Checkbox
+                    checked={paginatedClients.length > 0 && paginatedClients.every((c) => selectedIds.has(c.id))}
+                    onCheckedChange={(checked) => {
+                      const next = new Set(selectedIds);
+                      if (checked) paginatedClients.forEach((c) => next.add(c.id));
+                      else paginatedClients.forEach((c) => next.delete(c.id));
+                      setSelectedIds(next);
+                    }}
+                  />
+                </TableHead>
                 <TableHead className="w-[250px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("clients.company")}
                 </TableHead>
@@ -477,6 +626,12 @@ export default function Clients() {
                     className="group cursor-pointer hover:bg-muted/40 transition-colors border-border/50"
                     onClick={() => navigate(`/clients/${client.id}`)}
                   >
+                    <TableCell onClick={(e) => e.stopPropagation()} className={density === "compact" ? "py-2" : "py-3"}>
+                      <Checkbox
+                        checked={selectedIds.has(client.id)}
+                        onCheckedChange={() => toggleSelected(client.id)}
+                      />
+                    </TableCell>
                     <TableCell className={density === "compact" ? "py-2" : "py-3"}>
                       <div className="flex items-center gap-3">
                         <div
@@ -503,7 +658,19 @@ export default function Clients() {
                       {client.mc || "—"}
                     </TableCell>}
                     {columns.phone !== false && <TableCell className="text-muted-foreground text-sm">
-                      {client.phone || "—"}
+                      <EditableCell
+                        mode="text"
+                        value={client.phone}
+                        placeholder="—"
+                        onSave={async (next) => {
+                          const { error } = await supabase.from("clients").update({ phone: next }).eq("id", client.id);
+                          if (error) {
+                            toastBulk({ title: t("common.error"), description: error.message, variant: "destructive" });
+                            return;
+                          }
+                          queryClientForBulk.invalidateQueries({ queryKey: ["clients"] });
+                        }}
+                      />
                     </TableCell>}
                     {columns.services !== false && <TableCell>
                       <div className="flex gap-1 flex-wrap">
@@ -570,9 +737,24 @@ export default function Clients() {
                       />
                     </TableCell>}
                     {columns.status !== false && <TableCell>
-                      <Badge variant="outline" className={status.className}>
-                        {status.label}
-                      </Badge>
+                      <EditableCell
+                        mode="select"
+                        value={client.status}
+                        options={[
+                          { value: "active", label: t("common.active") },
+                          { value: "inactive", label: t("common.inactive") },
+                          { value: "pending", label: t("common.pending") },
+                        ]}
+                        onSave={async (next) => {
+                          if (!next) return;
+                          const { error } = await supabase.from("clients").update({ status: next }).eq("id", client.id);
+                          if (error) {
+                            toastBulk({ title: t("common.error"), description: error.message, variant: "destructive" });
+                            return;
+                          }
+                          queryClientForBulk.invalidateQueries({ queryKey: ["clients"] });
+                        }}
+                      />
                     </TableCell>}
                     <TableCell className="text-center">
                       <Link
@@ -594,6 +776,36 @@ export default function Clients() {
       )}
 
       <PaginationBar page={page} totalPages={totalPages} onPageChange={setPage} />
+
+      {/* Bulk action bar — floats at the bottom when ≥1 row selected. */}
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-2xl bg-card border border-border/60 shadow-2xl p-2 backdrop-blur-md">
+          <span className="px-3 text-sm font-semibold">
+            {t("bulk.selected").replace("{count}", String(selectedIds.size))}
+          </span>
+          <div className="h-6 w-px bg-border" />
+          <Select onValueChange={(v) => bulkUpdateStatus(v as "active" | "inactive" | "pending")}>
+            <SelectTrigger className="h-8 text-xs gap-1 border-0 bg-muted/50 hover:bg-muted">
+              <SelectValue placeholder={t("bulk.setStatus")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="active">{t("common.active")}</SelectItem>
+              <SelectItem value="inactive">{t("common.inactive")}</SelectItem>
+              <SelectItem value="pending">{t("common.pending")}</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button size="sm" variant="ghost" onClick={bulkApplyTag} className="h-8 text-xs">
+            {t("bulk.applyTag")}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={bulkDelete} className="h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10">
+            {t("bulk.delete")}
+          </Button>
+          <div className="h-6 w-px bg-border" />
+          <Button size="sm" variant="ghost" onClick={clearSelection} className="h-8 text-xs">
+            {t("bulk.clear")}
+          </Button>
+        </div>
+      )}
 
       <ClientFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
       <ClientImportDialog open={importOpen} onOpenChange={setImportOpen} />

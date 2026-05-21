@@ -12,6 +12,12 @@ import { ComplianceScorecard } from "@/components/ComplianceScorecard";
 import { Mcs150Card } from "@/components/Mcs150Card";
 import { NewEntrantCard } from "@/components/NewEntrantCard";
 import { CsaScoresCard } from "@/components/CsaScoresCard";
+import { PspCard } from "@/components/PspCard";
+import { InsurancePanel } from "@/components/InsurancePanel";
+import { RoadsidePanel } from "@/components/RoadsidePanel";
+import { AccidentsPanel } from "@/components/AccidentsPanel";
+import { ClientTagsEditor } from "@/components/ClientTagsEditor";
+import { ApplyTemplateButton } from "@/components/ApplyTemplateButton";
 import { DriversPanel } from "@/components/DriversPanel";
 import { DocumentViewer } from "@/components/DocumentViewer";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
@@ -550,6 +556,11 @@ export default function ClientDetail() {
         </div>
       </div>
 
+      <div className="flex items-center gap-2">
+        <ClientTagsEditor client={client} />
+      </div>
+      <ApplyTemplateButton clientId={client.id} />
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ComplianceScorecard client={client} trucks={trucks} permits={permits} />
         <ComplianceDashboard permits={permits} />
@@ -560,7 +571,15 @@ export default function ClientDetail() {
         <NewEntrantCard client={client} />
       </div>
 
+      <PspCard client={client} />
+
+      <InsurancePanel clientId={client.id} />
+
       <CsaScoresCard clientId={client.id} />
+
+      <RoadsidePanel clientId={client.id} />
+
+      <AccidentsPanel clientId={client.id} />
 
       <DriversPanel clientId={client.id} />
 

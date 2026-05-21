@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
   Settings, LogOut, ChevronsLeft, ChevronsRight, ShieldCheck, BarChart3,
   ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen, Sun, Moon,
-  Briefcase, Activity, MoreHorizontal, Server, Receipt, Beaker, Fuel, MapPin,
+  Briefcase, Activity, MoreHorizontal, Server, Receipt, Beaker, Fuel, MapPin, Search, TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
@@ -65,6 +65,7 @@ export function AppSidebar() {
           { to: "/hvut", icon: Receipt, label: t("sidebar.hvut") },
           { to: "/ifta", icon: Fuel, label: t("sidebar.ifta") },
           { to: "/irp", icon: MapPin, label: t("sidebar.irp") },
+          { to: "/safer-lookup", icon: Search, label: t("sidebar.saferLookup") },
         ]),
       },
       {
@@ -80,6 +81,7 @@ export function AppSidebar() {
         items: filterByFeature([
           { to: "/reports", icon: BarChart3, label: t("nav.reports") },
           { to: "/finance", icon: DollarSign, label: t("nav.finance"), feature: "finance" },
+          { to: "/profit-per-client", icon: TrendingUp, label: t("sidebar.profitPerClient") },
         ]),
       },
     ];
@@ -90,6 +92,7 @@ export function AppSidebar() {
           { to: "/workload", icon: Activity, label: t("sidebar.workload") },
           { to: "/admin/users", icon: ShieldCheck, label: t("nav.users") },
           { to: "/admin/ifta-rates", icon: Fuel, label: t("sidebar.iftaRates") },
+          { to: "/admin/task-templates", icon: ClipboardList, label: t("sidebar.taskTemplates") },
           { to: "/audit", icon: ScrollText, label: t("nav.audit"), feature: "audit_log" },
         ]),
       });

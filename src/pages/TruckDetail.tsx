@@ -13,6 +13,7 @@ import { useActivityLog } from "@/hooks/useActivityLog";
 import { CommentsSection } from "@/components/CommentsSection";
 import { TruckFormDialog } from "@/components/TruckFormDialog";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
+import { MaintenancePanel } from "@/components/MaintenancePanel";
 
 export default function TruckDetail() {
   const { id } = useParams();
@@ -188,6 +189,8 @@ export default function TruckDetail() {
           </CardContent>
         </Card>
       </div>
+
+      <MaintenancePanel truckId={truck.id} />
 
       <CommentsSection entityType="truck" entityId={truck.id} />
 

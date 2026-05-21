@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationCenter } from "./NotificationCenter";
+import { CommandPalette } from "./CommandPalette";
 import { SubscriptionBlockedScreen, isSubscriptionBlocked } from "./SubscriptionGate";
 import { SubscriptionBanner } from "./SubscriptionBanner";
 import { useOrg } from "@/contexts/OrgContext";
@@ -27,6 +28,7 @@ export function AppLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <CommandPalette />
       <AppSidebar />
       <main className="flex-1 overflow-auto bg-background">
         <SubscriptionBanner />

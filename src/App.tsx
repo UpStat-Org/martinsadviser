@@ -44,6 +44,9 @@ import HvutPage from "./pages/HvutPage";
 import IftaPage from "./pages/IftaPage";
 import IftaRatesAdminPage from "./pages/IftaRatesAdminPage";
 import IrpPage from "./pages/IrpPage";
+import SaferLookupPage from "./pages/SaferLookupPage";
+import TaskTemplatesPage from "./pages/TaskTemplatesPage";
+import ProfitPerClientPage from "./pages/ProfitPerClientPage";
 import MyDeskPage from "./pages/MyDeskPage";
 import SuperAdmin from "./pages/SuperAdmin";
 import StartOrg from "./pages/StartOrg";
@@ -128,6 +131,9 @@ const App = () => (
               <Route path="/ifta" element={<IftaPage />} />
               <Route path="/admin/ifta-rates" element={<IftaRatesAdminPage />} />
               <Route path="/irp" element={<IrpPage />} />
+              <Route path="/safer-lookup" element={<SaferLookupPage />} />
+              <Route path="/admin/task-templates" element={<TaskTemplatesPage />} />
+              <Route path="/profit-per-client" element={<ProfitPerClientPage />} />
               <Route path="/super-admin" element={<SuperAdminRoute><SuperAdmin /></SuperAdminRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />

@@ -52,6 +52,7 @@ import {
   Kanban as KanbanIcon,
 } from "lucide-react";
 import { CommentsSection } from "@/components/CommentsSection";
+import { TaskTimeLogger } from "@/components/TaskTimeLogger";
 import { format, isPast, isToday } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -785,7 +786,15 @@ export default function KanbanPage() {
               {t("kanban.taskComments")}
             </DialogTitle>
           </DialogHeader>
-          {showComments && <CommentsSection entityType="task" entityId={showComments} />}
+          {showComments && (
+            <>
+              <CommentsSection entityType="task" entityId={showComments} />
+              {(() => {
+                const task = tasks?.find((tk) => tk.id === showComments);
+                return task ? <TaskTimeLogger taskId={task.id} clientId={task.client_id ?? null} /> : null;
+              })()}
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
