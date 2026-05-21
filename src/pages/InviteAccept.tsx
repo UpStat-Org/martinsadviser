@@ -52,7 +52,7 @@ export default function InviteAccept() {
     queryFn: async (): Promise<PeekResult> => {
       const { data, error } = await supabase.rpc("peek_invitation", { p_token: token });
       if (error) throw error;
-      return data as PeekResult;
+      return data as unknown as PeekResult;
     },
   });
 
