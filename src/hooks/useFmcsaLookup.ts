@@ -58,8 +58,8 @@ export function useFmcsaLookup() {
         ]
           .filter(Boolean)
           .join(", "),
-        mc: carrier.mcNumber || "",
-        ein: carrier.ein || "",
+        mc: carrier.mcNumber != null ? String(carrier.mcNumber) : "",
+        ein: carrier.ein != null ? String(carrier.ein) : "",
         dot: String(carrier.dotNumber || trimmed),
         totalDrivers: carrier.totalDrivers || 0,
         totalPowerUnits: carrier.totalPowerUnits || 0,
