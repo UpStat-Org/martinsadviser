@@ -1287,6 +1287,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_invitation: { Args: { p_token: string }; Returns: string }
       claim_pending_messages: {
         Args: { p_channel?: string; p_limit?: number }
         Returns: {
@@ -1316,6 +1317,7 @@ export type Database = {
       }
       current_org_id: { Args: never; Returns: string }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      expire_trials: { Args: never; Returns: number }
       get_approval_status: { Args: { _user_id: string }; Returns: string }
       get_org_by_slug: {
         Args: { p_slug: string }
@@ -1341,11 +1343,39 @@ export type Database = {
         }
         Returns: boolean
       }
+      invite_member: {
+        Args: {
+          p_email: string
+          p_org_id: string
+          p_role?: Database["public"]["Enums"]["org_role"]
+        }
+        Returns: Json
+      }
       is_org_admin: { Args: { _org_id: string }; Returns: boolean }
       is_org_member: { Args: { _org_id: string }; Returns: boolean }
       is_portal_user: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      list_org_members: {
+        Args: { p_org_id: string }
+        Returns: {
+          approval_status: string
+          email: string
+          full_name: string
+          joined_at: string
+          role: Database["public"]["Enums"]["org_role"]
+          user_id: string
+        }[]
+      }
+      peek_invitation: { Args: { p_token: string }; Returns: Json }
+      public_create_org_with_owner: {
+        Args: { p_country?: string; p_name: string; p_slug: string }
+        Returns: string
+      }
       recover_stuck_sending: { Args: never; Returns: number }
+      revoke_invitation: {
+        Args: { p_invitation_id: string }
+        Returns: undefined
+      }
       super_admin_create_org: {
         Args: { p_name: string; p_slug: string }
         Returns: string
