@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
   Settings, LogOut, ChevronsLeft, ChevronsRight, ShieldCheck, BarChart3,
   ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen, Sun, Moon,
-  Briefcase, Activity, MoreHorizontal, Server, Receipt, Beaker, Fuel,
+  Briefcase, Activity, MoreHorizontal, Server, Receipt, Beaker, Fuel, MapPin,
   type LucideIcon,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
@@ -64,6 +64,7 @@ export function AppSidebar() {
           { to: "/drug-testing", icon: ShieldCheck, label: t("sidebar.drugTesting") },
           { to: "/hvut", icon: Receipt, label: t("sidebar.hvut") },
           { to: "/ifta", icon: Fuel, label: t("sidebar.ifta") },
+          { to: "/irp", icon: MapPin, label: t("sidebar.irp") },
         ]),
       },
       {

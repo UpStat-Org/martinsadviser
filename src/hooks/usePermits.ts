@@ -27,8 +27,34 @@ export const PERMIT_TYPES = [
   "Overweight",
   "Trip Permit",
   "Fuel Permit",
+  // Hazardous materials (49 CFR §172/§173)
+  "Hazmat HM-126F",
+  "Hazmat HM-181",
+  "Hazmat HM-232",
+  "Hazmat Generic",
+  // Border crossing
+  "CBP I-94",
+  "CBP ACE Manifest",
+  "FAST (US-Canada)",
+  "FAST (US-Mexico)",
+  "PARS / PAPS",
   "Other",
 ] as const;
+
+/**
+ * Categories that need extra metadata fields in the permit form (hazmat
+ * class / UN number, CBP port code, etc.). Permits of other types just use
+ * the standard fields and `metadata = {}`.
+ */
+export function permitCategory(permitType: string): "hazmat" | "border" | "generic" {
+  if (permitType.startsWith("Hazmat ")) return "hazmat";
+  if (
+    permitType.startsWith("CBP ") ||
+    permitType.startsWith("FAST ") ||
+    permitType === "PARS / PAPS"
+  ) return "border";
+  return "generic";
+}
 
 export function usePermits(
   search?: string,

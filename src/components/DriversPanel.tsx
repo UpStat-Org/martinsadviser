@@ -8,6 +8,7 @@ import { Plus, UserCircle2, Pencil, Trash2, FileText } from "lucide-react";
 import { useDrivers, useDeleteDriver, type Driver } from "@/hooks/useDrivers";
 import { DriverFormDialog } from "@/components/DriverFormDialog";
 import { DqfChecklist } from "@/components/DqfChecklist";
+import { HosViolationsPanel } from "@/components/HosViolationsPanel";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
 
@@ -144,8 +145,13 @@ export function DriversPanel({ clientId }: { clientId: string }) {
       <DriverFormDialog open={open} onOpenChange={setOpen} clientId={clientId} driver={editing} />
 
       <Dialog open={!!dqfFor} onOpenChange={(v) => !v && setDqfFor(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-0 bg-transparent shadow-none">
-          {dqfFor && <DqfChecklist driverId={dqfFor.id} driverName={dqfFor.full_name} />}
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 border-0 bg-transparent shadow-none space-y-4">
+          {dqfFor && (
+            <>
+              <DqfChecklist driverId={dqfFor.id} driverName={dqfFor.full_name} />
+              <HosViolationsPanel driverId={dqfFor.id} />
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </Card>

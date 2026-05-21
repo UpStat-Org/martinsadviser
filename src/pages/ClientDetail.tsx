@@ -10,6 +10,8 @@ import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { ComplianceDashboard } from "@/components/ComplianceDashboard";
 import { ComplianceScorecard } from "@/components/ComplianceScorecard";
 import { Mcs150Card } from "@/components/Mcs150Card";
+import { NewEntrantCard } from "@/components/NewEntrantCard";
+import { CsaScoresCard } from "@/components/CsaScoresCard";
 import { DriversPanel } from "@/components/DriversPanel";
 import { DocumentViewer } from "@/components/DocumentViewer";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
@@ -553,7 +555,12 @@ export default function ClientDetail() {
         <ComplianceDashboard permits={permits} />
       </div>
 
-      <Mcs150Card client={client} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Mcs150Card client={client} />
+        <NewEntrantCard client={client} />
+      </div>
+
+      <CsaScoresCard clientId={client.id} />
 
       <DriversPanel clientId={client.id} />
 

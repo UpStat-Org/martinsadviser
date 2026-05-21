@@ -43,6 +43,7 @@ import DrugTestingPage from "./pages/DrugTestingPage";
 import HvutPage from "./pages/HvutPage";
 import IftaPage from "./pages/IftaPage";
 import IftaRatesAdminPage from "./pages/IftaRatesAdminPage";
+import IrpPage from "./pages/IrpPage";
 import MyDeskPage from "./pages/MyDeskPage";
 import SuperAdmin from "./pages/SuperAdmin";
 import StartOrg from "./pages/StartOrg";
@@ -126,6 +127,7 @@ const App = () => (
               <Route path="/hvut" element={<HvutPage />} />
               <Route path="/ifta" element={<IftaPage />} />
               <Route path="/admin/ifta-rates" element={<IftaRatesAdminPage />} />
+              <Route path="/irp" element={<IrpPage />} />
               <Route path="/super-admin" element={<SuperAdminRoute><SuperAdmin /></SuperAdminRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />

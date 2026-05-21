@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { useCreatePermit, useUpdatePermit, PERMIT_TYPES, type Permit, type PermitInsert } from "@/hooks/usePermits";
+import { useCreatePermit, useUpdatePermit, PERMIT_TYPES, permitCategory, type Permit, type PermitInsert } from "@/hooks/usePermits";
 import { useClients } from "@/hooks/useClients";
 import { useTrucks } from "@/hooks/useTrucks";
 import { useEmployees, employeeName } from "@/hooks/useEmployees";
@@ -34,6 +34,15 @@ const formSchema = z.object({
   status: z.string().default("active"),
   notes: z.string().optional(),
   assigned_to: z.string().optional(),
+  // Hazmat metadata
+  hm_class: z.string().optional(),
+  un_number: z.string().optional(),
+  packing_group: z.string().optional(),
+  shipping_name: z.string().optional(),
+  // Border-crossing metadata
+  port_code: z.string().optional(),
+  entry_type: z.string().optional(),
+  bond_number: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -74,6 +83,15 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
           status: permit.status,
           notes: permit.notes || "",
           assigned_to: permit.assigned_to || "",
+          // Metadata fields (jsonb-on-row, added by migration 20260521190000).
+          // Safe-access via cast since auto-gen types may not be regenerated yet.
+          hm_class: (permit as Permit & { metadata?: Record<string, string> }).metadata?.hm_class ?? "",
+          un_number: (permit as Permit & { metadata?: Record<string, string> }).metadata?.un_number ?? "",
+          packing_group: (permit as Permit & { metadata?: Record<string, string> }).metadata?.packing_group ?? "",
+          shipping_name: (permit as Permit & { metadata?: Record<string, string> }).metadata?.shipping_name ?? "",
+          port_code: (permit as Permit & { metadata?: Record<string, string> }).metadata?.port_code ?? "",
+          entry_type: (permit as Permit & { metadata?: Record<string, string> }).metadata?.entry_type ?? "",
+          bond_number: (permit as Permit & { metadata?: Record<string, string> }).metadata?.bond_number ?? "",
         }
       : {
           client_id: defaultClientId || "",
@@ -85,6 +103,13 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
           status: "active",
           notes: "",
           assigned_to: "",
+          hm_class: "",
+          un_number: "",
+          packing_group: "",
+          shipping_name: "",
+          port_code: "",
+          entry_type: "",
+          bond_number: "",
         },
   });
 
@@ -105,6 +130,13 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
             status: permit.status,
             notes: permit.notes || "",
             assigned_to: permit.assigned_to || "",
+            hm_class: (permit as Permit & { metadata?: Record<string, string> }).metadata?.hm_class ?? "",
+            un_number: (permit as Permit & { metadata?: Record<string, string> }).metadata?.un_number ?? "",
+            packing_group: (permit as Permit & { metadata?: Record<string, string> }).metadata?.packing_group ?? "",
+            shipping_name: (permit as Permit & { metadata?: Record<string, string> }).metadata?.shipping_name ?? "",
+            port_code: (permit as Permit & { metadata?: Record<string, string> }).metadata?.port_code ?? "",
+            entry_type: (permit as Permit & { metadata?: Record<string, string> }).metadata?.entry_type ?? "",
+            bond_number: (permit as Permit & { metadata?: Record<string, string> }).metadata?.bond_number ?? "",
           }
         : {
             client_id: defaultClientId || "",
@@ -116,6 +148,13 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
             status: "active",
             notes: "",
             assigned_to: "",
+            hm_class: "",
+            un_number: "",
+            packing_group: "",
+            shipping_name: "",
+            port_code: "",
+            entry_type: "",
+            bond_number: "",
           }
     );
   }, [open, permit, defaultClientId, defaultTruckId, form]);
@@ -148,6 +187,24 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
   const onSubmit = async (values: FormValues) => {
     setUploading(true);
     try {
+      // Only persist metadata for the categories that use it; for other
+      // permit types the column stays as the default {} so we don't bloat
+      // generic rows with empty-string fields.
+      const cat = permitCategory(values.permit_type);
+      let metadata: Record<string, string> | undefined;
+      if (cat === "hazmat") {
+        metadata = {};
+        if (values.hm_class) metadata.hm_class = values.hm_class;
+        if (values.un_number) metadata.un_number = values.un_number;
+        if (values.packing_group) metadata.packing_group = values.packing_group;
+        if (values.shipping_name) metadata.shipping_name = values.shipping_name;
+      } else if (cat === "border") {
+        metadata = {};
+        if (values.port_code) metadata.port_code = values.port_code;
+        if (values.entry_type) metadata.entry_type = values.entry_type;
+        if (values.bond_number) metadata.bond_number = values.bond_number;
+      }
+
       const payload: Omit<PermitInsert, "user_id"> = {
         client_id: values.client_id,
         truck_id: values.truck_id && values.truck_id !== "none" ? values.truck_id : null,
@@ -158,7 +215,8 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
         status: values.status,
         notes: values.notes || null,
         assigned_to: values.assigned_to && values.assigned_to !== "none" ? values.assigned_to : null,
-      };
+        ...(metadata !== undefined ? { metadata } : {}),
+      } as Omit<PermitInsert, "user_id">;
 
       let savedPermit: Permit;
       if (isEditing) {
@@ -325,6 +383,53 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
                 )}
               />
             </div>
+
+            {/* Conditional metadata block — shows up only when the chosen
+                permit_type is hazmat or border-crossing. Bound to the same
+                FormField wrappers so empty fields just don't get persisted. */}
+            {(() => {
+              const cat = permitCategory(form.watch("permit_type"));
+              if (cat === "hazmat") {
+                return (
+                  <div className="rounded-xl bg-muted/40 border border-border/50 p-4 space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("permits.metadata.hazmat")}</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <FormField control={form.control} name="hm_class" render={({ field }) => (
+                        <FormItem><FormLabel>{t("permits.metadata.hmClass")}</FormLabel><FormControl><Input placeholder="1.4S, 3, 8…" {...field} /></FormControl></FormItem>
+                      )} />
+                      <FormField control={form.control} name="un_number" render={({ field }) => (
+                        <FormItem><FormLabel>{t("permits.metadata.unNumber")}</FormLabel><FormControl><Input placeholder="UN1203" {...field} /></FormControl></FormItem>
+                      )} />
+                      <FormField control={form.control} name="packing_group" render={({ field }) => (
+                        <FormItem><FormLabel>{t("permits.metadata.packingGroup")}</FormLabel><FormControl><Input placeholder="I / II / III" {...field} /></FormControl></FormItem>
+                      )} />
+                      <FormField control={form.control} name="shipping_name" render={({ field }) => (
+                        <FormItem><FormLabel>{t("permits.metadata.shippingName")}</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
+                      )} />
+                    </div>
+                  </div>
+                );
+              }
+              if (cat === "border") {
+                return (
+                  <div className="rounded-xl bg-muted/40 border border-border/50 p-4 space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("permits.metadata.border")}</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <FormField control={form.control} name="port_code" render={({ field }) => (
+                        <FormItem><FormLabel>{t("permits.metadata.portCode")}</FormLabel><FormControl><Input placeholder="Laredo / Detroit…" {...field} /></FormControl></FormItem>
+                      )} />
+                      <FormField control={form.control} name="entry_type" render={({ field }) => (
+                        <FormItem><FormLabel>{t("permits.metadata.entryType")}</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
+                      )} />
+                      <FormField control={form.control} name="bond_number" render={({ field }) => (
+                        <FormItem><FormLabel>{t("permits.metadata.bondNumber")}</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
+                      )} />
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
 
             <FormField
               control={form.control}
