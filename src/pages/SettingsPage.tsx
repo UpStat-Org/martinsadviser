@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OrgFeatureFlagsPanel } from "@/components/OrgFeatureFlagsPanel";
 import { OrgBrandingPanel } from "@/components/OrgBrandingPanel";
 import { OrgBillingPanel } from "@/components/OrgBillingPanel";
+import { OrgMembersPanel } from "@/components/OrgMembersPanel";
 
 export default function SettingsPage() {
   const { t } = useLanguage();
@@ -479,6 +480,7 @@ export default function SettingsPage() {
         {isOrgOwner && (
           <TabsContent value="organization" className="mt-4 space-y-4">
             <OrgBillingPanel />
+            <OrgMembersPanel />
             <OrgBrandingPanel />
             <OrgFeatureFlagsPanel />
           </TabsContent>

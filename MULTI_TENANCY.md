@@ -190,12 +190,22 @@ Apex foi flexibilizado em 2026-05-20 porque sem o wildcard DNS configurado, owne
 
 **Atenção:** o Netlify Free **não aceita** `*.dominio.com` no campo "Add domain alias" — wildcard custom domain é restrito ao plano Pro. O setup correto depende da estratégia escolhida, que ainda **não foi finalizada**. Opções:
 
-1. **Cloudflare DNS na frente do Netlify**: zona DNS no Cloudflare com CNAME `*.martinsadviser.com` proxied (modo laranja). Cloudflare termina SSL wildcard (grátis) e proxia para o site Netlify. É a abordagem mais comum no plano free.
-2. **Adicionar cada subdomain manualmente** no Netlify quando uma org nova for criada (`acme.martinsadviser.com`, `bob.martinsadviser.com`, ...). DNS CNAME individual. Funciona pros primeiros 5-10 clientes (sales-led), não escala.
-3. **Migrar pra Vercel**: wildcard SSL nativo no plano free, mas exige redeploy/redirect dos usuários atuais.
-4. **Upgrade Netlify Pro** ($19/mês): wildcard nativo.
+1. **Cloudflare DNS na frente do Netlify** (mais comum no free)
+   - No painel do registrar, apontar nameservers do domínio pro Cloudflare
+   - Cloudflare DNS → adicionar CNAME: `name=*`, `target=<seu-site>.netlify.app`, proxy "Proxied" (laranja)
+   - Cloudflare SSL/TLS → modo "Full" (Cloudflare ↔ Netlify via HTTPS)
+   - Cloudflare emite o cert wildcard sozinho. Netlify recebe a request via Cloudflare e serve o SPA. Funciona pros 2 hosts (apex + subdomain).
+2. **Adicionar cada subdomain manualmente** no Netlify
+   - Pra cada org nova: Domain management → Add domain alias → `<slug>.martinsadviser.com`
+   - DNS provider: CNAME individual pra `<site>.netlify.app`
+   - SSL: Netlify provisiona via Let's Encrypt
+   - Funciona pros primeiros 5-10 clientes (sales-led), não escala
+3. **Migrar pra Vercel**: wildcard SSL nativo no plano free, mas exige redeploy/redirect dos usuários atuais
+4. **Upgrade Netlify Pro** ($19/mês): wildcard nativo via UI
 
-Reaproveitar o setup de outro projeto interno (TBD validar). Até definirmos, o app continua funcionando em `martinsadviser.com` raiz como hoje — `orgHost.ts` trata isso como cliente 0.
+**Estado atual:** sem DNS wildcard ativo. `orgHost.ts` deixa o apex **permissivo** (qualquer user loga em `martinsadviser.com` e cai na sua org via `active_org_id`). Subdomains não funcionam até o DNS ser configurado.
+
+**Testar antes de ativar DNS:** editar `/etc/hosts` mapeando subdomain pra `127.0.0.1` (ou IP da instância) e rodar `bun run dev --host`.
 
 ### Testar local sem DNS configurado
 

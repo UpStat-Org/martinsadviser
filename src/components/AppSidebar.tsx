@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
   Settings, LogOut, ChevronsLeft, ChevronsRight, ShieldCheck, BarChart3,
   ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen, Sun, Moon,
-  Briefcase, Activity, MoreHorizontal, MonitorPlay, Server,
+  Briefcase, Activity, MoreHorizontal, Server,
   type LucideIcon,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
@@ -51,7 +51,6 @@ export function AppSidebar() {
         items: filterByFeature([
           { to: "/", icon: LayoutDashboard, label: t("nav.dashboard") },
           { to: "/my", icon: Briefcase, label: t("mydesk.title") },
-          { to: "/presentation", icon: MonitorPlay, label: t("nav.presentation") },
           { to: "https://status.martinsadviser.com", icon: Server, label: t("sidebar.systemStatus"), external: true },
         ]),
       },

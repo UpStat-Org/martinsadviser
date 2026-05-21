@@ -251,11 +251,33 @@ export default function ClientOnboarding() {
     setPermits(permits.filter((_, idx) => idx !== i));
 
   const nextStep = async () => {
-    if (step === 0) {
-      const valid = await form.trigger();
-      if (!valid) return;
+    try {
+      if (step === 0) {
+        const valid = await form.trigger();
+        if (!valid) {
+          // Surface the first field error as a toast so the user gets feedback
+          // even if the inline FormMessage is below the fold.
+          const errors = form.formState.errors;
+          const firstKey = Object.keys(errors)[0] as keyof typeof errors | undefined;
+          const firstMsg = firstKey
+            ? (errors[firstKey] as { message?: string } | undefined)?.message
+            : undefined;
+          toast({
+            title: "Confira os campos",
+            description: firstMsg ?? "Preencha os campos obrigatórios.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+      setStep((s) => Math.min(s + 1, steps.length - 1));
+    } catch (err) {
+      toast({
+        title: "Erro",
+        description: err instanceof Error ? err.message : String(err),
+        variant: "destructive",
+      });
     }
-    setStep((s) => Math.min(s + 1, steps.length - 1));
   };
 
   const prevStep = () => setStep((s) => Math.max(s - 1, 0));
@@ -1145,6 +1167,7 @@ export default function ClientOnboarding() {
       {/* Navigation */}
       <div className="flex justify-between items-center">
         <button
+          type="button"
           onClick={step === 0 ? () => navigate("/clients") : prevStep}
           className="h-11 px-5 rounded-xl bg-muted/60 hover:bg-muted border border-border/60 text-sm font-semibold inline-flex items-center gap-1.5 transition-colors"
         >
@@ -1153,31 +1176,37 @@ export default function ClientOnboarding() {
         </button>
         {step < steps.length - 1 ? (
           <button
+            type="button"
             onClick={nextStep}
             className="group h-11 px-6 btn-gradient text-white text-sm font-semibold rounded-xl inline-flex items-center gap-1.5 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all relative overflow-hidden"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-            {t("common.next")}
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            <span className="relative inline-flex items-center gap-1.5">
+              {t("common.next")}
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
           </button>
         ) : (
           <button
+            type="button"
             onClick={handleFinish}
             disabled={saving}
             className="group h-11 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-[0_10px_30px_-8px_hsl(158_55%_42%/0.55)] text-white text-sm font-semibold rounded-xl inline-flex items-center gap-1.5 transition-all disabled:opacity-60 relative overflow-hidden"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-            {saving ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {t("common.saving")}
-              </>
-            ) : (
-              <>
-                <CheckCircle2 className="w-4 h-4" />
-                {t("onboarding.finishRegistration")}
-              </>
-            )}
+            <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            <span className="relative inline-flex items-center gap-1.5">
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {t("common.saving")}
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-4 h-4" />
+                  {t("onboarding.finishRegistration")}
+                </>
+              )}
+            </span>
           </button>
         )}
       </div>

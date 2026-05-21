@@ -38,12 +38,12 @@ import DocumentationPage from "./pages/DocumentationPage";
 import MyDeskPage from "./pages/MyDeskPage";
 import SuperAdmin from "./pages/SuperAdmin";
 import StartOrg from "./pages/StartOrg";
+import InviteAccept from "./pages/InviteAccept";
 import WorkloadPage from "./pages/WorkloadPage";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalLayout from "./pages/portal/PortalLayout";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import LandingPage from "./pages/LandingPage";
-import PresentationPage from "./pages/PresentationPage";
 
 const queryClient = new QueryClient();
 
@@ -60,10 +60,10 @@ const App = () => (
           <ErrorBoundary>
           <Routes>
             <Route path="/lp" element={<LandingPage />} />
-            <Route path="/presentation" element={<PresentationPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/start" element={<StartOrg />} />
+            <Route path="/invite/:token" element={<InviteAccept />} />
             <Route path="/pending" element={<PendingApproval />} />
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route path="/portal" element={<PortalLayout />}>

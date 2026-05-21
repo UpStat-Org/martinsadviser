@@ -26,7 +26,12 @@ import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  // Pre-fill the email when arriving from an invite link so the user doesn't
+  // have to remember which address the org owner used.
+  const initialEmail = (typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search).get("email")
+    : null) ?? "";
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -100,6 +105,14 @@ export default function Login() {
     }
   }, [subdomainNotFound, slug, toast]);
 
+  // If we arrived from /invite/<token> the URL carries ?invite=<token>; after
+  // a successful sign-in we still need to redeem the invitation. We do it
+  // here (not in InviteAccept) because the user lands back on /login when
+  // they're not yet authenticated; this is the natural place to close the
+  // loop.
+  const inviteToken = searchParams.get("invite");
+  const inviteEmail = searchParams.get("email");
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -107,9 +120,18 @@ export default function Login() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast({ title: t("login.error"), description: error.message, variant: "destructive" });
-      } else {
-        navigate("/");
+        return;
       }
+      if (inviteToken) {
+        const { error: acceptErr } = await supabase.rpc("accept_invitation", { p_token: inviteToken });
+        if (acceptErr) {
+          toast({ title: "Convite", description: acceptErr.message, variant: "destructive" });
+          // Still send them in — they're authenticated, just not joined.
+        } else {
+          toast({ title: "Convite aceito!" });
+        }
+      }
+      navigate("/");
     } catch (err: any) {
       toast({ title: t("login.error"), description: err.message, variant: "destructive" });
     } finally {

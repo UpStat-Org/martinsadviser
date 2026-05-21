@@ -26,8 +26,14 @@ import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
 
 export default function Signup() {
+  // When arriving from /invite/<token>, pre-fill the email and remember
+  // the token so we can redeem the invitation after email confirmation.
+  const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const inviteToken = searchParams.get("invite");
+  const inviteEmail = searchParams.get("email") ?? "";
+
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(inviteEmail);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -63,19 +69,38 @@ export default function Signup() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName },
-        emailRedirectTo: window.location.origin,
+        // Persist the invite token on the user so we can redeem it after
+        // they confirm via email and sign in. handle_new_user ignores it
+        // (no intent='new-org'), so the normal pending-member-of-cliente-0
+        // path takes over until they click their invite again.
+        data: { full_name: fullName, invite_token: inviteToken },
+        emailRedirectTo: inviteToken
+          ? `${window.location.origin}/invite/${inviteToken}`
+          : window.location.origin,
       },
     });
     if (error) {
       toast({ title: t("signup.error"), description: error.message, variant: "destructive" });
-    } else {
-      setSubmitted(true);
+      setLoading(false);
+      return;
     }
+    // If signup returned a session immediately (email confirmation off),
+    // redeem the invite right away and route into the app.
+    if (data.session && inviteToken) {
+      const { error: acceptErr } = await supabase.rpc("accept_invitation", { p_token: inviteToken });
+      if (acceptErr) {
+        toast({ title: "Convite", description: acceptErr.message, variant: "destructive" });
+      } else {
+        toast({ title: "Convite aceito!" });
+      }
+      window.location.assign("/");
+      return;
+    }
+    setSubmitted(true);
     setLoading(false);
   };
 

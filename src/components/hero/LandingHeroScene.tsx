@@ -21,7 +21,7 @@ export function LandingHeroScene() {
           </div>
           <div className="landing-hero-panel-live">
             <Bot className="h-3.5 w-3.5" />
-            <span>{t("lp.hero.roadLabel3")}</span>
+            <span>{t("lp.heroScene.live")}</span>
           </div>
         </div>
 
@@ -56,11 +56,11 @@ export function LandingHeroScene() {
         <div className="landing-hero-panel-footer">
           <div>
             <strong>AI</strong>
-            <span>{t("lp.hero.stat.aiLabel")}</span>
+            <span>{t("lp.heroScene.aiLabel")}</span>
           </div>
           <div>
             <strong>24/7</strong>
-            <span>{t("lp.hero.stat.support")}</span>
+            <span>{t("lp.heroScene.support")}</span>
           </div>
           <div>
             <strong>100%</strong>
