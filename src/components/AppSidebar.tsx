@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
   Settings, LogOut, ChevronsLeft, ChevronsRight, ShieldCheck, BarChart3,
   ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen, Sun, Moon,
-  Briefcase, Activity, MoreHorizontal, Server,
+  Briefcase, Activity, MoreHorizontal, Server, Receipt, Beaker, Fuel,
   type LucideIcon,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
@@ -49,7 +49,7 @@ export function AppSidebar() {
       {
         label: t("sidebar.section.overview"),
         items: filterByFeature([
-          { to: "/", icon: LayoutDashboard, label: t("nav.dashboard") },
+          { to: "/dashboard", icon: LayoutDashboard, label: t("nav.dashboard") },
           { to: "/my", icon: Briefcase, label: t("mydesk.title") },
           { to: "https://status.martinsadviser.com", icon: Server, label: t("sidebar.systemStatus"), external: true },
         ]),
@@ -61,6 +61,9 @@ export function AppSidebar() {
           { to: "/trucks", icon: Truck, label: t("nav.trucks") },
           { to: "/permits", icon: FileCheck, label: t("nav.permits") },
           { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
+          { to: "/drug-testing", icon: ShieldCheck, label: t("sidebar.drugTesting") },
+          { to: "/hvut", icon: Receipt, label: t("sidebar.hvut") },
+          { to: "/ifta", icon: Fuel, label: t("sidebar.ifta") },
         ]),
       },
       {
@@ -68,6 +71,7 @@ export function AppSidebar() {
         items: filterByFeature([
           { to: "/messages", icon: MessageSquare, label: t("nav.messages"), feature: "messages" },
           { to: "/calendar", icon: CalendarDays, label: t("nav.calendar"), feature: "calendar" },
+          { to: "/compliance-calendar", icon: CalendarDays, label: t("sidebar.complianceCal") },
         ]),
       },
       {
@@ -84,6 +88,7 @@ export function AppSidebar() {
         items: filterByFeature([
           { to: "/workload", icon: Activity, label: t("sidebar.workload") },
           { to: "/admin/users", icon: ShieldCheck, label: t("nav.users") },
+          { to: "/admin/ifta-rates", icon: Fuel, label: t("sidebar.iftaRates") },
           { to: "/audit", icon: ScrollText, label: t("nav.audit"), feature: "audit_log" },
         ]),
       });

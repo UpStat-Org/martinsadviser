@@ -1,4 +1,4 @@
-import { Bell, FileWarning, Receipt, ListTodo, CheckCheck, Sparkles, BellOff } from "lucide-react";
+import { Bell, FileWarning, Receipt, ListTodo, CheckCheck, Sparkles, BellOff, ShieldAlert, CalendarClock } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -39,6 +39,18 @@ const typeConfig: Record<
     gradient: "from-orange-500 to-amber-500",
     ring: "ring-orange-500/20",
     label: "Tarefa",
+  },
+  fmcsa_change: {
+    icon: ShieldAlert,
+    gradient: "from-violet-500 to-fuchsia-500",
+    ring: "ring-violet-500/20",
+    label: "FMCSA",
+  },
+  mcs150_due: {
+    icon: CalendarClock,
+    gradient: "from-indigo-500 to-violet-500",
+    ring: "ring-indigo-500/20",
+    label: "MCS-150",
   },
 };
 

@@ -8,6 +8,9 @@ import { ClientFormDialog } from "@/components/ClientFormDialog";
 import { TruckFormDialog } from "@/components/TruckFormDialog";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { ComplianceDashboard } from "@/components/ComplianceDashboard";
+import { ComplianceScorecard } from "@/components/ComplianceScorecard";
+import { Mcs150Card } from "@/components/Mcs150Card";
+import { DriversPanel } from "@/components/DriversPanel";
 import { DocumentViewer } from "@/components/DocumentViewer";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { InvitePortalDialog } from "@/components/InvitePortalDialog";
@@ -545,7 +548,14 @@ export default function ClientDetail() {
         </div>
       </div>
 
-      <ComplianceDashboard permits={permits} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ComplianceScorecard client={client} trucks={trucks} permits={permits} />
+        <ComplianceDashboard permits={permits} />
+      </div>
+
+      <Mcs150Card client={client} />
+
+      <DriversPanel clientId={client.id} />
 
       <Card className="border-border/50 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500" />

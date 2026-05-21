@@ -38,6 +38,7 @@ import { useTrucks } from "@/hooks/useTrucks";
 import { EmptyState } from "@/components/EmptyState";
 import { TablePreferencesToolbar, type Density } from "@/components/TablePreferencesToolbar";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { ScoreBadge } from "@/components/ComplianceScorecard";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -58,6 +59,7 @@ const defaultClientColumns = {
   permits: true,
   trucks: true,
   risk: true,
+  score: true,
   status: true,
 };
 
@@ -124,6 +126,22 @@ export default function Clients() {
     const map: Record<string, number> = {};
     allTrucks?.forEach((t) => {
       map[t.client_id] = (map[t.client_id] || 0) + 1;
+    });
+    return map;
+  }, [allTrucks]);
+
+  const permitsByClient = useMemo(() => {
+    const map: Record<string, NonNullable<typeof allPermits>> = {};
+    allPermits?.forEach((p) => {
+      (map[p.client_id] ||= []).push(p);
+    });
+    return map;
+  }, [allPermits]);
+
+  const trucksByClient = useMemo(() => {
+    const map: Record<string, NonNullable<typeof allTrucks>> = {};
+    allTrucks?.forEach((tr) => {
+      (map[tr.client_id] ||= []).push(tr);
     });
     return map;
   }, [allTrucks]);
@@ -346,6 +364,7 @@ export default function Clients() {
               { key: "permits", label: "Permits" },
               { key: "trucks", label: "Trucks" },
               { key: "risk", label: t("common.risk") },
+              { key: "score", label: "Score" },
               { key: "status", label: t("clients.status") },
             ]}
           />
@@ -434,6 +453,9 @@ export default function Clients() {
                 </TableHead>}
                 {columns.risk !== false && <TableHead className="w-[130px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("common.risk")}
+                </TableHead>}
+                {columns.score !== false && <TableHead className="w-[80px] text-center font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                  Score
                 </TableHead>}
                 {columns.status !== false && <TableHead className="w-[120px] font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("clients.status")}
@@ -539,6 +561,13 @@ export default function Clients() {
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
+                    </TableCell>}
+                    {columns.score !== false && <TableCell className="text-center">
+                      <ScoreBadge
+                        client={client}
+                        trucks={trucksByClient[client.id]}
+                        permits={permitsByClient[client.id]}
+                      />
                     </TableCell>}
                     {columns.status !== false && <TableCell>
                       <Badge variant="outline" className={status.className}>

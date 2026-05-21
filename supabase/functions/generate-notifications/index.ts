@@ -115,7 +115,86 @@ Deno.serve(async (req) => {
     }
   }
 
-  return new Response(JSON.stringify({ success: true, created: results }), {
+  // ── 4. MCS-150 biennial updates coming due ────────────────────────────────
+  // FMCSA derives the next-due month from the USDOT number:
+  //   - last digit  → month (1=Jan ... 9=Sep, 0=Oct)
+  //   - 2nd-to-last → odd years (odd digit) or even years (even digit)
+  // If the carrier already filed (mcs_150_last_filed_at is set), the next due
+  // is just lastFiled + 24 months. We emit when ≤ 90 days remain.
+
+  const monthByLastDigit: Record<string, number> = {
+    "1": 0, "2": 1, "3": 2, "4": 3, "5": 4, "6": 5,
+    "7": 6, "8": 7, "9": 8, "0": 9,
+  };
+
+  function nextMcs150Due(dot: string, lastFiledAt: string | null, ref: Date): Date | null {
+    if (lastFiledAt) {
+      const d = new Date(lastFiledAt);
+      return new Date(Date.UTC(d.getUTCFullYear() + 2, d.getUTCMonth(), d.getUTCDate()));
+    }
+    const digits = dot.replace(/\D/g, "");
+    if (digits.length < 2) return null;
+    const last = digits[digits.length - 1];
+    const nextToLast = digits[digits.length - 2];
+    const month = monthByLastDigit[last];
+    if (month === undefined) return null;
+    const wantsOdd = parseInt(nextToLast, 10) % 2 === 1;
+    for (let i = 0; i < 4; i++) {
+      const cy = ref.getUTCFullYear() + i;
+      if ((cy % 2 === 1) !== wantsOdd) continue;
+      const candidate = new Date(Date.UTC(cy, month, 1));
+      if (candidate.getTime() >= Date.UTC(ref.getUTCFullYear(), ref.getUTCMonth(), ref.getUTCDate())) {
+        return candidate;
+      }
+    }
+    return null;
+  }
+
+  const refNow = new Date();
+  const { data: clientsForMcs } = await supabase
+    .from("clients")
+    .select("id, user_id, org_id, company_name, dot, mcs_150_last_filed_at")
+    .not("dot", "is", null)
+    .neq("dot", "");
+
+  let mcsCreated = 0;
+  for (const c of clientsForMcs ?? []) {
+    const due = nextMcs150Due(
+      String(c.dot ?? ""),
+      (c as { mcs_150_last_filed_at: string | null }).mcs_150_last_filed_at,
+      refNow,
+    );
+    if (!due) continue;
+    const days = Math.ceil((due.getTime() - refNow.getTime()) / 86_400_000);
+    if (days > 90) continue;
+
+    const { data: existing } = await supabase
+      .from("notifications")
+      .select("id")
+      .eq("user_id", c.user_id)
+      .eq("entity_id", c.id)
+      .eq("type", "mcs150_due")
+      .limit(1);
+    if (existing?.length) continue;
+
+    const title =
+      days < 0
+        ? `MCS-150 ATRASADO há ${Math.abs(days)} dias`
+        : `MCS-150 vence em ${days} dias`;
+    const body = `${c.company_name} — DOT ${c.dot} · prazo ${due.toISOString().slice(0, 10)}`;
+
+    await supabase.from("notifications").insert({
+      user_id: c.user_id,
+      org_id: c.org_id,
+      type: "mcs150_due",
+      title,
+      body,
+      entity_id: c.id,
+    });
+    mcsCreated++;
+  }
+
+  return new Response(JSON.stringify({ success: true, created: { ...results, mcs150: mcsCreated } }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });

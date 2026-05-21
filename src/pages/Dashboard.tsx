@@ -45,6 +45,7 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInvoices } from "@/hooks/useInvoices";
 import { PermitCoverageMap } from "@/components/PermitCoverageMap";
+import { RevenueForecastCard } from "@/components/RevenueForecastCard";
 
 const dateLocales = { pt, en: enUS, es };
 
@@ -857,6 +858,8 @@ export default function Dashboard() {
       </div>
 
       {/* ============ MAP ============ */}
+      <RevenueForecastCard />
+
       <Card className="border-border/50">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2.5">

@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { OrgProvider } from "./contexts/OrgContext";
@@ -12,6 +12,9 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { FeatureGate } from "./components/FeatureGate";
 import { SuperAdminRoute } from "./components/SuperAdminRoute";
+import { TruckLoadingScreen } from "./components/TruckLoadingScreen";
+import { useAuth } from "./hooks/useAuth";
+import { getHostnameOrg } from "./lib/orgHost";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PendingApproval from "./pages/PendingApproval";
@@ -35,6 +38,11 @@ import FinancePage from "./pages/FinancePage";
 import InvoiceDetail from "./pages/InvoiceDetail";
 import AuditPage from "./pages/AuditPage";
 import DocumentationPage from "./pages/DocumentationPage";
+import ComplianceCalendarPage from "./pages/ComplianceCalendarPage";
+import DrugTestingPage from "./pages/DrugTestingPage";
+import HvutPage from "./pages/HvutPage";
+import IftaPage from "./pages/IftaPage";
+import IftaRatesAdminPage from "./pages/IftaRatesAdminPage";
 import MyDeskPage from "./pages/MyDeskPage";
 import SuperAdmin from "./pages/SuperAdmin";
 import StartOrg from "./pages/StartOrg";
@@ -46,6 +54,21 @@ import PortalDashboard from "./pages/portal/PortalDashboard";
 import LandingPage from "./pages/LandingPage";
 
 const queryClient = new QueryClient();
+
+// `/` is host-aware:
+//   - Apex / dev host + signed-out visitor → marketing landing page
+//   - Tenant subdomain, or signed-in user → forward to the app dashboard
+// `/dashboard` stays protected so the post-login redirect always lands somewhere
+// authenticated.
+function HomeIndex() {
+  const { user, loading } = useAuth();
+  const host = getHostnameOrg();
+  const isApex = !host.slug || host.isDev;
+
+  if (loading) return <TruckLoadingScreen />;
+  if (isApex && !user) return <LandingPage />;
+  return <Navigate to="/dashboard" replace />;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -59,6 +82,7 @@ const App = () => (
         <BrowserRouter>
           <ErrorBoundary>
           <Routes>
+            <Route path="/" element={<HomeIndex />} />
             <Route path="/lp" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -77,7 +101,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             >
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/my" element={<MyDeskPage />} />
               <Route path="/workload" element={<WorkloadPage />} />
               <Route path="/clients" element={<Clients />} />
@@ -97,6 +121,11 @@ const App = () => (
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/audit" element={<FeatureGate flag="audit_log"><AuditPage /></FeatureGate>} />
               <Route path="/docs" element={<DocumentationPage />} />
+              <Route path="/compliance-calendar" element={<ComplianceCalendarPage />} />
+              <Route path="/drug-testing" element={<DrugTestingPage />} />
+              <Route path="/hvut" element={<HvutPage />} />
+              <Route path="/ifta" element={<IftaPage />} />
+              <Route path="/admin/ifta-rates" element={<IftaRatesAdminPage />} />
               <Route path="/super-admin" element={<SuperAdminRoute><SuperAdmin /></SuperAdminRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />

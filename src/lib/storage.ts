@@ -40,3 +40,30 @@ export async function getSignedDocumentUrl(
   }
   return data?.signedUrl ?? null;
 }
+
+/**
+ * Uploads a compliance document (DQF file, HVUT Schedule 1, etc.) to the
+ * permit-documents bucket. RLS requires the first path segment to be the
+ * caller's org_id, so we always prefix it. `prefix` namespaces uploads
+ * within the org folder (e.g. "dqf", "hvut").
+ *
+ * Returns the stored path. The caller persists this path on its row and
+ * resolves it via `useDocumentUrl` for signed downloads.
+ */
+export async function uploadComplianceDocument(
+  orgId: string,
+  prefix: "dqf" | "hvut",
+  entityId: string,
+  file: File,
+): Promise<string | null> {
+  const ext = file.name.split(".").pop() ?? "bin";
+  const path = `${orgId}/${prefix}/${entityId}/${Date.now()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(PERMIT_DOCUMENTS_BUCKET)
+    .upload(path, file, { upsert: true });
+  if (error) {
+    console.error("uploadComplianceDocument failed", { path, error });
+    return null;
+  }
+  return path;
+}
