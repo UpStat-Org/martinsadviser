@@ -6,6 +6,13 @@
 
 @layer base {
   :root {
+    /* Brand hue — single source of truth for the indigo accent. Every
+       indigo-derived token and decorative gradient below references it via
+       hsl(var(--brand-h) ...), so an org's primary color (set inline on
+       <html> by applyBrandingColors) repaints the whole internal app, not
+       just buttons. 234 is the built-in indigo. */
+    --brand-h: 234;
+
     --background: 0 0% 98%;
     --foreground: 224 28% 12%;
 
@@ -15,7 +22,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 224 28% 12%;
 
-    --primary: 234 75% 58%;
+    --primary: var(--brand-h) 75% 58%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14% 94%;
@@ -38,24 +45,24 @@
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 234 75% 58%;
+    --ring: var(--brand-h) 75% 58%;
 
     --radius: 0.75rem;
 
-    --chart-1: 234 75% 58%;
+    --chart-1: var(--brand-h) 75% 58%;
     --chart-2: 158 55% 42%;
     --chart-3: 38 88% 52%;
     --chart-4: 0 68% 55%;
     --chart-5: 280 55% 55%;
 
-    --sidebar-background: 228 28% 98%;
+    --sidebar-background: var(--brand-h) 28% 98%;
     --sidebar-foreground: 224 18% 32%;
-    --sidebar-primary: 234 75% 58%;
+    --sidebar-primary: var(--brand-h) 75% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 234 40% 94%;
-    --sidebar-accent-foreground: 234 50% 28%;
-    --sidebar-border: 228 18% 90%;
-    --sidebar-ring: 234 75% 58%;
+    --sidebar-accent: var(--brand-h) 40% 94%;
+    --sidebar-accent-foreground: var(--brand-h) 50% 28%;
+    --sidebar-border: var(--brand-h) 18% 90%;
+    --sidebar-ring: var(--brand-h) 75% 58%;
   }
 
   .dark {
@@ -68,7 +75,7 @@
     --popover: 224 22% 10%;
     --popover-foreground: 220 14% 92%;
 
-    --primary: 234 75% 62%;
+    --primary: var(--brand-h) 75% 62%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 224 18% 16%;
@@ -91,22 +98,22 @@
 
     --border: 224 18% 18%;
     --input: 224 18% 18%;
-    --ring: 234 75% 62%;
+    --ring: var(--brand-h) 75% 62%;
 
-    --chart-1: 234 75% 62%;
+    --chart-1: var(--brand-h) 75% 62%;
     --chart-2: 158 55% 46%;
     --chart-3: 38 88% 56%;
     --chart-4: 0 62% 45%;
     --chart-5: 280 55% 58%;
 
-    --sidebar-background: 226 20% 11%;
+    --sidebar-background: var(--brand-h) 20% 11%;
     --sidebar-foreground: 220 14% 75%;
-    --sidebar-primary: 234 80% 68%;
+    --sidebar-primary: var(--brand-h) 80% 68%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 226 20% 17%;
+    --sidebar-accent: var(--brand-h) 20% 17%;
     --sidebar-accent-foreground: 220 14% 94%;
-    --sidebar-border: 226 18% 20%;
-    --sidebar-ring: 234 80% 68%;
+    --sidebar-border: var(--brand-h) 18% 20%;
+    --sidebar-ring: var(--brand-h) 80% 68%;
   }
 }
 
@@ -869,10 +876,10 @@
 
   .mesh-gradient {
     background:
-      radial-gradient(ellipse at 20% 50%, hsl(234 75% 58% / 0.8) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 50%, hsl(var(--brand-h) 75% 58% / 0.8) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 20%, hsl(280 55% 55% / 0.6) 0%, transparent 50%),
       radial-gradient(ellipse at 40% 80%, hsl(158 55% 42% / 0.4) 0%, transparent 50%),
-      linear-gradient(135deg, hsl(234 75% 20%) 0%, hsl(234 75% 12%) 100%);
+      linear-gradient(135deg, hsl(var(--brand-h) 75% 20%) 0%, hsl(var(--brand-h) 75% 12%) 100%);
   }
 
   .grid-pattern {
@@ -883,24 +890,24 @@
   }
 
   .input-glow:focus-within {
-    box-shadow: 0 0 0 3px hsl(234 75% 58% / 0.1), 0 0 20px -5px hsl(234 75% 58% / 0.15);
+    box-shadow: 0 0 0 3px hsl(var(--brand-h) 75% 58% / 0.1), 0 0 20px -5px hsl(var(--brand-h) 75% 58% / 0.15);
   }
 
   .btn-gradient {
-    background: linear-gradient(135deg, hsl(234 75% 58%) 0%, hsl(280 55% 55%) 100%);
+    background: linear-gradient(135deg, hsl(var(--brand-h) 75% 58%) 0%, hsl(280 55% 55%) 100%);
   }
 
   .btn-gradient:hover {
-    background: linear-gradient(135deg, hsl(234 75% 52%) 0%, hsl(280 55% 50%) 100%);
+    background: linear-gradient(135deg, hsl(var(--brand-h) 75% 52%) 0%, hsl(280 55% 50%) 100%);
   }
 
   .aurora-bg {
     background:
-      radial-gradient(ellipse 80% 60% at 15% 20%, hsl(234 90% 62% / 0.55) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 60% at 15% 20%, hsl(var(--brand-h) 90% 62% / 0.55) 0%, transparent 60%),
       radial-gradient(ellipse 70% 50% at 85% 15%, hsl(280 70% 60% / 0.45) 0%, transparent 55%),
       radial-gradient(ellipse 75% 55% at 75% 85%, hsl(200 85% 55% / 0.35) 0%, transparent 60%),
       radial-gradient(ellipse 60% 50% at 20% 90%, hsl(158 65% 50% / 0.3) 0%, transparent 55%),
-      linear-gradient(135deg, hsl(234 70% 10%) 0%, hsl(250 60% 6%) 50%, hsl(234 70% 8%) 100%);
+      linear-gradient(135deg, hsl(var(--brand-h) 70% 10%) 0%, hsl(250 60% 6%) 50%, hsl(var(--brand-h) 70% 8%) 100%);
     background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%, 100% 100%;
     animation: aurora-drift 18s ease-in-out infinite;
   }
@@ -932,7 +939,7 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, hsl(234 75% 70% / 0.55), transparent 30%, transparent 70%, hsl(280 70% 70% / 0.55));
+    background: linear-gradient(135deg, hsl(var(--brand-h) 75% 70% / 0.55), transparent 30%, transparent 70%, hsl(280 70% 70% / 0.55));
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -1027,13 +1034,13 @@
     @apply backdrop-blur-xl bg-card/70 border border-border/40;
     box-shadow:
       0 1px 0 0 hsl(0 0% 100% / 0.6) inset,
-      0 20px 60px -20px hsl(234 75% 20% / 0.25),
+      0 20px 60px -20px hsl(var(--brand-h) 75% 20% / 0.25),
       0 0 0 1px hsl(0 0% 100% / 0.02);
   }
   .dark .glass-card-premium {
     box-shadow:
       0 1px 0 0 hsl(0 0% 100% / 0.05) inset,
-      0 30px 80px -20px hsl(234 75% 5% / 0.5);
+      0 30px 80px -20px hsl(var(--brand-h) 75% 5% / 0.5);
   }
 
   .orb {
@@ -1044,7 +1051,7 @@
   }
 
   .conic-ring {
-    background: conic-gradient(from 180deg at 50% 50%, hsl(234 75% 62%), hsl(280 70% 60%), hsl(200 85% 55%), hsl(234 75% 62%));
+    background: conic-gradient(from 180deg at 50% 50%, hsl(var(--brand-h) 75% 62%), hsl(280 70% 60%), hsl(200 85% 55%), hsl(var(--brand-h) 75% 62%));
   }
 
   /* ============ PRESENTATION 3D SCENE ============ */

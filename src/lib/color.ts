@@ -94,6 +94,11 @@ export function isHexColor(value: string): boolean {
  * variable that was never set is a no-op, so listing extras is safe.
  */
 const THEMED_VARS = [
+  // Brand hue drives the deep repaint: every indigo-derived token and
+  // decorative gradient in index.css reads hsl(var(--brand-h) ...). Setting
+  // it alone rotates the whole app to the org's color; the explicit triplet
+  // overrides below pin the primary surfaces to the exact picked shade.
+  "--brand-h",
   "--primary",
   "--primary-foreground",
   "--sidebar-primary",
@@ -132,6 +137,11 @@ export function applyBrandingColors(colors: BrandingColors) {
   if (colors.primary) {
     const hsl = hexToHsl(colors.primary);
     if (hsl) {
+      // Hue alone repaints the indigo-derived tokens + decorative gradients
+      // (sidebar, charts, glass cards, btn/mesh/aurora gradients) defined in
+      // index.css as hsl(var(--brand-h) ...).
+      root.style.setProperty("--brand-h", String(hsl.h));
+
       const primaryTriplet = formatTriplet(hsl);
       root.style.setProperty("--primary", primaryTriplet);
       root.style.setProperty("--sidebar-primary", primaryTriplet);

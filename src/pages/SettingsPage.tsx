@@ -238,7 +238,7 @@ export default function SettingsPage() {
             <Zap className="w-3.5 h-3.5" />
             Integrações
           </TabsTrigger>
-          {isOrgOwner && (
+          {isOrgAdmin && (
             <TabsTrigger value="organization" className="rounded-xl gap-1.5">
               <Building2 className="w-3.5 h-3.5" />
               Organização
@@ -481,12 +481,14 @@ export default function SettingsPage() {
         </TabsContent>
 
         {/* ============ ORGANIZATION ============ */}
-        {isOrgOwner && (
+        {isOrgAdmin && (
           <TabsContent value="organization" className="mt-4 space-y-4">
-            <OrgBillingPanel />
-            <OrgMembersPanel />
+            {/* Billing, members and feature flags stay owner-only; branding
+                (white-label colors/logo) is editable by admins too. */}
+            {isOrgOwner && <OrgBillingPanel />}
+            {isOrgOwner && <OrgMembersPanel />}
             <OrgBrandingPanel />
-            <OrgFeatureFlagsPanel />
+            {isOrgOwner && <OrgFeatureFlagsPanel />}
           </TabsContent>
         )}
       </Tabs>

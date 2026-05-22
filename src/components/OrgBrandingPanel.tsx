@@ -16,7 +16,7 @@ const DEFAULT_PREVIEW_PRIMARY = "#5B7BFF"; // Matches the built-in indigo theme
 const DEFAULT_PREVIEW_ACCENT = "#F59E0B";  // Matches the original amber accent
 
 export function OrgBrandingPanel() {
-  const { currentOrg, branding, isOrgOwner, refresh } = useOrg();
+  const { currentOrg, branding, isOrgAdmin, refresh } = useOrg();
   const qc = useQueryClient();
   const { toast } = useToast();
 
@@ -41,10 +41,13 @@ export function OrgBrandingPanel() {
         primary_color: values.primary_color,
         accent_color: values.accent_color,
       };
-      const { error } = await supabase
-        .from("organizations")
-        .update({ branding: next })
-        .eq("id", currentOrg.id);
+      // Saved through a SECURITY DEFINER RPC (not a direct table UPDATE) so
+      // org admins can edit branding without the owner-only RLS policy on
+      // organizations blocking them. The RPC writes only the branding column.
+      const { error } = await (supabase as any).rpc("update_org_branding", {
+        p_org_id: currentOrg.id,
+        p_branding: next,
+      });
       if (error) throw error;
     },
     onSuccess: async () => {
@@ -59,12 +62,12 @@ export function OrgBrandingPanel() {
 
   if (!currentOrg) return null;
 
-  if (!isOrgOwner) {
+  if (!isOrgAdmin) {
     return (
       <Card className="border-border/50">
         <CardContent className="p-6 flex items-center gap-3 text-muted-foreground">
           <Lock className="w-4 h-4" />
-          <span className="text-sm">Apenas o owner da organização pode editar o branding.</span>
+          <span className="text-sm">Apenas owners e admins da organização podem editar o branding.</span>
         </CardContent>
       </Card>
     );
