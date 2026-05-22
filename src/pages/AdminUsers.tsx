@@ -43,6 +43,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOrg } from "@/contexts/OrgContext";
 
 interface Profile {
   id: string;
@@ -95,6 +96,7 @@ export default function AdminUsers() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { t, language } = useLanguage();
+  const { currentOrg } = useOrg();
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -116,15 +118,24 @@ export default function AdminUsers() {
   const dateLocale =
     language === "en" ? "en-US" : language === "es" ? "es-ES" : "pt-BR";
 
+  // Scope the user list to the CURRENT org's members via list_org_members
+  // (SECURITY DEFINER). A global SELECT on profiles would expose users from
+  // every tenant to anyone holding the legacy global 'admin' role.
   const { data: profiles, isLoading } = useQuery({
-    queryKey: ["admin-profiles"],
+    queryKey: ["admin-profiles", currentOrg?.id],
+    enabled: !!currentOrg,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.rpc("list_org_members", { p_org_id: currentOrg!.id });
       if (error) throw error;
-      return data as Profile[];
+      return ((data ?? []) as Array<{ user_id: string; approval_status: string; joined_at: string; email: string | null; full_name: string | null }>)
+        .map((m) => ({
+          id: m.user_id,
+          full_name: m.full_name,
+          email: m.email,
+          approval_status: m.approval_status,
+          created_at: m.joined_at,
+        }))
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) as Profile[];
     },
   });
 
@@ -145,12 +156,14 @@ export default function AdminUsers() {
         .eq("id", id);
       if (profErr) throw profErr;
 
-      // Mirror status to all org memberships of this user so RLS allows access.
-      // In multi-org future, scope by current org instead of all memberships.
-      const { error: memErr } = await supabase
+      // Mirror status to THIS org's membership only — never touch the user's
+      // memberships in other organizations.
+      let memQuery = supabase
         .from("organization_members")
         .update({ approval_status: status })
         .eq("user_id", id);
+      if (currentOrg?.id) memQuery = memQuery.eq("organization_id", currentOrg.id);
+      const { error: memErr } = await memQuery;
       if (memErr) throw memErr;
     },
     onSuccess: () => {

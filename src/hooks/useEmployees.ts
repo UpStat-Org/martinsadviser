@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useOrg } from "@/contexts/OrgContext";
 
 export interface Employee {
   id: string;
@@ -7,21 +8,22 @@ export interface Employee {
   email: string | null;
 }
 
+// Approved members of the CURRENT org only. Goes through list_org_members
+// (SECURITY DEFINER, validates is_org_member) instead of a global SELECT on
+// profiles — a direct profiles query leaks users from other tenants to anyone
+// holding the legacy global 'admin' role.
 export function useEmployees() {
+  const { currentOrg } = useOrg();
   return useQuery({
-    queryKey: ["employees"],
+    queryKey: ["employees", currentOrg?.id],
+    enabled: !!currentOrg,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, full_name, email, approval_status")
-        .eq("approval_status", "approved")
-        .order("full_name");
+      const { data, error } = await supabase.rpc("list_org_members", { p_org_id: currentOrg!.id });
       if (error) throw error;
-      return (data ?? []).map((p) => ({
-        id: p.id,
-        full_name: p.full_name,
-        email: p.email,
-      })) as Employee[];
+      return ((data ?? []) as Array<{ user_id: string; full_name: string | null; email: string | null; approval_status: string }>)
+        .filter((m) => m.approval_status === "approved")
+        .map((m) => ({ id: m.user_id, full_name: m.full_name, email: m.email }))
+        .sort((a, b) => (a.full_name || a.email || "").localeCompare(b.full_name || b.email || "")) as Employee[];
     },
     staleTime: 60_000,
   });
