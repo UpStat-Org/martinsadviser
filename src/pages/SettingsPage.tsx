@@ -27,11 +27,12 @@ import { OrgFeatureFlagsPanel } from "@/components/OrgFeatureFlagsPanel";
 import { OrgBrandingPanel } from "@/components/OrgBrandingPanel";
 import { OrgBillingPanel } from "@/components/OrgBillingPanel";
 import { OrgMembersPanel } from "@/components/OrgMembersPanel";
+import { OrgEldPanel } from "@/components/OrgEldPanel";
 
 export default function SettingsPage() {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const { isOrgOwner } = useOrg();
+  const { isOrgOwner, isOrgAdmin } = useOrg();
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -448,6 +449,9 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* ELD integration (Motive / Samsara) — org admins only */}
+          {isOrgAdmin && <OrgEldPanel />}
 
           {/* Coming soon card */}
           <Card className="border-border/50 relative overflow-hidden">

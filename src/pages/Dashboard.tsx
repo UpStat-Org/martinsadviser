@@ -46,6 +46,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useInvoices } from "@/hooks/useInvoices";
 import { PermitCoverageMap } from "@/components/PermitCoverageMap";
 import { RevenueForecastCard } from "@/components/RevenueForecastCard";
+import { PortfolioRiskCard } from "@/components/PortfolioRiskCard";
 
 const dateLocales = { pt, en: enUS, es };
 
@@ -713,6 +714,9 @@ export default function Dashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* ============ PORTFOLIO RISK ============ */}
+      <PortfolioRiskCard />
 
       {/* ============ URGENT & RECENT ============ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

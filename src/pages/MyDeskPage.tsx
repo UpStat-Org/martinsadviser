@@ -21,6 +21,7 @@ import {
   RotateCcw,
   Check,
   FileWarning,
+  ShieldAlert,
 } from "lucide-react";
 import { format } from "date-fns";
 import { pt, enUS, es } from "date-fns/locale";
@@ -31,6 +32,8 @@ import { useRetryMessage } from "@/hooks/useMessages";
 import { getExpirationStatus } from "@/hooks/usePermits";
 import { useInvoices } from "@/hooks/useInvoices";
 import { useUpdateTask } from "@/hooks/useTasks";
+import { useRiskScores } from "@/hooks/useRiskScores";
+import { factorLabel, isAtRisk, bandLabelKey } from "@/lib/risk";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const dateLocales = { pt, en: enUS, es };
@@ -41,7 +44,7 @@ const PRIORITY_STYLES: Record<string, string> = {
   low: "bg-gradient-to-r from-sky-500 to-blue-500 text-white border-0",
 };
 
-type ActionKind = "all" | "compliance" | "tasks" | "messages" | "finance";
+type ActionKind = "all" | "risk" | "compliance" | "tasks" | "messages" | "finance";
 type ActionSeverity = "critical" | "high" | "medium" | "low";
 
 interface ActionItem {
@@ -73,6 +76,7 @@ export default function MyDeskPage() {
   const { data: tasks, isLoading: lt } = useAssignedTasks(user?.id);
   const { data: messages } = useScheduledMessages();
   const { data: invoices } = useInvoices();
+  const { data: riskScores } = useRiskScores();
   const retryMessage = useRetryMessage();
   const updateTask = useUpdateTask();
 
@@ -136,6 +140,23 @@ export default function MyDeskPage() {
     const now = new Date();
     const today = now.toISOString().slice(0, 10);
     const items: ActionItem[] = [];
+
+    // Risk roll-up: clients the daily job flagged high/critical lead the queue.
+    (riskScores ?? [])
+      .filter((s) => isAtRisk(s.band))
+      .forEach((s) => {
+        const top = [...(s.factors ?? [])].sort((a, b) => b.points - a.points)[0];
+        items.push({
+          id: `risk-${s.client_id}`,
+          kind: "risk",
+          severity: s.band === "critical" ? "critical" : "high",
+          title: `${s.clients?.company_name ?? "—"} — ${t("risk.scoreLabel")} ${s.score}`,
+          subtitle: top ? factorLabel(t, top) : t(bandLabelKey(s.band)),
+          meta: t(bandLabelKey(s.band)),
+          route: `/clients/${s.client_id}`,
+          icon: ShieldAlert,
+        });
+      });
 
     (permits ?? []).forEach((permit) => {
       if (!permit.expiration_date) {
@@ -237,7 +258,7 @@ export default function MyDeskPage() {
 
     const order: Record<ActionSeverity, number> = { critical: 0, high: 1, medium: 2, low: 3 };
     return items.sort((a, b) => order[a.severity] - order[b.severity]);
-  }, [permits, tasks, messages, invoices, retryMessage, updateTask, t]);
+  }, [permits, tasks, messages, invoices, riskScores, retryMessage, updateTask, t]);
 
   const filteredActions = activeKind === "all"
     ? actionItems
@@ -245,6 +266,7 @@ export default function MyDeskPage() {
 
   const actionCounts = {
     all: actionItems.length,
+    risk: actionItems.filter((item) => item.kind === "risk").length,
     compliance: actionItems.filter((item) => item.kind === "compliance").length,
     tasks: actionItems.filter((item) => item.kind === "tasks").length,
     messages: actionItems.filter((item) => item.kind === "messages").length,
@@ -381,6 +403,7 @@ export default function MyDeskPage() {
             <div className="flex flex-wrap gap-1.5">
               {[
                 { key: "all", label: t("search.all"), count: actionCounts.all },
+                { key: "risk", label: t("common.risk"), count: actionCounts.risk },
                 { key: "compliance", label: t("nav.permits"), count: actionCounts.compliance },
                 { key: "tasks", label: t("nav.tasks"), count: actionCounts.tasks },
                 { key: "messages", label: t("nav.messages"), count: actionCounts.messages },

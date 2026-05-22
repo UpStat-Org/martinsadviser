@@ -9,6 +9,7 @@ import { TruckFormDialog } from "@/components/TruckFormDialog";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { ComplianceDashboard } from "@/components/ComplianceDashboard";
 import { ComplianceScorecard } from "@/components/ComplianceScorecard";
+import { RiskScorePanel } from "@/components/RiskScorePanel";
 import { Mcs150Card } from "@/components/Mcs150Card";
 import { NewEntrantCard } from "@/components/NewEntrantCard";
 import { CsaScoresCard } from "@/components/CsaScoresCard";
@@ -564,6 +565,10 @@ export default function ClientDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ComplianceScorecard client={client} trucks={trucks} permits={permits} />
         <ComplianceDashboard permits={permits} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <RiskScorePanel clientId={client.id} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

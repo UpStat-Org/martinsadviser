@@ -46,6 +46,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { ScoreBadge } from "@/components/ComplianceScorecard";
+import { RiskBadge } from "@/components/RiskBadge";
+import { useRiskScores, type RiskScoreWithClient } from "@/hooks/useRiskScores";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -237,6 +239,15 @@ export default function Clients() {
     });
     return map;
   }, [allPermits]);
+
+  // Server-computed operational risk score per client (latest snapshot). Takes
+  // precedence over the permit-only `riskByClient` heuristic when present.
+  const { data: riskScores } = useRiskScores();
+  const scoreByClient = useMemo(() => {
+    const map: Record<string, RiskScoreWithClient> = {};
+    for (const s of riskScores ?? []) map[s.client_id] = s;
+    return map;
+  }, [riskScores]);
 
   // Union of all tags across the org — used by the filter dropdown.
   const availableTags = useMemo(() => {
@@ -701,7 +712,13 @@ export default function Clients() {
                       </div>
                     </TableCell>}
                     {columns.risk !== false && <TableCell>
-                      {riskByClient[client.id] === "danger" ? (
+                      {scoreByClient[client.id] ? (
+                        <RiskBadge
+                          score={scoreByClient[client.id].score}
+                          band={scoreByClient[client.id].band}
+                          showLabel
+                        />
+                      ) : riskByClient[client.id] === "danger" ? (
                         <Badge
                           className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20 gap-1"
                           variant="outline"

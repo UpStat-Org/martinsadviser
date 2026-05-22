@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, Send } from "lucide-react";
+import { CalendarIcon, Send, Wand2, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import { useMessageTemplates, useCreateScheduledMessage } from "@/hooks/useMessa
 import { replacePlaceholders } from "@/lib/placeholders";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFeatureFlag } from "@/contexts/OrgContext";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
@@ -32,19 +33,39 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState("09:00");
   const [sendNow, setSendNow] = useState(false);
+  const [aiInstruction, setAiInstruction] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   const { data: clients } = useClients();
   const { data: templates } = useMessageTemplates();
   const create = useCreateScheduledMessage();
   const selectedClient = clients?.find((c) => c.id === clientId) || null;
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const aiEnabled = useFeatureFlag("ai_chat") || useFeatureFlag("ai_reports");
   const { toast } = useToast();
 
   useEffect(() => {
     if (!open) {
-      setClientId(""); setChannel("email"); setTemplateId(""); setSubject(""); setBody(""); setDate(undefined); setTime("09:00"); setSendNow(false);
+      setClientId(""); setChannel("email"); setTemplateId(""); setSubject(""); setBody(""); setDate(undefined); setTime("09:00"); setSendNow(false); setAiInstruction("");
     }
   }, [open]);
+
+  const handleGenerateDraft = async () => {
+    if (!clientId) return;
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-draft", {
+        body: { client_id: clientId, channel, language, instruction: aiInstruction },
+      });
+      if (error) throw error;
+      if (data?.subject !== undefined && channel === "email") setSubject(data.subject || "");
+      if (data?.body) setBody(data.body);
+    } catch {
+      toast({ title: t("messages.aiDraftFailed"), variant: "destructive" });
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleTemplateChange = (tId: string) => {
     setTemplateId(tId);
@@ -152,6 +173,34 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
             <div className="space-y-2">
               <Label>{t("messages.subject")}</Label>
               <Input value={subject} onChange={(e) => setSubject(e.target.value)} />
+            </div>
+          )}
+
+          {aiEnabled && (
+            <div className="space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-3">
+              <Label className="flex items-center gap-1.5 text-sm">
+                <Wand2 className="w-3.5 h-3.5 text-primary" />
+                {t("messages.aiDraftTitle")}
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  value={aiInstruction}
+                  onChange={(e) => setAiInstruction(e.target.value)}
+                  placeholder={t("messages.aiDraftPlaceholder")}
+                  disabled={!clientId || aiLoading}
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleGenerateDraft}
+                  disabled={!clientId || aiLoading}
+                  className="shrink-0"
+                >
+                  {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+                  <span className="ml-1.5">{t("messages.aiDraftGenerate")}</span>
+                </Button>
+              </div>
+              {!clientId && <p className="text-xs text-muted-foreground">{t("messages.aiDraftPickClient")}</p>}
             </div>
           )}
 

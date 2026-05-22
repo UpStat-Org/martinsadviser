@@ -5,12 +5,21 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { lookupCarrier, type FmcsaResult } from "@/hooks/useFmcsaLookup";
+import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2, Hash, Search } from "lucide-react";
 // xlsx is dynamically imported to avoid bundling issues
+
+interface DotRow {
+  dot: string;
+  result: FmcsaResult | null;
+  selected: boolean;
+}
 
 interface Props {
   open: boolean;
@@ -50,21 +59,87 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [step, setStep] = useState<"upload" | "mapping" | "importing" | "done">("upload");
+  const [step, setStep] = useState<"upload" | "mapping" | "dotPreview" | "importing" | "done">("upload");
+  const [source, setSource] = useState<"file" | "dot">("file");
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<Record<string, string>[]>([]);
   const [mapping, setMapping] = useState<ColumnMapping>({});
   const [progress, setProgress] = useState(0);
   const [results, setResults] = useState<{ success: number; errors: string[] }>({ success: 0, errors: [] });
+  const [dotInput, setDotInput] = useState("");
+  const [dotRows, setDotRows] = useState<DotRow[]>([]);
 
   const reset = () => {
     setStep("upload");
+    setSource("file");
     setHeaders([]);
     setRows([]);
     setMapping({});
     setProgress(0);
     setResults({ success: 0, errors: [] });
+    setDotInput("");
+    setDotRows([]);
   };
+
+  // Parse free-form DOT input (newlines, commas, spaces) into unique numbers.
+  const parseDots = (raw: string): string[] => {
+    const seen = new Set<string>();
+    for (const tok of raw.split(/[\s,;]+/)) {
+      const d = tok.replace(/\D/g, "").trim();
+      if (d) seen.add(d);
+    }
+    return [...seen];
+  };
+
+  const handleLookupDots = async () => {
+    const dots = parseDots(dotInput);
+    if (!dots.length) return;
+    setStep("dotPreview");
+    setDotRows(dots.map((dot) => ({ dot, result: null, selected: false })));
+    setProgress(0);
+    for (let i = 0; i < dots.length; i++) {
+      const result = await lookupCarrier(dots[i]);
+      setDotRows((prev) =>
+        prev.map((r) => (r.dot === dots[i] ? { ...r, result, selected: !!result } : r)),
+      );
+      setProgress(Math.round(((i + 1) / dots.length) * 100));
+    }
+  };
+
+  const handleImportDots = async () => {
+    setStep("importing");
+    setProgress(0);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const selected = dotRows.filter((r) => r.selected && r.result);
+    let success = 0;
+    const errors: string[] = [];
+    for (let i = 0; i < selected.length; i++) {
+      const r = selected[i].result!;
+      const client: Record<string, any> = {
+        user_id: user.id,
+        status: "active",
+        company_name: r.company_name || `DOT ${selected[i].dot}`,
+        dot: r.dot,
+        mc: r.mc || null,
+        ein: r.ein || null,
+        phone: r.phone || null,
+        address: r.address || null,
+      };
+      const { error } = await supabase.from("clients").insert(client as any);
+      if (error) errors.push(`DOT ${selected[i].dot}: ${error.message}`);
+      else success++;
+      setProgress(Math.round(((i + 1) / selected.length) * 100));
+    }
+
+    setResults({ success, errors });
+    setStep("done");
+    queryClient.invalidateQueries({ queryKey: ["clients"] });
+  };
+
+  const dotLookupDone = dotRows.length > 0 && progress === 100;
+  const dotSelectedCount = dotRows.filter((r) => r.selected && r.result).length;
 
   const handleFile = useCallback(async (file: File) => {
     const XLSX = await import("xlsx");
@@ -160,16 +235,101 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
         </DialogHeader>
 
         {step === "upload" && (
-          <div
-            className="border-2 border-dashed border-border rounded-lg p-12 text-center cursor-pointer hover:border-primary/50 transition-colors"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleDrop}
-            onClick={() => document.getElementById("import-file-input")?.click()}
-          >
-            <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">{t("import.dragDrop")}</p>
-            <p className="text-xs text-muted-foreground mt-1">{t("import.fileTypes")}</p>
-            <input id="import-file-input" type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleInput} />
+          <div className="space-y-4">
+            {/* Source toggle: spreadsheet vs FMCSA-by-DOT */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setSource("file")}
+                className={`flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-semibold border transition-colors ${source === "file" ? "bg-primary text-primary-foreground border-primary" : "bg-muted/40 text-muted-foreground border-border hover:bg-muted"}`}
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                {t("import.sourceFile")}
+              </button>
+              <button
+                onClick={() => setSource("dot")}
+                className={`flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-semibold border transition-colors ${source === "dot" ? "bg-primary text-primary-foreground border-primary" : "bg-muted/40 text-muted-foreground border-border hover:bg-muted"}`}
+              >
+                <Hash className="w-4 h-4" />
+                {t("import.sourceDot")}
+              </button>
+            </div>
+
+            {source === "file" ? (
+              <div
+                className="border-2 border-dashed border-border rounded-lg p-12 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={handleDrop}
+                onClick={() => document.getElementById("import-file-input")?.click()}
+              >
+                <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">{t("import.dragDrop")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t("import.fileTypes")}</p>
+                <input id="import-file-input" type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleInput} />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">{t("import.dotDesc")}</p>
+                <Textarea
+                  value={dotInput}
+                  onChange={(e) => setDotInput(e.target.value)}
+                  rows={6}
+                  placeholder={"1234567\n7654321\n..."}
+                  className="font-mono text-sm"
+                />
+                <Button onClick={handleLookupDots} disabled={!parseDots(dotInput).length} className="w-full">
+                  <Search className="w-4 h-4 mr-2" />
+                  {t("import.dotLookup")} ({parseDots(dotInput).length})
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {step === "dotPreview" && (
+          <div className="space-y-4">
+            {!dotLookupDone && (
+              <div className="space-y-2">
+                <Progress value={progress} className="w-full" />
+                <p className="text-xs text-center text-muted-foreground">{t("import.dotLookingUp")}... {progress}%</p>
+              </div>
+            )}
+            <div className="max-h-80 overflow-auto border rounded">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-10"></TableHead>
+                    <TableHead className="text-xs">DOT</TableHead>
+                    <TableHead className="text-xs">{t("import.field.company_name")}</TableHead>
+                    <TableHead className="text-xs text-right">{t("import.dotUnitsDrivers")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {dotRows.map((r) => (
+                    <TableRow key={r.dot} className={!r.result ? "opacity-50" : ""}>
+                      <TableCell>
+                        <Checkbox
+                          checked={r.selected}
+                          disabled={!r.result}
+                          onCheckedChange={(v) =>
+                            setDotRows((prev) => prev.map((x) => (x.dot === r.dot ? { ...x, selected: !!v } : x)))
+                          }
+                        />
+                      </TableCell>
+                      <TableCell className="text-xs font-mono">{r.dot}</TableCell>
+                      <TableCell className="text-xs">
+                        {r.result ? r.result.company_name || "—" : <span className="text-destructive">{t("import.dotNotFound")}</span>}
+                      </TableCell>
+                      <TableCell className="text-xs text-right tabular-nums">
+                        {r.result ? `${r.result.totalPowerUnits} / ${r.result.totalDrivers}` : "—"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <Button onClick={handleImportDots} disabled={!dotLookupDone || dotSelectedCount === 0} className="w-full">
+              {t("import.importButton")} {dotSelectedCount} {t("nav.clients").toLowerCase()}
+            </Button>
           </div>
         )}
 
