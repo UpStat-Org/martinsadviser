@@ -14,6 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
+      accidents: {
+        Row: {
+          client_id: string
+          created_at: string
+          document_url: string | null
+          driver_id: string | null
+          fatalities: number
+          fmcsa_report_number: string | null
+          id: string
+          injuries: number
+          location: string | null
+          narrative: string | null
+          occurred_at: string
+          org_id: string
+          police_report_number: string | null
+          severity: string
+          state: string | null
+          tow_required: boolean
+          truck_id: string | null
+          updated_at: string
+          usdot_reportable: boolean | null
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          document_url?: string | null
+          driver_id?: string | null
+          fatalities?: number
+          fmcsa_report_number?: string | null
+          id?: string
+          injuries?: number
+          location?: string | null
+          narrative?: string | null
+          occurred_at: string
+          org_id?: string
+          police_report_number?: string | null
+          severity?: string
+          state?: string | null
+          tow_required?: boolean
+          truck_id?: string | null
+          updated_at?: string
+          usdot_reportable?: boolean | null
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          document_url?: string | null
+          driver_id?: string | null
+          fatalities?: number
+          fmcsa_report_number?: string | null
+          id?: string
+          injuries?: number
+          location?: string | null
+          narrative?: string | null
+          occurred_at?: string
+          org_id?: string
+          police_report_number?: string | null
+          severity?: string
+          state?: string | null
+          tow_required?: boolean
+          truck_id?: string | null
+          updated_at?: string
+          usdot_reportable?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accidents_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accidents_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accidents_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accidents_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activity_log: {
         Row: {
           action: string
@@ -318,9 +416,11 @@ export type Database = {
           id: string
           mc: string | null
           mcs_150_last_filed_at: string | null
+          new_entrant_start_at: string | null
           notes: string | null
           org_id: string
           phone: string | null
+          psp_subscribed_at: string | null
           registration_responsible: string | null
           service_automatic: boolean
           service_ct: boolean
@@ -329,6 +429,7 @@ export type Database = {
           service_nm: boolean
           service_ny: boolean
           status: string
+          tags: string[]
           updated_at: string
           user_id: string
         }
@@ -343,9 +444,11 @@ export type Database = {
           id?: string
           mc?: string | null
           mcs_150_last_filed_at?: string | null
+          new_entrant_start_at?: string | null
           notes?: string | null
           org_id?: string
           phone?: string | null
+          psp_subscribed_at?: string | null
           registration_responsible?: string | null
           service_automatic?: boolean
           service_ct?: boolean
@@ -354,6 +457,7 @@ export type Database = {
           service_nm?: boolean
           service_ny?: boolean
           status?: string
+          tags?: string[]
           updated_at?: string
           user_id: string
         }
@@ -368,9 +472,11 @@ export type Database = {
           id?: string
           mc?: string | null
           mcs_150_last_filed_at?: string | null
+          new_entrant_start_at?: string | null
           notes?: string | null
           org_id?: string
           phone?: string | null
+          psp_subscribed_at?: string | null
           registration_responsible?: string | null
           service_automatic?: boolean
           service_ct?: boolean
@@ -379,6 +485,7 @@ export type Database = {
           service_nm?: boolean
           service_ny?: boolean
           status?: string
+          tags?: string[]
           updated_at?: string
           user_id?: string
         }
@@ -426,6 +533,72 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "comments_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      csa_snapshots: {
+        Row: {
+          client_id: string
+          controlled_substances: number | null
+          crash_indicator: number | null
+          created_at: string
+          driver_fitness: number | null
+          hazmat_compliance: number | null
+          hours_of_service: number | null
+          id: string
+          measurement_period: string
+          notes: string | null
+          org_id: string
+          unsafe_driving: number | null
+          user_id: string
+          vehicle_maintenance: number | null
+        }
+        Insert: {
+          client_id: string
+          controlled_substances?: number | null
+          crash_indicator?: number | null
+          created_at?: string
+          driver_fitness?: number | null
+          hazmat_compliance?: number | null
+          hours_of_service?: number | null
+          id?: string
+          measurement_period: string
+          notes?: string | null
+          org_id?: string
+          unsafe_driving?: number | null
+          user_id: string
+          vehicle_maintenance?: number | null
+        }
+        Update: {
+          client_id?: string
+          controlled_substances?: number | null
+          crash_indicator?: number | null
+          created_at?: string
+          driver_fitness?: number | null
+          hazmat_compliance?: number | null
+          hours_of_service?: number | null
+          id?: string
+          measurement_period?: string
+          notes?: string | null
+          org_id?: string
+          unsafe_driving?: number | null
+          user_id?: string
+          vehicle_maintenance?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "csa_snapshots_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "csa_snapshots_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -806,6 +979,66 @@ export type Database = {
         }
         Relationships: []
       }
+      hos_violations: {
+        Row: {
+          created_at: string
+          driver_id: string
+          id: string
+          notes: string | null
+          occurred_at: string
+          org_id: string
+          resolved_at: string | null
+          rule_violated: string
+          severity: string
+          source: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          driver_id: string
+          id?: string
+          notes?: string | null
+          occurred_at: string
+          org_id?: string
+          resolved_at?: string | null
+          rule_violated: string
+          severity?: string
+          source?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          driver_id?: string
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          org_id?: string
+          resolved_at?: string | null
+          rule_violated?: string
+          severity?: string
+          source?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hos_violations_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hos_violations_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hvut_filings: {
         Row: {
           client_id: string
@@ -1132,6 +1365,72 @@ export type Database = {
           },
         ]
       }
+      insurance_certificates: {
+        Row: {
+          client_id: string
+          coverage_amount: number | null
+          created_at: string
+          document_url: string | null
+          effective_date: string | null
+          expiration_date: string | null
+          id: string
+          insurer_name: string | null
+          notes: string | null
+          org_id: string
+          policy_number: string | null
+          policy_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          coverage_amount?: number | null
+          created_at?: string
+          document_url?: string | null
+          effective_date?: string | null
+          expiration_date?: string | null
+          id?: string
+          insurer_name?: string | null
+          notes?: string | null
+          org_id?: string
+          policy_number?: string | null
+          policy_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          coverage_amount?: number | null
+          created_at?: string
+          document_url?: string | null
+          effective_date?: string | null
+          expiration_date?: string | null
+          id?: string
+          insurer_name?: string | null
+          notes?: string | null
+          org_id?: string
+          policy_number?: string | null
+          policy_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_certificates_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_certificates_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount: number
@@ -1185,6 +1484,186 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      irp_jurisdiction_lines: {
+        Row: {
+          created_at: string
+          fee: number | null
+          id: string
+          jurisdiction: string
+          miles: number
+          org_id: string
+          percentage: number | null
+          registration_id: string
+        }
+        Insert: {
+          created_at?: string
+          fee?: number | null
+          id?: string
+          jurisdiction: string
+          miles?: number
+          org_id?: string
+          percentage?: number | null
+          registration_id: string
+        }
+        Update: {
+          created_at?: string
+          fee?: number | null
+          id?: string
+          jurisdiction?: string
+          miles?: number
+          org_id?: string
+          percentage?: number | null
+          registration_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "irp_jurisdiction_lines_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "irp_jurisdiction_lines_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "irp_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      irp_registrations: {
+        Row: {
+          base_jurisdiction: string
+          client_id: string
+          created_at: string
+          filed_at: string | null
+          fleet_size: number
+          id: string
+          notes: string | null
+          org_id: string
+          registration_year: number
+          status: string
+          total_fee: number | null
+          total_fleet_miles: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          base_jurisdiction: string
+          client_id: string
+          created_at?: string
+          filed_at?: string | null
+          fleet_size?: number
+          id?: string
+          notes?: string | null
+          org_id?: string
+          registration_year: number
+          status?: string
+          total_fee?: number | null
+          total_fleet_miles?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          base_jurisdiction?: string
+          client_id?: string
+          created_at?: string
+          filed_at?: string | null
+          fleet_size?: number
+          id?: string
+          notes?: string | null
+          org_id?: string
+          registration_year?: number
+          status?: string
+          total_fee?: number | null
+          total_fleet_miles?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "irp_registrations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "irp_registrations_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_records: {
+        Row: {
+          cost: number | null
+          created_at: string
+          document_url: string | null
+          id: string
+          mileage: number | null
+          next_due_at: string | null
+          notes: string | null
+          org_id: string
+          service_date: string
+          service_type: string
+          truck_id: string
+          updated_at: string
+          user_id: string
+          vendor: string | null
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          document_url?: string | null
+          id?: string
+          mileage?: number | null
+          next_due_at?: string | null
+          notes?: string | null
+          org_id?: string
+          service_date: string
+          service_type: string
+          truck_id: string
+          updated_at?: string
+          user_id: string
+          vendor?: string | null
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          document_url?: string | null
+          id?: string
+          mileage?: number | null
+          next_due_at?: string | null
+          notes?: string | null
+          org_id?: string
+          service_date?: string
+          service_type?: string
+          truck_id?: string
+          updated_at?: string
+          user_id?: string
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_records_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_records_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
             referencedColumns: ["id"]
           },
         ]
@@ -1357,6 +1836,7 @@ export type Database = {
         Row: {
           branding: Json
           created_at: string
+          default_hourly_rate: number
           feature_flags: Json
           id: string
           is_master_org: boolean
@@ -1371,6 +1851,7 @@ export type Database = {
         Insert: {
           branding?: Json
           created_at?: string
+          default_hourly_rate?: number
           feature_flags?: Json
           id?: string
           is_master_org?: boolean
@@ -1385,6 +1866,7 @@ export type Database = {
         Update: {
           branding?: Json
           created_at?: string
+          default_hourly_rate?: number
           feature_flags?: Json
           id?: string
           is_master_org?: boolean
@@ -1511,6 +1993,7 @@ export type Database = {
           document_url: string | null
           expiration_date: string | null
           id: string
+          metadata: Json
           notes: string | null
           org_id: string
           permit_number: string | null
@@ -1528,6 +2011,7 @@ export type Database = {
           document_url?: string | null
           expiration_date?: string | null
           id?: string
+          metadata?: Json
           notes?: string | null
           org_id?: string
           permit_number?: string | null
@@ -1545,6 +2029,7 @@ export type Database = {
           document_url?: string | null
           expiration_date?: string | null
           id?: string
+          metadata?: Json
           notes?: string | null
           org_id?: string
           permit_number?: string | null
@@ -1617,6 +2102,101 @@ export type Database = {
           },
         ]
       }
+      roadside_inspections: {
+        Row: {
+          client_id: string
+          created_at: string
+          csa_points: number
+          document_url: string | null
+          driver_id: string | null
+          id: string
+          inspection_date: string
+          inspection_level: number | null
+          inspector_id: string | null
+          location: string | null
+          notes: string | null
+          org_id: string
+          report_number: string | null
+          result: string
+          state: string | null
+          truck_id: string | null
+          updated_at: string
+          user_id: string
+          violations: Json
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          csa_points?: number
+          document_url?: string | null
+          driver_id?: string | null
+          id?: string
+          inspection_date: string
+          inspection_level?: number | null
+          inspector_id?: string | null
+          location?: string | null
+          notes?: string | null
+          org_id?: string
+          report_number?: string | null
+          result: string
+          state?: string | null
+          truck_id?: string | null
+          updated_at?: string
+          user_id: string
+          violations?: Json
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          csa_points?: number
+          document_url?: string | null
+          driver_id?: string | null
+          id?: string
+          inspection_date?: string
+          inspection_level?: number | null
+          inspector_id?: string | null
+          location?: string | null
+          notes?: string | null
+          org_id?: string
+          report_number?: string | null
+          result?: string
+          state?: string | null
+          truck_id?: string | null
+          updated_at?: string
+          user_id?: string
+          violations?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roadside_inspections_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "roadside_inspections_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "roadside_inspections_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "roadside_inspections_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_filters: {
         Row: {
           created_at: string
@@ -1648,6 +2228,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "saved_filters_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_views: {
+        Row: {
+          created_at: string
+          filters: Json
+          id: string
+          name: string
+          org_id: string
+          scope: string
+          shared: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          name: string
+          org_id?: string
+          scope: string
+          shared?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          name?: string
+          org_id?: string
+          scope?: string
+          shared?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_views_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -1730,6 +2354,105 @@ export type Database = {
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "message_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          items: Json
+          name: string
+          org_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json
+          name: string
+          org_id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json
+          name?: string
+          org_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_templates_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_time_entries: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          id: string
+          logged_at: string
+          minutes: number
+          note: string | null
+          org_id: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          logged_at?: string
+          minutes: number
+          note?: string | null
+          org_id?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          logged_at?: string
+          minutes?: number
+          note?: string | null
+          org_id?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_time_entries_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_time_entries_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_time_entries_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
             referencedColumns: ["id"]
           },
         ]
