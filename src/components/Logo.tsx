@@ -3,9 +3,10 @@ interface LogoProps {
   title?: string;
   /**
    * When set, renders an <img> from the URL instead of the built-in SVG.
-   * Used by white-labeled orgs to bring their own logo without us hosting
-   * arbitrary uploads. Fits the same square box, so callers should pass a
-   * className that constrains the size (default w-10 h-10).
+   * Used by white-labeled orgs to bring their own logo — either a public URL
+   * or an image uploaded to the org-branding bucket (stored as its public
+   * URL). Fits the same square box, so callers should pass a className that
+   * constrains the size (default w-10 h-10).
    */
   src?: string | null;
 }

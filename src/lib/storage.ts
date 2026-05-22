@@ -1,6 +1,32 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const PERMIT_DOCUMENTS_BUCKET = "permit-documents";
+export const ORG_BRANDING_BUCKET = "org-branding";
+
+// White-label logos are small brand assets. Cap upload size and accept the
+// formats the <Logo> component can render.
+export const ORG_LOGO_MAX_BYTES = 2 * 1024 * 1024; // 2 MB
+export const ORG_LOGO_ACCEPT = "image/png,image/svg+xml,image/jpeg,image/webp";
+
+/**
+ * Uploads an org logo to the public `org-branding` bucket under the org's
+ * folder ("${orgId}/logo-${ts}.${ext}") and returns its public URL — which
+ * the caller stores in branding.logo_url. Storage RLS requires the caller to
+ * be an admin of `orgId`. Returns null on failure (caller surfaces a toast).
+ */
+export async function uploadOrgLogo(orgId: string, file: File): Promise<string | null> {
+  const ext = (file.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]/g, "") || "png";
+  const path = `${orgId}/logo-${Date.now()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(ORG_BRANDING_BUCKET)
+    .upload(path, file, { upsert: true, cacheControl: "3600", contentType: file.type || undefined });
+  if (error) {
+    console.error("uploadOrgLogo failed", { path, error });
+    return null;
+  }
+  const { data } = supabase.storage.from(ORG_BRANDING_BUCKET).getPublicUrl(path);
+  return data?.publicUrl ?? null;
+}
 
 // Signed URLs are issued for this long. Long enough that opening a PDF in
 // an iframe + scrolling around won't expire mid-session; short enough that

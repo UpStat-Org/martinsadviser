@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrg, splitWordmark, type OrgBranding } from "@/contexts/OrgContext";
 import { isHexColor } from "@/lib/color";
+import { uploadOrgLogo, ORG_LOGO_MAX_BYTES, ORG_LOGO_ACCEPT } from "@/lib/storage";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Lock, Save, RotateCcw } from "lucide-react";
+import { Loader2, Lock, Save, RotateCcw, Upload, Trash2 } from "lucide-react";
 
 const DEFAULT_PREVIEW_PRIMARY = "#5B7BFF"; // Matches the built-in indigo theme
 const DEFAULT_PREVIEW_ACCENT = "#F59E0B";  // Matches the original amber accent
@@ -23,6 +24,29 @@ export function OrgBrandingPanel() {
   // Local form state so the live preview updates instantly without writing
   // to the DB on every keystroke.
   const [draft, setDraft] = useState<OrgBranding>(branding);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoFile = async (file: File | undefined) => {
+    if (!file || !currentOrg) return;
+    if (file.size > ORG_LOGO_MAX_BYTES) {
+      toast({ title: "Imagem muito grande", description: "O logo deve ter no máximo 2 MB.", variant: "destructive" });
+      return;
+    }
+    if (!ORG_LOGO_ACCEPT.split(",").includes(file.type)) {
+      toast({ title: "Formato não suportado", description: "Use PNG, SVG, JPG ou WebP.", variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    const url = await uploadOrgLogo(currentOrg.id, file);
+    setUploading(false);
+    if (!url) {
+      toast({ title: "Falha no upload", description: "Não foi possível enviar a imagem.", variant: "destructive" });
+      return;
+    }
+    // The file is now in storage; the URL only persists once "Salvar" runs.
+    setDraft((d) => ({ ...d, logo_url: url }));
+  };
 
   useEffect(() => {
     setDraft(branding);
@@ -163,14 +187,56 @@ export function OrgBrandingPanel() {
             <p className="text-[11px] text-muted-foreground">Opcional. Quando combina com o final do nome, fica em duas linhas estilizadas.</p>
           </div>
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="logo_url">URL do logo</Label>
+            <Label>Logo</Label>
+            <div className="flex items-center gap-3">
+              <Logo
+                src={draft.logo_url}
+                title={draft.app_name}
+                className="w-12 h-12 rounded-lg border border-border/50 bg-muted/40 shrink-0"
+              />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ORG_LOGO_ACCEPT}
+                className="hidden"
+                onChange={(e) => {
+                  void handleLogoFile(e.target.files?.[0]);
+                  // Reset so re-picking the same file fires onChange again.
+                  e.target.value = "";
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="gap-2"
+              >
+                {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                {draft.logo_url ? "Trocar imagem" : "Enviar imagem"}
+              </Button>
+              {draft.logo_url && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDraft((d) => ({ ...d, logo_url: null }))}
+                  disabled={uploading}
+                  className="gap-1.5 text-muted-foreground"
+                  title="Remover logo"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              )}
+            </div>
+            <p className="text-[11px] text-muted-foreground">PNG, SVG, JPG ou WebP até 2 MB. Em branco mantém o logo padrão (truck SVG).</p>
             <Input
-              id="logo_url"
               value={draft.logo_url ?? ""}
               onChange={(e) => setDraft((d) => ({ ...d, logo_url: e.target.value.trim() || null }))}
-              placeholder="https://cdn.exemplo.com/logo.svg"
+              placeholder="ou cole uma URL pública: https://cdn.exemplo.com/logo.svg"
+              className="font-mono text-xs"
             />
-            <p className="text-[11px] text-muted-foreground">Em branco mantém o logo padrão (truck SVG).</p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="primary_color">Cor primária</Label>
