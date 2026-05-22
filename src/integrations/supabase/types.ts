@@ -2779,6 +2779,7 @@ export type Database = {
     }
     Functions: {
       accept_invitation: { Args: { p_token: string }; Returns: string }
+      can_admin_user: { Args: { _target: string }; Returns: boolean }
       claim_pending_messages: {
         Args: { p_channel?: string; p_limit?: number }
         Returns: {
@@ -2894,6 +2895,10 @@ export type Database = {
       }
       super_admin_update_org: {
         Args: { p_org_id: string; p_patch: Json }
+        Returns: undefined
+      }
+      update_org_branding: {
+        Args: { p_branding: Json; p_org_id: string }
         Returns: undefined
       }
     }
