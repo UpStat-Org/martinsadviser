@@ -540,6 +540,54 @@ export type Database = {
           },
         ]
       }
+      compliance_risk_scores: {
+        Row: {
+          band: string
+          client_id: string
+          computed_at: string
+          factors: Json
+          id: string
+          org_id: string
+          score: number
+          scored_date: string
+        }
+        Insert: {
+          band: string
+          client_id: string
+          computed_at?: string
+          factors?: Json
+          id?: string
+          org_id?: string
+          score: number
+          scored_date?: string
+        }
+        Update: {
+          band?: string
+          client_id?: string
+          computed_at?: string
+          factors?: Json
+          id?: string
+          org_id?: string
+          score?: number
+          scored_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_risk_scores_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_risk_scores_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       csa_snapshots: {
         Row: {
           client_id: string
@@ -882,6 +930,94 @@ export type Database = {
           },
           {
             foreignKeyName: "drug_test_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eld_connections: {
+        Row: {
+          api_key: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          last_error: string | null
+          last_sync_at: string | null
+          org_id: string
+          provider: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          api_key?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_error?: string | null
+          last_sync_at?: string | null
+          org_id?: string
+          provider: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          api_key?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_error?: string | null
+          last_sync_at?: string | null
+          org_id?: string
+          provider?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eld_connections_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eld_sync_log: {
+        Row: {
+          finished_at: string | null
+          hos_imported: number
+          id: string
+          message: string | null
+          org_id: string
+          provider: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          finished_at?: string | null
+          hos_imported?: number
+          id?: string
+          message?: string | null
+          org_id: string
+          provider: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          finished_at?: string | null
+          hos_imported?: number
+          id?: string
+          message?: string | null
+          org_id?: string
+          provider?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eld_sync_log_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -2612,7 +2748,34 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      latest_risk_scores: {
+        Row: {
+          band: string | null
+          client_id: string | null
+          computed_at: string | null
+          factors: Json | null
+          id: string | null
+          org_id: string | null
+          score: number | null
+          scored_date: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_risk_scores_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_risk_scores_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_invitation: { Args: { p_token: string }; Returns: string }
