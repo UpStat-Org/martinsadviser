@@ -304,7 +304,7 @@ export default function MyDeskPage() {
                 {greeting}{userName ? `, ${userName}` : ""} 👋
               </h1>
               <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">
-                {t("mydesk.subtitle")} — {totalAttention} {totalAttention === 1 ? "item precisa" : "itens precisam"} da sua atenção
+                {t("mydesk.subtitle")} — {totalAttention} {totalAttention === 1 ? t("myDesk.attention.one") : t("myDesk.attention.other")}
               </p>
             </div>
           </div>
@@ -487,7 +487,7 @@ export default function MyDeskPage() {
                 onClick={() => navigate("/permits")}
                 className="text-xs font-semibold text-primary hover:text-primary/80 inline-flex items-center gap-1"
               >
-                Ver todos <ArrowUpRight className="w-3 h-3" />
+                {t("common.viewAll")} <ArrowUpRight className="w-3 h-3" />
               </button>
             </div>
           </CardHeader>

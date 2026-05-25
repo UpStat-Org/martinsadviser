@@ -600,7 +600,7 @@ export default function Dashboard() {
                   onClick={() => navigate("/clients")}
                   className="text-xs font-medium text-primary hover:underline inline-flex items-center gap-1"
                 >
-                  {t("common.viewAll") !== "common.viewAll" ? t("common.viewAll") : "Ver todos"}
+                  {t("common.viewAll")}
                   <ArrowUpRight className="w-3 h-3" />
                 </button>
               }

@@ -2160,6 +2160,9 @@ const translations: Record<Language, Record<string, string>> = {
     "login.newOrgPrompt": "Quer criar uma nova organização?",
     "login.newOrgCta": "Comece aqui",
     "startOrg.welcomeNewOp": "Bem-vindo à sua nova operação.",
+    "myDesk.attention.one": "item precisa da sua atenção",
+    "myDesk.attention.other": "itens precisam da sua atenção",
+    "common.viewAll": "Ver todos",
 
     // Landing page — refresh com screenshots reais
     "lp2.hero.eyebrow": "CRM para Permit Services",
@@ -4343,6 +4346,9 @@ const translations: Record<Language, Record<string, string>> = {
     "login.newOrgPrompt": "Want to create a new organization?",
     "login.newOrgCta": "Start here",
     "startOrg.welcomeNewOp": "Welcome to your new operation.",
+    "myDesk.attention.one": "item needs your attention",
+    "myDesk.attention.other": "items need your attention",
+    "common.viewAll": "View all",
 
     // Landing page — refresh with real screenshots
     "lp2.hero.eyebrow": "CRM for Permit Services",
@@ -6525,6 +6531,9 @@ const translations: Record<Language, Record<string, string>> = {
     "login.newOrgPrompt": "¿Quieres crear una nueva organización?",
     "login.newOrgCta": "Empieza aquí",
     "startOrg.welcomeNewOp": "Bienvenido a tu nueva operación.",
+    "myDesk.attention.one": "ítem requiere tu atención",
+    "myDesk.attention.other": "ítems requieren tu atención",
+    "common.viewAll": "Ver todos",
 
     // Landing page — refresh con screenshots reales
     "lp2.hero.eyebrow": "CRM para Permit Services",
