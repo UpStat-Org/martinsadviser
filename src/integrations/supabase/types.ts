@@ -1892,6 +1892,50 @@ export type Database = {
           },
         ]
       }
+      organization_domains: {
+        Row: {
+          created_at: string
+          domain: string
+          id: string
+          last_checked_at: string | null
+          organization_id: string
+          status: string
+          updated_at: string
+          verification_token: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: string
+          last_checked_at?: string | null
+          organization_id: string
+          status?: string
+          updated_at?: string
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: string
+          last_checked_at?: string | null
+          organization_id?: string
+          status?: string
+          updated_at?: string
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_domains_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_invitations: {
         Row: {
           accepted_at: string | null
@@ -2811,15 +2855,6 @@ export type Database = {
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       expire_trials: { Args: never; Returns: number }
       get_approval_status: { Args: { _user_id: string }; Returns: string }
-      get_org_by_slug: {
-        Args: { p_slug: string }
-        Returns: {
-          branding: Json
-          id: string
-          name: string
-          slug: string
-        }[]
-      }
       get_org_by_hostname: {
         Args: { p_hostname: string }
         Returns: {
@@ -2829,18 +2864,13 @@ export type Database = {
           slug: string
         }[]
       }
-      request_org_domain: {
-        Args: { p_org_id: string; p_domain: string }
+      get_org_by_slug: {
+        Args: { p_slug: string }
         Returns: {
-          created_at: string
-          domain: string
+          branding: Json
           id: string
-          last_checked_at: string | null
-          organization_id: string
-          status: string
-          updated_at: string
-          verification_token: string
-          verified_at: string | null
+          name: string
+          slug: string
         }[]
       }
       get_portal_client_id: { Args: { _user_id: string }; Returns: string }
@@ -2881,12 +2911,27 @@ export type Database = {
           user_id: string
         }[]
       }
+      normalize_hostname: { Args: { p_hostname: string }; Returns: string }
       peek_invitation: { Args: { p_token: string }; Returns: Json }
       public_create_org_with_owner: {
         Args: { p_country?: string; p_name: string; p_slug: string }
         Returns: string
       }
       recover_stuck_sending: { Args: never; Returns: number }
+      request_org_domain: {
+        Args: { p_domain: string; p_org_id: string }
+        Returns: {
+          created_at: string
+          domain: string
+          id: string
+          last_checked_at: string
+          organization_id: string
+          status: string
+          updated_at: string
+          verification_token: string
+          verified_at: string
+        }[]
+      }
       revoke_invitation: {
         Args: { p_invitation_id: string }
         Returns: undefined
