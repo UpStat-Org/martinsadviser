@@ -166,9 +166,9 @@ export default function Login() {
 
           <ul className="space-y-2.5 text-sm text-foreground/80 max-w-md">
             {[
-              { icon: Shield, label: "Compliance" },
-              { icon: BarChart3, label: "Relatórios IA" },
-              { icon: Users, label: "Portal do Cliente" },
+              { icon: Shield, label: t("login.feature.compliance") },
+              { icon: BarChart3, label: t("login.feature.aiReports") },
+              { icon: Users, label: t("login.feature.portal") },
               { icon: Clock, label: t("login.feature.automations") },
             ].map(({ icon: Icon, label }) => (
               <li key={label} className="flex items-center gap-2.5">
@@ -287,9 +287,9 @@ export default function Login() {
                 </Link>
               </p>
               <p className="text-xs text-muted-foreground">
-                Quer criar uma nova organização?{" "}
+                {t("login.newOrgPrompt")}{" "}
                 <Link to="/start" className="text-primary hover:underline font-medium">
-                  Comece aqui
+                  {t("login.newOrgCta")}
                 </Link>
               </p>
             </div>

@@ -2153,6 +2153,14 @@ const translations: Record<Language, Record<string, string>> = {
     "orgBranding.previewBadge": "Badge accent",
     "common.clear": "Limpar",
 
+    // login/start strings ainda em PT
+    "login.feature.compliance": "Compliance",
+    "login.feature.aiReports": "Relatórios IA",
+    "login.feature.portal": "Portal do Cliente",
+    "login.newOrgPrompt": "Quer criar uma nova organização?",
+    "login.newOrgCta": "Comece aqui",
+    "startOrg.welcomeNewOp": "Bem-vindo à sua nova operação.",
+
     // Landing page — refresh com screenshots reais
     "lp2.hero.eyebrow": "CRM para Permit Services",
     "lp2.hero.title1": "Permits, frota e clientes",
@@ -4329,6 +4337,13 @@ const translations: Record<Language, Record<string, string>> = {
     "orgBranding.previewBadge": "Accent badge",
     "common.clear": "Clear",
 
+    "login.feature.compliance": "Compliance",
+    "login.feature.aiReports": "AI reports",
+    "login.feature.portal": "Client portal",
+    "login.newOrgPrompt": "Want to create a new organization?",
+    "login.newOrgCta": "Start here",
+    "startOrg.welcomeNewOp": "Welcome to your new operation.",
+
     // Landing page — refresh with real screenshots
     "lp2.hero.eyebrow": "CRM for Permit Services",
     "lp2.hero.title1": "Permits, fleet and clients",
@@ -6503,6 +6518,13 @@ const translations: Record<Language, Record<string, string>> = {
     "orgBranding.previewButton": "Botón primario",
     "orgBranding.previewBadge": "Badge accent",
     "common.clear": "Limpiar",
+
+    "login.feature.compliance": "Compliance",
+    "login.feature.aiReports": "Reportes IA",
+    "login.feature.portal": "Portal del cliente",
+    "login.newOrgPrompt": "¿Quieres crear una nueva organización?",
+    "login.newOrgCta": "Empieza aquí",
+    "startOrg.welcomeNewOp": "Bienvenido a tu nueva operación.",
 
     // Landing page — refresh con screenshots reales
     "lp2.hero.eyebrow": "CRM para Permit Services",

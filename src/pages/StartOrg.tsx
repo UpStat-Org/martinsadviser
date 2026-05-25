@@ -143,7 +143,7 @@ export default function StartOrg() {
           </div>
           <div className="space-y-5">
             <h2 className="text-5xl font-bold text-foreground leading-tight">
-              Bem-vindo à sua nova<br />operação.
+              {t("startOrg.welcomeNewOp")}
             </h2>
             <p className="text-muted-foreground text-lg max-w-md leading-relaxed">
               {t("startOrg.trialBlurb")}
