@@ -54,7 +54,7 @@ export function ClientTagsEditor({ client }: { client: Client }) {
   }, [tags]);
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardContent className="pt-5 space-y-2">
         <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           <Tag className="w-3.5 h-3.5" />

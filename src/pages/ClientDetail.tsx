@@ -501,7 +501,7 @@ export default function ClientDetail() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full">
         <ClientTagsEditor client={client} />
       </div>
       <ApplyTemplateButton clientId={client.id} />
@@ -511,7 +511,7 @@ export default function ClientDetail() {
         <ComplianceDashboard permits={permits} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <RiskScorePanel clientId={client.id} />
       </div>
 
