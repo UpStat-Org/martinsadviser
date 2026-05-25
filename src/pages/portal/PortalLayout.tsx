@@ -65,7 +65,7 @@ export default function PortalLayout() {
               <Building2 className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="font-display font-semibold text-lg leading-tight">{companyName}</h1>
+              <h1 className="font-semibold text-lg leading-tight">{companyName}</h1>
               <Badge variant="outline" className="text-xs">{t("portal.readOnly")}</Badge>
             </div>
           </div>

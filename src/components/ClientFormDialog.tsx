@@ -32,12 +32,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useFmcsaLookup } from "@/hooks/useFmcsaLookup";
 import { Loader2, Search } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { tNow } from "@/lib/translations";
 
 const formSchema = z.object({
-  company_name: z.string().min(1, "Nome da empresa é obrigatório"),
+  company_name: z.string().min(1, tNow("clientForm.companyRequired")),
   registration_responsible: z.string().optional(),
   phone: z.string().optional(),
-  email: z.string().email("Email inválido").optional().or(z.literal("")),
+  email: z.string().email(tNow("clientForm.emailInvalid")).optional().or(z.literal("")),
   address: z.string().optional(),
   ein: z.string().optional(),
   dot: z.string().optional(),
@@ -231,7 +232,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">
+          <DialogTitle className="text-xl">
             {isEditing ? t("clients.edit") : t("clients.new")}
           </DialogTitle>
         </DialogHeader>
@@ -392,7 +393,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                 name="country"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>País</FormLabel>
+                    <FormLabel>{t("common.country")}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -400,9 +401,9 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="US">🇺🇸 Estados Unidos</SelectItem>
-                        <SelectItem value="BR">🇧🇷 Brasil</SelectItem>
-                        <SelectItem value="ES">🇪🇸 Espanha</SelectItem>
+                        <SelectItem value="US">🇺🇸 {t("country.us")}</SelectItem>
+                        <SelectItem value="BR">🇧🇷 {t("country.br")}</SelectItem>
+                        <SelectItem value="ES">🇪🇸 {t("country.es")}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

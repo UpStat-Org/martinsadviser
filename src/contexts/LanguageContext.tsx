@@ -11,8 +11,10 @@ const LanguageContext = createContext<LanguageContextValue | undefined>(undefine
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
+    // English is the product's primary language now. Existing users who
+    // already picked pt/es keep their selection via localStorage.
     const stored = localStorage.getItem("app-language") as Language | null;
-    return stored && ["pt", "en", "es"].includes(stored) ? stored : "pt";
+    return stored && ["pt", "en", "es"].includes(stored) ? stored : "en";
   });
 
   const setLanguage = useCallback((lang: Language) => {

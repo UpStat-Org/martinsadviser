@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { LanguageProvider, useLanguage } from "../LanguageContext";
 
@@ -19,14 +19,14 @@ describe("LanguageContext", () => {
     localStorage.clear();
   });
 
-  it("defaults to Portuguese", () => {
+  it("defaults to English", () => {
     render(
       <LanguageProvider>
         <TestConsumer />
       </LanguageProvider>
     );
-    expect(screen.getByTestId("lang")).toHaveTextContent("pt");
-    expect(screen.getByTestId("translated")).toHaveTextContent("Clientes");
+    expect(screen.getByTestId("lang")).toHaveTextContent("en");
+    expect(screen.getByTestId("translated")).toHaveTextContent("Clients");
   });
 
   it("switches language to English", () => {
@@ -72,6 +72,13 @@ describe("LanguageContext", () => {
   });
 
   it("throws when used outside provider", () => {
-    expect(() => render(<TestConsumer />)).toThrow("useLanguage must be used within LanguageProvider");
+    // React logs the boundary error to console.error before the throw bubbles
+    // up — silencing keeps the test output clean without changing behavior.
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(() => render(<TestConsumer />)).toThrow("useLanguage must be used within LanguageProvider");
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

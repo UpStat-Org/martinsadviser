@@ -25,7 +25,7 @@ export function LanguageSwitcher() {
   }, [language]);
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 animate-fade-in">
+    <div className="fixed bottom-5 right-5 z-50">
       <div
         ref={containerRef}
         role="radiogroup"
@@ -34,13 +34,13 @@ export function LanguageSwitcher() {
                    bg-background/70 backdrop-blur-xl
                    border border-border/60
                    shadow-[0_10px_30px_-10px_hsl(234_75%_20%/0.35)]
-                   hover:shadow-[0_14px_40px_-10px_hsl(234_75%_25%/0.5)]
+
                    transition-shadow duration-300"
       >
         {/* Sliding active pill */}
         <span
           aria-hidden
-          className="absolute top-1 bottom-1 rounded-full btn-gradient
+          className="absolute top-1 bottom-1 rounded-full bg-primary text-primary-foreground hover:bg-primary/90
                      shadow-[0_6px_18px_-4px_hsl(234_75%_58%/0.6)]
                      transition-[left,width] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           style={{ left: indicator.left, width: indicator.width }}

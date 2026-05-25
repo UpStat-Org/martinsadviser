@@ -139,7 +139,7 @@ export function PermitCoverageMap({ permits, compact = false, defaultCountry }: 
                 {SUPPORTED_COUNTRIES.map((c) => (
                   <SelectItem key={c} value={c} className="text-xs">
                     <span className="mr-1.5">{COUNTRY_MAPS[c].flag}</span>
-                    {COUNTRY_MAPS[c].name}
+                    {t(`country.${c.toLowerCase()}`)}
                   </SelectItem>
                 ))}
               </SelectContent>

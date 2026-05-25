@@ -18,7 +18,7 @@ export default function PendingApproval() {
       <Card className="w-full max-w-md">
         <CardContent className="p-8 text-center space-y-4">
           <Clock className="w-12 h-12 text-warning mx-auto" />
-          <h2 className="font-display text-xl font-bold text-foreground">{t("pending.title")}</h2>
+          <h2 className="text-xl font-bold text-foreground">{t("pending.title")}</h2>
           <p className="text-muted-foreground">{t("pending.desc")}</p>
           <Button variant="outline" onClick={handleLogout}>{t("nav.logout")}</Button>
         </CardContent>

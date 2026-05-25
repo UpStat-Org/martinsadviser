@@ -67,26 +67,23 @@ export default function ComplianceCalendarPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
 
         <div className="relative flex items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-2">
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-2">
               {t("complianceCal.section")}
             </p>
-            <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
               {t("complianceCal.title")}
             </h1>
-            <p className="text-white/70 mt-2 text-sm max-w-xl">
+            <p className="text-muted-foreground mt-2 text-sm max-w-xl">
               {t("complianceCal.subtitle")}
             </p>
           </div>
-          <Button onClick={downloadICS} className="btn-gradient text-white border-0 gap-1.5">
+          <Button onClick={downloadICS} className="bg-primary text-primary-foreground hover:bg-primary/90 text-foreground border-0 gap-1.5">
             <Download className="w-4 h-4" />
             {t("complianceCal.export")}
           </Button>
@@ -140,7 +137,7 @@ export default function ComplianceCalendarPage() {
         {monthsToShow.map((m) => (
           <Card key={m.key} className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="font-display text-base capitalize flex items-center gap-2">
+              <CardTitle className="text-sm font-semibold capitalize flex items-center gap-2">
                 <CalendarIcon className="w-4 h-4 text-muted-foreground" />
                 {m.label}
               </CardTitle>
@@ -159,9 +156,9 @@ export default function ComplianceCalendarPage() {
                         className="flex items-start gap-3 rounded-lg border border-border/50 p-2.5 hover:bg-muted/30 transition-colors"
                       >
                         <div
-                          className={`w-9 h-9 rounded-lg bg-gradient-to-br ${meta.gradient} flex items-center justify-center shadow-sm flex-shrink-0`}
+                          className={`w-9 h-9 rounded-lg bg-secondary text-secondary-foreground border border-border flex items-center justify-center shadow-sm flex-shrink-0`}
                         >
-                          <span className="font-display text-sm font-bold text-white tabular-nums">{day}</span>
+                          <span className="text-sm font-bold text-foreground tabular-nums">{day}</span>
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 flex-wrap">

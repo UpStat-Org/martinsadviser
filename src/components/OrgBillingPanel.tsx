@@ -3,6 +3,8 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrg } from "@/contexts/OrgContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { tNow } from "@/lib/translations";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +30,7 @@ const STATUS_BADGE: Record<string, { label: string; tone: "default" | "secondary
 
 export function OrgBillingPanel() {
   const { currentOrg, isOrgOwner } = useOrg();
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -72,7 +75,7 @@ export function OrgBillingPanel() {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      if (!data?.url) throw new Error("Stripe não retornou uma URL de checkout");
+      if (!data?.url) throw new Error(tNow("orgBilling.stripeNoCheckoutUrl"));
       window.location.href = data.url;
     },
     onError: (e: any) => toast({ title: "Falha ao iniciar checkout", description: e.message, variant: "destructive" }),
@@ -86,7 +89,7 @@ export function OrgBillingPanel() {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      if (!data?.url) throw new Error("Stripe não retornou uma URL do portal");
+      if (!data?.url) throw new Error(tNow("orgBilling.stripeNoPortalUrl"));
       window.location.href = data.url;
     },
     onError: (e: any) => toast({ title: "Falha ao abrir portal", description: e.message, variant: "destructive" }),
@@ -99,7 +102,7 @@ export function OrgBillingPanel() {
       <Card className="border-border/50">
         <CardContent className="p-6 flex items-center gap-3 text-muted-foreground">
           <Lock className="w-4 h-4" />
-          <span className="text-sm">Apenas o owner da organização vê a faturação.</span>
+          <span className="text-sm">{t("orgBilling.ownerOnly")}</span>
         </CardContent>
       </Card>
     );
@@ -114,18 +117,17 @@ export function OrgBillingPanel() {
   // panel that explains the status and hides the action buttons.
   if (info?.is_master_org) {
     return (
-      <Card className="border-border/50 bg-gradient-to-br from-primary/5 via-transparent to-transparent">
-        <CardContent className="p-6 flex items-start gap-4">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+      <Card className="border-border/50 bg-secondary text-secondary-foreground border border-border">        <CardContent className="p-6 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-semibold">Conta principal</h3>
-              <Badge variant="default">Sem cobrança</Badge>
+              <h3 className="text-base font-semibold">{t("orgBilling.mainAccount")}</h3>
+              <Badge variant="default">{t("orgBilling.noBilling")}</Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              Esta organização opera a plataforma e tem acesso permanente. Nenhuma assinatura Stripe é necessária.
+              {t("orgBilling.masterDesc")}
             </p>
           </div>
         </CardContent>

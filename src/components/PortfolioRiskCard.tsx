@@ -22,7 +22,7 @@ export function PortfolioRiskCard({ limit = 6 }: { limit?: number }) {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="font-display text-lg flex items-center gap-2">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldAlert className="w-5 h-5 text-destructive" />
             {t("risk.portfolioTitle")}
           </CardTitle>

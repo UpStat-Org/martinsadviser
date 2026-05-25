@@ -150,22 +150,19 @@ export default function AuditPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
 
         <div className="relative flex items-start gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-            <ScrollText className="w-6 h-6 text-white" />
+          <div className="w-14 h-14 rounded-md bg-card border border-border flex items-center justify-center flex-shrink-0">
+            <ScrollText className="w-6 h-6 text-secondary-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
               {t("audit.title")}
             </h1>
-            <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">
               {t("audit.subtitle")}
             </p>
           </div>
@@ -176,60 +173,50 @@ export default function AuditPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
-            label: "Total de eventos",
+            label: t("audit.title") !== "audit.title" ? t("audit.title") : "Events",
             value: stats.total,
             icon: Activity,
-            gradient: "from-indigo-500 to-violet-500",
+            action: "all" as const,
           },
           {
-            label: "Criações",
+            label: t("audit.creations"),
             value: stats.created,
             icon: Plus,
-            gradient: "from-emerald-500 to-teal-500",
+            action: "created" as const,
           },
           {
-            label: "Atualizações",
+            label: t("audit.updates"),
             value: stats.updated,
             icon: Pencil,
-            gradient: "from-amber-500 to-orange-500",
+            action: "updated" as const,
           },
           {
-            label: "Exclusões",
+            label: t("audit.deletions"),
             value: stats.deleted,
             icon: Trash2,
-            gradient: "from-red-500 to-rose-500",
+            action: "deleted" as const,
           },
         ].map((s) => (
           <button
-            key={s.label}
-            onClick={() =>
-              setActionFilter(
-                s.label === "Criações"
-                  ? "created"
-                  : s.label === "Atualizações"
-                  ? "updated"
-                  : s.label === "Exclusões"
-                  ? "deleted"
-                  : "all"
-              )
-            }
-            className="group relative text-left overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            key={s.action}
+            onClick={() => setActionFilter(s.action)}
+            className="group relative text-left overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
           >
             <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
+              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
             />
             <div className="relative flex items-start justify-between mb-3">
               <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-md`}
+                className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
               >
-                <s.icon className="w-4 h-4 text-white" />
+                <s.icon className="w-4 h-4 text-foreground" />
               </div>
             </div>
             <div className="relative">
               <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
                 {s.label}
               </div>
-              <div className="font-display text-3xl font-bold tracking-tight">
+              <div className="text-xl font-semibold tracking-tight tracking-tight">
                 {s.value}
               </div>
             </div>
@@ -239,19 +226,19 @@ export default function AuditPage() {
 
       {/* ============ FILTERS ============ */}
       <Card className="border-border/50 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md">
-                <Filter className="w-4 h-4 text-white" />
+              <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                <Filter className="w-4 h-4 text-secondary-foreground" />
               </div>
               <div>
-                <h2 className="font-display font-bold text-base">{t("common.filters")}</h2>
+                <h2 className="font-bold text-base">{t("common.filters")}</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {activeFilters > 0
                     ? `${activeFilters} filtro(s) aplicado(s)`
-                    : "Refine os registros de auditoria"}
+                    : t("audit.refineHint")}
                 </p>
               </div>
             </div>
@@ -265,7 +252,7 @@ export default function AuditPage() {
                   className="text-xs font-semibold text-destructive hover:text-destructive/80 inline-flex items-center gap-1"
                 >
                   <X className="w-3 h-3" />
-                  Limpar
+                  {t("common.clear")}
                 </button>
               )}
             </div>
@@ -274,10 +261,10 @@ export default function AuditPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="space-y-1.5">
               <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Entidade
+                {t("audit.colEntity")}
               </Label>
               <Select value={entityFilter} onValueChange={setEntityFilter}>
-                <SelectTrigger className="h-10 rounded-xl bg-muted/40 border-border/60">
+                <SelectTrigger className="h-10 rounded-md bg-muted/40 border-border/60">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -292,10 +279,10 @@ export default function AuditPage() {
             </div>
             <div className="space-y-1.5">
               <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Ação
+                {t("audit.colAction")}
               </Label>
               <Select value={actionFilter} onValueChange={setActionFilter}>
-                <SelectTrigger className="h-10 rounded-xl bg-muted/40 border-border/60">
+                <SelectTrigger className="h-10 rounded-md bg-muted/40 border-border/60">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -320,7 +307,7 @@ export default function AuditPage() {
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="h-10 rounded-xl bg-muted/40 border-border/60"
+                className="h-10 rounded-md bg-muted/40 border-border/60"
               />
             </div>
             <div className="space-y-1.5">
@@ -331,7 +318,7 @@ export default function AuditPage() {
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="h-10 rounded-xl bg-muted/40 border-border/60"
+                className="h-10 rounded-md bg-muted/40 border-border/60"
               />
             </div>
           </div>
@@ -350,16 +337,16 @@ export default function AuditPage() {
       ) : filtered.length === 0 ? (
         <Card className="border-border/50">
           <CardContent className="p-16 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
+            <div className="w-20 h-20 rounded-md bg-secondary text-secondary-foreground border border-border border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
               <ScrollText className="w-9 h-9 text-indigo-500" />
             </div>
-            <p className="font-display text-lg font-semibold mb-1">
+            <p className="text-base font-semibold font-semibold mb-1">
               {t("audit.empty")}
             </p>
             <p className="text-sm text-muted-foreground">
               {activeFilters > 0
-                ? "Tente ajustar os filtros para ver mais resultados."
-                : "Os eventos do sistema aparecerão aqui."}
+                ? t("audit.tryAdjustFilters") !== "audit.tryAdjustFilters" ? t("audit.tryAdjustFilters") : "Try adjusting the filters to see more results."
+                : t("audit.emptyDesc")}
             </p>
           </CardContent>
         </Card>
@@ -369,7 +356,7 @@ export default function AuditPage() {
             <TableHeader>
               <TableRow className="bg-muted/40 hover:bg-muted/40 border-border/50">
                 <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Quando
+                  {t("audit.colWhen")}
                 </TableHead>
                 <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("audit.user")}
@@ -418,9 +405,7 @@ export default function AuditPage() {
                     <TableCell>
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div
-                          className={`w-8 h-8 rounded-lg bg-gradient-to-br ${gradientFor(
-                            log.user_id
-                          )} flex items-center justify-center text-white font-semibold text-[11px] shadow-sm flex-shrink-0`}
+                          className={`w-8 h-8 rounded-lg bg-secondary text-secondary-foreground border border-border flex items-center justify-center text-foreground font-semibold text-[11px] shadow-sm flex-shrink-0`}
                         >
                           {initials(userName)}
                         </div>
@@ -434,9 +419,9 @@ export default function AuditPage() {
                         className={`inline-flex items-center gap-1.5 h-6 px-2 rounded-md text-[11px] font-bold border ${actionCfg.badge}`}
                       >
                         <span
-                          className={`w-3.5 h-3.5 rounded bg-gradient-to-br ${actionCfg.gradient} flex items-center justify-center`}
+                          className={`w-3.5 h-3.5 rounded bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
                         >
-                          <ActionIcon className="w-2 h-2 text-white" />
+                          <ActionIcon className="w-2 h-2 text-secondary-foreground" />
                         </span>
                         {t(`activity.action.${log.action}`) || log.action}
                       </span>

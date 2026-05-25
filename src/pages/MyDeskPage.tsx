@@ -39,9 +39,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const dateLocales = { pt, en: enUS, es };
 
 const PRIORITY_STYLES: Record<string, string> = {
-  high: "bg-gradient-to-r from-red-500 to-rose-500 text-white border-0",
-  medium: "bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0",
-  low: "bg-gradient-to-r from-sky-500 to-blue-500 text-white border-0",
+  high: "bg-secondary text-secondary-foreground border border-border text-foreground border-0",
+  medium: "bg-secondary text-secondary-foreground border border-border text-foreground border-0",
+  low: "bg-secondary text-secondary-foreground border border-border text-foreground border-0",
 };
 
 type ActionKind = "all" | "risk" | "compliance" | "tasks" | "messages" | "finance";
@@ -275,51 +275,35 @@ export default function MyDeskPage() {
 
   const hour = new Date().getHours();
   const greeting =
-    language === "pt"
-      ? hour < 12
-        ? "Bom dia"
-        : hour < 18
-        ? "Boa tarde"
-        : "Boa noite"
-      : language === "es"
-      ? hour < 12
-        ? "Buenos días"
-        : hour < 18
-        ? "Buenas tardes"
-        : "Buenas noches"
-      : hour < 12
-      ? "Good morning"
+    hour < 12
+      ? t("myDesk.greeting.morning")
       : hour < 18
-      ? "Good afternoon"
-      : "Good evening";
+      ? t("myDesk.greeting.afternoon")
+      : t("myDesk.greeting.evening");
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
-        <div className="orb w-64 h-64 bg-accent/20 bottom-0 left-1/3" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
 
         <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-              <Briefcase className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-md bg-card border border-border flex items-center justify-center flex-shrink-0">
+              <Briefcase className="w-6 h-6 text-secondary-foreground" />
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 border border-white/15 backdrop-blur-md mb-3">
-                <Sparkles className="w-3.5 h-3.5 text-white/80" />
-                <span className="text-[11px] font-semibold text-white/80 uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card border border-border mb-3">
+                <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                   {format(new Date(), "EEEE, dd 'de' MMMM", {
                     locale: dateLocales[language],
                   })}
                 </span>
               </div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
                 {greeting}{userName ? `, ${userName}` : ""} 👋
               </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
+              <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">
                 {t("mydesk.subtitle")} — {totalAttention} {totalAttention === 1 ? "item precisa" : "itens precisam"} da sua atenção
               </p>
             </div>
@@ -328,14 +312,14 @@ export default function MyDeskPage() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => navigate("/tasks")}
-              className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
+              className="h-10 px-4 rounded-md bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
             >
               <ClipboardList className="w-4 h-4" />
               Kanban
             </button>
             <button
               onClick={() => navigate("/permits")}
-              className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
+              className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
             >
               <FileCheck className="w-4 h-4" />
               Permits
@@ -351,16 +335,16 @@ export default function MyDeskPage() {
           return (
             <div
               key={c.label}
-              className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
+              className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
             >
               <div
-                className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${c.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
+                className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
               />
               <div className="relative flex items-start justify-between mb-4">
                 <div
-                  className={`w-11 h-11 rounded-xl bg-gradient-to-br ${c.gradient} flex items-center justify-center shadow-md`}
+                  className={`w-11 h-11 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
                 >
-                  <c.icon className="w-5 h-5 text-white" />
+                  <c.icon className="w-5 h-5 text-foreground" />
                 </div>
                 {isZero ? (
                   <CheckCircle2 className="w-5 h-5 text-emerald-500/70" />
@@ -372,7 +356,7 @@ export default function MyDeskPage() {
                 <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
                   {c.label}
                 </div>
-                <div className="font-display text-4xl font-bold tracking-tight">
+                <div className="text-2xl font-semibold tracking-tight tracking-tight">
                   {c.value}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">{c.desc}</div>
@@ -384,15 +368,15 @@ export default function MyDeskPage() {
 
       {/* ============ ACTION CENTER ============ */}
       <Card className="border-border/50 overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-amber-500 to-emerald-500" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
         <CardHeader className="pb-3">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-amber-500 flex items-center justify-center shadow-md">
-                <Flame className="w-4 h-4 text-white" />
+              <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                <Flame className="w-4 h-4 text-secondary-foreground" />
               </div>
               <div>
-                <CardTitle className="font-display text-base">
+                <CardTitle className="text-sm font-semibold">
                   {t("mydesk.actionCenter")}
                 </CardTitle>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -427,14 +411,14 @@ export default function MyDeskPage() {
         <CardContent>
           {!filteredActions.length ? (
             <div className="text-center py-10">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-3">
+              <div className="w-14 h-14 mx-auto rounded-md bg-emerald-500/10 flex items-center justify-center mb-3">
                 <CheckCircle2 className="w-6 h-6 text-emerald-500" />
               </div>
               <p className="text-sm font-semibold">{t("mydesk.noActions")}</p>
               <p className="text-xs text-muted-foreground mt-1">{t("mydesk.noActionsDesc")}</p>
             </div>
           ) : (
-            <div className="divide-y divide-border/60 rounded-xl border border-border/50 overflow-hidden">
+            <div className="divide-y divide-border/60 rounded-md border border-border/50 overflow-hidden">
               {filteredActions.slice(0, 18).map((item) => {
                 const Icon = item.icon;
                 return (
@@ -443,7 +427,7 @@ export default function MyDeskPage() {
                       onClick={() => navigate(item.route)}
                       className="flex items-center gap-3 min-w-0 flex-1 text-left"
                     >
-                      <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${severityStyles[item.severity]}`}>
+                      <div className={`w-10 h-10 rounded-md border flex items-center justify-center shrink-0 ${severityStyles[item.severity]}`}>
                         <Icon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
@@ -483,19 +467,19 @@ export default function MyDeskPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* My Permits */}
         <Card className="border-border/50 overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-                  <FileCheck className="w-4 h-4 text-white" />
+                <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                  <FileCheck className="w-4 h-4 text-secondary-foreground" />
                 </div>
                 <div>
-                  <CardTitle className="font-display text-base">
+                  <CardTitle className="text-sm font-semibold">
                     {t("mydesk.myPermits")}
                   </CardTitle>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {permits?.length ?? 0} atribuídos a você
+                    {permits?.length ?? 0} {t("myDesk.assignedToYou")}
                   </p>
                 </div>
               </div>
@@ -516,11 +500,11 @@ export default function MyDeskPage() {
               </div>
             ) : !permits?.length ? (
               <div className="text-center py-10">
-                <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-3">
+                <div className="w-14 h-14 mx-auto rounded-md bg-emerald-500/10 flex items-center justify-center mb-3">
                   <Target className="w-6 h-6 text-emerald-500" />
                 </div>
                 <p className="text-sm font-semibold text-foreground mb-1">
-                  Nada por aqui
+                  {t("myDesk.nothingHere")}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {t("mydesk.noPermits")}
@@ -535,14 +519,14 @@ export default function MyDeskPage() {
                     <button
                       key={p.id}
                       onClick={() => navigate(`/clients/${p.client_id}`)}
-                      className="group w-full flex items-center justify-between p-3 rounded-xl hover:bg-muted/60 transition-all text-left"
+                      className="group w-full flex items-center justify-between p-3 rounded-md hover:bg-muted/60 transition-all text-left"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                          className={`w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 ${
                             overdue
-                              ? "bg-gradient-to-br from-red-500/15 to-rose-500/15 border border-red-500/20"
-                              : "bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20"
+                              ? "bg-secondary text-secondary-foreground border border-border border border-red-500/20"
+                              : "bg-secondary text-secondary-foreground border border-border border border-emerald-500/20"
                           }`}
                         >
                           <FileCheck
@@ -579,19 +563,19 @@ export default function MyDeskPage() {
 
         {/* My Tasks */}
         <Card className="border-border/50 overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md">
-                  <ClipboardList className="w-4 h-4 text-white" />
+                <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                  <ClipboardList className="w-4 h-4 text-secondary-foreground" />
                 </div>
                 <div>
-                  <CardTitle className="font-display text-base">
+                  <CardTitle className="text-sm font-semibold">
                     {t("mydesk.myTasks")}
                   </CardTitle>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {tasks?.length ?? 0} tarefas ativas
+                    {tasks?.length ?? 0} {t("myDesk.activeTasks")}
                   </p>
                 </div>
               </div>
@@ -614,11 +598,11 @@ export default function MyDeskPage() {
               </div>
             ) : !tasks?.length ? (
               <div className="text-center py-10">
-                <div className="w-14 h-14 mx-auto rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-3">
+                <div className="w-14 h-14 mx-auto rounded-md bg-indigo-500/10 flex items-center justify-center mb-3">
                   <CheckCircle2 className="w-6 h-6 text-indigo-500" />
                 </div>
                 <p className="text-sm font-semibold text-foreground mb-1">
-                  Tudo feito! ✨
+                  {t("myDesk.allDone")}
                 </p>
                 <p className="text-xs text-muted-foreground">{t("mydesk.noTasks")}</p>
               </div>
@@ -633,14 +617,14 @@ export default function MyDeskPage() {
                   return (
                     <div
                       key={task.id}
-                      className="group w-full flex items-center justify-between p-3 rounded-xl hover:bg-muted/60 transition-all text-left"
+                      className="group w-full flex items-center justify-between p-3 rounded-md hover:bg-muted/60 transition-all text-left"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                          className={`w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 ${
                             overdue
-                              ? "bg-gradient-to-br from-red-500/15 to-rose-500/15 border border-red-500/20"
-                              : "bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-500/20"
+                              ? "bg-secondary text-secondary-foreground border border-border border border-red-500/20"
+                              : "bg-secondary text-secondary-foreground border border-border border border-indigo-500/20"
                           }`}
                         >
                           {overdue ? (

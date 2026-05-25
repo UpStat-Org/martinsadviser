@@ -295,23 +295,20 @@ export default function ReportsPage() {
   }, [filtered]);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
 
         <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-              <FileBarChart className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-md bg-card border border-border flex items-center justify-center flex-shrink-0">
+              <FileBarChart className="w-6 h-6 text-secondary-foreground" />
             </div>
             <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
                 {t("reports.title")}
               </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
+              <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">
                 {t("reports.subtitle")}
               </p>
             </div>
@@ -323,15 +320,15 @@ export default function ReportsPage() {
                 setSelectedClients(new Set());
                 setBatchOpen(true);
               }}
-              className="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:shadow-lg transition-all"
+              className="h-10 px-4 rounded-md bg-secondary text-secondary-foreground border border-border text-sm font-semibold inline-flex items-center gap-1.5 hover:shadow-lg transition-all"
             >
               <ShieldCheck className="w-4 h-4" />
-              Compliance em Lote
+              {t("reports.bulkCompliance")}
             </button>
             <button
               onClick={handleCsv}
               disabled={!filtered.length}
-              className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all disabled:opacity-40"
+              className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all disabled:opacity-40"
             >
               <Download className="w-4 h-4" />
               {t("reports.exportCsv")}
@@ -339,7 +336,7 @@ export default function ReportsPage() {
             <button
               onClick={handlePdf}
               disabled={!filtered.length}
-              className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg disabled:opacity-60"
+              className="h-10 px-4 rounded-md bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg disabled:opacity-60"
             >
               <FileText className="w-4 h-4" />
               {t("reports.exportPdf")}
@@ -378,23 +375,23 @@ export default function ReportsPage() {
         ].map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
           >
             <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
+              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
             />
             <div className="relative flex items-start justify-between mb-3">
               <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-md`}
+                className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
               >
-                <s.icon className="w-4 h-4 text-white" />
+                <s.icon className="w-4 h-4 text-foreground" />
               </div>
             </div>
             <div className="relative">
               <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
                 {s.label}
               </div>
-              <div className="font-display text-3xl font-bold tracking-tight">
+              <div className="text-xl font-semibold tracking-tight tracking-tight">
                 {s.value}
               </div>
             </div>
@@ -404,15 +401,15 @@ export default function ReportsPage() {
 
       {/* ============ FILTERS ============ */}
       <Card className="border-border/50 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md">
-                <Filter className="w-4 h-4 text-white" />
+              <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                <Filter className="w-4 h-4 text-secondary-foreground" />
               </div>
               <div>
-                <h2 className="font-display font-bold text-base">{t("common.filters")}</h2>
+                <h2 className="font-bold text-base">{t("common.filters")}</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {activeFilters > 0
                     ? `${activeFilters} filtro(s) aplicado(s)`
@@ -440,7 +437,7 @@ export default function ReportsPage() {
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="h-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
+                className="h-10 rounded-md bg-muted/40 border-border/60 focus:bg-background"
               />
             </div>
             <div className="space-y-1.5">
@@ -451,7 +448,7 @@ export default function ReportsPage() {
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="h-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
+                className="h-10 rounded-md bg-muted/40 border-border/60 focus:bg-background"
               />
             </div>
             <div className="space-y-1.5">
@@ -459,7 +456,7 @@ export default function ReportsPage() {
                 {t("reports.filterType")}
               </Label>
               <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="h-10 rounded-xl bg-muted/40 border-border/60">
+                <SelectTrigger className="h-10 rounded-md bg-muted/40 border-border/60">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -477,7 +474,7 @@ export default function ReportsPage() {
                 {t("reports.filterState")}
               </Label>
               <Select value={filterState} onValueChange={setFilterState}>
-                <SelectTrigger className="h-10 rounded-xl bg-muted/40 border-border/60">
+                <SelectTrigger className="h-10 rounded-md bg-muted/40 border-border/60">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -495,7 +492,7 @@ export default function ReportsPage() {
                 {t("reports.filterClient")}
               </Label>
               <Select value={filterClient} onValueChange={setFilterClient}>
-                <SelectTrigger className="h-10 rounded-xl bg-muted/40 border-border/60">
+                <SelectTrigger className="h-10 rounded-md bg-muted/40 border-border/60">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -529,10 +526,10 @@ export default function ReportsPage() {
       ) : !filtered.length ? (
         <Card className="border-border/50">
           <CardContent className="p-16 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
+            <div className="w-20 h-20 rounded-md bg-secondary text-secondary-foreground border border-border border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
               <FileBarChart className="w-9 h-9 text-indigo-500" />
             </div>
-            <p className="font-display text-lg font-semibold mb-1">
+            <p className="text-base font-semibold font-semibold mb-1">
               {t("reports.noResults")}
             </p>
             <p className="text-sm text-muted-foreground">
@@ -615,11 +612,11 @@ export default function ReportsPage() {
 
       {/* ============ BATCH COMPLIANCE DIALOG ============ */}
       <Dialog open={batchOpen} onOpenChange={setBatchOpen}>
-        <DialogContent className="max-w-lg max-h-[85vh] overflow-hidden p-0 rounded-2xl flex flex-col">
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-hidden p-0 rounded-md flex flex-col">
           <DialogHeader className="p-6 pb-4 border-b border-border/50">
-            <DialogTitle className="flex items-center gap-2.5 font-display text-lg">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-                <ShieldCheck className="w-5 h-5 text-white" />
+            <DialogTitle className="flex items-center gap-2.5 text-base font-semibold">
+              <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                <ShieldCheck className="w-5 h-5 text-secondary-foreground" />
               </div>
               Compliance em Lote
             </DialogTitle>
@@ -636,12 +633,12 @@ export default function ReportsPage() {
                 placeholder={t("reports.searchClient")}
                 value={clientSearch}
                 onChange={(e) => setClientSearch(e.target.value)}
-                className="pl-10 h-10 rounded-xl bg-muted/40 border-border/60"
+                className="pl-10 h-10 rounded-md bg-muted/40 border-border/60"
               />
             </div>
 
             {/* Select all bar */}
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-muted/40 border border-border/50">
+            <div className="flex items-center gap-2 p-2.5 rounded-md bg-muted/40 border border-border/50">
               <Checkbox
                 checked={
                   clients?.length ? selectedClients.size === clients.length : false
@@ -674,7 +671,7 @@ export default function ReportsPage() {
                   return (
                     <label
                       key={c.id}
-                      className={`flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all ${
+                      className={`flex items-center gap-3 p-2.5 rounded-md cursor-pointer transition-all ${
                         active ? "bg-primary/[0.06] border border-primary/20" : "hover:bg-muted/50 border border-transparent"
                       }`}
                     >
@@ -703,9 +700,9 @@ export default function ReportsPage() {
             <button
               onClick={handleBatchCompliance}
               disabled={selectedClients.size === 0 || batchGenerating}
-              className="group w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-[0_10px_30px_-8px_hsl(158_55%_42%/0.55)] text-white font-semibold rounded-xl inline-flex items-center justify-center gap-2 transition-all disabled:opacity-60 relative overflow-hidden"
+              className="group w-full h-11 bg-secondary text-secondary-foreground border border-border font-semibold rounded-md inline-flex items-center justify-center gap-2 transition-all disabled:opacity-60 relative overflow-hidden"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <span className="absolute inset-0 bg-secondary text-secondary-foreground border border-border -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               {batchGenerating ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />

@@ -49,13 +49,14 @@ import { useCreatePermit, PERMIT_TYPES } from "@/hooks/usePermits";
 import { useToast } from "@/hooks/use-toast";
 import { useFmcsaLookup } from "@/hooks/useFmcsaLookup";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { tNow } from "@/lib/translations";
 
 // --- Schemas ---
 const clientSchema = z.object({
-  company_name: z.string().min(1, "Nome da empresa é obrigatório"),
+  company_name: z.string().min(1, tNow("clientForm.companyRequired")),
   registration_responsible: z.string().optional(),
   phone: z.string().optional(),
-  email: z.string().email("Email inválido").optional().or(z.literal("")),
+  email: z.string().email(tNow("clientForm.emailInvalid")).optional().or(z.literal("")),
   address: z.string().optional(),
   ein: z.string().optional(),
   dot: z.string().optional(),
@@ -359,30 +360,27 @@ export default function ClientOnboarding() {
   // ============ TEMPLATE SELECTION ============
   if (!templateSelected) {
     return (
-      <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
-        <div className="relative overflow-hidden rounded-3xl aurora-bg p-8 sm:p-10">
-          <div className="absolute inset-0 grid-pattern opacity-40" />
-          <div className="absolute inset-0 noise-overlay" />
-          <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="max-w-5xl mx-auto space-y-6">
+        <div className="relative overflow-hidden rounded-md bg-card border border-border p-8 sm:p-10">
 
           <div className="relative text-center">
             <button
               onClick={() => navigate("/clients")}
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/10 border border-white/15 backdrop-blur-md text-white text-xs font-semibold hover:bg-white/15 transition-all mb-6"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-card border border-border text-foreground text-xs font-semibold hover:bg-white/15 transition-all mb-6"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               {t("common.back")}
             </button>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md mb-5">
-              <Sparkles className="w-3.5 h-3.5 text-white/80" />
-              <span className="text-xs font-semibold text-white/80 uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border mb-5">
+              <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {t("onboarding.stepsCount")}
               </span>
             </div>
-            <h1 className="font-display text-4xl sm:text-5xl font-bold gradient-text leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-bold text-foreground leading-tight">
               {t("clients.new")}
             </h1>
-            <p className="text-white/70 mt-3 text-base sm:text-lg max-w-xl mx-auto">
+            <p className="text-muted-foreground mt-3 text-base sm:text-lg max-w-xl mx-auto">
               {t("onboarding.templateIntro")}
             </p>
           </div>
@@ -393,27 +391,27 @@ export default function ClientOnboarding() {
             <button
               key={tmpl.name}
               onClick={() => applyTemplate(tmpl.services)}
-              className="group relative text-left overflow-hidden rounded-3xl bg-card border border-border/50 p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+              className="group relative text-left overflow-hidden rounded-md bg-card border border-border/50 p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
             >
               <div
-                className={`absolute -top-12 -right-12 w-40 h-40 rounded-full bg-gradient-to-br ${tmpl.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
+                className={`absolute -top-12 -right-12 w-40 h-40 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
               />
               <div className="relative flex items-start justify-between mb-5">
                 <div
-                  className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${tmpl.gradient} flex items-center justify-center shadow-lg`}
+                  className={`w-14 h-14 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
                 >
-                  <tmpl.icon className="w-6 h-6 text-white" />
+                  <tmpl.icon className="w-6 h-6 text-foreground" />
                 </div>
                 <ArrowRight className="w-5 h-5 text-muted-foreground/50 group-hover:text-foreground group-hover:translate-x-1 transition-all" />
               </div>
               <div className="relative">
-                <h3 className="font-display font-bold text-xl mb-1">{tmpl.name}</h3>
+                <h3 className="font-bold text-xl mb-1">{tmpl.name}</h3>
                 <p className="text-sm text-muted-foreground mb-4">{tmpl.desc}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {tmpl.tags.map((tag) => (
                     <span
                       key={tag}
-                      className={`inline-flex items-center h-6 px-2.5 rounded-md text-[11px] font-bold bg-gradient-to-r ${tmpl.gradient} text-white shadow-sm`}
+                      className={`inline-flex items-center h-6 px-2.5 rounded-md text-[11px] font-bold bg-secondary text-secondary-foreground border border-border text-foreground shadow-sm`}
                     >
                       {tag}
                     </span>
@@ -432,17 +430,14 @@ export default function ClientOnboarding() {
   const StepIcon = currentStep.icon;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Hero + Stepper */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
 
         <div className="relative">
           <button
             onClick={() => navigate("/clients")}
-            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/10 border border-white/15 backdrop-blur-md text-white text-xs font-semibold hover:bg-white/15 transition-all mb-5"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-card border border-border text-foreground text-xs font-semibold hover:bg-white/15 transition-all mb-5"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             {t("common.back")}
@@ -450,10 +445,10 @@ export default function ClientOnboarding() {
 
           <div className="flex items-end justify-between gap-4 mb-8">
             <div>
-              <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-1">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-1">
                 {t("onboarding.step")} {step + 1} {t("common.of")} {steps.length}
               </p>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
                 {t(currentStep.labelKey)}
               </h1>
             </div>
@@ -463,7 +458,7 @@ export default function ClientOnboarding() {
           <div className="relative">
             <div className="absolute top-5 left-5 right-5 h-0.5 bg-white/10" />
             <div
-              className="absolute top-5 left-5 h-0.5 bg-gradient-to-r from-white/80 to-white/40 transition-all duration-500"
+              className="absolute top-5 left-5 h-0.5 bg-secondary text-secondary-foreground border border-border transition-all duration-500"
               style={{ width: `calc((100% - 40px) * ${step / (steps.length - 1)})` }}
             />
             <div className="relative flex justify-between">
@@ -479,12 +474,12 @@ export default function ClientOnboarding() {
                     className="flex flex-col items-center gap-2 group"
                   >
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                      className={`w-10 h-10 rounded-md flex items-center justify-center transition-all ${
                         isActive
-                          ? `bg-gradient-to-br ${s.gradient} shadow-xl ring-4 ring-white/20 scale-110`
+                          ? `bg-secondary text-secondary-foreground border border-border shadow-xl ring-4 ring-white/20 scale-110`
                           : isDone
                           ? "bg-white/90 text-[#0b0d2e]"
-                          : "bg-white/10 border border-white/20 text-white/50"
+                          : "bg-white/10 border border-border text-muted-foreground"
                       }`}
                     >
                       {isDone ? (
@@ -492,7 +487,7 @@ export default function ClientOnboarding() {
                       ) : (
                         <Icon
                           className={`w-4 h-4 ${
-                            isActive ? "text-white" : ""
+                            isActive ? "text-foreground" : ""
                           }`}
                         />
                       )}
@@ -500,10 +495,10 @@ export default function ClientOnboarding() {
                     <span
                       className={`hidden sm:block text-[11px] font-semibold tracking-wider ${
                         isActive
-                          ? "text-white"
+                          ? "text-foreground"
                           : isDone
-                          ? "text-white/80"
-                          : "text-white/40"
+                          ? "text-muted-foreground"
+                          : "text-muted-foreground"
                       }`}
                     >
                       {t(s.labelKey)}
@@ -517,19 +512,19 @@ export default function ClientOnboarding() {
       </div>
 
       {/* Step Card */}
-      <div className="glass-card-premium rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+      <div className="glass-card-premium rounded-md p-6 sm:p-8 relative overflow-hidden">
         <div
-          className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${currentStep.gradient}`}
+          className={`absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border`}
         />
 
         <div className="flex items-center gap-3 mb-6">
           <div
-            className={`w-11 h-11 rounded-xl bg-gradient-to-br ${currentStep.gradient} flex items-center justify-center shadow-md`}
+            className={`w-11 h-11 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
           >
-            <StepIcon className="w-5 h-5 text-white" />
+            <StepIcon className="w-5 h-5 text-secondary-foreground" />
           </div>
           <div>
-            <h2 className="font-display text-xl font-bold">{t(currentStep.labelKey)}</h2>
+            <h2 className="text-xl font-bold">{t(currentStep.labelKey)}</h2>
             <p className="text-xs text-muted-foreground">
               {step === 0 && t("onboarding.basicInfo")}
               {step === 1 && t("onboarding.selectActiveServices")}
@@ -553,11 +548,11 @@ export default function ClientOnboarding() {
                       {t("onboarding.companyName")} *
                     </FormLabel>
                     <FormControl>
-                      <div className="relative input-glow rounded-xl">
+                      <div className="relative input-glow rounded-md">
                         <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                           placeholder={t("common.companyExamplePlaceholder")}
-                          className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
+                          className="h-12 pl-10 rounded-md bg-muted/40 border-border/60 focus:bg-background"
                           {...field}
                         />
                       </div>
@@ -575,11 +570,11 @@ export default function ClientOnboarding() {
                       {t("onboarding.registrationResponsible")}
                     </FormLabel>
                     <FormControl>
-                      <div className="relative input-glow rounded-xl">
+                      <div className="relative input-glow rounded-md">
                         <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                           placeholder={t("onboarding.registrationResponsiblePlaceholder")}
-                          className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
+                          className="h-12 pl-10 rounded-md bg-muted/40 border-border/60 focus:bg-background"
                           {...field}
                         />
                       </div>
@@ -598,11 +593,11 @@ export default function ClientOnboarding() {
                         {t("clients.phone")}
                       </FormLabel>
                       <FormControl>
-                        <div className="relative input-glow rounded-xl">
+                        <div className="relative input-glow rounded-md">
                           <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                           <Input
                             placeholder="(555) 123-4567"
-                            className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
+                            className="h-12 pl-10 rounded-md bg-muted/40 border-border/60 focus:bg-background"
                             {...field}
                           />
                         </div>
@@ -619,12 +614,12 @@ export default function ClientOnboarding() {
                         {t("login.email")}
                       </FormLabel>
                       <FormControl>
-                        <div className="relative input-glow rounded-xl">
+                        <div className="relative input-glow rounded-md">
                           <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                           <Input
                             type="email"
                             placeholder={t("common.emailPlaceholder")}
-                            className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
+                            className="h-12 pl-10 rounded-md bg-muted/40 border-border/60 focus:bg-background"
                             {...field}
                           />
                         </div>
@@ -644,11 +639,11 @@ export default function ClientOnboarding() {
                       {t("common.address")}
                     </FormLabel>
                     <FormControl>
-                      <div className="relative input-glow rounded-xl">
+                      <div className="relative input-glow rounded-md">
                         <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                           placeholder={t("common.addressPlaceholder")}
-                          className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background"
+                          className="h-12 pl-10 rounded-md bg-muted/40 border-border/60 focus:bg-background"
                           {...field}
                         />
                       </div>
@@ -658,10 +653,10 @@ export default function ClientOnboarding() {
               />
 
               {/* DOT lookup highlight card */}
-              <div className="rounded-2xl bg-gradient-to-br from-indigo-500/5 via-primary/5 to-violet-500/5 border border-primary/15 p-4 sm:p-5">
+              <div className="rounded-md bg-secondary text-secondary-foreground border border-border border border-primary/15 p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-lg btn-gradient flex items-center justify-center">
-                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                  <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
+                    <Sparkles className="w-3.5 h-3.5 text-secondary-foreground" />
                   </div>
                   <div>
                     <p className="text-sm font-bold">{t("onboarding.fmcsaLookup")}</p>
@@ -681,11 +676,11 @@ export default function ClientOnboarding() {
                         </FormLabel>
                         <div className="flex gap-2">
                           <FormControl>
-                            <div className="relative input-glow rounded-xl flex-1">
+                            <div className="relative input-glow rounded-md flex-1">
                               <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                               <Input
                                 placeholder={t("clients.dotPlaceholder")}
-                                className="h-11 pl-9 rounded-xl bg-background border-border/60"
+                                className="h-11 pl-9 rounded-md bg-background border-border/60"
                                 {...field}
                               />
                             </div>
@@ -694,7 +689,7 @@ export default function ClientOnboarding() {
                             type="button"
                             onClick={handleDotLookup}
                             disabled={lookingUp}
-                            className="h-11 px-3 btn-gradient text-white border-0 rounded-xl"
+                            className="h-11 px-3 bg-primary text-primary-foreground hover:bg-primary/90 text-foreground border-0 rounded-md"
                           >
                             {lookingUp ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
@@ -715,11 +710,11 @@ export default function ClientOnboarding() {
                           MC #
                         </FormLabel>
                         <FormControl>
-                          <div className="relative input-glow rounded-xl">
+                          <div className="relative input-glow rounded-md">
                             <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                             <Input
                               placeholder={t("clients.mcPlaceholder")}
-                              className="h-11 pl-9 rounded-xl bg-background border-border/60"
+                              className="h-11 pl-9 rounded-md bg-background border-border/60"
                               {...field}
                             />
                           </div>
@@ -736,11 +731,11 @@ export default function ClientOnboarding() {
                           EIN
                         </FormLabel>
                         <FormControl>
-                          <div className="relative input-glow rounded-xl">
+                          <div className="relative input-glow rounded-md">
                             <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                             <Input
                               placeholder={t("common.einPlaceholder")}
-                              className="h-11 pl-9 rounded-xl bg-background border-border/60"
+                              className="h-11 pl-9 rounded-md bg-background border-border/60"
                               {...field}
                             />
                           </div>
@@ -763,7 +758,7 @@ export default function ClientOnboarding() {
                       <Textarea
                         rows={3}
                         placeholder={t("common.notesPlaceholder")}
-                        className="rounded-xl bg-muted/40 border-border/60 focus:bg-background"
+                        className="rounded-md bg-muted/40 border-border/60 focus:bg-background"
                         {...field}
                       />
                     </FormControl>
@@ -793,29 +788,29 @@ export default function ClientOnboarding() {
                         [s.key]: !active,
                       })
                     }
-                    className={`group relative overflow-hidden rounded-2xl p-4 text-left transition-all ${
+                    className={`group relative overflow-hidden rounded-md p-4 text-left transition-all ${
                       active
-                        ? `bg-gradient-to-br ${s.gradient} shadow-xl scale-[1.02] text-white`
+                        ? `bg-secondary text-secondary-foreground border border-border shadow-xl scale-[1.02] text-foreground`
                         : "bg-muted/40 border border-border/60 hover:border-primary/40 hover:bg-muted/60"
                     }`}
                   >
                     {active && (
                       <div className="absolute top-3 right-3">
-                        <div className="w-6 h-6 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center">
-                          <CheckCircle2 className="w-4 h-4 text-white" />
+                        <div className="w-6 h-6 rounded-full bg-card flex items-center justify-center">
+                          <CheckCircle2 className="w-4 h-4 text-secondary-foreground" />
                         </div>
                       </div>
                     )}
                     <div
-                      className={`font-display text-2xl font-bold tracking-tight mb-1 ${
-                        active ? "text-white" : "text-foreground"
+                      className={`text-lg font-semibold tracking-tight mb-1 ${
+                        active ? "text-foreground" : "text-foreground"
                       }`}
                     >
                       {s.label}
                     </div>
                     <div
                       className={`text-xs ${
-                        active ? "text-white/80" : "text-muted-foreground"
+                        active ? "text-muted-foreground" : "text-muted-foreground"
                       }`}
                     >
                       {s.desc}
@@ -839,10 +834,10 @@ export default function ClientOnboarding() {
                 {trucks.map((truck, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border/50"
+                    className="flex items-center gap-3 p-3 rounded-md bg-muted/40 border border-border/50"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md flex-shrink-0">
-                      <Truck className="w-4 h-4 text-white" />
+                    <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center flex-shrink-0">
+                      <Truck className="w-4 h-4 text-secondary-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm">{truck.plate}</p>
@@ -862,7 +857,7 @@ export default function ClientOnboarding() {
               </div>
             )}
 
-            <div className="rounded-2xl border-2 border-dashed border-border/60 bg-muted/20 p-5 space-y-3">
+            <div className="rounded-md border-2 border-dashed border-border/60 bg-muted/20 p-5 space-y-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
                 {t("onboarding.addTruckTitle")}
               </p>
@@ -871,13 +866,13 @@ export default function ClientOnboarding() {
                   placeholder={`${t("trucks.plate")} *`}
                   value={truckDraft.plate}
                   onChange={(e) => setTruckDraft({ ...truckDraft, plate: e.target.value })}
-                  className="h-11 rounded-xl bg-background"
+                  className="h-11 rounded-md bg-background"
                 />
                 <Input
                   placeholder={t("trucks.vin")}
                   value={truckDraft.vin}
                   onChange={(e) => setTruckDraft({ ...truckDraft, vin: e.target.value })}
-                  className="h-11 rounded-xl bg-background"
+                  className="h-11 rounded-md bg-background"
                 />
               </div>
               <div className="grid grid-cols-3 gap-3">
@@ -885,25 +880,25 @@ export default function ClientOnboarding() {
                   placeholder={t("trucks.year")}
                   value={truckDraft.year}
                   onChange={(e) => setTruckDraft({ ...truckDraft, year: e.target.value })}
-                  className="h-11 rounded-xl bg-background"
+                  className="h-11 rounded-md bg-background"
                 />
                 <Input
                   placeholder={t("trucks.make")}
                   value={truckDraft.make}
                   onChange={(e) => setTruckDraft({ ...truckDraft, make: e.target.value })}
-                  className="h-11 rounded-xl bg-background"
+                  className="h-11 rounded-md bg-background"
                 />
                 <Input
                   placeholder={t("trucks.model")}
                   value={truckDraft.model}
                   onChange={(e) => setTruckDraft({ ...truckDraft, model: e.target.value })}
-                  className="h-11 rounded-xl bg-background"
+                  className="h-11 rounded-md bg-background"
                 />
               </div>
               <Button
                 type="button"
                 onClick={addTruck}
-                className="w-full h-11 btn-gradient text-white border-0 rounded-xl font-semibold"
+                className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 text-foreground border-0 rounded-md font-semibold"
               >
                 <Plus className="w-4 h-4 mr-1.5" />
                 {t("onboarding.addTruck")}
@@ -924,10 +919,10 @@ export default function ClientOnboarding() {
                 {permits.map((p, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border/50"
+                    className="flex items-center gap-3 p-3 rounded-md bg-muted/40 border border-border/50"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-md flex-shrink-0">
-                      <FileCheck className="w-4 h-4 text-white" />
+                    <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center flex-shrink-0">
+                      <FileCheck className="w-4 h-4 text-secondary-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm">
@@ -955,7 +950,7 @@ export default function ClientOnboarding() {
               </div>
             )}
 
-            <div className="rounded-2xl border-2 border-dashed border-border/60 bg-muted/20 p-5 space-y-3">
+            <div className="rounded-md border-2 border-dashed border-border/60 bg-muted/20 p-5 space-y-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
                 {t("onboarding.addPermitTitle")}
               </p>
@@ -964,7 +959,7 @@ export default function ClientOnboarding() {
                   value={permitDraft.permit_type}
                   onValueChange={(v) => setPermitDraft({ ...permitDraft, permit_type: v })}
                 >
-                  <SelectTrigger className="h-11 rounded-xl bg-background">
+                  <SelectTrigger className="h-11 rounded-md bg-background">
                     <SelectValue placeholder={`${t("common.type")} *`} />
                   </SelectTrigger>
                   <SelectContent>
@@ -981,7 +976,7 @@ export default function ClientOnboarding() {
                   onChange={(e) =>
                     setPermitDraft({ ...permitDraft, permit_number: e.target.value })
                   }
-                  className="h-11 rounded-xl bg-background"
+                  className="h-11 rounded-md bg-background"
                 />
               </div>
               <div className="grid grid-cols-3 gap-3">
@@ -989,7 +984,7 @@ export default function ClientOnboarding() {
                   placeholder={t("common.state")}
                   value={permitDraft.state}
                   onChange={(e) => setPermitDraft({ ...permitDraft, state: e.target.value })}
-                  className="h-11 rounded-xl bg-background"
+                  className="h-11 rounded-md bg-background"
                 />
                 <Input
                   type="date"
@@ -997,7 +992,7 @@ export default function ClientOnboarding() {
                   onChange={(e) =>
                     setPermitDraft({ ...permitDraft, expiration_date: e.target.value })
                   }
-                  className="h-11 rounded-xl bg-background"
+                  className="h-11 rounded-md bg-background"
                 />
                 <Select
                   value={
@@ -1012,7 +1007,7 @@ export default function ClientOnboarding() {
                     })
                   }
                 >
-                  <SelectTrigger className="h-11 rounded-xl bg-background">
+                  <SelectTrigger className="h-11 rounded-md bg-background">
                     <SelectValue placeholder={t("common.truck")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1028,7 +1023,7 @@ export default function ClientOnboarding() {
               <Button
                 type="button"
                 onClick={addPermit}
-                className="w-full h-11 btn-gradient text-white border-0 rounded-xl font-semibold"
+                className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 text-foreground border-0 rounded-md font-semibold"
               >
                 <Plus className="w-4 h-4 mr-1.5" />
                 {t("onboarding.addPermit")}
@@ -1089,7 +1084,7 @@ export default function ClientOnboarding() {
                         .map((s) => (
                           <span
                             key={s.key}
-                            className={`inline-flex items-center h-7 px-3 rounded-lg text-xs font-semibold bg-gradient-to-r ${s.gradient} text-white shadow-sm`}
+                            className={`inline-flex items-center h-7 px-3 rounded-lg text-xs font-semibold bg-secondary text-secondary-foreground border border-border text-foreground shadow-sm`}
                           >
                             {s.label}
                           </span>
@@ -1144,18 +1139,18 @@ export default function ClientOnboarding() {
             ].map((card) => (
               <div
                 key={card.title}
-                className="relative overflow-hidden rounded-2xl bg-card border border-border/50 p-5"
+                className="relative overflow-hidden rounded-md bg-card border border-border/50 p-5"
               >
                 <div
-                  className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${card.gradient}`}
+                  className={`absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border`}
                 />
                 <div className="flex items-center gap-2.5 mb-3">
                   <div
-                    className={`w-9 h-9 rounded-xl bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-md`}
+                    className={`w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
                   >
-                    <card.icon className="w-4 h-4 text-white" />
+                    <card.icon className="w-4 h-4 text-foreground" />
                   </div>
-                  <h3 className="font-display font-bold text-sm">{card.title}</h3>
+                  <h3 className="font-bold text-sm">{card.title}</h3>
                 </div>
                 <div className="pl-12">{card.content}</div>
               </div>
@@ -1169,7 +1164,7 @@ export default function ClientOnboarding() {
         <button
           type="button"
           onClick={step === 0 ? () => navigate("/clients") : prevStep}
-          className="h-11 px-5 rounded-xl bg-muted/60 hover:bg-muted border border-border/60 text-sm font-semibold inline-flex items-center gap-1.5 transition-colors"
+          className="h-11 px-5 rounded-md bg-muted/60 hover:bg-muted border border-border/60 text-sm font-semibold inline-flex items-center gap-1.5 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           {step === 0 ? t("common.cancel") : t("common.back")}
@@ -1178,9 +1173,9 @@ export default function ClientOnboarding() {
           <button
             type="button"
             onClick={nextStep}
-            className="group h-11 px-6 btn-gradient text-white text-sm font-semibold rounded-xl inline-flex items-center gap-1.5 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all relative overflow-hidden"
+            className="group h-11 px-6 bg-primary text-primary-foreground hover:bg-primary/90 text-foreground text-sm font-semibold rounded-md inline-flex items-center gap-1.5 transition-all relative overflow-hidden"
           >
-            <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            <span className="pointer-events-none absolute inset-0 bg-secondary text-secondary-foreground border border-border -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             <span className="relative inline-flex items-center gap-1.5">
               {t("common.next")}
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -1191,9 +1186,9 @@ export default function ClientOnboarding() {
             type="button"
             onClick={handleFinish}
             disabled={saving}
-            className="group h-11 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-[0_10px_30px_-8px_hsl(158_55%_42%/0.55)] text-white text-sm font-semibold rounded-xl inline-flex items-center gap-1.5 transition-all disabled:opacity-60 relative overflow-hidden"
+            className="group h-11 px-6 bg-secondary text-secondary-foreground border border-border text-sm font-semibold rounded-md inline-flex items-center gap-1.5 transition-all disabled:opacity-60 relative overflow-hidden"
           >
-            <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            <span className="pointer-events-none absolute inset-0 bg-secondary text-secondary-foreground border border-border -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             <span className="relative inline-flex items-center gap-1.5">
               {saving ? (
                 <>

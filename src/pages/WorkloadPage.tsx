@@ -118,22 +118,19 @@ export default function WorkloadPage() {
   const isLoading = le || la;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
 
         <div className="relative flex items-start gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-            <Activity className="w-6 h-6 text-white" />
+          <div className="w-14 h-14 rounded-md bg-card border border-border flex items-center justify-center flex-shrink-0">
+            <Activity className="w-6 h-6 text-secondary-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
               {t("workload.title")}
             </h1>
-            <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">
               {t("workload.subtitle")}
             </p>
           </div>
@@ -170,23 +167,23 @@ export default function WorkloadPage() {
         ].map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
           >
             <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
+              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
             />
             <div className="relative flex items-start justify-between mb-3">
               <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-md`}
+                className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
               >
-                <s.icon className="w-4 h-4 text-white" />
+                <s.icon className="w-4 h-4 text-foreground" />
               </div>
             </div>
             <div className="relative">
               <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
                 {s.label}
               </div>
-              <div className="font-display text-3xl font-bold tracking-tight">
+              <div className="text-xl font-semibold tracking-tight tracking-tight">
                 {s.value}
               </div>
             </div>
@@ -196,18 +193,18 @@ export default function WorkloadPage() {
 
       {/* ============ DISTRIBUTION CHART ============ */}
       <Card className="border-border/50 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
         <CardContent className="p-5">
           <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md">
-              <Users className="w-4 h-4 text-white" />
+            <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <Users className="w-4 h-4 text-secondary-foreground" />
             </div>
             <div>
-              <h2 className="font-display font-bold text-base">
+              <h2 className="font-bold text-base">
                 {t("workload.distribution")}
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Permits e tarefas abertas por colaborador
+                {t("workload.subtitle")}
               </p>
             </div>
           </div>
@@ -216,7 +213,7 @@ export default function WorkloadPage() {
             <Skeleton className="h-[280px] w-full" />
           ) : !chartData.length ? (
             <div className="text-center py-16">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-muted flex items-center justify-center mb-3">
+              <div className="w-14 h-14 mx-auto rounded-md bg-muted flex items-center justify-center mb-3">
                 <Users className="w-6 h-6 text-muted-foreground" />
               </div>
               <p className="text-sm text-muted-foreground">
@@ -288,18 +285,18 @@ export default function WorkloadPage() {
 
       {/* ============ EMPLOYEE DETAILS ============ */}
       <Card className="border-border/50 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
         <CardContent className="p-5">
           <div className="flex items-center gap-2.5 mb-5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-              <Clock className="w-4 h-4 text-white" />
+            <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <Clock className="w-4 h-4 text-secondary-foreground" />
             </div>
             <div>
-              <h2 className="font-display font-bold text-base">
+              <h2 className="font-bold text-base">
                 {t("workload.detailsByEmployee")}
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Ordenado por carga total
+                {t("workload.sortedByTotal")}
               </p>
             </div>
           </div>
@@ -312,7 +309,7 @@ export default function WorkloadPage() {
             </div>
           ) : !rows.length ? (
             <div className="text-center py-12">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-muted flex items-center justify-center mb-3">
+              <div className="w-14 h-14 mx-auto rounded-md bg-muted flex items-center justify-center mb-3">
                 <Users className="w-6 h-6 text-muted-foreground" />
               </div>
               <p className="text-sm text-muted-foreground">
@@ -327,13 +324,13 @@ export default function WorkloadPage() {
                 return (
                   <div
                     key={r.id}
-                    className="relative overflow-hidden rounded-2xl border border-border/50 bg-muted/20 hover:bg-muted/40 transition-all p-4"
+                    className="relative overflow-hidden rounded-md border border-border/50 bg-muted/20 hover:bg-muted/40 transition-all p-4"
                   >
                     <div className="flex items-center gap-4">
                       {/* Rank + avatar */}
                       <div className="flex items-center gap-3 flex-shrink-0">
                         {idx < 3 ? (
-                          <div className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
+                          <div className="w-6 h-6 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center font-bold text-[10px] shadow-sm">
                             {idx === 0 ? (
                               <Trophy className="w-3 h-3" />
                             ) : (
@@ -346,9 +343,7 @@ export default function WorkloadPage() {
                           </div>
                         )}
                         <div
-                          className={`w-11 h-11 rounded-xl bg-gradient-to-br ${gradientFor(
-                            r.id
-                          )} flex items-center justify-center text-white font-semibold text-sm shadow-md`}
+                          className={`w-11 h-11 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center text-foreground font-semibold text-sm`}
                         >
                           {initials(r.name)}
                         </div>
@@ -372,11 +367,8 @@ export default function WorkloadPage() {
                             <div
                               className={`h-full rounded-full transition-all ${
                                 overloaded
-                                  ? "bg-gradient-to-r from-red-500 to-rose-500"
-                                  : loadPct > 50
-                                  ? "bg-gradient-to-r from-amber-500 to-orange-500"
-                                  : "bg-gradient-to-r from-emerald-500 to-teal-500"
-                              }`}
+                                  ? "bg-secondary text-secondary-foreground border border-border"                                  : loadPct > 50
+                                  ? "bg-secondary text-secondary-foreground border border-border"                                  : "bg-secondary text-secondary-foreground border border-border"                              }`}
                               style={{ width: `${loadPct}%` }}
                             />
                           </div>
@@ -389,7 +381,7 @@ export default function WorkloadPage() {
                       {/* Metrics */}
                       <div className="hidden md:grid grid-cols-5 gap-4 flex-shrink-0">
                         <div className="text-center min-w-[60px]">
-                          <div className="font-display text-xl font-bold tracking-tight">
+                          <div className="text-xl font-bold tracking-tight">
                             {r.permits}
                           </div>
                           <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
@@ -398,7 +390,7 @@ export default function WorkloadPage() {
                         </div>
                         <div className="text-center min-w-[60px]">
                           <div
-                            className={`font-display text-xl font-bold tracking-tight ${
+                            className={`text-xl font-bold tracking-tight ${
                               r.overdue > 0
                                 ? "text-red-500"
                                 : "text-muted-foreground"
@@ -407,32 +399,32 @@ export default function WorkloadPage() {
                             {r.overdue}
                           </div>
                           <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                            Atraso
+                            {t("workload.overdue")}
                           </div>
                         </div>
                         <div className="text-center min-w-[60px]">
-                          <div className="font-display text-xl font-bold tracking-tight">
+                          <div className="text-xl font-bold tracking-tight">
                             {r.openTasks}
                           </div>
                           <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                            Abertas
+                            {t("workload.open")}
                           </div>
                         </div>
                         <div className="text-center min-w-[60px]">
-                          <div className="font-display text-xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400 inline-flex items-center gap-1">
+                          <div className="text-xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400 inline-flex items-center gap-1">
                             <CheckCircle2 className="w-4 h-4" />
                             {r.completed}
                           </div>
                           <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                            Concluídas
+                            {t("workload.completed")}
                           </div>
                         </div>
                         <div className="text-center min-w-[60px]">
-                          <div className="font-display text-xl font-bold tracking-tight">
+                          <div className="text-xl font-bold tracking-tight">
                             {r.avgSla !== null ? r.avgSla.toFixed(1) : "—"}
                           </div>
                           <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                            SLA (d)
+                            {t("workload.slaDays")}
                           </div>
                         </div>
                       </div>
@@ -441,7 +433,7 @@ export default function WorkloadPage() {
                     {/* Mobile metrics */}
                     <div className="md:hidden grid grid-cols-5 gap-2 mt-3 pt-3 border-t border-border/50">
                       <div className="text-center">
-                        <div className="font-display text-sm font-bold">
+                        <div className="text-sm font-bold">
                           {r.permits}
                         </div>
                         <div className="text-[9px] text-muted-foreground uppercase">
@@ -450,38 +442,38 @@ export default function WorkloadPage() {
                       </div>
                       <div className="text-center">
                         <div
-                          className={`font-display text-sm font-bold ${
+                          className={`text-sm font-bold ${
                             r.overdue > 0 ? "text-red-500" : ""
                           }`}
                         >
                           {r.overdue}
                         </div>
                         <div className="text-[9px] text-muted-foreground uppercase">
-                          Atraso
+                          {t("workload.overdue")}
                         </div>
                       </div>
                       <div className="text-center">
-                        <div className="font-display text-sm font-bold">
+                        <div className="text-sm font-bold">
                           {r.openTasks}
                         </div>
                         <div className="text-[9px] text-muted-foreground uppercase">
-                          Abertas
+                          {t("workload.open")}
                         </div>
                       </div>
                       <div className="text-center">
-                        <div className="font-display text-sm font-bold text-emerald-600">
+                        <div className="text-sm font-bold text-emerald-600">
                           {r.completed}
                         </div>
                         <div className="text-[9px] text-muted-foreground uppercase">
-                          Done
+                          {t("workload.completed")}
                         </div>
                       </div>
                       <div className="text-center">
-                        <div className="font-display text-sm font-bold">
+                        <div className="text-sm font-bold">
                           {r.avgSla !== null ? r.avgSla.toFixed(1) : "—"}
                         </div>
                         <div className="text-[9px] text-muted-foreground uppercase">
-                          SLA
+                          {t("workload.slaDays")}
                         </div>
                       </div>
                     </div>

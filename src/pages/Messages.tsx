@@ -69,9 +69,9 @@ const ChannelBadge = ({ channel }: { channel: string }) => {
   return (
     <span className="inline-flex items-center gap-1.5 h-6 px-2 rounded-md text-[11px] font-semibold bg-muted/60 border border-border/50">
       <span
-        className={`w-4 h-4 rounded bg-gradient-to-br ${cfg.gradient} flex items-center justify-center`}
+        className={`w-4 h-4 rounded bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
       >
-        <Icon className="w-2.5 h-2.5 text-white" />
+        <Icon className="w-2.5 h-2.5 text-secondary-foreground" />
       </span>
       {cfg.label}
     </span>
@@ -156,23 +156,20 @@ export default function Messages() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
 
         <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-              <Send className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-md bg-card border border-border flex items-center justify-center flex-shrink-0">
+              <Send className="w-6 h-6 text-secondary-foreground" />
             </div>
             <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
                 {t("messages.title")}
               </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
+              <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">
                 {t("messages.subtitle")}
               </p>
             </div>
@@ -183,7 +180,7 @@ export default function Messages() {
               <button
                 onClick={handleSendNow}
                 disabled={sending}
-                className="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:shadow-lg transition-all disabled:opacity-60"
+                className="h-10 px-4 rounded-md bg-secondary text-secondary-foreground border border-border text-sm font-semibold inline-flex items-center gap-1.5 hover:shadow-lg transition-all disabled:opacity-60"
               >
                 {sending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -195,7 +192,7 @@ export default function Messages() {
             )}
             <button
               onClick={() => setScheduleOpen(true)}
-              className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
+              className="h-10 px-4 rounded-md bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
             >
               <Plus className="w-4 h-4" />
               {t("messages.new")}
@@ -234,23 +231,23 @@ export default function Messages() {
         ].map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
           >
             <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
+              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
             />
             <div className="relative flex items-start justify-between mb-3">
               <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-md`}
+                className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
               >
-                <s.icon className="w-4 h-4 text-white" />
+                <s.icon className="w-4 h-4 text-foreground" />
               </div>
             </div>
             <div className="relative">
               <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
                 {s.label}
               </div>
-              <div className="font-display text-3xl font-bold tracking-tight">{s.value}</div>
+              <div className="text-xl font-semibold tracking-tight tracking-tight">{s.value}</div>
             </div>
           </div>
         ))}
@@ -258,8 +255,8 @@ export default function Messages() {
 
       {/* ============ TABS ============ */}
       <Tabs defaultValue="scheduled">
-        <TabsList className="h-auto p-1.5 bg-muted/50 rounded-2xl flex-wrap gap-1">
-          <TabsTrigger value="scheduled" className="rounded-xl gap-1.5">
+        <TabsList className="h-auto p-1.5 bg-muted/50 rounded-md flex-wrap gap-1">
+          <TabsTrigger value="scheduled" className="rounded-md gap-1.5">
             <Clock className="w-3.5 h-3.5" />
             {t("messages.scheduled")}
             {stats.pending > 0 && (
@@ -268,11 +265,11 @@ export default function Messages() {
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="sent" className="rounded-xl gap-1.5">
+          <TabsTrigger value="sent" className="rounded-md gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5" />
             {t("messages.sentTab")}
           </TabsTrigger>
-          <TabsTrigger value="automations" className="rounded-xl gap-1.5">
+          <TabsTrigger value="automations" className="rounded-md gap-1.5">
             <Zap className="w-3.5 h-3.5" />
             {t("messages.automations")}
             {stats.automations > 0 && (
@@ -281,7 +278,7 @@ export default function Messages() {
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="templates" className="rounded-xl gap-1.5">
+          <TabsTrigger value="templates" className="rounded-md gap-1.5">
             <FileText className="w-3.5 h-3.5" />
             {t("messages.templates")}
           </TabsTrigger>
@@ -296,10 +293,10 @@ export default function Messages() {
           ) : !pendingMsgs?.length ? (
             <Card className="border-border/50">
               <CardContent className="p-16 text-center">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
+                <div className="w-20 h-20 rounded-md bg-secondary text-secondary-foreground border border-border border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
                   <Mail className="w-9 h-9 text-amber-500" />
                 </div>
-                <p className="font-display text-lg font-semibold mb-1">
+                <p className="text-base font-semibold font-semibold mb-1">
                   {t("messages.noScheduled")}
                 </p>
                 <p className="text-sm text-muted-foreground mb-6">
@@ -307,7 +304,7 @@ export default function Messages() {
                 </p>
                 <button
                   onClick={() => setScheduleOpen(true)}
-                  className="h-11 px-6 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-2 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
+                  className="h-11 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-foreground text-sm font-semibold inline-flex items-center gap-2 transition-all"
                 >
                   <Plus className="w-4 h-4" />
                   {t("messages.schedule")}
@@ -411,7 +408,7 @@ export default function Messages() {
           ) : !sentAndFailed.length ? (
             <Card className="border-border/50">
               <CardContent className="p-16 text-center">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
+                <div className="w-20 h-20 rounded-md bg-secondary text-secondary-foreground border border-border border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
                   <CheckCircle2 className="w-9 h-9 text-emerald-500" />
                 </div>
                 <p className="text-muted-foreground">{t("messages.noSent")}</p>
@@ -476,7 +473,7 @@ export default function Messages() {
                 setEditRule(null);
                 setAutomationOpen(true);
               }}
-              className="h-10 px-4 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
+              className="h-10 px-4 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-foreground text-sm font-semibold inline-flex items-center gap-1.5 transition-all"
             >
               <Zap className="w-4 h-4" />
               {t("messages.newAutomation")}
@@ -489,10 +486,10 @@ export default function Messages() {
           ) : !rules?.length ? (
             <Card className="border-border/50">
               <CardContent className="p-16 text-center">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-fuchsia-500/10 to-pink-500/10 border border-fuchsia-500/20 flex items-center justify-center mx-auto mb-5">
+                <div className="w-20 h-20 rounded-md bg-secondary text-secondary-foreground border border-border border border-fuchsia-500/20 flex items-center justify-center mx-auto mb-5">
                   <Zap className="w-9 h-9 text-fuchsia-500" />
                 </div>
-                <p className="font-display text-lg font-semibold mb-1">
+                <p className="text-base font-semibold font-semibold mb-1">
                   {t("messages.noAutomation")}
                 </p>
                 <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
@@ -503,7 +500,7 @@ export default function Messages() {
                     setEditRule(null);
                     setAutomationOpen(true);
                   }}
-                  className="h-11 px-6 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-2 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
+                  className="h-11 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-foreground text-sm font-semibold inline-flex items-center gap-2 transition-all"
                 >
                   <Sparkles className="w-4 h-4" />
                   {t("messages.createAutomation")}
@@ -520,25 +517,17 @@ export default function Messages() {
                   }`}
                 >
                   <div
-                    className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${
-                      r.enabled
-                        ? "from-fuchsia-500 via-pink-500 to-rose-500"
-                        : "from-muted to-muted"
-                    }`}
+                    className={`absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border`}
                   />
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-md flex-shrink-0 bg-gradient-to-br ${
-                            r.enabled
-                              ? "from-fuchsia-500 to-pink-500"
-                              : "from-slate-400 to-zinc-400"
-                          }`}
+                          className={`w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 bg-secondary text-secondary-foreground border border-border`}
                         >
-                          <Zap className="w-4 h-4 text-white" />
+                          <Zap className="w-4 h-4 text-secondary-foreground" />
                         </div>
-                        <div className="font-display font-bold text-sm truncate">
+                        <div className="font-bold text-sm truncate">
                           {r.name}
                         </div>
                       </div>
@@ -590,7 +579,7 @@ export default function Messages() {
                 setEditTemplate(null);
                 setTemplateOpen(true);
               }}
-              className="h-10 px-4 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
+              className="h-10 px-4 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-foreground text-sm font-semibold inline-flex items-center gap-1.5 transition-all"
             >
               <Plus className="w-4 h-4" />
               {t("messages.newTemplate")}
@@ -603,7 +592,7 @@ export default function Messages() {
           ) : !templates?.length ? (
             <Card className="border-border/50">
               <CardContent className="p-16 text-center">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
+                <div className="w-20 h-20 rounded-md bg-secondary text-secondary-foreground border border-border border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
                   <FileText className="w-9 h-9 text-indigo-500" />
                 </div>
                 <p className="text-muted-foreground">{t("messages.noTemplates")}</p>
@@ -620,18 +609,18 @@ export default function Messages() {
                     className="relative overflow-hidden border-border/50 hover:-translate-y-0.5 hover:shadow-lg transition-all"
                   >
                     <div
-                      className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${cfg.gradient}`}
+                      className={`absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border`}
                     />
                     <CardContent className="p-4 space-y-3">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div
-                            className={`w-10 h-10 rounded-xl bg-gradient-to-br ${cfg.gradient} flex items-center justify-center shadow-md flex-shrink-0`}
+                            className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center flex-shrink-0`}
                           >
-                            <Icon className="w-4 h-4 text-white" />
+                            <Icon className="w-4 h-4 text-secondary-foreground" />
                           </div>
                           <div className="min-w-0">
-                            <div className="font-display font-bold text-sm truncate">
+                            <div className="font-bold text-sm truncate">
                               {tmpl.name}
                             </div>
                             <div className="text-[11px] text-muted-foreground uppercase tracking-wider">
@@ -691,11 +680,11 @@ export default function Messages() {
 
       {/* Preview dialog */}
       <Dialog open={!!previewMsg} onOpenChange={() => setPreviewMsg(null)}>
-        <DialogContent className="sm:max-w-lg rounded-2xl">
+        <DialogContent className="sm:max-w-lg rounded-md">
           <DialogHeader>
-            <DialogTitle className="font-display flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
-                <Eye className="w-4 h-4 text-white" />
+            <DialogTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
+                <Eye className="w-4 h-4 text-secondary-foreground" />
               </div>
               {t("messages.preview")}
             </DialogTitle>
@@ -709,7 +698,7 @@ export default function Messages() {
                 </span>
               </div>
               {previewMsg.subject && (
-                <div className="rounded-xl bg-muted/40 border border-border/50 p-3">
+                <div className="rounded-md bg-muted/40 border border-border/50 p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                     {t("messages.subject")}
                   </p>
@@ -722,7 +711,7 @@ export default function Messages() {
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
                   {t("messages.message")}
                 </p>
-                <p className="text-sm whitespace-pre-wrap rounded-xl border border-border/60 bg-muted/30 p-4 leading-relaxed">
+                <p className="text-sm whitespace-pre-wrap rounded-md border border-border/60 bg-muted/30 p-4 leading-relaxed">
                   {replacePlaceholders(previewMsg.body, previewMsg.clients)}
                 </p>
               </div>

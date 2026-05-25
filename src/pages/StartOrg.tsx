@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useOrg } from "@/contexts/OrgContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
 import { ArrowRight, Building2, CheckCircle2, Loader2 } from "lucide-react";
@@ -51,6 +52,7 @@ export default function StartOrg() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { refresh } = useOrg();
+  const { t } = useLanguage();
 
   const [step, setStep] = useState<"form" | "creating" | "done" | "confirm-email">("form");
   const [companyName, setCompanyName] = useState("");
@@ -69,11 +71,11 @@ export default function StartOrg() {
 
   const slugError = useMemo(() => {
     if (!slug) return null;
-    if (!SLUG_REGEX.test(slug)) return "Use só letras minúsculas, números e hífens";
-    if (RESERVED.has(slug)) return "Esse slug está reservado";
-    if (slug.length < 2) return "Mínimo 2 caracteres";
+    if (!SLUG_REGEX.test(slug)) return t("startOrg.slug.invalidChars");
+    if (RESERVED.has(slug)) return t("startOrg.slug.reserved");
+    if (slug.length < 2) return t("startOrg.slug.tooShort");
     return null;
-  }, [slug]);
+  }, [slug, t]);
 
   const canSubmit =
     companyName.trim().length > 0 &&
@@ -124,7 +126,7 @@ export default function StartOrg() {
       // just need the user to confirm and come back.
       setStep("confirm-email");
     } catch (e: any) {
-      toast({ title: "Não foi possível criar a organização", description: e.message, variant: "destructive" });
+      toast({ title: t("startOrg.createFailed"), description: e.message, variant: "destructive" });
       setStep("form");
       setSubmitting(false);
     }
@@ -133,38 +135,34 @@ export default function StartOrg() {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left visual panel */}
-      <div className="hidden lg:flex lg:w-[45%] aurora-bg relative overflow-hidden">
-        <div className="absolute inset-0 grid-pattern opacity-60" />
-        <div className="orb w-80 h-80 bg-primary/30 top-1/4 left-1/4 animate-pulse-glow" />
-        <div className="orb w-96 h-96 bg-accent/20 bottom-1/4 right-1/4 animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+      <div className="hidden lg:flex lg:w-[45%] bg-card border border-border relative overflow-hidden">
         <div className="relative z-10 flex flex-col justify-between px-16 py-14 w-full">
           <div className="flex items-center gap-3">
-            <Logo className="w-12 h-12 rounded-2xl shadow-xl ring-1 ring-white/20" />
+            <Logo className="w-12 h-12 rounded-md ring-1 ring-white/20" />
             <Wordmark size="xl" tone="light" />
           </div>
           <div className="space-y-5">
-            <h2 className="font-display text-5xl font-bold text-white leading-tight">
+            <h2 className="text-5xl font-bold text-foreground leading-tight">
               Bem-vindo à sua nova<br />operação.
             </h2>
-            <p className="text-white/65 text-lg max-w-md leading-relaxed">
-              Configure sua organização em 60 segundos. Você ganha 14 dias de trial completo — sem cartão.
+            <p className="text-muted-foreground text-lg max-w-md leading-relaxed">
+              {t("startOrg.trialBlurb")}
             </p>
             <ul className="space-y-2.5 mt-6">
               {[
-                "Gestão completa de permits e compliance",
-                "Portal do cliente final + assinaturas",
-                "Automações de vencimento e mensagens",
-                "Branding próprio e subdomínio dedicado",
+                t("startOrg.benefit1"),
+                t("startOrg.benefit2"),
+                t("startOrg.benefit3"),
               ].map((feature) => (
-                <li key={feature} className="flex items-center gap-2.5 text-white/75 text-sm">
+                <li key={feature} className="flex items-center gap-2.5 text-foreground/75 text-sm">
                   <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
                   {feature}
                 </li>
               ))}
             </ul>
           </div>
-          <div className="text-white/40 text-xs">
-            <Link to="/login" className="hover:text-white/80 transition-colors">← Já tenho conta</Link>
+          <div className="text-muted-foreground text-xs">
+            <Link to="/login" className="hover:text-muted-foreground transition-colors">← {t("startOrg.haveAccount")}</Link>
           </div>
         </div>
       </div>
@@ -173,19 +171,19 @@ export default function StartOrg() {
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-[480px]">
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
-            <Logo className="w-10 h-10 rounded-xl shadow-md" />
+            <Logo className="w-10 h-10 rounded-md" />
             <Wordmark size="lg" tone="dark" />
           </div>
 
           {step === "done" ? (
             <Card className="border-border/50">
               <CardContent className="p-8 text-center space-y-4">
-                <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center">
+                <div className="w-12 h-12 mx-auto rounded-md bg-emerald-500/15 text-emerald-600 flex items-center justify-center">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div>
-                  <h1 className="font-display text-2xl font-bold">Organização criada!</h1>
-                  <p className="text-sm text-muted-foreground mt-1">Redirecionando você…</p>
+                  <h1 className="text-lg font-semibold">{t("startOrg.orgCreated")}</h1>
+                  <p className="text-sm text-muted-foreground mt-1">{t("common.loading")}</p>
                 </div>
                 <Loader2 className="w-4 h-4 animate-spin text-muted-foreground mx-auto" />
               </CardContent>
@@ -193,28 +191,29 @@ export default function StartOrg() {
           ) : step === "confirm-email" ? (
             <Card className="border-border/50">
               <CardContent className="p-8 text-center space-y-4">
-                <div className="w-12 h-12 mx-auto rounded-2xl bg-primary/15 text-primary flex items-center justify-center">
+                <div className="w-12 h-12 mx-auto rounded-md bg-primary/15 text-primary flex items-center justify-center">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div className="space-y-2">
-                  <h1 className="font-display text-2xl font-bold">Organização criada!</h1>
+                  <h1 className="text-lg font-semibold">{t("startOrg.orgCreated")}</h1>
                   <p className="text-sm text-muted-foreground">
-                    Enviamos um email pra <strong className="text-foreground">{email}</strong>.
-                    Confirme sua conta clicando no link e depois faça login pra entrar na sua nova org.
+                    {t("startOrg.confirmEmailDesc").split("{email}").map((part, i) =>
+                      i === 0 ? part : <><strong className="text-foreground">{email}</strong>{part}</>
+                    )}
                   </p>
                 </div>
                 <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-left text-xs space-y-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-muted-foreground">Subdomínio</span>
+                    <span className="text-muted-foreground">{t("startOrg.subdomainLabel")}</span>
                     <span className="font-mono font-semibold">{slug}.martinsadviser.com</span>
                   </div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-muted-foreground">Status</span>
-                    <span className="font-semibold text-primary">Aguardando confirmação</span>
+                    <span className="text-muted-foreground">{t("common.status")}</span>
+                    <span className="font-semibold text-primary">{t("startOrg.awaitingConfirmation")}</span>
                   </div>
                 </div>
                 <Button asChild className="w-full">
-                  <Link to="/login">Ir pro login</Link>
+                  <Link to="/login">{t("common.goToLogin")}</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -223,17 +222,17 @@ export default function StartOrg() {
               <div className="mb-6">
                 <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-semibold uppercase tracking-wider text-primary mb-3">
                   <Building2 className="w-3 h-3" />
-                  Nova organização
+                  {t("superadmin.newOrg")}
                 </div>
-                <h1 className="font-display text-3xl font-bold tracking-tight">Comece sua operação</h1>
+                <h1 className="text-xl font-semibold tracking-tight">{t("startOrg.startTitle")}</h1>
                 <p className="text-muted-foreground mt-1.5 text-[15px]">
-                  14 dias de trial. Pagamento começa depois.
+                  {t("startOrg.trialBlurb")}
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 gap-4">
-                  <Field label="Nome da empresa" required>
+                  <Field label={t("startOrg.companyNameLabel")} required>
                     <Input
                       autoFocus
                       value={companyName}
@@ -243,9 +242,9 @@ export default function StartOrg() {
                   </Field>
 
                   <Field
-                    label="Subdomínio"
+                    label={t("startOrg.subdomainLabel")}
                     required
-                    hint={slug ? `${slug}.martinsadviser.com` : "Identifica sua org na URL"}
+                    hint={slug ? `${slug}.martinsadviser.com` : t("startOrg.subdomainHint")}
                     error={slugError}
                   >
                     <Input
@@ -256,28 +255,28 @@ export default function StartOrg() {
                     />
                   </Field>
 
-                  <Field label="País principal" required>
+                  <Field label={t("startOrg.country")} required>
                     <Select value={country} onValueChange={(v) => setCountry(v as "US" | "BR" | "ES")}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="US">🇺🇸 Estados Unidos</SelectItem>
-                        <SelectItem value="BR">🇧🇷 Brasil</SelectItem>
-                        <SelectItem value="ES">🇪🇸 Espanha</SelectItem>
+                        <SelectItem value="US">🇺🇸 {t("country.us")}</SelectItem>
+                        <SelectItem value="BR">🇧🇷 {t("country.br")}</SelectItem>
+                        <SelectItem value="ES">🇪🇸 {t("country.es")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </Field>
 
                   <div className="pt-2 mt-2 border-t border-border/40">
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-3">Seu acesso</p>
+                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-3">{t("startOrg.yourAccess")}</p>
                   </div>
 
-                  <Field label="Seu nome">
+                  <Field label={t("common.name")}>
                     <Input
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="João da Silva"
+                      placeholder={t("startOrg.fullNamePlaceholder")}
                     />
                   </Field>
 
@@ -290,7 +289,7 @@ export default function StartOrg() {
                     />
                   </Field>
 
-                  <Field label="Senha" required hint="Mínimo 6 caracteres">
+                  <Field label={t("login.password")} required hint={t("startOrg.passwordHint")}>
                     <Input
                       type="password"
                       value={password}
@@ -302,14 +301,14 @@ export default function StartOrg() {
 
                 <Button type="submit" disabled={!canSubmit} className="w-full gap-2 h-11 mt-2">
                   {step === "creating" ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Criando…</>
+                    <><Loader2 className="w-4 h-4 animate-spin" /> {t("startOrg.creating")}</>
                   ) : (
-                    <>Criar organização <ArrowRight className="w-4 h-4" /></>
+                    <>{t("startOrg.cta")} <ArrowRight className="w-4 h-4" /></>
                   )}
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground">
-                  Já tem conta? <Link to="/login" className="text-primary hover:underline">Entrar</Link>
+                  {t("startOrg.haveAccount")} <Link to="/login" className="text-primary hover:underline">{t("common.signIn")}</Link>
                 </p>
               </form>
             </>

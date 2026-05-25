@@ -39,7 +39,7 @@ export default function PortalDashboard() {
       {client && (
         <Card>
           <CardHeader>
-            <CardTitle className="font-display text-xl">{t("portal.welcome")}, {client.company_name}</CardTitle>
+            <CardTitle className="text-xl">{t("portal.welcome")}, {client.company_name}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-4 text-sm">
             {client.phone && <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-muted-foreground" />{client.phone}</div>}

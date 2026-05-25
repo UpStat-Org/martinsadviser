@@ -46,10 +46,10 @@ export function DriversPanel({ clientId }: { clientId: string }) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md">
-              <UserCircle2 className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <UserCircle2 className="w-4 h-4 text-secondary-foreground" />
             </div>
-            <CardTitle className="font-display text-base">
+            <CardTitle className="text-sm font-semibold">
               {t("drivers.title")} {drivers ? `(${drivers.length})` : ""}
             </CardTitle>
           </div>

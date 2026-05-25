@@ -6,131 +6,128 @@
 
 @layer base {
   :root {
-    /* Brand hue — single source of truth for the indigo accent. Every
-       indigo-derived token and decorative gradient below references it via
-       hsl(var(--brand-h) ...), so an org's primary color (set inline on
-       <html> by applyBrandingColors) repaints the whole internal app, not
-       just buttons. 234 is the built-in indigo. */
-    --brand-h: 234;
+    /* Brand hue drives the primary color (buttons, focus rings, active nav
+       state). It still flows through the CRM theme — but only as a focused
+       highlight, not as the dominant surface paint. Sidebar / page chrome
+       stay neutral so the working area looks like a tool, not a hero.
+       232 is a saturated indigo — sits clearly apart from the neutral grays
+       so the eye reads "brand" instead of "more UI chrome". */
+    --brand-h: 232;
 
-    --background: 0 0% 98%;
-    --foreground: 224 28% 12%;
+    /* Surfaces — neutral, near-white. Background is a hair below pure white
+       so cards (pure white) lift cleanly with a 1px border. */
+    --background: 220 20% 99%;
+    --foreground: 222 30% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 224 28% 12%;
+    --card-foreground: 222 30% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 224 28% 12%;
+    --popover-foreground: 222 30% 12%;
 
-    --primary: var(--brand-h) 75% 58%;
+    --primary: var(--brand-h) 73% 56%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 94%;
-    --secondary-foreground: 224 20% 22%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 24% 20%;
 
     --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 46%;
+    --muted-foreground: 220 12% 44%;
 
-    --accent: 38 92% 50%;
+    /* Accent stays amber but used sparingly — for highlights, never for big
+       backgrounds. */
+    --accent: 38 90% 50%;
     --accent-foreground: 38 92% 12%;
 
-    --destructive: 0 68% 55%;
+    --destructive: 0 72% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 158 55% 42%;
+    --success: 158 60% 38%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 88% 52%;
-    --warning-foreground: 38 88% 12%;
+    --warning: 32 92% 48%;
+    --warning-foreground: 32 92% 12%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: var(--brand-h) 75% 58%;
+    --border: 220 14% 90%;
+    --input: 220 14% 90%;
+    --ring: var(--brand-h) 73% 56%;
 
-    --radius: 0.75rem;
+    /* Tighter radius — 0.375rem (6px). Buttons/inputs feel like a tool.
+       Cards inherit `lg` (= radius). Badges use `sm` (radius - 4px = 2px). */
+    --radius: 0.375rem;
 
-    --chart-1: var(--brand-h) 75% 58%;
-    --chart-2: 158 55% 42%;
-    --chart-3: 38 88% 52%;
-    --chart-4: 0 68% 55%;
-    --chart-5: 280 55% 55%;
+    --chart-1: var(--brand-h) 73% 56%;
+    --chart-2: 158 60% 38%;
+    --chart-3: 32 92% 48%;
+    --chart-4: 0 72% 50%;
+    --chart-5: 262 60% 56%;
 
-    --sidebar-background: var(--brand-h) 28% 98%;
-    --sidebar-foreground: 224 18% 32%;
-    --sidebar-primary: var(--brand-h) 75% 58%;
+    /* Sidebar: neutral white, hairline border. No brand tint on the surface
+       — only the active-item indicator/text picks up `--sidebar-primary`. */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 18% 28%;
+    --sidebar-primary: var(--brand-h) 73% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: var(--brand-h) 40% 94%;
-    --sidebar-accent-foreground: var(--brand-h) 50% 28%;
-    --sidebar-border: var(--brand-h) 18% 90%;
-    --sidebar-ring: var(--brand-h) 75% 58%;
+    --sidebar-accent: 220 14% 95%;
+    --sidebar-accent-foreground: 222 28% 16%;
+    --sidebar-border: 220 14% 90%;
+    --sidebar-ring: var(--brand-h) 73% 56%;
   }
 
   .dark {
-    --background: 224 25% 6%;
-    --foreground: 220 14% 92%;
+    /* Dark mode is a darker working surface, not a "night" theme. Charcoal
+       grays with the brand hue only on accents. */
+    --background: 222 24% 8%;
+    --foreground: 220 14% 94%;
 
-    --card: 224 22% 10%;
-    --card-foreground: 220 14% 92%;
+    --card: 222 22% 11%;
+    --card-foreground: 220 14% 94%;
 
-    --popover: 224 22% 10%;
-    --popover-foreground: 220 14% 92%;
+    --popover: 222 22% 11%;
+    --popover-foreground: 220 14% 94%;
 
-    --primary: var(--brand-h) 75% 62%;
+    --primary: var(--brand-h) 78% 64%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 224 18% 16%;
+    --secondary: 222 18% 16%;
     --secondary-foreground: 220 14% 85%;
 
-    --muted: 224 18% 14%;
-    --muted-foreground: 220 10% 52%;
+    --muted: 222 18% 14%;
+    --muted-foreground: 220 10% 60%;
 
-    --accent: 38 88% 52%;
+    --accent: 38 88% 56%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 45%;
+    --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 158 55% 46%;
+    --success: 158 60% 48%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 88% 56%;
-    --warning-foreground: 38 88% 10%;
+    --warning: 32 90% 56%;
+    --warning-foreground: 32 90% 10%;
 
-    --border: 224 18% 18%;
-    --input: 224 18% 18%;
-    --ring: var(--brand-h) 75% 62%;
+    --border: 222 18% 18%;
+    --input: 222 18% 18%;
+    --ring: var(--brand-h) 78% 64%;
 
-    --chart-1: var(--brand-h) 75% 62%;
-    --chart-2: 158 55% 46%;
-    --chart-3: 38 88% 56%;
-    --chart-4: 0 62% 45%;
-    --chart-5: 280 55% 58%;
+    --chart-1: var(--brand-h) 78% 64%;
+    --chart-2: 158 60% 48%;
+    --chart-3: 32 90% 56%;
+    --chart-4: 0 70% 50%;
+    --chart-5: 262 65% 68%;
 
-    --sidebar-background: var(--brand-h) 20% 11%;
-    --sidebar-foreground: 220 14% 75%;
-    --sidebar-primary: var(--brand-h) 80% 68%;
+    --sidebar-background: 222 24% 9%;
+    --sidebar-foreground: 220 14% 78%;
+    --sidebar-primary: var(--brand-h) 78% 64%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: var(--brand-h) 20% 17%;
+    --sidebar-accent: 222 20% 14%;
     --sidebar-accent-foreground: 220 14% 94%;
-    --sidebar-border: var(--brand-h) 18% 20%;
-    --sidebar-ring: var(--brand-h) 80% 68%;
+    --sidebar-border: 222 18% 16%;
+    --sidebar-ring: var(--brand-h) 78% 64%;
   }
 }
 
-.truck-loading-screen {
-  position: relative;
-  min-height: 100vh;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 20px;
-  background:
-    radial-gradient(circle at 18% 18%, hsl(214 92% 46% / 0.12), transparent 26%),
-    radial-gradient(circle at 82% 18%, hsl(164 88% 42% / 0.1), transparent 24%),
-    linear-gradient(180deg, hsl(223 36% 10%) 0%, hsl(224 30% 7%) 100%);
-  color: hsl(0 0% 100%);
-}
 
 .landing-hero-visual {
   position: relative;
@@ -403,453 +400,6 @@
   }
 }
 
-.truck-loading-sky,
-.truck-loading-grid,
-.truck-loading-radar {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.truck-loading-sky {
-  background:
-    linear-gradient(180deg, hsl(219 54% 28% / 0.36) 0%, transparent 42%),
-    radial-gradient(circle at 50% 12%, hsl(202 100% 90% / 0.12), transparent 18%);
-  opacity: 0.72;
-}
-
-.truck-loading-grid {
-  background-image:
-    linear-gradient(hsl(0 0% 100% / 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(0 0% 100% / 0.035) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: linear-gradient(180deg, transparent 0%, black 20%, black 78%, transparent 100%);
-  opacity: 0.4;
-}
-
-.truck-loading-radar {
-  background:
-    radial-gradient(circle at 50% 72%, hsl(149 100% 70% / 0.12), transparent 12%),
-    radial-gradient(ellipse 48% 20% at 50% 73%, hsl(149 100% 70% / 0.08), transparent 65%);
-  animation: truck-loading-radar 6s ease-in-out infinite;
-}
-
-.truck-loading-content {
-  position: relative;
-  z-index: 1;
-  width: min(1180px, 100%);
-  display: grid;
-  gap: 28px;
-}
-
-.truck-loading-copy {
-  max-width: 760px;
-}
-
-.truck-loading-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: hsl(0 0% 100% / 0.05);
-  border: 1px solid hsl(0 0% 100% / 0.06);
-  color: hsl(153 85% 78%);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.truck-loading-title {
-  margin: 16px 0 10px;
-  font-size: clamp(30px, 4vw, 58px);
-  line-height: 1.02;
-  letter-spacing: 0;
-}
-
-.truck-loading-subtitle {
-  max-width: 620px;
-  color: hsl(220 13% 76%);
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-.truck-loading-stage {
-  position: relative;
-  min-height: 420px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.truck-loading-road {
-  position: absolute;
-  left: 50%;
-  bottom: 72px;
-  width: min(920px, 100%);
-  height: 110px;
-  transform: translateX(-50%);
-}
-
-.truck-loading-road-glow {
-  position: absolute;
-  inset: 32px 0 0;
-  border-radius: 999px;
-  background: radial-gradient(circle, hsl(149 100% 72% / 0.12), transparent 62%);
-  filter: blur(10px);
-}
-
-.truck-loading-lane {
-  position: absolute;
-  top: 50%;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, hsl(149 100% 75% / 0.95), transparent);
-  opacity: 0.48;
-}
-
-.truck-loading-lane-left {
-  transform: translateY(-18px);
-}
-
-.truck-loading-lane-right {
-  transform: translateY(18px);
-}
-
-.truck-loading-road-dashes {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  overflow: hidden;
-}
-
-.truck-loading-dash {
-  display: block;
-  width: 42px;
-  height: 6px;
-  border-radius: 999px;
-  background: hsl(0 0% 100% / 0.3);
-  animation: truck-loading-road-flow 2.4s linear infinite;
-}
-
-.truck-loading-truck-wrap {
-  position: relative;
-  width: min(920px, 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.truck-loading-truck-shadow {
-  position: absolute;
-  inset: auto 10% 10px;
-  height: 34px;
-  border-radius: 999px;
-  background: radial-gradient(circle, hsl(0 0% 0% / 0.28), transparent 72%);
-  filter: blur(9px);
-}
-
-.truck-loading-truck {
-  position: relative;
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  transform-origin: center;
-  animation: truck-loading-float 4.8s ease-in-out infinite;
-}
-
-.truck-loading-trailer {
-  width: clamp(240px, 44vw, 430px);
-  min-height: 148px;
-  padding: 18px 22px;
-  border-radius: 26px 16px 16px 26px;
-  border: 1px solid hsl(0 0% 100% / 0.08);
-  background:
-    linear-gradient(180deg, hsl(220 20% 20% / 0.92), hsl(223 20% 13% / 0.92)),
-    linear-gradient(135deg, hsl(150 100% 72% / 0.1), transparent 46%);
-  box-shadow:
-    0 16px 36px hsl(223 40% 2% / 0.32),
-    inset 0 1px 0 hsl(0 0% 100% / 0.06);
-}
-
-.truck-loading-trailer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: hsl(215 14% 76%);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-}
-
-.truck-loading-status-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: hsl(149 100% 64%);
-  box-shadow: 0 0 0 0 hsl(149 100% 64% / 0.28);
-  animation: truck-loading-pulse 1.8s ease-in-out infinite;
-}
-
-.truck-loading-trailer-value {
-  margin-top: 18px;
-  font-size: clamp(24px, 3vw, 40px);
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-.truck-loading-trailer-bars {
-  display: flex;
-  gap: 8px;
-  margin-top: 18px;
-}
-
-.truck-loading-trailer-bars span {
-  flex: 1;
-  height: 10px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, hsl(149 100% 60% / 0.16), hsl(204 100% 66% / 0.72));
-}
-
-.truck-loading-trailer-bars span:nth-child(1) { animation: truck-loading-bar 1.8s ease-in-out infinite; }
-.truck-loading-trailer-bars span:nth-child(2) { animation: truck-loading-bar 1.8s ease-in-out infinite 0.2s; }
-.truck-loading-trailer-bars span:nth-child(3) { animation: truck-loading-bar 1.8s ease-in-out infinite 0.4s; }
-
-.truck-loading-cabin {
-  position: relative;
-  width: clamp(160px, 26vw, 220px);
-  min-height: 148px;
-  margin-left: -18px;
-  padding: 16px 18px 20px;
-  border-radius: 22px 28px 22px 18px;
-  background:
-    linear-gradient(180deg, hsl(215 42% 32% / 0.9), hsl(217 36% 16% / 0.9));
-  border: 1px solid hsl(0 0% 100% / 0.08);
-  box-shadow:
-    0 16px 36px hsl(223 40% 2% / 0.3),
-    inset 0 1px 0 hsl(0 0% 100% / 0.06);
-}
-
-.truck-loading-cabin-window {
-  width: 100%;
-  height: 72px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: hsl(205 100% 85%);
-  background:
-    linear-gradient(180deg, hsl(207 100% 78% / 0.18), hsl(210 80% 30% / 0.24)),
-    linear-gradient(135deg, hsl(0 0% 100% / 0.12), transparent);
-  border: 1px solid hsl(0 0% 100% / 0.08);
-}
-
-.truck-loading-cabin-lights {
-  display: flex;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.truck-loading-cabin-lights span {
-  width: 36px;
-  height: 8px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, hsl(35 100% 62%), hsl(16 95% 60%));
-  box-shadow: 0 0 12px hsl(30 100% 64% / 0.22);
-}
-
-.truck-loading-wheel {
-  position: absolute;
-  bottom: -14px;
-  width: 42px;
-  height: 42px;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 50% 50%, hsl(0 0% 18%) 0 34%, hsl(0 0% 92%) 35% 39%, hsl(0 0% 10%) 40% 100%);
-  box-shadow: 0 6px 14px hsl(0 0% 0% / 0.28);
-  animation: truck-loading-wheel-spin 1s linear infinite;
-}
-
-.truck-loading-wheel::before {
-  content: "";
-  position: absolute;
-  inset: 12px;
-  border-radius: inherit;
-  border: 2px solid hsl(0 0% 100% / 0.14);
-}
-
-.truck-loading-wheel-rear {
-  left: 28px;
-}
-
-.truck-loading-wheel-front {
-  right: 20px;
-}
-
-.truck-loading-card {
-  position: absolute;
-  top: 18px;
-  width: min(240px, 34vw);
-  padding: 16px 18px;
-  border-radius: 20px;
-  background: hsl(223 32% 11% / 0.92);
-  border: 1px solid hsl(0 0% 100% / 0.08);
-  box-shadow: 0 14px 28px hsl(223 40% 2% / 0.22);
-  backdrop-filter: blur(6px);
-}
-
-.truck-loading-card-label {
-  color: hsl(216 12% 70%);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-}
-
-.truck-loading-card-value {
-  margin-top: 10px;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.truck-loading-card-left {
-  left: 0;
-  transform: translateY(18px);
-  animation: truck-loading-card-left 3.8s ease-in-out infinite;
-}
-
-.truck-loading-card-right {
-  right: 0;
-  transform: translateY(36px);
-  animation: truck-loading-card-right 4.2s ease-in-out infinite;
-}
-
-.truck-loading-highlights {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.truck-loading-highlight {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 18px;
-  background: hsl(223 26% 13% / 0.72);
-  border: 1px solid hsl(0 0% 100% / 0.06);
-  backdrop-filter: blur(6px);
-}
-
-.truck-loading-highlight-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: hsl(149 100% 70%);
-  background: hsl(149 100% 70% / 0.08);
-  flex: none;
-}
-
-.truck-loading-highlight-title {
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.truck-loading-highlight-desc {
-  margin-top: 4px;
-  color: hsl(216 10% 72%);
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-@keyframes truck-loading-road-flow {
-  from { transform: translateX(0); }
-  to { transform: translateX(56px); }
-}
-
-@keyframes truck-loading-wheel-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes truck-loading-float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-8px) scale(1.01); }
-}
-
-@keyframes truck-loading-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 hsl(149 100% 64% / 0.35); transform: scale(1); }
-  50% { box-shadow: 0 0 0 12px hsl(149 100% 64% / 0); transform: scale(1.06); }
-}
-
-@keyframes truck-loading-bar {
-  0%, 100% { transform: scaleX(0.92); opacity: 0.55; }
-  50% { transform: scaleX(1); opacity: 1; }
-}
-
-@keyframes truck-loading-card-left {
-  0%, 100% { transform: translateY(18px); }
-  50% { transform: translateY(6px); }
-}
-
-@keyframes truck-loading-card-right {
-  0%, 100% { transform: translateY(36px); }
-  50% { transform: translateY(24px); }
-}
-
-@keyframes truck-loading-radar {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.02); opacity: 0.85; }
-}
-
-@media (max-width: 900px) {
-  .truck-loading-stage {
-    min-height: 500px;
-  }
-
-  .truck-loading-highlights {
-    grid-template-columns: 1fr;
-  }
-
-  .truck-loading-card {
-    width: min(220px, 44vw);
-  }
-}
-
-@media (max-width: 720px) {
-  .truck-loading-content {
-    gap: 20px;
-  }
-
-  .truck-loading-stage {
-    min-height: 440px;
-  }
-
-  .truck-loading-road {
-    bottom: 58px;
-    width: 100%;
-  }
-
-  .truck-loading-truck {
-    transform: scale(0.86);
-  }
-
-  .truck-loading-card-left {
-    left: 0;
-    top: 0;
-  }
-
-  .truck-loading-card-right {
-    right: 0;
-    top: 10px;
-  }
-}
-
 @layer base {
   * {
     @apply border-border;
@@ -857,17 +407,31 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "cv11", "ss01", "ss03";
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    /* Match the body font — a single sans for the entire CRM. The old
+       Space Grotesk heading rule made every page header feel like a hero. */
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  /* Tabular numerics on numeric data — KPI strips, tables, badges. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 }
 
 @layer utilities {
+  /* `.glass-card` is referenced from a few internal surfaces. In the CRM
+     look it degrades to a flat card with a hairline border — no blur, no
+     translucency — so internal pages stop looking glassy. The decorative
+     `glass-badge` (used only on landing-style hero overlays) keeps its
+     original look further down. */
   .glass-card {
-    @apply bg-card/80 backdrop-blur-sm border border-border/50;
+    @apply bg-card border border-border;
   }
 
   .glass-badge {
@@ -890,7 +454,8 @@
   }
 
   .input-glow:focus-within {
-    box-shadow: 0 0 0 3px hsl(var(--brand-h) 75% 58% / 0.1), 0 0 20px -5px hsl(var(--brand-h) 75% 58% / 0.15);
+    /* Tight focus ring, no halo. Matches the rest of the form controls. */
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.25);
   }
 
   .btn-gradient {

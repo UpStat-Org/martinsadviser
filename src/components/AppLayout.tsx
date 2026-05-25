@@ -27,22 +27,23 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-background">
       <CommandPalette />
       <AppSidebar />
-      <main className="flex-1 overflow-auto bg-background">
+      <main className="flex-1 overflow-auto">
         <SubscriptionBanner />
-        <div className="sticky top-0 z-10 bg-background/85 backdrop-blur-md border-b border-border/50 px-4 lg:px-8 py-3">
-          <div className="max-w-7xl mx-auto pl-10 lg:pl-0 flex items-center gap-2">
+        {/* Top bar: flat surface, hairline border, no blur. Mobile leaves
+            room for the hamburger button (positioned by AppSidebar). */}
+        <div className="sticky top-0 z-10 bg-background border-b border-border">
+          <div className="max-w-screen-2xl mx-auto pl-14 pr-4 lg:px-8 h-12 flex items-center gap-3">
             <div className="flex-1 max-w-md">
               <GlobalSearch />
             </div>
             <div className="flex-1" />
-            <div className="h-8 w-px bg-border/60 mx-1 hidden sm:block" />
             <NotificationCenter />
           </div>
         </div>
-        <div className="p-4 lg:p-8 max-w-7xl mx-auto">
+        <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-screen-2xl mx-auto">
           <Outlet />
         </div>
       </main>

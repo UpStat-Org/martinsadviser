@@ -17,6 +17,9 @@ import { usePermits } from "@/hooks/usePermits";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import { CommentsSection } from "@/components/CommentsSection";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
+import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-500/10 text-amber-600 border-amber-500/20",
@@ -28,6 +31,7 @@ const STATUS_STYLES: Record<string, string> = {
 export default function InvoiceDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [editOpen, setEditOpen] = useState(false);
   const [permitOpen, setPermitOpen] = useState(false);
   const { data: invoice, isLoading } = useInvoice(id);
@@ -53,7 +57,7 @@ export default function InvoiceDetail() {
     });
   }, [invoice, editOpen]);
 
-  if (isLoading) return <Skeleton className="h-96 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-96 w-full rounded-md" />;
   if (!invoice) return null;
 
   const fmt = (n: number) =>
@@ -77,79 +81,67 @@ export default function InvoiceDetail() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-5">
       <button
         onClick={() => navigate(-1)}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" />
-        Voltar
+        <ArrowLeft className="w-3.5 h-3.5" />
+        {t("common.back")}
       </button>
 
-      <div className="rounded-2xl border border-border/50 bg-card p-5">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-md">
-              <Receipt className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-display text-3xl font-bold">{fmt(Number(invoice.amount))}</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {invoice.description || "Invoice sem descrição"}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline" className={STATUS_STYLES[invoice.status]}>
-              {invoice.status}
-            </Badge>
-            <button
-              onClick={() => setEditOpen(true)}
-              className="h-9 px-3 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold inline-flex items-center gap-2"
-            >
-              <Pencil className="w-4 h-4" />
-              Editar
-            </button>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title={fmt(Number(invoice.amount))}
+        description={invoice.description || t("invoice.noDescription")}
+        meta={
+          <Badge variant="outline" className={STATUS_STYLES[invoice.status]}>
+            {invoice.status}
+          </Badge>
+        }
+        actions={
+          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+            <Pencil className="w-4 h-4 mr-1.5" />
+            {t("common.edit")}
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <StatusTile label="Status operacional" value={invoice.status} tone={invoice.status === "overdue" ? "red" : invoice.status === "paid" ? "emerald" : "amber"} />
-        <StatusTile label="Dias em atraso" value={String(overdueDays)} tone={overdueDays ? "red" : "muted"} />
-        <StatusTile label="Permits do cliente" value={String(permits?.length ?? 0)} tone="muted" />
+        <StatusTile label={t("common.status")} value={invoice.status} tone={invoice.status === "overdue" ? "red" : invoice.status === "paid" ? "emerald" : "amber"} />
+        <StatusTile label={t("invoiceDetail.overdueDays") !== "invoiceDetail.overdueDays" ? t("invoiceDetail.overdueDays") : "Overdue days"} value={String(overdueDays)} tone={overdueDays ? "red" : "muted"} />
+        <StatusTile label={t("nav.permits")} value={String(permits?.length ?? 0)} tone="muted" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="border-border/50 lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base">Dados financeiros</CardTitle>
+            <CardTitle className="text-base">{t("invoiceDetail.financialData")}</CardTitle>
           </CardHeader>
           <CardContent className="grid sm:grid-cols-2 gap-4 text-sm">
-            <Info label="Cliente" value={invoice.clients?.company_name || "—"} to={`/clients/${invoice.client_id}`} icon={<Building2 className="w-4 h-4" />} />
-            <Info label="Valor" value={fmt(Number(invoice.amount))} icon={<DollarSign className="w-4 h-4" />} />
-            <Info label="Vencimento" value={format(new Date(invoice.due_date), "dd/MM/yyyy")} icon={<CalendarDays className="w-4 h-4" />} />
-            <Info label="Pagamento" value={invoice.paid_date ? format(new Date(invoice.paid_date), "dd/MM/yyyy") : "—"} icon={<CalendarDays className="w-4 h-4" />} />
+            <Info label={t("common.client")} value={invoice.clients?.company_name || "—"} to={`/clients/${invoice.client_id}`} icon={<Building2 className="w-4 h-4" />} />
+            <Info label={t("common.value")} value={fmt(Number(invoice.amount))} icon={<DollarSign className="w-4 h-4" />} />
+            <Info label={t("common.dueDate")} value={format(new Date(invoice.due_date), "dd/MM/yyyy")} icon={<CalendarDays className="w-4 h-4" />} />
+            <Info label={t("common.paymentDate")} value={invoice.paid_date ? format(new Date(invoice.paid_date), "dd/MM/yyyy") : "—"} icon={<CalendarDays className="w-4 h-4" />} />
           </CardContent>
         </Card>
 
         <Card className="border-border/50">
           <CardHeader>
-            <CardTitle className="text-base">Ações rápidas</CardTitle>
+            <CardTitle className="text-base">{t("common.quickActions")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Link className="block h-10 px-3 rounded-xl bg-muted/60 hover:bg-muted text-sm font-semibold leading-10" to={`/clients/${invoice.client_id}`}>
-              Abrir cliente
+            <Link className="block h-10 px-3 rounded-md bg-muted/60 hover:bg-muted text-sm font-semibold leading-10" to={`/clients/${invoice.client_id}`}>
+              {t("invoiceDetail.quickClient")}
             </Link>
             <button
-              className="block w-full h-10 px-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold leading-10 text-left"
+              className="block w-full h-10 px-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold leading-10 text-left"
               onClick={() => setPermitOpen(true)}
             >
               <Plus className="inline w-4 h-4 mr-2" />
-              Novo permit do cliente
+              {t("invoiceDetail.quickNewPermit")}
             </button>
-            <Link className="block h-10 px-3 rounded-xl bg-muted/60 hover:bg-muted text-sm font-semibold leading-10" to="/finance">
-              Voltar ao financeiro
+            <Link className="block h-10 px-3 rounded-md bg-muted/60 hover:bg-muted text-sm font-semibold leading-10" to="/finance">
+              {t("invoiceDetail.quickBackFinance")}
             </Link>
           </CardContent>
         </Card>
@@ -169,26 +161,26 @@ export default function InvoiceDetail() {
                 <DocumentLink
                   key={permit.id}
                   path={permit.document_url}
-                  className="flex items-center justify-between rounded-xl border border-border/50 p-3 hover:bg-muted/40"
+                  className="flex items-center justify-between rounded-md border border-border/50 p-3 hover:bg-muted/40"
                 >
                   <span className="text-sm font-semibold">{permit.permit_type}</span>
-                  <span className="text-xs text-muted-foreground">Abrir documento</span>
+                  <span className="text-xs text-muted-foreground">{t("common.openDocument")}</span>
                 </DocumentLink>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">Nenhum documento de permit encontrado para este cliente.</p>
+              <p className="text-sm text-muted-foreground">{t("invoiceDetail.noPermitDoc")}</p>
             )}
           </CardContent>
         </Card>
 
         <Card className="border-border/50">
           <CardHeader>
-            <CardTitle className="text-base">Atividade recente</CardTitle>
+            <CardTitle className="text-base">{t("common.recentActivity")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {activity?.length ? (
               activity.slice(0, 5).map((item) => (
-                <div key={item.id} className="rounded-xl bg-muted/40 border border-border/50 p-3">
+                <div key={item.id} className="rounded-md bg-muted/40 border border-border/50 p-3">
                   <div className="text-sm font-semibold">{item.action}</div>
                   <div className="text-xs text-muted-foreground">
                     {new Date(item.created_at).toLocaleString()}
@@ -196,7 +188,7 @@ export default function InvoiceDetail() {
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">Nenhuma atividade registrada.</p>
+              <p className="text-sm text-muted-foreground">{t("common.noActivity")}</p>
             )}
           </CardContent>
         </Card>
@@ -211,14 +203,14 @@ export default function InvoiceDetail() {
       />
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="rounded-2xl">
+        <DialogContent className="rounded-md">
           <DialogHeader>
-            <DialogTitle>Editar invoice</DialogTitle>
+            <DialogTitle>{t("invoiceDetail.editTitle")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Valor</Label>
+                <Label>{t("common.value")}</Label>
                 <Input
                   type="number"
                   step="0.01"
@@ -227,7 +219,7 @@ export default function InvoiceDetail() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Vencimento</Label>
+                <Label>{t("common.dueDate")}</Label>
                 <Input
                   type="date"
                   value={form.due_date}
@@ -237,20 +229,20 @@ export default function InvoiceDetail() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Status</Label>
+                <Label>{t("common.status")}</Label>
                 <Select value={form.status} onValueChange={(status) => setForm({ ...form, status })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Pendente</SelectItem>
-                    <SelectItem value="paid">Pago</SelectItem>
-                    <SelectItem value="overdue">Atrasado</SelectItem>
-                    <SelectItem value="cancelled">Cancelado</SelectItem>
+                    <SelectItem value="pending">{t("invoice.status.pending")}</SelectItem>
+                    <SelectItem value="paid">{t("invoice.status.paid")}</SelectItem>
+                    <SelectItem value="overdue">{t("invoice.status.overdue")}</SelectItem>
+                    <SelectItem value="cancelled">{t("invoice.status.cancelled")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               {form.status === "paid" && (
                 <div className="space-y-1.5">
-                  <Label>Data de pagamento</Label>
+                  <Label>{t("common.paymentDate")}</Label>
                   <Input
                     type="date"
                     value={form.paid_date}
@@ -260,7 +252,7 @@ export default function InvoiceDetail() {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label>Descrição</Label>
+              <Label>{t("messages.description") !== "messages.description" ? t("messages.description") : "Description"}</Label>
               <Textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -269,9 +261,9 @@ export default function InvoiceDetail() {
             <button
               onClick={handleSave}
               disabled={!form.amount || !form.due_date || updateInvoice.isPending}
-              className="w-full h-11 rounded-xl bg-primary text-primary-foreground font-semibold disabled:opacity-60"
+              className="w-full h-11 rounded-md bg-primary text-primary-foreground font-semibold disabled:opacity-60"
             >
-              {updateInvoice.isPending ? "Salvando..." : "Salvar"}
+              {updateInvoice.isPending ? t("common.loading") : t("common.save")}
             </button>
           </div>
         </DialogContent>
@@ -296,7 +288,7 @@ function StatusTile({
     muted: "bg-muted text-muted-foreground border-border",
   }[tone];
   return (
-    <div className={`rounded-2xl border p-4 ${toneClass}`}>
+    <div className={`rounded-md border p-4 ${toneClass}`}>
       <div className="text-xs font-semibold uppercase tracking-wider opacity-80">{label}</div>
       <div className="text-2xl font-bold mt-1">{value}</div>
     </div>
@@ -315,7 +307,7 @@ function Info({
   to?: string;
 }) {
   const content = (
-    <div className="rounded-xl bg-muted/40 border border-border/50 p-3">
+    <div className="rounded-md bg-muted/40 border border-border/50 p-3">
       <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
         {icon}
         {label}

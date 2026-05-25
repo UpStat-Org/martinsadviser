@@ -75,11 +75,11 @@ export function AccidentsPanel({ clientId, truckId, driverId }: Props) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center shadow-md">
-              <AlertOctagon className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <AlertOctagon className="w-4 h-4 text-secondary-foreground" />
             </div>
             <div>
-              <CardTitle className="font-display text-base">{t("accidents.title")}</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("accidents.title")}</CardTitle>
               <p className="text-xs text-muted-foreground">{t("accidents.subtitle")}</p>
             </div>
           </div>

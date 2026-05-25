@@ -54,7 +54,7 @@ export default function PortalLogin() {
               <Building2 className="w-7 h-7 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="font-display text-2xl">{t("portal.login")}</CardTitle>
+          <CardTitle className="text-2xl">{t("portal.login")}</CardTitle>
           <CardDescription>{t("portal.loginSubtitle")}</CardDescription>
         </CardHeader>
         <CardContent>

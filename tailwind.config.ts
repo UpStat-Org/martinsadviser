@@ -13,10 +13,14 @@ export default {
       },
     },
     extend: {
+      // CRM look: a single typeface for the entire product surface. The
+      // `display` and `brand` aliases stay pointed at Inter so legacy uses
+      // (`font-display`, `font-brand`) keep rendering but pick up the same
+      // weight/spacing as the rest of the UI.
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        display: ["Space Grotesk", "sans-serif"],
-        brand: ["Unbounded", "Space Grotesk", "sans-serif"],
+        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        brand: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -83,11 +87,14 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      // CRM look: shadows are barely visible. Cards rely on 1px borders,
+      // not elevation. `glow` is kept as an alias for `soft` so any legacy
+      // `shadow-glow` usage degrades gracefully instead of breaking.
       boxShadow: {
-        "soft": "0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.06)",
-        "soft-md": "0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)",
-        "soft-lg": "0 10px 15px -3px rgb(0 0 0 / 0.06), 0 4px 6px -4px rgb(0 0 0 / 0.06)",
-        "glow": "0 0 20px -5px hsl(var(--primary) / 0.15)",
+        "soft": "0 1px 2px 0 rgb(15 23 42 / 0.04)",
+        "soft-md": "0 1px 3px 0 rgb(15 23 42 / 0.06), 0 1px 2px -1px rgb(15 23 42 / 0.04)",
+        "soft-lg": "0 4px 12px -2px rgb(15 23 42 / 0.06), 0 2px 4px -2px rgb(15 23 42 / 0.04)",
+        "glow": "0 1px 2px 0 rgb(15 23 42 / 0.04)",
       },
       keyframes: {
         "accordion-down": {

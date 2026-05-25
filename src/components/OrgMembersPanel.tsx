@@ -13,6 +13,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Copy, Loader2, Lock, Mail, Trash2, UserPlus, Users } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Lists the org's members and pending invitations, plus the invite form.
 // Lives in Settings → Organização and shows up only for owners/admins.
@@ -40,6 +41,7 @@ export function OrgMembersPanel() {
   const { currentOrg, isOrgAdmin } = useOrg();
   const qc = useQueryClient();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"member" | "admin">("member");
 
@@ -100,10 +102,10 @@ export function OrgMembersPanel() {
           variant: "destructive",
         });
       } else {
-        toast({ title: "Convite enviado por email" });
+        toast({ title: t("orgMembers.inviteSent") });
       }
     },
-    onError: (e: any) => toast({ title: "Falha ao convidar", description: e.message, variant: "destructive" }),
+    onError: (e: any) => toast({ title: t("orgMembers.inviteFailed"), description: e.message, variant: "destructive" }),
   });
 
   const revoke = useMutation({
@@ -126,9 +128,9 @@ export function OrgMembersPanel() {
   const copyLink = async (token: string) => {
     try {
       await navigator.clipboard.writeText(inviteUrl(token));
-      toast({ title: "Link copiado" });
+      toast({ title: t("orgMembers.linkCopied") });
     } catch {
-      toast({ title: "Não foi possível copiar", variant: "destructive" });
+      toast({ title: t("orgMembers.copyFailed"), variant: "destructive" });
     }
   };
 
@@ -144,7 +146,7 @@ export function OrgMembersPanel() {
       <Card className="border-border/50">
         <CardContent className="p-6 flex items-center gap-3 text-muted-foreground">
           <Lock className="w-4 h-4" />
-          <span className="text-sm">Apenas owner/admin pode gerenciar membros.</span>
+          <span className="text-sm">{t("orgMembers.ownerOnly")}</span>
         </CardContent>
       </Card>
     );
@@ -156,11 +158,10 @@ export function OrgMembersPanel() {
         <div>
           <h3 className="text-base font-semibold flex items-center gap-2">
             <Users className="w-4 h-4" />
-            Membros & convites
+            {t("orgMembers.heading")}
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Convide pessoas pra organização. Owner/admin podem ver e gerenciar permits, clientes e configurações.
-            Member tem acesso operacional, sem configurar a org.
+            {t("orgMembers.headingHint")}
           </p>
         </div>
 
@@ -170,7 +171,7 @@ export function OrgMembersPanel() {
           onSubmit={(e) => { e.preventDefault(); invite.mutate(); }}
         >
           <div className="space-y-1">
-            <Label htmlFor="invite-email" className="sr-only">Email</Label>
+            <Label htmlFor="invite-email" className="sr-only">{t("common.email")}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <Input
@@ -178,7 +179,7 @@ export function OrgMembersPanel() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="email@empresa.com"
+                placeholder={t("orgMembers.inviteEmailPlaceholder")}
                 className="pl-9"
               />
             </div>
@@ -188,13 +189,13 @@ export function OrgMembersPanel() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="member">Member</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="member">{t("orgMembers.roleMember")}</SelectItem>
+              <SelectItem value="admin">{t("orgMembers.roleAdmin")}</SelectItem>
             </SelectContent>
           </Select>
           <Button type="submit" disabled={!email || invite.isPending} className="gap-2">
             {invite.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
-            Convidar
+            {t("orgMembers.invite")}
           </Button>
         </form>
 
@@ -202,7 +203,7 @@ export function OrgMembersPanel() {
         {!!invitationsQuery.data?.length && (
           <section className="space-y-2">
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-              Convites pendentes ({invitationsQuery.data.length})
+              {t("orgMembers.pendingInvites")} ({invitationsQuery.data.length})
             </Label>
             <div className="divide-y divide-border/50 border border-border/50 rounded-lg overflow-hidden">
               {invitationsQuery.data.map((inv) => {
@@ -218,17 +219,17 @@ export function OrgMembersPanel() {
                     <div className="flex items-center gap-1.5 shrink-0">
                       <Badge variant="outline" className="capitalize">{inv.role}</Badge>
                       {expired ? (
-                        <Badge variant="destructive">Expirado</Badge>
+                        <Badge variant="destructive">{t("orgMembers.invitedExpired")}</Badge>
                       ) : (
                         <span className="text-[11px] text-muted-foreground">
-                          até {format(new Date(inv.expires_at), "dd/MM")}
+                          {t("orgMembers.expiresAt")} {format(new Date(inv.expires_at), "dd/MM")}
                         </span>
                       )}
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        title="Copiar link"
+                        title={t("orgMembers.copyLink")}
                         onClick={() => copyLink(inv.token)}
                       >
                         <Copy className="w-3.5 h-3.5" />
@@ -237,7 +238,7 @@ export function OrgMembersPanel() {
                         type="button"
                         variant="ghost"
                         size="icon"
-                        title="Revogar"
+                        title={t("orgMembers.revoke")}
                         onClick={() => revoke.mutate(inv.id)}
                         disabled={revoke.isPending}
                       >
@@ -254,14 +255,14 @@ export function OrgMembersPanel() {
         {/* Existing members */}
         <section className="space-y-2">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-            Membros ({memberSorted.length})
+            {t("orgMembers.members")} ({memberSorted.length})
           </Label>
           {membersQuery.isLoading ? (
             <div className="py-6 flex justify-center">
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
             </div>
           ) : !memberSorted.length ? (
-            <p className="text-sm text-muted-foreground">Nenhum membro aprovado ainda.</p>
+            <p className="text-sm text-muted-foreground">{t("orgMembers.noMembersYet")}</p>
           ) : (
             <div className="divide-y divide-border/50 border border-border/50 rounded-lg overflow-hidden">
               {memberSorted.map((m) => (

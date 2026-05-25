@@ -48,7 +48,7 @@ export function InvitePortalDialog({ open, onOpenChange, clientId, clientName }:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display">{t("portal.inviteClient")}</DialogTitle>
+          <DialogTitle className="">{t("portal.inviteClient")}</DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground">
           {clientName}

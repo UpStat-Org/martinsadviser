@@ -99,9 +99,11 @@ export function AppSidebar() {
     }
     if (isSuperAdmin) {
       base.push({
+        // Super-admin section labels stay in English — only platform owners
+        // ever see this section and the strings double as the page title.
         label: "Super-admin",
         items: [
-          { to: "/super-admin", icon: ShieldCheck, label: "Organizações" },
+          { to: "/super-admin", icon: ShieldCheck, label: "Organizations" },
         ],
       });
     }
@@ -127,21 +129,21 @@ export function AppSidebar() {
   const renderNavItem = (item: NavItem) => {
     const active = !item.external && isActive(item.to);
     const className = cn(
-      "group relative flex items-center gap-3 h-9 rounded-md text-[13px] font-medium transition-colors",
+      "group relative flex items-center gap-2.5 h-8 rounded-md text-[13px] transition-colors",
       collapsed && !isMobile ? "justify-center px-0 mx-1" : "px-2.5",
       active
-        ? "bg-sidebar-accent/75 text-sidebar-accent-foreground font-semibold"
-        : "text-sidebar-foreground/68 hover:bg-sidebar-accent/45 hover:text-sidebar-foreground"
+        ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
     );
     const content = (
       <>
         {active && !collapsed && (
-          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-sidebar-primary" />
+          <span className="absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-r bg-sidebar-primary" />
         )}
         <item.icon
           className={cn(
             "w-4 h-4 shrink-0 transition-colors",
-            active ? "text-sidebar-primary" : "text-sidebar-foreground/45 group-hover:text-sidebar-foreground/80"
+            active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground/55 group-hover:text-sidebar-accent-foreground"
           )}
         />
         {showLabel && <span className="truncate">{item.label}</span>}
@@ -177,22 +179,19 @@ export function AppSidebar() {
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      {/* Logo */}
+      {/* Logo + wordmark — neutral, no status dot, no halo. */}
       <div className={cn(
-        "flex items-center gap-3 h-14 border-b border-sidebar-border/40 shrink-0",
+        "flex items-center gap-2.5 h-14 border-b border-sidebar-border shrink-0",
         collapsed && !isMobile ? "justify-center px-2" : "px-4"
       )}>
-        <div className="relative shrink-0">
-          <Logo
-            src={branding.logo_url}
-            title={branding.app_name}
-            className="w-8 h-8 rounded-lg shadow-sm"
-          />
-          <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 ring-1 ring-sidebar-background" />
-        </div>
+        <Logo
+          src={branding.logo_url}
+          title={branding.app_name}
+          className="w-7 h-7 rounded shrink-0"
+        />
         {showLabel && (
           <Wordmark
-            size="sm"
+            size="md"
             tone="dark"
             className="min-w-0"
             primary={wordmark.primary}
@@ -201,7 +200,11 @@ export function AppSidebar() {
           />
         )}
         {isMobile && (
-          <button onClick={() => setMobileOpen(false)} className="ml-auto text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors">
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="ml-auto text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors"
+            aria-label="Close menu"
+          >
             <X className="w-4 h-4" />
           </button>
         )}
@@ -210,28 +213,29 @@ export function AppSidebar() {
       {/* User card */}
       {user && (
         <div className={cn(
-          "border-b border-sidebar-border/40 shrink-0",
-          collapsed && !isMobile ? "py-2 px-2 flex justify-center" : "p-3"
+          "border-b border-sidebar-border shrink-0",
+          collapsed && !isMobile ? "py-2 px-2 flex justify-center" : "p-2"
         )}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-          className={cn(
-            "w-full flex items-center gap-2.5 rounded-md hover:bg-sidebar-accent/40 transition-colors group",
-            collapsed && !isMobile ? "p-1" : "p-1.5"
-          )}
+                className={cn(
+                  "w-full flex items-center gap-2.5 rounded-md hover:bg-sidebar-accent transition-colors group",
+                  collapsed && !isMobile ? "p-1" : "p-1.5"
+                )}
                 title={collapsed && !isMobile ? displayName : undefined}
               >
-                <div className="relative shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-violet-400 ring-1 ring-sidebar-border/50 flex items-center justify-center text-[11px] font-semibold text-white shadow-sm">
+                {/* Flat avatar — square with subtle radius, no gradient. */}
+                <div className="shrink-0 w-7 h-7 rounded bg-secondary text-secondary-foreground flex items-center justify-center text-[11px] font-semibold border border-sidebar-border">
                   {initials}
                 </div>
                 {showLabel && (
                   <>
                     <div className="flex-1 min-w-0 text-left">
                       <div className="text-[12px] font-medium text-sidebar-foreground truncate">{displayName}</div>
-                      <div className="text-[10px] text-sidebar-foreground/45 truncate">{roleLabel}</div>
+                      <div className="text-[10px] text-sidebar-foreground/55 truncate">{roleLabel}</div>
                     </div>
-                    <MoreHorizontal className="w-3.5 h-3.5 text-sidebar-foreground/30 group-hover:text-sidebar-foreground/60" />
+                    <MoreHorizontal className="w-3.5 h-3.5 text-sidebar-foreground/40 group-hover:text-sidebar-foreground/70" />
                   </>
                 )}
               </button>
@@ -266,16 +270,16 @@ export function AppSidebar() {
       <OrgSwitcher collapsed={collapsed && !isMobile} />
 
       {/* Navigation */}
-      <nav className="flex-1 py-3 overflow-y-auto sidebar-scrollbar">
-        <div className={cn("space-y-5", collapsed && !isMobile ? "px-1" : "px-2")}>
+      <nav className="flex-1 py-2 overflow-y-auto sidebar-scrollbar">
+        <div className={cn("space-y-4", collapsed && !isMobile ? "px-1" : "px-2")}>
           {sections.map((section, idx) => (
-            <div key={section.label} className="space-y-0.5">
+            <div key={section.label} className="space-y-px">
               {showLabel ? (
-                <p className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-sidebar-foreground/35">
+                <p className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
                   {section.label}
                 </p>
               ) : (
-                idx > 0 && <div className="my-2 mx-2 h-px bg-sidebar-border/40" />
+                idx > 0 && <div className="my-2 mx-2 h-px bg-sidebar-border" />
               )}
               {section.items.map(renderNavItem)}
             </div>
@@ -284,21 +288,21 @@ export function AppSidebar() {
       </nav>
 
       {/* Footer: collapse toggle + quick theme + logout */}
-      <div className="border-t border-sidebar-border/40 shrink-0 p-2">
+      <div className="border-t border-sidebar-border shrink-0 p-2">
         {showLabel ? (
           <div className="flex items-center justify-between gap-1">
             <div className="flex items-center gap-0.5">
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 title={theme === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode")}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
               <button
                 onClick={() => navigate("/settings")}
                 title={t("nav.settings")}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               >
                 <Settings className="w-4 h-4" />
               </button>
@@ -314,7 +318,7 @@ export function AppSidebar() {
               <button
                 onClick={() => setCollapsed(true)}
                 title={t("sidebar.collapse")}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/40 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/40 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               >
                 <ChevronsLeft className="w-4 h-4" />
               </button>
@@ -325,7 +329,7 @@ export function AppSidebar() {
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               title={theme === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode")}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
@@ -340,7 +344,7 @@ export function AppSidebar() {
               <button
                 onClick={() => setCollapsed(false)}
                 title={t("sidebar.expand")}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/40 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/40 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               >
                 <ChevronsRight className="w-4 h-4" />
               </button>
@@ -356,16 +360,17 @@ export function AppSidebar() {
       <>
         <button
           onClick={() => setMobileOpen(true)}
-          className="fixed top-3 left-3 z-50 p-2 rounded-lg bg-background border shadow-soft lg:hidden"
+          className="fixed top-3 left-3 z-50 p-2 rounded-md bg-card border border-border shadow-soft lg:hidden"
+          aria-label="Open menu"
         >
           <Menu className="w-5 h-5" />
         </button>
         {mobileOpen && (
-          <div className="fixed inset-0 z-40 bg-foreground/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <div className="fixed inset-0 z-40 bg-foreground/40" onClick={() => setMobileOpen(false)} />
         )}
         <aside
           className={cn(
-            "fixed inset-y-0 left-0 z-50 flex flex-col w-72 bg-sidebar text-sidebar-foreground border-r border-sidebar-border/50 shadow-2xl transition-transform duration-300",
+            "fixed inset-y-0 left-0 z-50 flex flex-col w-72 bg-sidebar text-sidebar-foreground border-r border-sidebar-border shadow-soft-lg transition-transform duration-200",
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
@@ -375,14 +380,14 @@ export function AppSidebar() {
     );
   }
 
+  // Desktop sidebar — neutral surface, hairline border, no decorative overlay.
   return (
     <aside
       className={cn(
-        "hidden lg:flex flex-col h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border/40 transition-[width] duration-300 relative",
-        collapsed ? "w-[64px]" : "w-[232px]"
+        "hidden lg:flex flex-col h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-[width] duration-200 relative",
+        collapsed ? "w-[60px]" : "w-[224px]"
       )}
     >
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-sidebar-primary/[0.04] to-transparent pointer-events-none" />
       {sidebarContent}
     </aside>
   );

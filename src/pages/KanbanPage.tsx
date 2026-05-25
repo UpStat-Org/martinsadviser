@@ -55,6 +55,8 @@ import { CommentsSection } from "@/components/CommentsSection";
 import { TaskTimeLogger } from "@/components/TaskTimeLogger";
 import { format, isPast, isToday } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { PageHeader } from "@/components/PageHeader";
+import { cn } from "@/lib/utils";
 
 const COLUMNS = [
   {
@@ -110,18 +112,15 @@ const TASK_TYPES = [
 
 const PRIORITY_STYLES: Record<string, { bar: string; badge: string; labelKey: string }> = {
   high: {
-    bar: "bg-gradient-to-b from-red-500 to-rose-500",
-    badge: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+    bar: "bg-secondary text-secondary-foreground border border-border",    badge: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
     labelKey: "priority.high",
   },
   medium: {
-    bar: "bg-gradient-to-b from-amber-400 to-orange-400",
-    badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    bar: "bg-secondary text-secondary-foreground border border-border",    badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
     labelKey: "priority.medium",
   },
   low: {
-    bar: "bg-gradient-to-b from-sky-400 to-blue-400",
-    badge: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+    bar: "bg-secondary text-secondary-foreground border border-border",    badge: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
     labelKey: "priority.low",
   },
 };
@@ -275,69 +274,49 @@ export default function KanbanPage() {
     );
   }
 
+  const kpis: Array<{ label: string; value: number; icon: typeof KanbanIcon; tone: "neutral" | "warning" | "danger" }> = [
+    { label: t("kanban.stats.total"), value: stats.total, icon: KanbanIcon, tone: "neutral" },
+    { label: t("kanban.stats.today"), value: stats.dueToday, icon: CalendarIcon, tone: "warning" },
+    { label: t("kanban.stats.overdue"), value: stats.overdue, icon: Flame, tone: "danger" },
+    { label: t("kanban.stats.completed"), value: stats.completed, icon: CheckCircle2, tone: "neutral" },
+  ];
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
-
-        <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-              <KanbanIcon className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
-                {t("kanban.title")}
-              </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
-                {t("kanban.subtitle")}
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => openNew()}
-            className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
-          >
-            <Plus className="w-4 h-4" />
+    <div className="space-y-5">
+      <PageHeader
+        title={t("kanban.title")}
+        description={t("kanban.subtitle")}
+        actions={
+          <Button size="sm" onClick={() => openNew()}>
+            <Plus className="w-4 h-4 mr-1.5" />
             {t("kanban.newTask")}
-          </button>
-        </div>
-      </div>
+          </Button>
+        }
+      />
 
-      {/* ============ QUICK STATS ============ */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {[
-          { label: t("kanban.stats.total"), value: stats.total, icon: KanbanIcon, gradient: "from-indigo-500 to-violet-500" },
-          { label: t("kanban.stats.today"), value: stats.dueToday, icon: CalendarIcon, gradient: "from-sky-500 to-blue-500" },
-          { label: t("kanban.stats.overdue"), value: stats.overdue, icon: Flame, gradient: "from-red-500 to-rose-500" },
-          { label: t("kanban.stats.completed"), value: stats.completed, icon: CheckCircle2, gradient: "from-emerald-500 to-teal-500" },
-        ].map((s) => (
-          <div
-            key={s.label}
-            className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
-          >
+      {/* KPI strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        {kpis.map((s) => {
+          const toneBar =
+            s.tone === "danger" ? "bg-destructive" : s.tone === "warning" ? "bg-warning" : null;
+          return (
             <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
-            />
-            <div className="relative flex items-start justify-between mb-3">
-              <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-md`}
-              >
-                <s.icon className="w-4 h-4 text-white" />
+              key={s.label}
+              className="relative rounded-md border border-border bg-card p-3.5 transition-colors hover:bg-muted/60 overflow-hidden"
+            >
+              {toneBar && (
+                <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1", toneBar)} />
+              )}
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  {s.label}
+                </span>
+                <s.icon className="w-4 h-4 text-muted-foreground/70" />
               </div>
+              <div className="text-2xl font-semibold tracking-tight tabular mt-1.5">{s.value}</div>
             </div>
-            <div className="relative">
-              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                {s.label}
-              </div>
-              <div className="font-display text-3xl font-bold tracking-tight">{s.value}</div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* ============ BOARD ============ */}
@@ -355,19 +334,19 @@ export default function KanbanPage() {
               onDrop={() => handleDrop(col.id)}
             >
               {/* Column header */}
-              <div className="relative overflow-hidden rounded-2xl bg-card border border-border/50 p-3">
+              <div className="relative overflow-hidden rounded-md bg-card border border-border/50 p-3">
                 <div
-                  className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${col.gradient}`}
+                  className={`absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border`}
                 />
                 <div className="flex items-center justify-between mt-1">
                   <div className="flex items-center gap-2 min-w-0">
                     <div
-                      className={`w-8 h-8 rounded-lg bg-gradient-to-br ${col.gradient} flex items-center justify-center shadow-sm flex-shrink-0`}
+                      className={`w-8 h-8 rounded-lg bg-secondary text-secondary-foreground border border-border flex items-center justify-center shadow-sm flex-shrink-0`}
                     >
-                      <Icon className="w-4 h-4 text-white" />
+                      <Icon className="w-4 h-4 text-secondary-foreground" />
                     </div>
                     <div className="min-w-0">
-                      <h2 className="font-display font-bold text-sm truncate">
+                      <h2 className="font-bold text-sm truncate">
                         {t(col.labelKey)}
                       </h2>
                       <span className="text-[10px] text-muted-foreground">
@@ -386,14 +365,14 @@ export default function KanbanPage() {
 
               {/* Column body */}
               <div
-                className={`rounded-2xl p-2 min-h-[200px] space-y-2 transition-all ${col.tint} border ${
+                className={`rounded-md p-2 min-h-[200px] space-y-2 transition-all ${col.tint} border ${
                   isDragOver ? `${col.border} border-dashed border-2` : "border-transparent"
                 }`}
               >
                 {colTasks.length === 0 && !isDragOver && (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
                     <div
-                      className={`w-10 h-10 rounded-xl ${col.tint} ${col.border} border flex items-center justify-center mb-2`}
+                      className={`w-10 h-10 rounded-md ${col.tint} ${col.border} border flex items-center justify-center mb-2`}
                     >
                       <Icon className="w-4 h-4 text-muted-foreground/60" />
                     </div>
@@ -488,7 +467,7 @@ export default function KanbanPage() {
                               </span>
                             )}
                             {task.notes?.startsWith("[Auto]") && (
-                              <span className="inline-flex items-center gap-1 h-5 px-2 rounded-md text-[10px] font-bold bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white shadow-sm">
+                              <span className="inline-flex items-center gap-1 h-5 px-2 rounded-md text-[10px] font-bold bg-secondary text-secondary-foreground border border-border shadow-sm">
                                 <Sparkles className="w-2.5 h-2.5" />
                                 Auto
                               </span>
@@ -500,9 +479,7 @@ export default function KanbanPage() {
                         {task.clients?.company_name && (
                           <div className="flex items-center gap-2 min-w-0">
                             <div
-                              className={`w-5 h-5 rounded-md bg-gradient-to-br ${gradientFor(
-                                task.clients.company_name
-                              )} flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0`}
+                              className={`w-5 h-5 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0`}
                             >
                               {initials(task.clients.company_name)}
                             </div>
@@ -577,14 +554,14 @@ export default function KanbanPage() {
 
       {/* ============ TASK DIALOG ============ */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg rounded-2xl">
+        <DialogContent className="max-w-lg rounded-md">
           <DialogHeader>
-            <DialogTitle className="font-display text-xl flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
                 {editingTask ? (
-                  <Pencil className="w-4 h-4 text-white" />
+                  <Pencil className="w-4 h-4 text-secondary-foreground" />
                 ) : (
-                  <Plus className="w-4 h-4 text-white" />
+                  <Plus className="w-4 h-4 text-secondary-foreground" />
                 )}
               </div>
               {editingTask ? t("kanban.editTask") : t("kanban.newTask")}
@@ -602,7 +579,7 @@ export default function KanbanPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t("kanban.taskTitlePlaceholder")}
-                className="h-11 rounded-xl mt-1.5"
+                className="h-11 rounded-md mt-1.5"
               />
             </div>
 
@@ -612,7 +589,7 @@ export default function KanbanPage() {
                   {t("common.type")}
                 </label>
                 <Select value={taskType} onValueChange={setTaskType}>
-                  <SelectTrigger className="h-11 rounded-xl mt-1.5">
+                  <SelectTrigger className="h-11 rounded-md mt-1.5">
                     <SelectValue placeholder={t("kanban.selectType")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -629,7 +606,7 @@ export default function KanbanPage() {
                   {t("common.client")}
                 </label>
                 <Select value={clientId} onValueChange={setClientId}>
-                  <SelectTrigger className="h-11 rounded-xl mt-1.5">
+                  <SelectTrigger className="h-11 rounded-md mt-1.5">
                     <SelectValue placeholder={t("common.none")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -653,7 +630,7 @@ export default function KanbanPage() {
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="h-11 rounded-xl mt-1.5"
+                  className="h-11 rounded-md mt-1.5"
                 />
               </div>
               <div>
@@ -661,7 +638,7 @@ export default function KanbanPage() {
                   {t("kanban.priority")}
                 </label>
                 <Select value={priority} onValueChange={setPriority}>
-                  <SelectTrigger className="h-11 rounded-xl mt-1.5">
+                  <SelectTrigger className="h-11 rounded-md mt-1.5">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -681,7 +658,7 @@ export default function KanbanPage() {
                 value={operator}
                 onChange={(e) => setOperator(e.target.value)}
                 placeholder={t("kanban.operatorPlaceholder")}
-                className="h-11 rounded-xl mt-1.5"
+                className="h-11 rounded-md mt-1.5"
               />
             </div>
 
@@ -694,7 +671,7 @@ export default function KanbanPage() {
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   placeholder={t("kanban.tagPlaceholder")}
-                  className="h-10 rounded-xl"
+                  className="h-10 rounded-md"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
@@ -706,7 +683,7 @@ export default function KanbanPage() {
                   type="button"
                   variant="outline"
                   onClick={handleAddTag}
-                  className="h-10 rounded-xl"
+                  className="h-10 rounded-md"
                 >
                   {t("common.add")}
                 </Button>
@@ -741,7 +718,7 @@ export default function KanbanPage() {
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 placeholder={t("kanban.notesPlaceholder")}
-                className="rounded-xl mt-1.5"
+                className="rounded-md mt-1.5"
               />
             </div>
 
@@ -749,16 +726,16 @@ export default function KanbanPage() {
               <Button
                 variant="outline"
                 onClick={() => setDialogOpen(false)}
-                className="h-10 rounded-xl"
+                className="h-10 rounded-md"
               >
                 {t("common.cancel")}
               </Button>
               <button
                 onClick={handleSubmit}
                 disabled={!name.trim() || createTask.isPending || updateTask.isPending}
-                className="group h-10 px-5 btn-gradient text-white text-sm font-semibold rounded-xl inline-flex items-center gap-1.5 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all disabled:opacity-60 relative overflow-hidden"
+                className="group h-10 px-5 bg-primary text-primary-foreground hover:bg-primary/90 text-white text-sm font-semibold rounded-md inline-flex items-center gap-1.5 transition-all disabled:opacity-60 relative overflow-hidden"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="absolute inset-0 bg-secondary text-secondary-foreground border border-border -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 {createTask.isPending || updateTask.isPending
                   ? t("common.saving")
                   : editingTask
@@ -777,11 +754,11 @@ export default function KanbanPage() {
           if (!v) setShowComments(null);
         }}
       >
-        <DialogContent className="sm:max-w-lg rounded-2xl">
+        <DialogContent className="sm:max-w-lg rounded-md">
           <DialogHeader>
-            <DialogTitle className="font-display flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center">
-                <MessageSquare className="w-4 h-4 text-white" />
+            <DialogTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                <MessageSquare className="w-4 h-4 text-secondary-foreground" />
               </div>
               {t("kanban.taskComments")}
             </DialogTitle>

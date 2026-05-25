@@ -21,6 +21,14 @@ export function Logo({ className = "w-10 h-10", title = "MartinsAdviser", src }:
       />
     );
   }
+  // Silhueta lateral de semi-truck: trailer (caixa de carga retangular,
+  // mais alta) à esquerda + cab com windshield inclinado à direita + duas
+  // rodas (rear do trailer + front do cab). Tudo sólido branco sobre
+  // charcoal slate-900 — sem gradientes, sem stripe de marca, sem cara de
+  // mascote. O 1px de gap entre trailer e cab simula o fifth-wheel
+  // coupling, sutil em telas grandes e some no favicon (apenas duas
+  // formas + dois dots). Charcoal fixo para que a marca não compita com
+  // o primary do tenant.
   return (
     <svg
       viewBox="0 0 48 48"
@@ -29,54 +37,14 @@ export function Logo({ className = "w-10 h-10", title = "MartinsAdviser", src }:
       role="img"
       aria-label={title}
     >
-      <defs>
-        <linearGradient id="ma-bg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#5B7BFF" />
-          <stop offset="55%" stopColor="#3D5AF1" />
-          <stop offset="100%" stopColor="#7C3AED" />
-        </linearGradient>
-        <linearGradient id="ma-accent" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#FCD34D" />
-          <stop offset="100%" stopColor="#F59E0B" />
-        </linearGradient>
-        <linearGradient id="ma-shine" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="white" stopOpacity="0.28" />
-          <stop offset="100%" stopColor="white" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-
-      <rect width="48" height="48" rx="12" fill="url(#ma-bg)" />
-      <rect width="48" height="24" rx="12" fill="url(#ma-shine)" />
-
-      {/* Motion / speed lines */}
-      <path d="M4 18h5" stroke="white" strokeOpacity="0.55" strokeWidth="1.6" strokeLinecap="round" />
-      <path d="M3 23h7" stroke="white" strokeOpacity="0.35" strokeWidth="1.6" strokeLinecap="round" />
-      <path d="M5 28h4" stroke="white" strokeOpacity="0.45" strokeWidth="1.6" strokeLinecap="round" />
-
-      {/* Trailer */}
-      <rect x="12" y="17" width="16" height="14" rx="1.8" fill="white" />
-      {/* Cab */}
-      <path d="M28 22h5.5l4.5 4.5V31H28z" fill="white" />
-      {/* Windshield */}
-      <path d="M29.5 23.2h4l2.3 2.3h-6.3z" fill="#3D5AF1" fillOpacity="0.85" />
-
-      {/* Amber side stripe */}
-      <rect x="12" y="25.6" width="16" height="1.6" fill="url(#ma-accent)" />
-      {/* M monogram on trailer */}
-      <path
-        d="M15.5 20.6l1.7 3 1.7-3 1.7 3 1.7-3"
-        stroke="url(#ma-accent)"
-        strokeWidth="1.35"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-
-      {/* Wheels */}
-      <circle cx="17" cy="32" r="2.9" fill="#0B0D2E" />
-      <circle cx="17" cy="32" r="1.15" fill="url(#ma-accent)" />
-      <circle cx="33" cy="32" r="2.9" fill="#0B0D2E" />
-      <circle cx="33" cy="32" r="1.15" fill="url(#ma-accent)" />
+      <rect width="48" height="48" rx="8" fill="#0F172A" />
+      {/* Trailer — cargo box on the left, taller than the cab */}
+      <rect x="6" y="15" width="20" height="16" fill="#ffffff" />
+      {/* Cab — shorter, with a slanted windshield at the front-right */}
+      <path d="M27 31 L27 21 L37 21 L41 25 L41 31 Z" fill="#ffffff" />
+      {/* Wheels — rear of trailer + front of cab */}
+      <circle cx="12" cy="35" r="3" fill="#ffffff" />
+      <circle cx="36" cy="35" r="3" fill="#ffffff" />
     </svg>
   );
 }

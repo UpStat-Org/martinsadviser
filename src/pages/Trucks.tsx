@@ -38,6 +38,8 @@ import { useTrucks, useDeleteTruck } from "@/hooks/useTrucks";
 import { TruckFormDialog } from "@/components/TruckFormDialog";
 import type { Truck, TruckWithClient } from "@/hooks/useTrucks";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/EmptyState";
 import { TablePreferencesToolbar, type Density } from "@/components/TablePreferencesToolbar";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
@@ -103,100 +105,51 @@ export default function Trucks() {
     return { total, active, inactive, recent };
   }, [trucks]);
 
+  const kpis: Array<{ label: string; value: number; icon: typeof TruckIcon }> = [
+    { label: t("trucks.statsTotal"), value: stats.total, icon: TruckIcon },
+    { label: t("trucks.statsActive"), value: stats.active, icon: CheckCircle2 },
+    { label: t("trucks.statsInactive"), value: stats.inactive, icon: XCircle },
+    { label: t("trucks.statsRecent"), value: stats.recent, icon: Calendar },
+  ];
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* ============ HERO HEADER ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
-
-        <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-              <TruckIcon className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
-                {t("trucks.title")}
-              </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
-                {t("trucks.subtitle")}
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={handleNew}
-            className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
-          >
-            <Plus className="w-4 h-4" />
+    <div className="space-y-5">
+      <PageHeader
+        title={t("trucks.title")}
+        description={t("trucks.subtitle")}
+        actions={
+          <Button size="sm" onClick={handleNew}>
+            <Plus className="w-4 h-4 mr-1.5" />
             {t("trucks.new")}
-          </button>
-        </div>
-      </div>
+          </Button>
+        }
+      />
 
-      {/* ============ QUICK STATS ============ */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {[
-          {
-            label: "Total de caminhões",
-            value: stats.total,
-            icon: TruckIcon,
-            gradient: "from-indigo-500 to-violet-500",
-          },
-          {
-            label: "Ativos",
-            value: stats.active,
-            icon: CheckCircle2,
-            gradient: "from-emerald-500 to-teal-500",
-          },
-          {
-            label: "Inativos",
-            value: stats.inactive,
-            icon: XCircle,
-            gradient: "from-slate-500 to-zinc-500",
-          },
-          {
-            label: "Frota recente (≤5 anos)",
-            value: stats.recent,
-            icon: Calendar,
-            gradient: "from-sky-500 to-blue-500",
-          },
-        ].map((s) => (
+      {/* KPI strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        {kpis.map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="rounded-md border border-border bg-card p-3.5 transition-colors hover:bg-muted/60"
           >
-            <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
-            />
-            <div className="relative flex items-start justify-between mb-3">
-              <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-md`}
-              >
-                <s.icon className="w-4 h-4 text-white" />
-              </div>
-            </div>
-            <div className="relative">
-              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
+            <div className="flex items-start justify-between gap-2">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                 {s.label}
-              </div>
-              <div className="font-display text-3xl font-bold tracking-tight">
-                {s.value}
-              </div>
+              </span>
+              <s.icon className="w-4 h-4 text-muted-foreground/70" />
             </div>
+            <div className="text-2xl font-semibold tracking-tight tabular mt-1.5">{s.value}</div>
           </div>
         ))}
       </div>
 
       {/* ============ SEARCH ============ */}
-      <div className="rounded-2xl bg-card border border-border/50 p-3 flex flex-col sm:flex-row sm:items-center gap-3">
+      <div className="rounded-md bg-card border border-border/50 p-3 flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder={t("trucks.search")}
-            className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-xl transition-colors"
+            className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-md transition-colors"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -236,7 +189,7 @@ export default function Trucks() {
             !search ? (
               <button
                 onClick={handleNew}
-                className="h-11 px-6 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-2 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
+                className="h-11 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-white text-sm font-semibold inline-flex items-center gap-2 transition-all"
               >
                 <Plus className="w-4 h-4" />
                 {t("trucks.registerFirst")}
@@ -244,7 +197,7 @@ export default function Trucks() {
             ) : (
               <button
                 onClick={() => setSearch("")}
-                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold"
+                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold"
               >
                 {t("common.clearSearch")}
               </button>
@@ -254,7 +207,7 @@ export default function Trucks() {
             !search ? (
               <button
                 onClick={() => navigate("/clients")}
-                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold"
+                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold"
               >
                 {t("common.viewClients")}
               </button>
@@ -307,11 +260,9 @@ export default function Trucks() {
                       <TableCell className={density === "compact" ? "py-2" : "py-3"}>
                         <div className="flex items-center gap-3">
                           <div
-                            className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientFor(
-                              truck.id
-                            )} flex items-center justify-center shadow-md flex-shrink-0`}
+                            className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center flex-shrink-0`}
                           >
-                            <TruckIcon className="w-4 h-4 text-white" />
+                            <TruckIcon className="w-4 h-4 text-secondary-foreground" />
                           </div>
                           <div className="min-w-0">
                             <div className="font-mono text-sm font-bold tracking-wide">

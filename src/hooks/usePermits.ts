@@ -7,6 +7,7 @@ import type {
 } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
+import { sanitizeSearchTerm } from "@/lib/utils";
 
 export type Permit = Tables<"permits">;
 export type PermitInsert = TablesInsert<"permits">;
@@ -70,9 +71,14 @@ export function usePermits(
         .order("expiration_date", { ascending: true });
       if (clientId) query = query.eq("client_id", clientId);
       if (search) {
-        query = query.or(
-          `permit_type.ilike.%${search}%,permit_number.ilike.%${search}%,state.ilike.%${search}%`,
-        );
+        // See useTrucks for the rationale — punctuation in the raw query
+        // would corrupt the PostgREST OR list.
+        const safe = sanitizeSearchTerm(search);
+        if (safe) {
+          query = query.or(
+            `permit_type.ilike.%${safe}%,permit_number.ilike.%${safe}%,state.ilike.%${safe}%`,
+          );
+        }
       }
       if (statusFilter && statusFilter !== "all") {
         query = query.eq("status", statusFilter);

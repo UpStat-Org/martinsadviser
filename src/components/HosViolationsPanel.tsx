@@ -65,7 +65,7 @@ export function HosViolationsPanel({ driverId }: { driverId: string }) {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="font-display text-base flex items-center gap-2">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
             <Clock className="w-4 h-4" />
             {t("hos.title")} ({violations?.length ?? 0})
           </CardTitle>

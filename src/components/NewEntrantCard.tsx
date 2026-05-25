@@ -61,11 +61,11 @@ export function NewEntrantCard({ client }: { client: Client }) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-md">
-              <ClipboardCheck className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <ClipboardCheck className="w-4 h-4 text-secondary-foreground" />
             </div>
             <div>
-              <CardTitle className="font-display text-base">{t("newEntrant.title")}</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("newEntrant.title")}</CardTitle>
               <p className="text-xs text-muted-foreground">{t("newEntrant.subtitle")}</p>
             </div>
           </div>
@@ -83,7 +83,7 @@ export function NewEntrantCard({ client }: { client: Client }) {
           <>
             <div className="rounded-lg bg-muted/40 border border-border/40 p-3">
               <div className="flex items-baseline justify-between mb-2">
-                <p className={`font-display text-lg font-bold ${style.text}`}>
+                <p className={`text-base font-semibold font-bold ${style.text}`}>
                   {status.state === "completed"
                     ? t("newEntrant.endedDaysAgo").replace("{days}", String(Math.abs(status.daysUntilEnd)))
                     : t("newEntrant.daysToEnd").replace("{days}", String(status.daysUntilEnd))}

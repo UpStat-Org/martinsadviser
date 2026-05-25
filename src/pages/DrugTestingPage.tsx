@@ -156,19 +156,17 @@ export default function DrugTestingPage() {
   const targetAlcoholAnnual = Math.ceil(pool.length * 0.1);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
         <div className="relative">
-          <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-2">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-2">
             {t("drugTest.section")}
           </p>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
             {t("drugTest.title")}
           </h1>
-          <p className="text-white/70 mt-2 text-sm max-w-xl">
+          <p className="text-muted-foreground mt-2 text-sm max-w-xl">
             {t("drugTest.subtitle")}
           </p>
         </div>
@@ -181,7 +179,7 @@ export default function DrugTestingPage() {
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               {t("drugTest.poolNow")}
             </p>
-            <p className="font-display text-3xl font-bold mt-1 tabular-nums">{pool.length}</p>
+            <p className="text-xl font-semibold tracking-tight mt-1 tabular-nums">{pool.length}</p>
             <p className="text-xs text-muted-foreground mt-0.5">
               {t("drugTest.poolDesc")}
             </p>
@@ -192,7 +190,7 @@ export default function DrugTestingPage() {
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               {t("drugTest.drugYear").replace("{year}", String(year))}
             </p>
-            <p className="font-display text-3xl font-bold mt-1 tabular-nums">
+            <p className="text-xl font-semibold tracking-tight mt-1 tabular-nums">
               {drugTestsThisYear} <span className="text-base text-muted-foreground font-normal">/ {targetDrugAnnual}</span>
             </p>
             <p className={`text-xs mt-0.5 ${drugTestsThisYear >= targetDrugAnnual ? "text-success" : "text-warning"}`}>
@@ -205,7 +203,7 @@ export default function DrugTestingPage() {
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               {t("drugTest.alcoholYear").replace("{year}", String(year))}
             </p>
-            <p className="font-display text-3xl font-bold mt-1 tabular-nums">
+            <p className="text-xl font-semibold tracking-tight mt-1 tabular-nums">
               {alcoholTestsThisYear} <span className="text-base text-muted-foreground font-normal">/ {targetAlcoholAnnual}</span>
             </p>
             <p className={`text-xs mt-0.5 ${alcoholTestsThisYear >= targetAlcoholAnnual ? "text-success" : "text-warning"}`}>
@@ -220,7 +218,7 @@ export default function DrugTestingPage() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <CardTitle className="font-display text-lg">{quarter}</CardTitle>
+              <CardTitle className="text-base font-semibold">{quarter}</CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {t("drugTest.quarterSelected").replace("{count}", String(quarterTests.length))}
               </p>

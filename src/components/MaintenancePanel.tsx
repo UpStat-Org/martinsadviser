@@ -70,11 +70,11 @@ export function MaintenancePanel({ truckId }: { truckId: string }) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-500 to-zinc-500 flex items-center justify-center shadow-md">
-              <Wrench className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <Wrench className="w-4 h-4 text-secondary-foreground" />
             </div>
             <div>
-              <CardTitle className="font-display text-base">{t("maintenance.title")}</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("maintenance.title")}</CardTitle>
               <p className="text-xs text-muted-foreground">{t("maintenance.subtitle")}</p>
             </div>
           </div>

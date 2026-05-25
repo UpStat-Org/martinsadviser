@@ -20,17 +20,19 @@ const changeTypeConfig: Record<string, { labelKey: string; icon: typeof History;
   expired: { labelKey: "history.expired", icon: FileCheck, color: "bg-destructive/10 text-destructive" },
 };
 
-function formatChanges(values: Record<string, any> | null): string[] {
+function formatChanges(values: Record<string, any> | null, t: (key: string) => string): string[] {
   if (!values) return [];
+  // The labels come from the i18n bag so the change-log table reads in the
+  // user's locale. Falls back to the column name when a key isn't translated.
   const labels: Record<string, string> = {
-    permit_type: "Tipo",
-    permit_number: "Número",
-    state: "Estado",
-    expiration_date: "Validade",
-    status: "Status",
-    notes: "Notas",
-    document_url: "Documento",
-    truck_id: "Caminhão",
+    permit_type: t("permits.type"),
+    permit_number: t("permitDetail.fieldNumber"),
+    state: t("permits.state"),
+    expiration_date: t("permitDetail.fieldExpiration"),
+    status: t("common.status"),
+    notes: t("permits.notes") !== "permits.notes" ? t("permits.notes") : "Notes",
+    document_url: t("permits.document") !== "permits.document" ? t("permits.document") : "Document",
+    truck_id: t("permitDetail.fieldTruck"),
   };
   return Object.entries(values)
     .filter(([key]) => labels[key])
@@ -45,7 +47,7 @@ export function PermitHistoryDialog({ open, onOpenChange, permitId, permitLabel 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2">
             <History className="w-5 h-5 text-muted-foreground" />
             {t("history.title")} — {permitLabel}
           </DialogTitle>
@@ -66,8 +68,8 @@ export function PermitHistoryDialog({ open, onOpenChange, permitId, permitLabel 
               {history.map((entry) => {
                 const config = changeTypeConfig[entry.change_type] || changeTypeConfig.updated;
                 const Icon = config.icon;
-                const oldLines = formatChanges(entry.old_values as Record<string, any> | null);
-                const newLines = formatChanges(entry.new_values as Record<string, any> | null);
+                const oldLines = formatChanges(entry.old_values as Record<string, any> | null, t);
+                const newLines = formatChanges(entry.new_values as Record<string, any> | null, t);
 
                 return (
                   <div key={entry.id} className="relative pl-10">

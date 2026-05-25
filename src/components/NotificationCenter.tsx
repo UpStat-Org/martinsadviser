@@ -66,7 +66,7 @@ export function NotificationCenter() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-10 w-10 rounded-xl hover:bg-muted transition-all"
+          className="relative h-10 w-10 rounded-md hover:bg-muted transition-all"
         >
           <Bell
             className={cn(
@@ -78,7 +78,7 @@ export function NotificationCenter() {
             <>
               <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-70" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-gradient-to-br from-destructive to-rose-500 ring-2 ring-background" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-secondary text-secondary-foreground border border-border ring-2 ring-background" />
               </span>
               <span className="sr-only">{t("notifications.unreadCount").replace("{count}", String(unreadCount))}</span>
             </>
@@ -86,21 +86,20 @@ export function NotificationCenter() {
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[420px] p-0 rounded-2xl shadow-2xl border-border/60 overflow-hidden"
+        className="w-[420px] p-0 rounded-md shadow-2xl border-border/60 overflow-hidden"
         align="end"
         sideOffset={12}
       >
         {/* Gradient header */}
-        <div className="relative overflow-hidden aurora-bg px-5 py-4">
-          <div className="absolute inset-0 grid-pattern opacity-30" />
+        <div className="relative overflow-hidden bg-card border border-border px-5 py-4">
           <div className="relative flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md flex items-center justify-center">
-                <Bell className="h-4 w-4 text-white" />
+              <div className="w-9 h-9 rounded-md bg-card border border-border flex items-center justify-center">
+                <Bell className="h-4 w-4 text-foreground" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">{t("notifications.title")}</h3>
-                <p className="text-[11px] text-white/70">
+                <h3 className="text-sm font-bold text-foreground">{t("notifications.title")}</h3>
+                <p className="text-[11px] text-muted-foreground">
                   {unreadCount > 0
                     ? t(unreadCount === 1 ? "notifications.unreadOne" : "notifications.unreadMany").replace("{count}", String(unreadCount))
                     : t("notifications.allCaughtUp")}
@@ -111,7 +110,7 @@ export function NotificationCenter() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 px-2.5 text-xs text-white hover:text-white hover:bg-white/15 rounded-lg font-semibold"
+                className="h-8 px-2.5 text-xs text-foreground hover:text-foreground hover:bg-white/15 rounded-lg font-semibold"
                 onClick={() => markAllRead.mutate()}
               >
                 <CheckCheck className="mr-1 h-3.5 w-3.5" />
@@ -126,7 +125,7 @@ export function NotificationCenter() {
             <div className="p-8 space-y-3">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex gap-3 animate-pulse">
-                  <div className="w-10 h-10 rounded-xl bg-muted" />
+                  <div className="w-10 h-10 rounded-md bg-muted" />
                   <div className="flex-1 space-y-2">
                     <div className="h-3 bg-muted rounded w-3/4" />
                     <div className="h-2 bg-muted/60 rounded w-1/2" />
@@ -136,7 +135,7 @@ export function NotificationCenter() {
             </div>
           ) : !notifications?.length ? (
             <div className="p-10 text-center">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
+              <div className="w-16 h-16 mx-auto rounded-md bg-secondary text-secondary-foreground border border-border border border-emerald-500/20 flex items-center justify-center mb-4">
                 <Sparkles className="h-7 w-7 text-emerald-500" />
               </div>
               <p className="text-sm font-semibold text-foreground mb-1">{t("notifications.emptyTitle")}</p>
@@ -159,22 +158,22 @@ export function NotificationCenter() {
                   <button
                     key={n.id}
                     className={cn(
-                      "group w-full flex items-start gap-3 px-3 py-3 rounded-xl text-left transition-all relative",
+                      "group w-full flex items-start gap-3 px-3 py-3 rounded-md text-left transition-all relative",
                       !n.read ? "bg-primary/[0.04] hover:bg-primary/[0.08]" : "hover:bg-muted/60"
                     )}
                     onClick={() => !n.read && markRead.mutate(n.id)}
                   >
                     {!n.read && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full bg-gradient-to-b from-primary to-purple-500" />
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full bg-secondary text-secondary-foreground border border-border" />
                     )}
                     <div
                       className={cn(
-                        "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-sm flex-shrink-0 ring-4",
+                        "w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center shadow-sm flex-shrink-0 ring-4",
                         config.gradient,
                         config.ring
                       )}
                     >
-                      <Icon className="h-4 w-4 text-white" />
+                      <Icon className="h-4 w-4 text-foreground" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">

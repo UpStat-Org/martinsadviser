@@ -244,22 +244,19 @@ export default function AdminUsers() {
   }, [profiles, filterStatus, search]);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
 
         <div className="relative flex items-start gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-            <UserCog className="w-6 h-6 text-white" />
+          <div className="w-14 h-14 rounded-md bg-card border border-border flex items-center justify-center flex-shrink-0">
+            <UserCog className="w-6 h-6 text-secondary-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
               {t("admin.title")}
             </h1>
-            <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">
               {t("admin.subtitle")}
             </p>
           </div>
@@ -303,23 +300,23 @@ export default function AdminUsers() {
             onClick={() =>
               setFilterStatus(s.filter)
             }
-            className="group relative text-left overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative text-left overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
           >
             <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
+              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
             />
             <div className="relative flex items-start justify-between mb-3">
               <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-md`}
+                className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
               >
-                <s.icon className="w-4 h-4 text-white" />
+                <s.icon className="w-4 h-4 text-foreground" />
               </div>
             </div>
             <div className="relative">
               <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
                 {s.label}
               </div>
-              <div className="font-display text-3xl font-bold tracking-tight">
+              <div className="text-xl font-semibold tracking-tight tracking-tight">
                 {s.value}
               </div>
             </div>
@@ -328,14 +325,14 @@ export default function AdminUsers() {
       </div>
 
       {/* ============ FILTERS ============ */}
-      <div className="rounded-2xl bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div className="rounded-md bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder={t("admin.search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-xl"
+            className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-md"
           />
         </div>
         <div className="hidden sm:block h-8 w-px bg-border/60" />
@@ -353,7 +350,7 @@ export default function AdminUsers() {
                 onClick={() => setFilterStatus(f.value)}
                 className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all ${
                   active
-                    ? "btn-gradient text-white shadow-md"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 text-foreground shadow-md"
                     : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
@@ -372,18 +369,18 @@ export default function AdminUsers() {
       ) : !filtered.length ? (
         <Card className="border-border/50">
           <CardContent className="p-16 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
+            <div className="w-20 h-20 rounded-md bg-secondary text-secondary-foreground border border-border border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
               <Users className="w-9 h-9 text-indigo-500" />
             </div>
-            <p className="font-display text-lg font-semibold mb-1">
+            <p className="text-base font-semibold font-semibold mb-1">
               {search || filterStatus !== "all"
-                ? "Nenhum usuário encontrado"
-                : t("admin.noRequests")}
+                ? t("adminUsers.noUsers")
+                : t("adminUsers.noRequests")}
             </p>
             <p className="text-sm text-muted-foreground">
               {search || filterStatus !== "all"
-                ? "Ajuste os filtros para visualizar usuários."
-                : "Ainda não há solicitações de acesso."}
+                ? t("adminUsers.adjustFilters")
+                : t("adminUsers.noRequests")}
             </p>
           </CardContent>
         </Card>
@@ -393,7 +390,7 @@ export default function AdminUsers() {
             <TableHeader>
               <TableRow className="bg-muted/40 hover:bg-muted/40 border-border/50">
                 <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Usuário
+                  {t("adminUsers.colUser")}
                 </TableHead>
                 <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                   {t("admin.date")}
@@ -422,9 +419,7 @@ export default function AdminUsers() {
                     <TableCell className="py-3">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientFor(
-                            profile.id
-                          )} flex items-center justify-center text-white font-semibold text-sm shadow-md flex-shrink-0`}
+                          className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center text-foreground font-semibold text-sm flex-shrink-0`}
                         >
                           {initials(name)}
                         </div>
@@ -456,9 +451,9 @@ export default function AdminUsers() {
                         <SelectTrigger className="w-36 h-8 rounded-lg border-border/60">
                           <div className="flex items-center gap-1.5">
                             <span
-                              className={`w-4 h-4 rounded bg-gradient-to-br ${roleStyle.gradient} flex items-center justify-center flex-shrink-0`}
+                              className={`w-4 h-4 rounded bg-secondary text-secondary-foreground border border-border flex items-center justify-center flex-shrink-0`}
                             >
-                              <Shield className="w-2.5 h-2.5 text-white" />
+                              <Shield className="w-2.5 h-2.5 text-secondary-foreground" />
                             </span>
                             <SelectValue />
                           </div>
@@ -528,11 +523,11 @@ export default function AdminUsers() {
         open={!!deleteUserId}
         onOpenChange={(open) => !open && setDeleteUserId(null)}
       >
-        <AlertDialogContent className="rounded-2xl">
+        <AlertDialogContent className="rounded-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center shadow-md">
-                <Trash2 className="w-4 h-4 text-white" />
+              <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                <Trash2 className="w-4 h-4 text-secondary-foreground" />
               </div>
               {t("admin.deleteUser")}
             </AlertDialogTitle>
@@ -543,7 +538,7 @@ export default function AdminUsers() {
           <AlertDialogFooter>
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-gradient-to-r from-red-500 to-rose-500 text-white hover:shadow-lg"
+              className="bg-secondary text-secondary-foreground border border-border hover:shadow-lg"
               onClick={() => deleteUserId && deleteUser.mutate(deleteUserId)}
               disabled={deleteUser.isPending}
             >

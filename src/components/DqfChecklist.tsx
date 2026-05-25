@@ -128,7 +128,7 @@ export function DqfChecklist({ driverId, driverName }: DqfChecklistProps) {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3">
-          <CardTitle className="font-display text-base">{t("dqf.title").replace("{name}", driverName)}</CardTitle>
+          <CardTitle className="text-sm font-semibold">{t("dqf.title").replace("{name}", driverName)}</CardTitle>
           <div className="flex items-center gap-2">
             <Badge
               className={

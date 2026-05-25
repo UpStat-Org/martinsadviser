@@ -106,30 +106,20 @@ export default function Signup() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden p-6">
-        <div className="orb w-[500px] h-[500px] bg-success/10 top-1/4 left-1/4 animate-pulse-glow" />
-        <div
-          className="orb w-[400px] h-[400px] bg-primary/10 bottom-1/4 right-1/4 animate-pulse-glow"
-          style={{ animationDelay: "1.2s" }}
-        />
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-
-        <div className="relative z-10 w-full max-w-md animate-scale-in">
-          <div className="glass-card-premium shimmer-border rounded-3xl p-10 text-center">
-            <div className="relative w-24 h-24 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full bg-success/20 animate-pulse-glow" />
-              <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-success/20 to-success/5 border border-success/30 flex items-center justify-center">
-                <CheckCircle className="w-12 h-12 text-success" strokeWidth={2.2} />
-              </div>
+      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+        <div className="w-full max-w-md">
+          <div className="rounded-md border border-border bg-card p-8 sm:p-10 text-center">
+            <div className="w-14 h-14 rounded-full bg-success/10 border border-success/30 flex items-center justify-center mx-auto mb-5">
+              <CheckCircle className="w-7 h-7 text-success" strokeWidth={2.2} />
             </div>
-            <h2 className="font-display text-3xl font-bold text-foreground mb-3">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">
               {t("signup.success")}
             </h2>
-            <p className="text-muted-foreground text-[15px] leading-relaxed mb-8">
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
               {t("signup.successDesc")}
             </p>
-            <Link to="/login">
-              <Button className="h-11 px-8 font-semibold btn-gradient text-white border-0 hover:shadow-[0_10px_40px_-10px_hsl(234_75%_58%/0.6)]">
+            <Link to="/login" className="inline-block mt-6">
+              <Button>
                 {t("signup.backToLogin")}
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
@@ -148,166 +138,109 @@ export default function Signup() {
   ];
 
   return (
-    <div className="min-h-screen flex bg-background relative overflow-hidden">
-      <div className="orb w-[520px] h-[520px] bg-primary/10 -top-40 -right-40" />
-      <div className="orb w-[420px] h-[420px] bg-accent/10 -bottom-40 right-1/4" />
-
-      {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-[55%] aurora-bg relative overflow-hidden">
-        <div className="absolute inset-0 grid-pattern opacity-60" />
-        <div className="absolute inset-0 noise-overlay" />
-
-        <div className="orb w-80 h-80 bg-primary/30 top-1/4 left-1/4 animate-pulse-glow" />
-        <div
-          className="orb w-96 h-96 bg-accent/20 bottom-1/4 right-1/4 animate-pulse-glow"
-          style={{ animationDelay: "1.5s" }}
-        />
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full conic-ring opacity-[0.08] blur-2xl" />
-
-        <div className="relative z-10 flex flex-col justify-between px-16 xl:px-20 py-14 w-full">
-          {/* Logo */}
-          <div className="flex items-center gap-3 animate-slide-in-left">
-            <div className="relative shrink-0">
-              <Logo className="w-12 h-12 rounded-2xl shadow-xl ring-1 ring-white/20" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gradient-to-br from-emerald-300 to-emerald-500 ring-2 ring-[#0b0d2e]" />
-            </div>
-            <Wordmark size="xl" tone="light" />
+    <div className="min-h-screen flex bg-background">
+      {/* Branding side — calm and informative */}
+      <div className="hidden lg:flex lg:w-[42%] bg-muted/40 border-r border-border">
+        <div className="flex flex-col justify-between px-12 xl:px-16 py-12 w-full max-w-xl">
+          <div className="flex items-center gap-2.5">
+            <Logo className="w-9 h-9 rounded" />
+            <Wordmark size="lg" tone="dark" />
           </div>
 
-          {/* Headline */}
-          <div className="animate-slide-in-left max-w-xl" style={{ animationDelay: "0.1s" }}>
-            <h2 className="font-display text-5xl xl:text-[64px] font-bold leading-[1.05] gradient-text mb-6">
-              {t("signup.brandingHeadline").split("\n").map((line, i) => (
-                <span key={i}>
-                  {line}
-                  {i === 0 && <br />}
-                </span>
-              ))}
+          <div>
+            <h2 className="text-3xl xl:text-4xl font-semibold tracking-tight text-foreground leading-tight">
+              {t("signup.brandingHeadline")}
             </h2>
-            <p className="text-white/65 text-lg max-w-md leading-relaxed">
+            <p className="text-muted-foreground text-base mt-4 max-w-md">
               {t("signup.brandingSubtitle")}
             </p>
           </div>
 
-          {/* Benefits checklist */}
-          <div className="space-y-4 animate-slide-in-left" style={{ animationDelay: "0.2s" }}>
-            <div className="space-y-3 max-w-md">
-              {benefits.map((b, i) => (
-                <div
-                  key={b}
-                  className="flex items-center gap-3 animate-slide-in-left"
-                  style={{ animationDelay: `${0.25 + i * 0.05}s` }}
-                >
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400/30 to-emerald-600/20 border border-emerald-400/30 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3.5 h-3.5 text-emerald-300" strokeWidth={3} />
-                  </div>
-                  <span className="text-[15px] text-white/85">{b}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 max-w-md pt-4">
-              {[
-                { icon: Shield, label: t("compliance.title") },
-                { icon: BarChart3, label: t("signup.feature.aiReports") },
-                { icon: Users, label: t("signup.feature.portal") },
-                { icon: Clock, label: t("signup.feature.automations") },
-              ].map(({ icon: Icon, label }) => (
-                <div
-                  key={label}
-                  className="glass-badge px-4 py-3 flex items-center gap-3 hover:bg-white/15 transition-colors"
-                >
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center flex-shrink-0 border border-white/10">
-                    <Icon className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-white/85">{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ul className="space-y-2.5 text-sm text-foreground/80 max-w-md">
+            {benefits.map((b) => (
+              <li key={b} className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded bg-card border border-border flex items-center justify-center mt-0.5 shrink-0">
+                  <Check className="w-3 h-3 text-success" strokeWidth={3} />
+                </span>
+                {b}
+              </li>
+            ))}
+          </ul>
         </div>
-
-        <div className="absolute top-20 right-20 w-24 h-24 rounded-3xl border border-white/10 rotate-12 animate-float backdrop-blur-sm" />
-        <div className="absolute bottom-32 right-40 w-16 h-16 rounded-2xl border border-white/10 -rotate-6 animate-float-delayed backdrop-blur-sm" />
-        <div className="absolute top-1/2 right-16 w-2.5 h-2.5 rounded-full bg-white/30 animate-float" />
       </div>
 
-      {/* Right form panel */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative z-10">
-        <div className="w-full max-w-[440px]">
-          {/* Mobile logo */}
-          <div className="flex items-center justify-center gap-3 mb-10 lg:hidden animate-fade-in">
-            <Logo className="w-10 h-10 rounded-xl shadow-md" />
-            <Wordmark size="lg" tone="dark" />
+      {/* Form side */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
+        <div className="w-full max-w-[400px]">
+          <div className="flex items-center justify-center gap-2.5 mb-8 lg:hidden">
+            <Logo className="w-8 h-8 rounded" />
+            <Wordmark size="md" tone="dark" />
           </div>
 
-          <div className="glass-card-premium shimmer-border rounded-3xl p-8 sm:p-10 animate-fade-in">
-            <div className="mb-8">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4">
-                <Sparkles className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-semibold text-primary">{t("signup.subtitle")}</span>
-              </div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+          <div className="rounded-md border border-border bg-card p-6 sm:p-8">
+            <div className="mb-6">
+              <h1 className="text-xl font-semibold tracking-tight text-foreground">
                 {t("signup.title")}
               </h1>
+              <p className="text-sm text-muted-foreground mt-1">{t("signup.subtitle")}</p>
             </div>
 
-            <form onSubmit={handleSignup} className="space-y-5">
-              <div className="space-y-2 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-                <Label htmlFor="name" className="text-sm font-medium text-foreground">
+            <form onSubmit={handleSignup} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-xs font-medium text-foreground">
                   {t("signup.fullName")}
                 </Label>
-                <div className="relative input-glow rounded-xl transition-all">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder={t("common.fullNamePlaceholder")}
-                    className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background focus:border-primary/40 transition-all"
+                    className="h-9 pl-9"
                     required
                   />
                 </div>
               </div>
 
-              <div className="space-y-2 animate-fade-in" style={{ animationDelay: "0.15s" }}>
-                <Label htmlFor="email" className="text-sm font-medium text-foreground">
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-xs font-medium text-foreground">
                   {t("login.email")}
                 </Label>
-                <div className="relative input-glow rounded-xl transition-all">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t("common.emailPlaceholder")}
-                    className="h-12 pl-10 rounded-xl bg-muted/40 border-border/60 focus:bg-background focus:border-primary/40 transition-all"
+                    className="h-9 pl-9"
                     required
                   />
                 </div>
               </div>
 
-              <div className="space-y-2 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-xs font-medium text-foreground">
                   {t("login.password")}
                 </Label>
-                <div className="relative input-glow rounded-xl transition-all">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="h-12 pl-10 pr-11 rounded-xl bg-muted/40 border-border/60 focus:bg-background focus:border-primary/40 transition-all"
+                    className="h-9 pl-9 pr-9"
                     minLength={6}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                     aria-label={showPassword ? t("login.hidePassword") : t("login.showPassword")}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -315,18 +248,18 @@ export default function Signup() {
                 </div>
 
                 {password.length > 0 && (
-                  <div className="pt-2 space-y-1.5 animate-fade-in">
-                    <div className="flex gap-1.5">
+                  <div className="pt-1 space-y-1">
+                    <div className="flex gap-1">
                       {[0, 1, 2, 3].map((i) => (
                         <div
                           key={i}
-                          className={`h-1 flex-1 rounded-full transition-colors ${
+                          className={`h-0.5 flex-1 rounded transition-colors ${
                             i < passwordStrength ? strengthColors[passwordStrength] : "bg-muted"
                           }`}
                         />
                       ))}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-[11px] text-muted-foreground">
                       {t("signup.passwordStrength")}{" "}
                       <span className="font-medium text-foreground">
                         {strengthLabels[passwordStrength]}
@@ -336,52 +269,29 @@ export default function Signup() {
                 )}
               </div>
 
-              <div className="animate-fade-in pt-1" style={{ animationDelay: "0.25s" }}>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="group w-full h-12 btn-gradient text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-all hover:shadow-[0_10px_40px_-10px_hsl(234_75%_58%/0.6)] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none relative overflow-hidden"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  {loading ? (
-                    t("signup.submitting")
-                  ) : (
-                    <>
-                      {t("signup.submit")}
-                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                    </>
-                  )}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full h-9 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium rounded-md flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {loading ? t("signup.submitting") : (
+                  <>
+                    {t("signup.submit")}
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
             </form>
 
-            <div
-              className="flex items-center gap-4 my-7 animate-fade-in"
-              style={{ animationDelay: "0.3s" }}
-            >
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-              <span className="text-[10px] text-muted-foreground uppercase tracking-[0.25em] font-semibold">
-                {t("login.or")}
-              </span>
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-            </div>
-
-            <p
-              className="text-center text-sm text-muted-foreground animate-fade-in"
-              style={{ animationDelay: "0.35s" }}
-            >
+            <p className="text-center text-sm text-muted-foreground mt-6 pt-5 border-t border-border">
               {t("signup.hasAccount")}{" "}
-              <Link
-                to="/login"
-                className="text-primary hover:text-primary/80 font-semibold transition-colors inline-flex items-center gap-1"
-              >
+              <Link to="/login" className="text-primary hover:underline font-medium">
                 {t("signup.login")}
-                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </p>
           </div>
 
-          <p className="text-center text-xs text-muted-foreground/70 mt-6 animate-fade-in">
+          <p className="text-center text-xs text-muted-foreground mt-5">
             © {new Date().getFullYear()} MartinsAdviser · {t("common.allRightsReserved")}
           </p>
         </div>

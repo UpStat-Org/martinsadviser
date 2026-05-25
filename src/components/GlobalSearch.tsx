@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { cn } from "@/lib/utils";
 
 type SearchType = "all" | "client" | "truck" | "permit" | "invoice";
 
@@ -225,30 +226,59 @@ export function GlobalSearch() {
     [results]
   );
 
+  const queryTooShort = sanitizeSearch(query).length < 2;
+  const emptyMessage = loading
+    ? t("common.loading")
+    : queryTooShort
+    ? t("search.typeToSearch")
+    : t("search.noResults");
+
   return (
     <>
+      {/* Trigger button — flat, single neutral surface, no gradient halo */}
       <button
         onClick={() => setOpen(true)}
-        className="group relative flex items-center gap-2.5 h-10 px-3.5 rounded-xl bg-muted/50 hover:bg-muted border border-border/60 hover:border-border text-muted-foreground text-sm transition-all w-full max-w-md shadow-sm hover:shadow-md"
+        className="group flex items-center gap-2.5 h-9 px-3 rounded-md border border-border bg-card hover:bg-muted text-muted-foreground text-sm transition-colors w-full max-w-md"
       >
-        <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 group-hover:from-primary/25 group-hover:to-primary/10 transition-colors">
-          <Search className="w-3.5 h-3.5 text-primary" />
-        </div>
-        <span className="flex-1 text-left font-medium">{t("search.placeholder")}</span>
-        <kbd className="hidden sm:inline-flex h-6 items-center gap-1 rounded-md border border-border/80 bg-background/80 px-1.5 font-mono text-[10px] font-semibold text-muted-foreground shadow-sm">
+        <Search className="w-4 h-4 text-muted-foreground/70 shrink-0" />
+        <span className="flex-1 text-left">{t("search.placeholder")}</span>
+        <kbd className="hidden sm:inline-flex h-5 items-center rounded border border-border bg-muted/60 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
           Ctrl K
         </kbd>
       </button>
+
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="overflow-hidden p-0 shadow-2xl rounded-2xl border-border/60 max-w-xl">
-          <Command shouldFilter={false} className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.15em] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input-wrapper]_svg]:text-primary [&_[cmdk-input]]:h-14 [&_[cmdk-input]]:text-base [&_[cmdk-item]]:px-3 [&_[cmdk-item]]:py-2.5 [&_[cmdk-item]]:rounded-lg [&_[cmdk-item]]:gap-3 [&_[cmdk-item][data-selected=true]]:bg-accent">
+        <DialogContent className="p-0 overflow-hidden max-w-2xl gap-0">
+          <Command
+            shouldFilter={false}
+            // The cmdk primitive ships with several CSS hooks we have to
+            // override piecewise — pulling them into one className keeps
+            // the markup readable.
+            className={cn(
+              // input
+              "[&_[cmdk-input-wrapper]]:px-4 [&_[cmdk-input-wrapper]]:border-b [&_[cmdk-input-wrapper]]:border-border",
+              "[&_[cmdk-input-wrapper]_svg]:h-4 [&_[cmdk-input-wrapper]_svg]:w-4 [&_[cmdk-input-wrapper]_svg]:text-muted-foreground/70",
+              "[&_[cmdk-input]]:h-12 [&_[cmdk-input]]:text-sm [&_[cmdk-input]]:placeholder:text-muted-foreground",
+              // group heading
+              "[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-2",
+              "[&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider",
+              "[&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-muted-foreground/80",
+              // group spacing
+              "[&_[cmdk-group]]:px-1.5 [&_[cmdk-group]+[cmdk-group]]:pt-1",
+              // item
+              "[&_[cmdk-item]]:px-2.5 [&_[cmdk-item]]:py-2.5 [&_[cmdk-item]]:rounded-md [&_[cmdk-item]]:gap-3",
+              "[&_[cmdk-item][data-selected=true]]:bg-muted",
+              "[&_[cmdk-item]]:cursor-pointer",
+            )}
+          >
             <CommandInput
               placeholder={t("search.placeholder")}
               value={query}
               onValueChange={setQuery}
             />
 
-            <div className="px-3 pb-2 flex flex-wrap gap-1.5 border-b border-border/60">
+            {/* Type filter — own row with breathing room, separated from input */}
+            <div className="px-3 py-2.5 border-b border-border bg-muted/30 flex flex-wrap items-center gap-1.5">
               {typeOptions.map((option) => {
                 const Icon = option.icon;
                 const active = activeType === option.value;
@@ -257,11 +287,12 @@ export function GlobalSearch() {
                     key={option.value}
                     type="button"
                     onClick={() => setActiveType(option.value)}
-                    className={`h-7 px-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-colors ${
+                    className={cn(
+                      "h-7 px-2.5 rounded-md text-xs font-medium inline-flex items-center gap-1.5 transition-colors",
                       active
                         ? "bg-primary text-primary-foreground"
-                        : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
+                        : "bg-card border border-border text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
                   >
                     <Icon className="w-3.5 h-3.5" />
                     {option.label}
@@ -270,31 +301,20 @@ export function GlobalSearch() {
               })}
             </div>
 
-            <CommandList className="max-h-[440px] p-1">
+            <CommandList className="max-h-[420px] py-2">
               {results.length === 0 && (
-                <CommandEmpty className="py-10 text-center">
-                  <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
-                    <div className="w-12 h-12 rounded-2xl bg-muted/70 flex items-center justify-center">
-                      <Search className="w-5 h-5 text-muted-foreground" />
+                <CommandEmpty className="py-12">
+                  <div className="flex flex-col items-center gap-3 text-center px-6">
+                    <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center">
+                      <Search className="w-4 h-4 text-muted-foreground" />
                     </div>
-                    <span>
-                      {loading
-                        ? t("common.loading")
-                        : sanitizeSearch(query).length >= 2
-                        ? t("search.noResults")
-                        : t("search.typeToSearch")}
-                    </span>
+                    <p className="text-sm text-muted-foreground max-w-xs">{emptyMessage}</p>
                   </div>
                 </CommandEmpty>
               )}
+
               {Object.entries(grouped).map(([type, items]) => {
                 const Icon = icons[type as SearchResult["type"]];
-                const iconGradient = {
-                  client: "from-indigo-500 to-violet-500",
-                  truck: "from-blue-500 to-cyan-500",
-                  permit: "from-emerald-500 to-teal-500",
-                  invoice: "from-amber-500 to-orange-500",
-                }[type as SearchResult["type"]];
                 return (
                   <CommandGroup key={type} heading={labels[type as SearchResult["type"]]}>
                     {items.map((item) => (
@@ -303,44 +323,46 @@ export function GlobalSearch() {
                         value={`${item.type}-${item.id}`}
                         onSelect={() => handleSelect(item.route)}
                       >
-                        <div
-                          className={`w-8 h-8 rounded-lg bg-gradient-to-br ${iconGradient} flex items-center justify-center shadow-sm flex-shrink-0`}
-                        >
-                          <Icon className="w-4 h-4 text-white" />
+                        <div className="w-8 h-8 rounded-md bg-muted border border-border flex items-center justify-center shrink-0">
+                          <Icon className="w-4 h-4 text-muted-foreground" />
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">
-                          <span className="text-sm font-semibold truncate">{item.label}</span>
+                          <span className="text-sm font-medium text-foreground truncate">
+                            {item.label}
+                          </span>
                           {item.sublabel && (
-                            <span className="text-xs text-muted-foreground truncate">
+                            <span className="text-xs text-muted-foreground truncate font-mono mt-0.5">
                               {item.sublabel}
                             </span>
                           )}
                         </div>
-                        <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border/80 bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-                          Enter
-                        </kbd>
                       </CommandItem>
                     ))}
                   </CommandGroup>
                 );
               })}
             </CommandList>
-            <div className="border-t border-border/60 px-3 py-2 flex items-center justify-between text-[11px] text-muted-foreground bg-muted/30">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex items-center gap-1">
-                  <kbd className="h-4 px-1 rounded bg-background border border-border font-mono text-[10px]">↑↓</kbd>
-                  {t("search.navigate")}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <kbd className="h-4 px-1 rounded bg-background border border-border font-mono text-[10px]">Enter</kbd>
-                  {t("search.open")}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <kbd className="h-4 px-1 rounded bg-background border border-border font-mono text-[10px]">esc</kbd>
-                  {t("search.close")}
-                </span>
-              </div>
-              <span className="font-semibold text-primary">MartinsAdviser</span>
+
+            {/* Footer — single row, evenly spaced shortcuts */}
+            <div className="border-t border-border px-4 py-2.5 flex items-center gap-5 text-[11px] text-muted-foreground bg-muted/30">
+              <span className="inline-flex items-center gap-1.5">
+                <kbd className="h-4 px-1.5 rounded bg-card border border-border font-mono text-[10px] leading-none flex items-center">
+                  ↑↓
+                </kbd>
+                {t("search.navigate")}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <kbd className="h-4 px-1.5 rounded bg-card border border-border font-mono text-[10px] leading-none flex items-center">
+                  ↵
+                </kbd>
+                {t("search.open")}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <kbd className="h-4 px-1.5 rounded bg-card border border-border font-mono text-[10px] leading-none flex items-center">
+                  Esc
+                </kbd>
+                {t("search.close")}
+              </span>
             </div>
           </Command>
         </DialogContent>

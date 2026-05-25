@@ -36,6 +36,17 @@ function toISODate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
+// Maximum staleness for "still the active deadline" before we roll forward to
+// the next cycle. A carrier who missed the filing month is overdue against
+// *this* cycle's deadline, not magically pushed to the next one — surface
+// that for ~12 months so the card keeps screaming "file it now".
+const STALE_DEADLINE_THRESHOLD_DAYS = 365;
+
+function lastDayOfMonthUTC(year: number, monthIndex: number): number {
+  // monthIndex 0-11. Day 0 of the *next* month = last day of this month.
+  return new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+}
+
 function computeFromSchedule(dot: string, now: Date): Date | null {
   const digits = dot.replace(/\D/g, "");
   if (digits.length < 2) return null;
@@ -45,15 +56,20 @@ function computeFromSchedule(dot: string, now: Date): Date | null {
   if (month === undefined) return null;
 
   const wantsOdd = parseInt(nextToLast, 10) % 2 === 1;
-  let year = now.getUTCFullYear();
-  // Walk forward up to a couple of years until we land on a valid month+year
-  // that is at or after `now`.
-  for (let i = 0; i < 4; i++) {
-    const candidateYear = year + i;
+  const todayMs = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+
+  // Walk from two cycles ago (to catch recent overdue cases) up to a couple of
+  // future cycles. Candidate date = last day of the filing month, which is the
+  // actual deadline. The first candidate whose deadline is in the future *or*
+  // within STALE_DEADLINE_THRESHOLD_DAYS in the past is the one we surface.
+  for (let i = -2; i <= 4; i++) {
+    const candidateYear = now.getUTCFullYear() + i;
     const yearParity = candidateYear % 2 === 1;
     if (yearParity !== wantsOdd) continue;
-    const candidate = new Date(Date.UTC(candidateYear, month, 1));
-    if (candidate.getTime() >= Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())) {
+    const lastDay = lastDayOfMonthUTC(candidateYear, month);
+    const candidate = new Date(Date.UTC(candidateYear, month, lastDay));
+    const daysFromNow = Math.ceil((candidate.getTime() - todayMs) / 86_400_000);
+    if (daysFromNow >= -STALE_DEADLINE_THRESHOLD_DAYS) {
       return candidate;
     }
   }

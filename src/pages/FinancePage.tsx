@@ -372,23 +372,20 @@ export default function FinancePage() {
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
 
         <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-              <DollarSign className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-md bg-card border border-border flex items-center justify-center flex-shrink-0">
+              <DollarSign className="w-6 h-6 text-secondary-foreground" />
             </div>
             <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
                 {t("finance.title")}
               </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
+              <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">
                 {t("finance.subtitle")}
               </p>
             </div>
@@ -398,7 +395,7 @@ export default function FinancePage() {
             <button
               onClick={exportFinanceCsv}
               disabled={!filtered.length}
-              className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all disabled:opacity-40"
+              className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all disabled:opacity-40"
             >
               <Download className="w-4 h-4" />
               {t("reports.exportCsv")}
@@ -406,7 +403,7 @@ export default function FinancePage() {
             {!isViewer && (
               <button
                 onClick={openNew}
-                className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
+                className="h-10 px-4 rounded-md bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
               >
                 <Plus className="w-4 h-4" />
                 {t("finance.newInvoice")}
@@ -450,23 +447,23 @@ export default function FinancePage() {
         ].map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
           >
             <div
-              className={`absolute -top-10 -right-10 w-32 h-32 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
+              className={`absolute -top-10 -right-10 w-32 h-32 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
             />
             <div className="relative flex items-start justify-between mb-3">
               <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-md`}
+                className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
               >
-                <s.icon className="w-4 h-4 text-white" />
+                <s.icon className="w-4 h-4 text-foreground" />
               </div>
             </div>
             <div className="relative">
               <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
                 {s.label}
               </div>
-              <div className="font-display text-2xl lg:text-3xl font-bold tracking-tight truncate">
+              <div className="text-2xl lg:text-3xl font-bold tracking-tight truncate">
                 {s.isCurrency ? fmt(s.value) : s.value}
               </div>
             </div>
@@ -478,14 +475,14 @@ export default function FinancePage() {
       {invoices && invoices.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card className="border-border/50 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
             <CardContent className="p-5">
               <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-                  <BarChart3 className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                  <BarChart3 className="w-4 h-4 text-secondary-foreground" />
                 </div>
                 <div>
-                  <h2 className="font-display font-bold text-base">
+                  <h2 className="font-bold text-base">
                     {t("finance.monthlyRevenue")}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -531,14 +528,14 @@ export default function FinancePage() {
           </Card>
 
           <Card className="border-border/50 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-violet-500" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
             <CardContent className="p-5">
               <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md">
-                  <Wallet className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                  <Wallet className="w-4 h-4 text-secondary-foreground" />
                 </div>
                 <div>
-                  <h2 className="font-display font-bold text-base">
+                  <h2 className="font-bold text-base">
                     {t("finance.statusDist")}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -586,14 +583,14 @@ export default function FinancePage() {
       {revenueByClient.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card className="border-border/50 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
             <CardContent className="p-5">
               <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-md">
-                  <Trophy className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                  <Trophy className="w-4 h-4 text-secondary-foreground" />
                 </div>
                 <div>
-                  <h2 className="font-display font-bold text-base">
+                  <h2 className="font-bold text-base">
                     {t("finance.topClients")}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">{t("finance.byRevenue")}</p>
@@ -651,15 +648,15 @@ export default function FinancePage() {
           </Card>
 
           <Card className="border-border/50 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
             <CardContent className="p-0">
               <div className="p-5 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-                    <DollarSign className="w-4 h-4 text-white" />
+                  <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                    <DollarSign className="w-4 h-4 text-secondary-foreground" />
                   </div>
                   <div>
-                    <h2 className="font-display font-bold text-base">
+                    <h2 className="font-bold text-base">
                       {t("finance.revenueByClient")}
                     </h2>
                     <p className="text-xs text-muted-foreground mt-0.5">
@@ -705,7 +702,7 @@ export default function FinancePage() {
                           <span
                             className={`inline-flex items-center justify-center w-6 h-6 rounded-md text-[10px] font-bold ${
                               i < 3
-                                ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-sm"
+                                ? "bg-secondary text-secondary-foreground border border-border text-foreground shadow-sm"
                                 : "bg-muted text-muted-foreground"
                             }`}
                           >
@@ -743,15 +740,15 @@ export default function FinancePage() {
       {/* ============ DELINQUENT ============ */}
       {delinquentClients.length > 0 && (
         <Card className="border-red-500/30 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-rose-500 to-pink-500" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center shadow-md">
-                  <AlertTriangle className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                  <AlertTriangle className="w-4 h-4 text-secondary-foreground" />
                 </div>
                 <div>
-                  <h2 className="font-display font-bold text-base text-red-600 dark:text-red-400">
+                  <h2 className="font-bold text-base text-red-600 dark:text-red-400">
                     {t("finance.delinquentClients")}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -763,7 +760,7 @@ export default function FinancePage() {
                 {delinquentClients.length}
               </span>
             </div>
-            <div className="rounded-xl border border-border/50 overflow-hidden">
+            <div className="rounded-md border border-border/50 overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/40 hover:bg-muted/40 border-border/50">
@@ -788,7 +785,7 @@ export default function FinancePage() {
                         {fmt(row.overdue)}
                       </TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center h-6 px-2.5 rounded-md text-xs font-bold bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-sm">
+                        <span className="inline-flex items-center h-6 px-2.5 rounded-md text-xs font-bold bg-secondary text-secondary-foreground border border-border shadow-sm">
                           {row.maxOverdueDays} {t("common.days")}
                         </span>
                       </TableCell>
@@ -802,13 +799,13 @@ export default function FinancePage() {
       )}
 
       {/* ============ FILTERS ============ */}
-      <div className="rounded-2xl bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div className="rounded-md bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground px-1">
           <Filter className="w-3.5 h-3.5" />
           {t("common.filters")}:
         </div>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-full sm:w-44 h-10 rounded-xl bg-muted/40 border-border/60">
+          <SelectTrigger className="w-full sm:w-44 h-10 rounded-md bg-muted/40 border-border/60">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -820,7 +817,7 @@ export default function FinancePage() {
           </SelectContent>
         </Select>
         <Select value={filterClient} onValueChange={setFilterClient}>
-          <SelectTrigger className="w-full sm:w-56 h-10 rounded-xl bg-muted/40 border-border/60">
+          <SelectTrigger className="w-full sm:w-56 h-10 rounded-md bg-muted/40 border-border/60">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -871,14 +868,14 @@ export default function FinancePage() {
                   setFilterStatus("all");
                   setFilterClient("all");
                 }}
-                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold"
+                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold"
               >
                 {t("common.clearFilters")}
               </button>
             ) : !isViewer ? (
               <button
                 onClick={openNew}
-                className="h-11 px-6 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-2"
+                className="h-11 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-foreground text-sm font-semibold inline-flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 {t("finance.newInvoice")}
@@ -1003,14 +1000,14 @@ export default function FinancePage() {
 
       {/* ============ DIALOG ============ */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="rounded-2xl">
+        <DialogContent className="rounded-md">
           <DialogHeader>
-            <DialogTitle className="font-display flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
+            <DialogTitle className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
                 {editing ? (
-                  <Pencil className="w-4 h-4 text-white" />
+                  <Pencil className="w-4 h-4 text-secondary-foreground" />
                 ) : (
-                  <Plus className="w-4 h-4 text-white" />
+                  <Plus className="w-4 h-4 text-secondary-foreground" />
                 )}
               </div>
               {editing ? t("finance.editInvoice") : t("finance.newInvoice")}
@@ -1028,7 +1025,7 @@ export default function FinancePage() {
                 value={form.client_id}
                 onValueChange={(v) => setForm({ ...form, client_id: v })}
               >
-                <SelectTrigger className="h-11 rounded-xl">
+                <SelectTrigger className="h-11 rounded-md">
                   <SelectValue placeholder={t("kanban.client")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -1050,7 +1047,7 @@ export default function FinancePage() {
                   step="0.01"
                   value={form.amount}
                   onChange={(e) => setForm({ ...form, amount: e.target.value })}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
               <div className="space-y-1.5">
@@ -1061,7 +1058,7 @@ export default function FinancePage() {
                   type="date"
                   value={form.due_date}
                   onChange={(e) => setForm({ ...form, due_date: e.target.value })}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-md"
                 />
               </div>
             </div>
@@ -1074,7 +1071,7 @@ export default function FinancePage() {
                   value={form.status}
                   onValueChange={(v) => setForm({ ...form, status: v })}
                 >
-                  <SelectTrigger className="h-11 rounded-xl">
+                  <SelectTrigger className="h-11 rounded-md">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1098,7 +1095,7 @@ export default function FinancePage() {
                     onChange={(e) =>
                       setForm({ ...form, paid_date: e.target.value })
                     }
-                    className="h-11 rounded-xl"
+                    className="h-11 rounded-md"
                   />
                 </div>
               )}
@@ -1112,7 +1109,7 @@ export default function FinancePage() {
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
                 }
-                className="rounded-xl"
+                className="rounded-md"
               />
             </div>
             <button
@@ -1124,9 +1121,9 @@ export default function FinancePage() {
                 createInvoice.isPending ||
                 updateInvoice.isPending
               }
-              className="group w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-[0_10px_30px_-8px_hsl(158_55%_42%/0.55)] text-white font-semibold rounded-xl inline-flex items-center justify-center gap-2 transition-all disabled:opacity-60 relative overflow-hidden"
+              className="group w-full h-11 bg-secondary text-secondary-foreground border border-border font-semibold rounded-md inline-flex items-center justify-center gap-2 transition-all disabled:opacity-60 relative overflow-hidden"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <span className="absolute inset-0 bg-secondary text-secondary-foreground border border-border -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               {createInvoice.isPending || updateInvoice.isPending
                 ? t("common.saving")
                 : t("common.save")}

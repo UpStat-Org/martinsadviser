@@ -1,4 +1,4 @@
-import { Component, type ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { tNow } from "@/lib/translations";
 
@@ -21,6 +21,12 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    // Surface the stack to the console so issues caught by the boundary
+    // aren't silently swallowed — the user only sees the friendly message.
+    console.error("[ErrorBoundary] uncaught render error", error, info.componentStack);
+  }
+
   render() {
     if (this.state.hasError) {
       return (
@@ -29,7 +35,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
               <AlertTriangle className="w-8 h-8 text-destructive" />
             </div>
-            <h2 className="font-display text-xl font-bold text-foreground">{tNow("errorBoundary.title")}</h2>
+            <h2 className="text-xl font-bold text-foreground">{tNow("errorBoundary.title")}</h2>
             <p className="text-sm text-muted-foreground">
               {tNow("errorBoundary.description")}
             </p>

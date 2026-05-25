@@ -7,22 +7,22 @@ interface WordmarkProps {
   size?: Size;
   tone?: Tone;
   className?: string;
-  /** Main brand word. Defaults to "Martins" to preserve the original look. */
+  /** Main brand word. */
   primary?: string;
-  /** Secondary word after the gold bar. Defaults to "Adviser". */
+  /** Secondary word (shown after a separator). */
   secondary?: string;
-  /**
-   * Hex color overriding the amber gradient on the bar between primary and
-   * secondary. Default keeps the original MartinsAdviser amber.
-   */
+  /** Hex color used for the separator dot when set. Defaults to the theme accent. */
   accentColor?: string | null;
 }
 
-const sizeMap: Record<Size, { main: string; sub: string; gap: string; bar: string }> = {
-  sm: { main: "text-[13px]", sub: "text-[8px]", gap: "gap-[2px]", bar: "w-3 h-[1.5px]" },
-  md: { main: "text-[17px]", sub: "text-[9px]", gap: "gap-[3px]", bar: "w-4 h-[2px]" },
-  lg: { main: "text-[22px]", sub: "text-[10px]", gap: "gap-[4px]", bar: "w-5 h-[2px]" },
-  xl: { main: "text-[28px]", sub: "text-[11px]", gap: "gap-[5px]", bar: "w-6 h-[2.5px]" },
+// CRM wordmark: a single inline name, neutral sans, with a tiny accent dot
+// separating the two halves when both are provided. No display font, no
+// uppercase, no decorative bar — the page chrome is supposed to be calm.
+const sizeMap: Record<Size, { main: string; sub: string; dot: string }> = {
+  sm: { main: "text-[13px]", sub: "text-[12px]", dot: "w-1 h-1" },
+  md: { main: "text-[15px]", sub: "text-[14px]", dot: "w-1.5 h-1.5" },
+  lg: { main: "text-[18px]", sub: "text-[16px]", dot: "w-1.5 h-1.5" },
+  xl: { main: "text-[22px]", sub: "text-[18px]", dot: "w-2 h-2" },
 };
 
 export function Wordmark({
@@ -35,46 +35,24 @@ export function Wordmark({
 }: WordmarkProps) {
   const s = sizeMap[size];
   const mainColor = tone === "light" ? "text-white" : "text-foreground";
-  const subColor = tone === "light" ? "text-white/55" : "text-muted-foreground";
-  const hasSecondary = secondary && secondary.length > 0;
+  const subColor = tone === "light" ? "text-white/65" : "text-muted-foreground";
+  const hasSecondary = !!secondary && secondary.length > 0;
 
-  // The bar between the two lines is the wordmark's visual signature. When
-  // the org overrides the accent color, swap the amber gradient for a solid
-  // (it doesn't look great as a gradient unless we know the shade variant);
-  // otherwise keep the original amber → gold gradient.
-  const barStyle = accentColor
-    ? { background: accentColor }
-    : undefined;
-  const barClass = accentColor
-    ? "rounded-full shrink-0"
-    : "rounded-full shrink-0 bg-gradient-to-r from-[#F59E0B] to-[#FCD34D]";
+  const dotStyle = accentColor ? { backgroundColor: accentColor } : undefined;
+  const dotClass = accentColor ? "rounded-full shrink-0" : "rounded-full shrink-0 bg-accent";
 
   return (
-    <div className={cn("flex flex-col leading-none select-none", s.gap, className)}>
-      <span
-        className={cn(
-          "font-brand font-bold uppercase",
-          s.main,
-          mainColor,
-        )}
-        style={{ letterSpacing: "-0.045em" }}
-      >
+    <div className={cn("flex items-baseline gap-1.5 leading-none select-none min-w-0", className)}>
+      <span className={cn("font-semibold tracking-tight truncate", s.main, mainColor)}>
         {primary}
       </span>
       {hasSecondary && (
-        <div className="flex items-center gap-1.5">
-          <span className={cn(barClass, s.bar)} style={barStyle} />
-          <span
-            className={cn(
-              "font-sans font-semibold uppercase",
-              s.sub,
-              subColor,
-            )}
-            style={{ letterSpacing: "0.32em" }}
-          >
+        <>
+          <span className={cn(dotClass, s.dot, "self-center")} style={dotStyle} aria-hidden />
+          <span className={cn("font-medium tracking-tight truncate", s.sub, subColor)}>
             {secondary}
           </span>
-        </div>
+        </>
       )}
     </div>
   );

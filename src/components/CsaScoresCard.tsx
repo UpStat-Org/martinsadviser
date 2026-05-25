@@ -81,11 +81,11 @@ export function CsaScoresCard({ clientId }: { clientId: string }) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center shadow-md">
-              <ShieldAlert className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <ShieldAlert className="w-4 h-4 text-secondary-foreground" />
             </div>
             <div>
-              <CardTitle className="font-display text-base">{t("csa.title")}</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("csa.title")}</CardTitle>
               <p className="text-xs text-muted-foreground">{t("csa.subtitle")}</p>
             </div>
           </div>
@@ -112,7 +112,7 @@ export function CsaScoresCard({ clientId }: { clientId: string }) {
                       {t(b.labelKey)}
                     </p>
                     <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="font-display text-xl font-bold tabular-nums">
+                      <span className="text-xl font-bold tabular-nums">
                         {value != null ? value.toFixed(1) : "—"}
                       </span>
                     </div>

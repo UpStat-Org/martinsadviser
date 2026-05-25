@@ -14,7 +14,7 @@ function Tip({ children, variant = "info" }: { children: ReactNode; variant?: "i
   const isWarning = variant === "warning";
   return (
     <div
-      className={`relative overflow-hidden flex gap-3 rounded-xl p-4 my-3 border ${
+      className={`relative overflow-hidden flex gap-3 rounded-md p-4 my-3 border ${
         isWarning
           ? "bg-amber-500/5 border-amber-500/20"
           : "bg-primary/5 border-primary/15"
@@ -23,21 +23,19 @@ function Tip({ children, variant = "info" }: { children: ReactNode; variant?: "i
       <div
         className={`absolute top-0 left-0 bottom-0 w-1 ${
           isWarning
-            ? "bg-gradient-to-b from-amber-500 to-orange-500"
-            : "bg-gradient-to-b from-indigo-500 to-violet-500"
-        }`}
+            ? "bg-secondary text-secondary-foreground border border-border"            : "bg-secondary text-secondary-foreground border border-border"        }`}
       />
       <div
         className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${
           isWarning
-            ? "bg-gradient-to-br from-amber-500 to-orange-500"
-            : "bg-gradient-to-br from-indigo-500 to-violet-500"
+            ? "bg-secondary text-secondary-foreground border border-border"
+            : "bg-secondary text-secondary-foreground border border-border"
         }`}
       >
         {isWarning ? (
-          <AlertTriangle className="w-4 h-4 text-white" />
+          <AlertTriangle className="w-4 h-4 text-secondary-foreground" />
         ) : (
-          <Lightbulb className="w-4 h-4 text-white" />
+          <Lightbulb className="w-4 h-4 text-secondary-foreground" />
         )}
       </div>
       <p className="text-sm text-foreground/80 leading-relaxed pt-0.5">{children}</p>
@@ -50,7 +48,7 @@ function Steps({ items }: { items: string[] }) {
     <ol className="space-y-3 my-4">
       {items.map((item, i) => (
         <li key={i} className="flex gap-3 items-start group">
-          <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 text-white text-xs font-bold shrink-0 mt-0.5 shadow-sm ring-2 ring-background group-hover:scale-105 transition-transform">
+          <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-secondary text-secondary-foreground border border-border text-xs font-bold shrink-0 mt-0.5 shadow-sm ring-2 ring-background group-hover:scale-105 transition-transform">
             {i + 1}
           </span>
           <span className="text-sm text-foreground leading-relaxed">{item}</span>
@@ -63,7 +61,7 @@ function Steps({ items }: { items: string[] }) {
 function SectionIcon({ icon: Icon, color }: { icon: any; color: string }) {
   return (
     <div
-      className={`flex items-center justify-center w-10 h-10 rounded-xl ${color} shrink-0 shadow-sm`}
+      className={`flex items-center justify-center w-10 h-10 rounded-md ${color} shrink-0 shadow-sm`}
     >
       <Icon className="w-5 h-5" />
     </div>
@@ -86,22 +84,19 @@ export default function DocumentationPage() {
   const sections: DocSection[] = language === "en" ? getEnSections() : language === "es" ? getEsSections() : getPtSections();
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
 
         <div className="relative flex items-start gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-            <BookOpen className="w-6 h-6 text-white" />
+          <div className="w-14 h-14 rounded-md bg-card border border-border flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-6 h-6 text-secondary-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
               {t("docs.title")}
             </h1>
-            <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">
               {t("docs.subtitle")}
             </p>
           </div>
@@ -110,14 +105,14 @@ export default function DocumentationPage() {
 
       {/* ============ WELCOME ============ */}
       <Card className="border-border/50 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
-        <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 opacity-10 blur-2xl pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
+        <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl pointer-events-none" />
         <CardContent className="relative flex gap-4 items-start p-6">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 flex items-center justify-center shadow-xl flex-shrink-0">
-            <BookOpen className="w-5 h-5 text-white" />
+          <div className="w-12 h-12 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-5 h-5 text-secondary-foreground" />
           </div>
           <div className="flex-1">
-            <h2 className="font-display font-bold text-base mb-1">
+            <h2 className="font-bold text-base mb-1">
               {t("docs.welcomeTitle")}
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -144,7 +139,7 @@ export default function DocumentationPage() {
           <AccordionItem
             key={section.id}
             value={section.id}
-            className="border border-border/50 rounded-2xl bg-card shadow-sm hover:shadow-md transition-shadow overflow-hidden group"
+            className="border border-border/50 rounded-md bg-card shadow-sm hover:shadow-md transition-shadow overflow-hidden group"
           >
             <AccordionTrigger className="hover:no-underline px-5 py-4 group-data-[state=open]:border-b group-data-[state=open]:border-border/50">
               <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -153,7 +148,7 @@ export default function DocumentationPage() {
                 </span>
                 <SectionIcon icon={section.icon} color={section.color} />
                 <div className="text-left min-w-0">
-                  <span className="font-display font-bold text-foreground text-[15px] truncate block">
+                  <span className="font-bold text-foreground text-[15px] truncate block">
                     {section.title}
                   </span>
                   <p className="text-xs text-muted-foreground font-normal mt-0.5 truncate">

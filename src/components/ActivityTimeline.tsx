@@ -79,7 +79,7 @@ export function ActivityTimeline({ clientId }: ActivityTimelineProps) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="font-display text-lg">{t("activity.title")}</CardTitle>
+        <CardTitle className="text-base font-semibold">{t("activity.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="relative">

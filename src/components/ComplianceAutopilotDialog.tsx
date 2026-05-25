@@ -378,11 +378,11 @@ export function ComplianceAutopilotDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[88vh] overflow-y-auto rounded-2xl">
+      <DialogContent className="max-w-4xl max-h-[88vh] overflow-y-auto rounded-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-display text-2xl">
-            <span className="w-9 h-9 rounded-xl btn-gradient flex items-center justify-center">
-              <Bot className="w-4 h-4 text-white" />
+          <DialogTitle className="flex items-center gap-2 text-2xl">
+            <span className="w-9 h-9 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
+              <Bot className="w-4 h-4 text-secondary-foreground" />
             </span>
             {t("autopilot.title")}
           </DialogTitle>
@@ -393,7 +393,7 @@ export function ComplianceAutopilotDialog({
 
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
           <div className="space-y-4">
-            <div className="rounded-2xl border border-border/50 bg-muted/30 p-4">
+            <div className="rounded-md border border-border/50 bg-muted/30 p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {t("autopilot.riskScore")}
@@ -410,7 +410,7 @@ export function ComplianceAutopilotDialog({
                   {levelLabel}
                 </Badge>
               </div>
-              <div className="font-display text-5xl font-bold tracking-tight mb-3">
+              <div className="text-5xl font-bold tracking-tight mb-3">
                 {analysis.score}%
               </div>
               <Progress value={analysis.score} />
@@ -423,9 +423,9 @@ export function ComplianceAutopilotDialog({
                 { label: t("autopilot.metric.docs"), value: analysis.missingDocuments.length, icon: FileText },
                 { label: t("autopilot.metric.invoices"), value: analysis.overdueInvoices.length, icon: Receipt },
               ].map((m) => (
-                <div key={m.label} className="rounded-xl border border-border/50 bg-card p-3">
+                <div key={m.label} className="rounded-md border border-border/50 bg-card p-3">
                   <m.icon className="w-4 h-4 text-muted-foreground mb-2" />
-                  <div className="font-display text-2xl font-bold">{m.value}</div>
+                  <div className="text-lg font-semibold">{m.value}</div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                     {m.label}
                   </div>
@@ -437,7 +437,7 @@ export function ComplianceAutopilotDialog({
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="font-display font-bold text-lg">{t("autopilot.planTitle")}</h3>
+                <h3 className="font-bold text-lg">{t("autopilot.planTitle")}</h3>
                 <p className="text-sm text-muted-foreground">{t("autopilot.planSubtitle")}</p>
               </div>
               <Badge variant="outline" className="shrink-0">
@@ -451,7 +451,7 @@ export function ComplianceAutopilotDialog({
                 return (
                   <div
                     key={action.id}
-                    className={cn("rounded-xl border p-3 flex gap-3", toneClass[action.tone])}
+                    className={cn("rounded-md border p-3 flex gap-3", toneClass[action.tone])}
                   >
                     <div className="w-9 h-9 rounded-lg bg-background border border-border/60 flex items-center justify-center shrink-0">
                       <Icon className="w-4 h-4" />

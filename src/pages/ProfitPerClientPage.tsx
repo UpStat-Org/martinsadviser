@@ -52,15 +52,13 @@ export default function ProfitPerClientPage() {
   const totalProfit = totalRevenue - totalCost;
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
         <div className="relative">
-          <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-2">Finance</p>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">{t("profit.title")}</h1>
-          <p className="text-white/70 mt-2 text-sm max-w-2xl">{t("profit.subtitle")}</p>
-          <p className="text-white/50 mt-1 text-xs">{t("profit.hourlyRate").replace("{rate}", hourlyRate.toFixed(2))}</p>
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-2">{t("common.financeEyebrow")}</p>
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">{t("profit.title")}</h1>
+          <p className="text-muted-foreground mt-2 text-sm max-w-2xl">{t("profit.subtitle")}</p>
+          <p className="text-muted-foreground mt-1 text-xs">{t("profit.hourlyRate").replace("{rate}", hourlyRate.toFixed(2))}</p>
         </div>
       </div>
 
@@ -71,7 +69,7 @@ export default function ProfitPerClientPage() {
               <DollarSign className="w-3.5 h-3.5" />
               {t("profit.col.revenue")}
             </div>
-            <p className="font-display text-2xl font-bold tabular-nums mt-1">{usd.format(totalRevenue)}</p>
+            <p className="text-lg font-semibold tabular-nums mt-1">{usd.format(totalRevenue)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -80,7 +78,7 @@ export default function ProfitPerClientPage() {
               <Clock className="w-3.5 h-3.5" />
               {t("profit.col.cost")}
             </div>
-            <p className="font-display text-2xl font-bold tabular-nums mt-1">{usd.format(totalCost)}</p>
+            <p className="text-lg font-semibold tabular-nums mt-1">{usd.format(totalCost)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -89,7 +87,7 @@ export default function ProfitPerClientPage() {
               {totalProfit >= 0 ? <TrendingUp className="w-3.5 h-3.5 text-success" /> : <TrendingDown className="w-3.5 h-3.5 text-destructive" />}
               {t("profit.col.profit")}
             </div>
-            <p className={`font-display text-2xl font-bold tabular-nums mt-1 ${totalProfit >= 0 ? "text-success" : "text-destructive"}`}>
+            <p className={`text-lg font-semibold tabular-nums mt-1 ${totalProfit >= 0 ? "text-success" : "text-destructive"}`}>
               {usd.format(totalProfit)}
             </p>
           </CardContent>
@@ -98,7 +96,7 @@ export default function ProfitPerClientPage() {
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="font-display text-base">{t("profit.title")}</CardTitle>
+          <CardTitle className="text-sm font-semibold">{t("profit.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           {rows.length === 0 ? (

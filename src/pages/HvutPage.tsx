@@ -146,23 +146,21 @@ export default function HvutPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
         <div className="relative flex items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-2">
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-2">
               {t("hvut.section").replace("{year}", String(taxYear))}
             </p>
-            <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
               {t("hvut.title")}
             </h1>
-            <p className="text-white/70 mt-2 text-sm max-w-xl">
+            <p className="text-muted-foreground mt-2 text-sm max-w-xl">
               {t("hvut.subtitle")}
             </p>
           </div>
-          <Button onClick={() => setOpen(true)} className="btn-gradient text-white border-0 gap-1.5">
+          <Button onClick={() => setOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 text-foreground border-0 gap-1.5">
             <Plus className="w-4 h-4" />
             {t("hvut.newFiling")}
           </Button>
@@ -173,21 +171,21 @@ export default function HvutPage() {
         <Card>
           <CardContent className="pt-6">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("hvut.filingsCount").replace("{year}", String(taxYear))}</p>
-            <p className="font-display text-3xl font-bold mt-1 tabular-nums">{filings?.length ?? 0}</p>
+            <p className="text-xl font-semibold tracking-tight mt-1 tabular-nums">{filings?.length ?? 0}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{t("hvut.filingsCountDesc")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("hvut.missing")}</p>
-            <p className="font-display text-3xl font-bold mt-1 tabular-nums">{trucksMissing.length}</p>
+            <p className="text-xl font-semibold tracking-tight mt-1 tabular-nums">{trucksMissing.length}</p>
             <p className="text-xs text-warning mt-0.5">{t("hvut.missingDesc").replace("{year}", String(taxYear))}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("hvut.totalTax")}</p>
-            <p className="font-display text-3xl font-bold mt-1 tabular-nums">{usd.format(totalTaxThisYear)}</p>
+            <p className="text-xl font-semibold tracking-tight mt-1 tabular-nums">{usd.format(totalTaxThisYear)}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{t("hvut.totalTaxDesc")}</p>
           </CardContent>
         </Card>
@@ -195,7 +193,7 @@ export default function HvutPage() {
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="font-display text-lg flex items-center gap-2">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Receipt className="w-4 h-4" />
             {t("hvut.tableTitle").replace("{year}", String(taxYear))}
           </CardTitle>
@@ -264,7 +262,7 @@ export default function HvutPage() {
       {trucksMissing.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="font-display text-base flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-warning" />
               {t("hvut.missingTitle").replace("{year}", String(taxYear)).replace("{count}", String(trucksMissing.length))}
             </CardTitle>
@@ -334,7 +332,7 @@ export default function HvutPage() {
 
             <div className="rounded-lg bg-primary/5 border border-primary/15 p-3">
               <p className="text-xs text-muted-foreground">{t("hvut.taxEstimate")}</p>
-              <p className="font-display text-2xl font-bold tabular-nums">{usd.format(previewTax)}</p>
+              <p className="text-lg font-semibold tabular-nums">{usd.format(previewTax)}</p>
             </div>
           </div>
           <DialogFooter>

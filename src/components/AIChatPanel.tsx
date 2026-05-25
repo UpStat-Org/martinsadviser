@@ -78,7 +78,7 @@ export function AIChatPanel({ clientId, clientName }: { clientId: string; client
   return (
     <Card>
       <CardHeader className="pb-3 flex flex-row items-center justify-between">
-        <CardTitle className="font-display text-lg flex items-center gap-2">
+        <CardTitle className="text-base font-semibold flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-primary" />
           {t("aichat.title")} — {clientName}
         </CardTitle>

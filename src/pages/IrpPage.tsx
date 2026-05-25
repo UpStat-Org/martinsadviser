@@ -100,14 +100,12 @@ export default function IrpPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
         <div className="relative">
-          <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-2">IRP</p>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">{t("irp.title")}</h1>
-          <p className="text-white/70 mt-2 text-sm max-w-2xl">{t("irp.subtitle")}</p>
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-2">IRP</p>
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">{t("irp.title")}</h1>
+          <p className="text-muted-foreground mt-2 text-sm max-w-2xl">{t("irp.subtitle")}</p>
         </div>
       </div>
 
@@ -149,25 +147,25 @@ export default function IrpPage() {
             <Card>
               <CardContent className="pt-6">
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("irp.baseJuris")}</p>
-                <p className="font-display text-2xl font-bold tabular-nums mt-1">{registration.base_jurisdiction || "—"}</p>
+                <p className="text-lg font-semibold tabular-nums mt-1">{registration.base_jurisdiction || "—"}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("irp.totalMiles")}</p>
-                <p className="font-display text-2xl font-bold tabular-nums mt-1">{Number(registration.total_fleet_miles).toFixed(0)}</p>
+                <p className="text-lg font-semibold tabular-nums mt-1">{Number(registration.total_fleet_miles).toFixed(0)}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("irp.fleetSize")}</p>
-                <p className="font-display text-2xl font-bold tabular-nums mt-1">{registration.fleet_size}</p>
+                <p className="text-lg font-semibold tabular-nums mt-1">{registration.fleet_size}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("irp.totalFee")}</p>
-                <p className="font-display text-2xl font-bold tabular-nums mt-1">{usd.format(totalFee)}</p>
+                <p className="text-lg font-semibold tabular-nums mt-1">{usd.format(totalFee)}</p>
                 <Badge variant="outline" className={`mt-1 ${STATUS_BADGE[registration.status]}`}>{t(`irp.status.${registration.status}`)}</Badge>
               </CardContent>
             </Card>
@@ -176,7 +174,7 @@ export default function IrpPage() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="font-display text-base flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
                   {t("irp.linesTitle")} ({linesWithPct.length})
                 </CardTitle>

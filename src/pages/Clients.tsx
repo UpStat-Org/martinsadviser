@@ -48,6 +48,8 @@ import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { ScoreBadge } from "@/components/ComplianceScorecard";
 import { RiskBadge } from "@/components/RiskBadge";
 import { useRiskScores, type RiskScoreWithClient } from "@/hooks/useRiskScores";
+import { PageHeader } from "@/components/PageHeader";
+import { cn } from "@/lib/utils";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -72,17 +74,6 @@ const defaultClientColumns = {
   status: true,
 };
 
-const AVATAR_GRADIENTS = [
-  "from-indigo-500 to-violet-500",
-  "from-blue-500 to-cyan-500",
-  "from-emerald-500 to-teal-500",
-  "from-orange-500 to-amber-500",
-  "from-rose-500 to-red-500",
-  "from-fuchsia-500 to-pink-500",
-  "from-sky-500 to-blue-500",
-  "from-purple-500 to-indigo-500",
-];
-
 function initials(name: string) {
   return name
     .split(" ")
@@ -90,12 +81,6 @@ function initials(name: string) {
     .slice(0, 2)
     .map((s) => s[0]?.toUpperCase() ?? "")
     .join("");
-}
-
-function gradientFor(id: string) {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  return AVATAR_GRADIENTS[h % AVATAR_GRADIENTS.length];
 }
 
 export default function Clients() {
@@ -312,111 +297,71 @@ export default function Clients() {
     return { total, active, danger, warning };
   }, [clients, riskByClient]);
 
+  const kpiCards: Array<{
+    label: string;
+    value: number;
+    icon: typeof Users;
+    tone: "neutral" | "warning" | "danger";
+  }> = [
+    { label: t("clients.title"), value: stats.total, icon: Users, tone: "neutral" },
+    { label: t("common.active"), value: stats.active, icon: TrendingUp, tone: "neutral" },
+    { label: t("clients.statsAttention"), value: stats.warning, icon: ShieldAlert, tone: "warning" },
+    { label: t("clients.statsUrgent"), value: stats.danger, icon: ShieldAlert, tone: "danger" },
+  ];
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* ============ HERO HEADER ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
-
-        <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-              <Users className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
-                {t("clients.title")}
-              </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
-                {t("clients.subtitle")}
-              </p>
-            </div>
-          </div>
-
-          {!isViewer && (
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => setImportOpen(true)}
-                className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
-              >
-                <Upload className="w-4 h-4" />
+    <div className="space-y-5">
+      <PageHeader
+        title={t("clients.title")}
+        description={t("clients.subtitle")}
+        actions={
+          !isViewer && (
+            <>
+              <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
+                <Upload className="w-4 h-4 mr-1.5" />
                 {t("import.title")}
-              </button>
-              <button
-                onClick={() => navigate("/clients/onboarding")}
-                className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
-              >
-                <Plus className="w-4 h-4" />
+              </Button>
+              <Button size="sm" onClick={() => navigate("/clients/onboarding")}>
+                <Plus className="w-4 h-4 mr-1.5" />
                 {t("clients.new")}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+              </Button>
+            </>
+          )
+        }
+      />
 
-      {/* ============ QUICK STATS ============ */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {[
-          {
-            label: "Total de clientes",
-            value: stats.total,
-            icon: Users,
-            gradient: "from-indigo-500 to-violet-500",
-          },
-          {
-            label: "Clientes ativos",
-            value: stats.active,
-            icon: TrendingUp,
-            gradient: "from-emerald-500 to-teal-500",
-          },
-          {
-            label: "Em atenção",
-            value: stats.warning,
-            icon: ShieldAlert,
-            gradient: "from-amber-500 to-orange-500",
-          },
-          {
-            label: "Urgentes",
-            value: stats.danger,
-            icon: ShieldAlert,
-            gradient: "from-red-500 to-rose-500",
-          },
-        ].map((s) => (
-          <div
-            key={s.label}
-            className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
-          >
+      {/* KPI strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        {kpiCards.map((s) => {
+          const toneBar =
+            s.tone === "danger" ? "bg-destructive" : s.tone === "warning" ? "bg-warning" : null;
+          return (
             <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
-            />
-            <div className="relative flex items-start justify-between mb-3">
-              <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-md`}
-              >
-                <s.icon className="w-4 h-4 text-white" />
+              key={s.label}
+              className="relative rounded-md border border-border bg-card p-3.5 transition-colors hover:bg-muted/60 overflow-hidden"
+            >
+              {toneBar && (
+                <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1", toneBar)} />
+              )}
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  {s.label}
+                </span>
+                <s.icon className="w-4 h-4 text-muted-foreground/70" />
               </div>
+              <div className="text-2xl font-semibold tracking-tight tabular mt-1.5">{s.value}</div>
             </div>
-            <div className="relative">
-              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                {s.label}
-              </div>
-              <div className="font-display text-3xl font-bold tracking-tight">
-                {s.value}
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* ============ FILTERS ============ */}
-      <div className="rounded-2xl bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div className="rounded-md bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder={t("clients.search")}
-            className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-xl transition-colors"
+            className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-md transition-colors"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -425,7 +370,7 @@ export default function Clients() {
         <div className="flex items-center gap-1.5 flex-wrap">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground mr-1">
             <Filter className="w-3.5 h-3.5" />
-            Serviços:
+            {t("clients.servicesLabel")}
           </div>
           {serviceLabels.map((s) => {
             const active = serviceFilter === s.key;
@@ -435,7 +380,7 @@ export default function Clients() {
                 onClick={() => setServiceFilter(active ? null : s.key)}
                 className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all ${
                   active
-                    ? "btn-gradient text-white shadow-md"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 text-white shadow-md"
                     : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
@@ -449,7 +394,7 @@ export default function Clients() {
               className="h-8 px-2.5 rounded-lg text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex items-center gap-1"
             >
               <X className="w-3 h-3" />
-              Limpar
+              {t("common.clear")}
             </button>
           )}
         </div>
@@ -469,7 +414,7 @@ export default function Clients() {
                     onClick={() => setTagFilter(active ? null : tg)}
                     className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all ${
                       active
-                        ? "btn-gradient text-white shadow-md"
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 text-white shadow-md"
                         : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}
                   >
@@ -483,7 +428,7 @@ export default function Clients() {
                   className="h-8 px-2.5 rounded-lg text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex items-center gap-1"
                 >
                   <X className="w-3 h-3" />
-                  Limpar
+                  {t("common.clear")}
                 </button>
               )}
             </div>
@@ -538,7 +483,7 @@ export default function Clients() {
             !search && !serviceFilter ? (
               <button
                 onClick={() => navigate("/clients/onboarding")}
-                className="h-11 px-6 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-2 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
+                className="h-11 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-white text-sm font-semibold inline-flex items-center gap-2 transition-all"
               >
                 <Plus className="w-4 h-4" />
                 {t("clients.registerFirst")}
@@ -552,14 +497,14 @@ export default function Clients() {
                   setSearch("");
                   setServiceFilter(null);
                 }}
-                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold"
+                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold"
               >
                 {t("common.clearFilters")}
               </button>
             ) : (
               <button
                 onClick={() => setImportOpen(true)}
-                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold inline-flex items-center gap-2"
+                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold inline-flex items-center gap-2"
               >
                 <Upload className="w-4 h-4" />
                 {t("import.title")}
@@ -646,9 +591,7 @@ export default function Clients() {
                     <TableCell className={density === "compact" ? "py-2" : "py-3"}>
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientFor(
-                            client.id
-                          )} flex items-center justify-center text-white font-semibold text-sm shadow-md flex-shrink-0`}
+                          className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center text-white font-semibold text-sm flex-shrink-0`}
                         >
                           {initials(client.company_name)}
                         </div>
@@ -796,7 +739,7 @@ export default function Clients() {
 
       {/* Bulk action bar — floats at the bottom when ≥1 row selected. */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-2xl bg-card border border-border/60 shadow-2xl p-2 backdrop-blur-md">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-md bg-card border border-border/60 shadow-2xl p-2 backdrop-blur-md">
           <span className="px-3 text-sm font-semibold">
             {t("bulk.selected").replace("{count}", String(selectedIds.size))}
           </span>

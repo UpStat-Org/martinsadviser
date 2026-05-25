@@ -19,10 +19,10 @@ export function EmptyState({
   return (
     <Card className="border-border/50">
       <CardContent className="p-10 sm:p-16 text-center">
-        <div className="w-20 h-20 rounded-3xl bg-muted/70 border border-border/60 flex items-center justify-center mx-auto mb-5">
+        <div className="w-20 h-20 rounded-md bg-muted/70 border border-border/60 flex items-center justify-center mx-auto mb-5">
           {icon}
         </div>
-        <p className="font-display text-lg font-semibold text-foreground mb-1">
+        <p className="text-base font-semibold font-semibold text-foreground mb-1">
           {title}
         </p>
         <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">

@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertTriangle, X, ExternalLink, Loader2, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { differenceInDays } from "date-fns";
+import { tNow } from "@/lib/translations";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Soft warning bar above the app. Catches the two states SubscriptionGate
 // doesn't (it only hard-blocks suspended/canceled):
@@ -23,6 +25,7 @@ const DISMISS_KEY = "subscription-banner-dismissed-at";
 const DISMISS_HOURS = 8; // re-show after this many hours
 
 export function SubscriptionBanner() {
+  const { t } = useLanguage();
   const { currentOrg, isOrgOwner, loading } = useOrg();
   const { data: isSuperAdmin } = useSuperAdmin();
   const { toast } = useToast();
@@ -53,7 +56,7 @@ export function SubscriptionBanner() {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      if (!data?.url) throw new Error("Stripe não retornou URL");
+      if (!data?.url) throw new Error(tNow("orgBilling.stripeNoUrl"));
       window.location.href = data.url;
     },
     onError: (e: any) => toast({ title: "Falha", description: e.message, variant: "destructive" }),
@@ -107,7 +110,7 @@ export function SubscriptionBanner() {
       <div className="flex-1 min-w-0 text-sm">
         {isPastDue ? (
           <>
-            <strong>Pagamento pendente.</strong>{" "}
+            <strong>{t("subscription.paymentPending")}</strong>{" "}
             <span className="text-muted-foreground">
               Atualize seu método de pagamento pra evitar suspensão do acesso.
             </span>

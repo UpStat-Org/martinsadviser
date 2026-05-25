@@ -19,6 +19,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Loader2, Plus, Building2, UserPlus, ShieldCheck } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Shape returned by super_admin_list_orgs RPC.
 interface OrgRow {
@@ -73,6 +74,7 @@ function statusTone(status: string): "default" | "secondary" | "destructive" | "
 export default function SuperAdmin() {
   const qc = useQueryClient();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [createOpen, setCreateOpen] = useState(false);
   const [openOrgId, setOpenOrgId] = useState<string | null>(null);
 
@@ -95,9 +97,9 @@ export default function SuperAdmin() {
             <ShieldCheck className="w-3 h-3" />
             Super-admin
           </div>
-          <h1 className="font-display text-2xl font-bold">Organizações</h1>
+          <h1 className="text-lg font-semibold">{t("superadmin.title")}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Visão cross-tenant de todas as orgs do sistema. Apenas owners da MartinsAdviser veem essa página.
+            Cross-tenant view of every org in the system. Only MartinsAdviser owners see this page.
           </p>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2">
@@ -125,13 +127,13 @@ export default function SuperAdmin() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Org</TableHead>
-                  <TableHead>Slug</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Members</TableHead>
-                  <TableHead className="text-right">Clientes</TableHead>
-                  <TableHead className="text-right">Permits</TableHead>
-                  <TableHead className="text-right">Trucks</TableHead>
-                  <TableHead>Criada em</TableHead>
+                  <TableHead>{t("common.slug")}</TableHead>
+                  <TableHead>{t("common.status")}</TableHead>
+                  <TableHead className="text-right">{t("superadmin.tableMembers")}</TableHead>
+                  <TableHead className="text-right">{t("superadmin.tableClients")}</TableHead>
+                  <TableHead className="text-right">{t("superadmin.tablePermits")}</TableHead>
+                  <TableHead className="text-right">{t("superadmin.tableTrucks")}</TableHead>
+                  <TableHead>{t("superadmin.tableCreatedAt")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -173,7 +175,7 @@ export default function SuperAdmin() {
         onOpenChange={setCreateOpen}
         onCreated={() => {
           refetchAll();
-          toast({ title: "Organização criada" });
+          toast({ title: t("superadmin.orgCreatedToast") });
         }}
       />
 
@@ -196,6 +198,7 @@ function CreateOrgDialog({
   const [slug, setSlug] = useState("");
   const [name, setName] = useState("");
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const createOrg = useMutation({
     mutationFn: async () => {
@@ -215,14 +218,15 @@ function CreateOrgDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Nova organização</DialogTitle>
+          <DialogTitle>{t("superadmin.newOrg")}</DialogTitle>
           <DialogDescription>
-            Cria a tenant em status "trialing". Defina o owner em seguida pelo drawer de detalhes.
+            {/* Description left as-is until a translation key is added — operational detail only super-admins see. */}
+            Creates the tenant in "trialing" status. Set the owner afterwards from the details drawer.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <Label htmlFor="org-slug">Slug</Label>
+            <Label htmlFor="org-slug">{t("common.slug")}</Label>
             <Input
               id="org-slug"
               value={slug}
@@ -231,21 +235,21 @@ function CreateOrgDialog({
               className="font-mono"
             />
             <p className="text-[11px] text-muted-foreground">
-              Vira o subdomínio: <span className="font-mono">{slug || "&lt;slug&gt;"}.martinsadviser.com</span>
+              {slug || "<slug>"}.martinsadviser.com
             </p>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="org-name">Nome</Label>
+            <Label htmlFor="org-name">{t("superadmin.orgName")}</Label>
             <Input
               id="org-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Acme Permit Services"
+              placeholder={t("superadmin.orgNamePlaceholder")}
             />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
           <Button
             onClick={() => createOrg.mutate()}
             disabled={!slug || !name || createOrg.isPending}
@@ -268,6 +272,7 @@ function OrgDetailsDrawer({
   orgId, onClose, onChanged,
 }: { orgId: string | null; onClose: () => void; onChanged: () => void }) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const open = !!orgId;
 
   const detailsQuery = useQuery({
@@ -339,7 +344,7 @@ function OrgDetailsDrawer({
           <div className="space-y-6 py-6">
             {/* Status */}
             <section className="space-y-2">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">Status</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground">{t("common.status")}</Label>
               <Select
                 value={details.org.subscription_status}
                 onValueChange={(v) => updateStatus.mutate(v)}
@@ -384,9 +389,9 @@ function OrgDetailsDrawer({
 
             {/* Members */}
             <section className="space-y-2">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">Members</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground">{t("superadmin.tableMembers")}</Label>
               {details.members.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Sem members aprovados ainda.</p>
+                <p className="text-sm text-muted-foreground">{t("superadmin.noMembersYet")}</p>
               ) : (
                 <div className="divide-y divide-border/50 border border-border/50 rounded-lg overflow-hidden">
                   {details.members.map((m) => (
@@ -411,9 +416,9 @@ function OrgDetailsDrawer({
 
             {/* Feature flags snapshot */}
             <section className="space-y-2">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">Feature flags</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground">{t("superadmin.featureFlags")}</Label>
               {flagEntries.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Padrões (todos on).</p>
+                <p className="text-sm text-muted-foreground">Defaults (all on).</p>
               ) : (
                 <div className="grid grid-cols-2 gap-1.5">
                   {flagEntries.map(([flag, on]) => (

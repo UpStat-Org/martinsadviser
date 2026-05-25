@@ -26,7 +26,7 @@ export function InternalNotesSection({ clientId }: { clientId: string }) {
   return (
     <Card className="border-amber-500/30 bg-amber-50/40 dark:bg-amber-950/10">
       <CardHeader className="pb-3">
-        <CardTitle className="font-display text-lg flex items-center gap-2">
+        <CardTitle className="text-base font-semibold flex items-center gap-2">
           <Lock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           {t("notes.internal.title")}
           <span className="text-xs font-normal text-muted-foreground">

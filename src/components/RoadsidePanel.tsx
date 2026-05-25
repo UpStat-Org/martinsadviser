@@ -78,11 +78,11 @@ export function RoadsidePanel({ clientId, truckId, driverId }: Props) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-md">
-              <Search className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <Search className="w-4 h-4 text-secondary-foreground" />
             </div>
             <div>
-              <CardTitle className="font-display text-base">{t("roadside.title")}</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("roadside.title")}</CardTitle>
               <p className="text-xs text-muted-foreground">{t("roadside.subtitle")}</p>
             </div>
           </div>

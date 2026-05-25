@@ -275,7 +275,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
     <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setSelectedFile(null); setIsDragging(false); } }}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">
+          <DialogTitle className="text-xl">
             {isEditing ? t("permits.form.edit") : t("permits.new")}
           </DialogTitle>
         </DialogHeader>
@@ -391,7 +391,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
               const cat = permitCategory(form.watch("permit_type"));
               if (cat === "hazmat") {
                 return (
-                  <div className="rounded-xl bg-muted/40 border border-border/50 p-4 space-y-3">
+                  <div className="rounded-md bg-muted/40 border border-border/50 p-4 space-y-3">
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("permits.metadata.hazmat")}</p>
                     <div className="grid grid-cols-2 gap-3">
                       <FormField control={form.control} name="hm_class" render={({ field }) => (
@@ -412,7 +412,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
               }
               if (cat === "border") {
                 return (
-                  <div className="rounded-xl bg-muted/40 border border-border/50 p-4 space-y-3">
+                  <div className="rounded-md bg-muted/40 border border-border/50 p-4 space-y-3">
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("permits.metadata.border")}</p>
                     <div className="grid grid-cols-3 gap-3">
                       <FormField control={form.control} name="port_code" render={({ field }) => (

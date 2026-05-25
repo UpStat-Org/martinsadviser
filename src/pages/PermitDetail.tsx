@@ -14,10 +14,14 @@ import { CommentsSection } from "@/components/CommentsSection";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { DocumentViewer } from "@/components/DocumentViewer";
 import { DocumentLink } from "@/components/DocumentLink";
+import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function PermitDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [editOpen, setEditOpen] = useState(false);
   const [docOpen, setDocOpen] = useState(false);
   const { data: permit, isLoading } = usePermit(id);
@@ -25,7 +29,7 @@ export default function PermitDetail() {
   const { data: history } = usePermitHistory(id);
   const { data: activity } = useActivityLog(permit?.client_id, 8);
 
-  if (isLoading) return <Skeleton className="h-96 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-96 w-full rounded-md" />;
   if (!permit) return null;
 
   const status = getExpirationStatus(permit.expiration_date);
@@ -36,58 +40,44 @@ export default function PermitDetail() {
   const documentUrl = currentDoc?.document_url || permit.document_url;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-5">
       <button
         onClick={() => navigate(-1)}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" />
-        Voltar
+        <ArrowLeft className="w-3.5 h-3.5" />
+        {t("common.back")}
       </button>
 
-      <div className="rounded-2xl border border-border/50 bg-card p-5">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-              <FileCheck className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-display text-3xl font-bold">{permit.permit_type}</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {permit.permit_number || "Sem número"} {permit.state ? `• ${permit.state}` : ""}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className={status.color}>{status.label}</Badge>
-            <button
-              onClick={() => setEditOpen(true)}
-              className="h-9 px-3 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold inline-flex items-center gap-2"
-            >
-              <Pencil className="w-4 h-4" />
-              Editar
-            </button>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title={permit.permit_type}
+        description={`${permit.permit_number || t("permitDetail.noNumber")}${permit.state ? ` · ${permit.state}` : ""}`}
+        meta={<Badge className={status.color}>{status.label}</Badge>}
+        actions={
+          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+            <Pencil className="w-4 h-4 mr-1.5" />
+            {t("common.edit")}
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <StatusTile label="Status operacional" value={status.label} tone={daysToExpiration !== null && daysToExpiration <= 30 ? "red" : "emerald"} />
-        <StatusTile label="Dias para vencimento" value={daysToExpiration === null ? "Sem data" : String(daysToExpiration)} tone={daysToExpiration !== null && daysToExpiration <= 30 ? "amber" : "muted"} />
-        <StatusTile label="Versões de documento" value={String(documents?.length ?? (permit.document_url ? 1 : 0))} tone={documentUrl ? "emerald" : "muted"} />
+        <StatusTile label={t("common.status")} value={status.label} tone={daysToExpiration !== null && daysToExpiration <= 30 ? "red" : "emerald"} />
+        <StatusTile label={t("forecast.expiringIn").replace("{days}", "").trim() || "Days to expiration"} value={daysToExpiration === null ? "—" : String(daysToExpiration)} tone={daysToExpiration !== null && daysToExpiration <= 30 ? "amber" : "muted"} />
+        <StatusTile label={t("permitDetail.dataTitle")} value={String(documents?.length ?? (permit.document_url ? 1 : 0))} tone={documentUrl ? "emerald" : "muted"} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="border-border/50 lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base">Dados do permit</CardTitle>
+            <CardTitle className="text-base">{t("permitDetail.dataTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="grid sm:grid-cols-2 gap-4 text-sm">
-            <Info label="Cliente" value={permit.clients?.company_name || "—"} to={`/clients/${permit.client_id}`} icon={<Building2 className="w-4 h-4" />} />
-            <Info label="Caminhão" value={permit.trucks?.plate || "—"} to={permit.truck_id ? `/trucks/${permit.truck_id}` : undefined} icon={<Truck className="w-4 h-4" />} />
-            <Info label="Número" value={permit.permit_number || "—"} icon={<Hash className="w-4 h-4" />} />
+            <Info label={t("common.client")} value={permit.clients?.company_name || "—"} to={`/clients/${permit.client_id}`} icon={<Building2 className="w-4 h-4" />} />
+            <Info label={t("permitDetail.fieldTruck")} value={permit.trucks?.plate || "—"} to={permit.truck_id ? `/trucks/${permit.truck_id}` : undefined} icon={<Truck className="w-4 h-4" />} />
+            <Info label={t("permitDetail.fieldNumber")} value={permit.permit_number || "—"} icon={<Hash className="w-4 h-4" />} />
             <Info
-              label="Vencimento"
+              label={t("permitDetail.fieldExpiration")}
               value={permit.expiration_date ? format(new Date(permit.expiration_date), "dd/MM/yyyy") : "—"}
               icon={<CalendarDays className="w-4 h-4" />}
             />
@@ -96,25 +86,25 @@ export default function PermitDetail() {
 
         <Card className="border-border/50">
           <CardHeader>
-            <CardTitle className="text-base">Ações rápidas</CardTitle>
+            <CardTitle className="text-base">{t("common.quickActions")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Link className="block h-10 px-3 rounded-xl bg-muted/60 hover:bg-muted text-sm font-semibold leading-10" to={`/clients/${permit.client_id}`}>
-              Abrir cliente
+            <Link className="block h-10 px-3 rounded-md bg-muted/60 hover:bg-muted text-sm font-semibold leading-10" to={`/clients/${permit.client_id}`}>
+              {t("permitDetail.quickClient")}
             </Link>
             {permit.truck_id && (
-              <Link className="block h-10 px-3 rounded-xl bg-muted/60 hover:bg-muted text-sm font-semibold leading-10" to={`/trucks/${permit.truck_id}`}>
-                Abrir caminhão
+              <Link className="block h-10 px-3 rounded-md bg-muted/60 hover:bg-muted text-sm font-semibold leading-10" to={`/trucks/${permit.truck_id}`}>
+                {t("permitDetail.quickTruck")}
               </Link>
             )}
             {permit.document_url && (
-              <button className="block w-full h-10 px-3 rounded-xl bg-muted/60 hover:bg-muted text-sm font-semibold leading-10 text-left" onClick={() => setDocOpen(true)}>
-                Abrir documento
+              <button className="block w-full h-10 px-3 rounded-md bg-muted/60 hover:bg-muted text-sm font-semibold leading-10 text-left" onClick={() => setDocOpen(true)}>
+                {t("permitDetail.quickDoc")}
               </button>
             )}
-            <Link className="block h-10 px-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold leading-10" to={`/finance?action=new&client=${permit.client_id}`}>
+            <Link className="block h-10 px-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold leading-10" to={`/finance?action=new&client=${permit.client_id}`}>
               <Receipt className="inline w-4 h-4 mr-2" />
-              Nova invoice do cliente
+              {t("permitDetail.quickNewInvoice")}
             </Link>
           </CardContent>
         </Card>
@@ -125,7 +115,7 @@ export default function PermitDetail() {
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              Documentos
+              {t("permitDetail.docsTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -133,7 +123,7 @@ export default function PermitDetail() {
               <>
                 <button
                   onClick={() => setDocOpen(true)}
-                  className="w-full rounded-xl border border-border/50 p-3 text-left hover:bg-muted/40"
+                  className="w-full rounded-md border border-border/50 p-3 text-left hover:bg-muted/40"
                 >
                   <div className="text-sm font-semibold">{currentDoc?.file_name || `${permit.permit_type} documento`}</div>
                   <div className="text-xs text-muted-foreground">
@@ -144,7 +134,7 @@ export default function PermitDetail() {
                   <DocumentLink
                     key={doc.id}
                     path={doc.document_url}
-                    className="flex items-center justify-between rounded-xl bg-muted/40 border border-border/50 p-3 hover:bg-muted"
+                    className="flex items-center justify-between rounded-md bg-muted/40 border border-border/50 p-3 hover:bg-muted"
                   >
                     <span className="text-sm font-semibold">v{doc.version}</span>
                     <span className="text-xs text-muted-foreground">{format(new Date(doc.created_at), "dd/MM/yyyy")}</span>
@@ -152,7 +142,7 @@ export default function PermitDetail() {
                 ))}
               </>
             ) : (
-              <p className="text-sm text-muted-foreground">Nenhum documento registrado para este permit.</p>
+              <p className="text-sm text-muted-foreground">{t("permitDetail.noDocs")}</p>
             )}
           </CardContent>
         </Card>
@@ -161,13 +151,13 @@ export default function PermitDetail() {
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <History className="w-4 h-4" />
-              Histórico
+              {t("permitDetail.historyTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {history?.length ? (
               history.slice(0, 5).map((entry) => (
-                <div key={entry.id} className="rounded-xl bg-muted/40 border border-border/50 p-3">
+                <div key={entry.id} className="rounded-md bg-muted/40 border border-border/50 p-3">
                   <div className="text-sm font-semibold">{entry.change_type}</div>
                   <div className="text-xs text-muted-foreground">
                     {format(new Date(entry.created_at), "dd/MM/yyyy HH:mm")}
@@ -176,7 +166,7 @@ export default function PermitDetail() {
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">Nenhum histórico registrado.</p>
+              <p className="text-sm text-muted-foreground">{t("permitDetail.noHistory")}</p>
             )}
           </CardContent>
         </Card>
@@ -187,24 +177,24 @@ export default function PermitDetail() {
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              Observações
+              {t("permitDetail.notesTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-              {permit.notes || "Nenhuma observação registrada."}
+              {permit.notes || t("permitDetail.noNotes")}
             </p>
           </CardContent>
         </Card>
 
         <Card className="border-border/50">
           <CardHeader>
-            <CardTitle className="text-base">Atividade recente</CardTitle>
+            <CardTitle className="text-base">{t("common.recentActivity")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {activity?.length ? (
               activity.slice(0, 5).map((item) => (
-                <div key={item.id} className="rounded-xl bg-muted/40 border border-border/50 p-3">
+                <div key={item.id} className="rounded-md bg-muted/40 border border-border/50 p-3">
                   <div className="text-sm font-semibold">{item.action}</div>
                   <div className="text-xs text-muted-foreground">
                     {new Date(item.created_at).toLocaleString()}
@@ -212,7 +202,7 @@ export default function PermitDetail() {
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">Nenhuma atividade registrada.</p>
+              <p className="text-sm text-muted-foreground">{t("common.noActivity")}</p>
             )}
           </CardContent>
         </Card>
@@ -250,7 +240,7 @@ function StatusTile({
     muted: "bg-muted text-muted-foreground border-border",
   }[tone];
   return (
-    <div className={`rounded-2xl border p-4 ${toneClass}`}>
+    <div className={`rounded-md border p-4 ${toneClass}`}>
       <div className="text-xs font-semibold uppercase tracking-wider opacity-80">{label}</div>
       <div className="text-2xl font-bold mt-1">{value}</div>
     </div>
@@ -269,7 +259,7 @@ function Info({
   to?: string;
 }) {
   const content = (
-    <div className="rounded-xl bg-muted/40 border border-border/50 p-3">
+    <div className="rounded-md bg-muted/40 border border-border/50 p-3">
       <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
         {icon}
         {label}

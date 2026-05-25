@@ -17,10 +17,11 @@ import {
 import { useCreateTruck, useUpdateTruck, type Truck } from "@/hooks/useTrucks";
 import { useClients } from "@/hooks/useClients";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { tNow } from "@/lib/translations";
 
 const formSchema = z.object({
-  client_id: z.string().min(1, "Cliente é obrigatório"),
-  plate: z.string().min(1, "Placa é obrigatória"),
+  client_id: z.string().min(1, tNow("truckForm.clientRequired")),
+  plate: z.string().min(1, tNow("truckForm.plateRequired")),
   vin: z.string().optional(),
   year: z.coerce.number().optional(),
   make: z.string().optional(),
@@ -125,7 +126,7 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">
+          <DialogTitle className="text-xl">
             {isEditing ? t("trucks.edit") : t("trucks.new")}
           </DialogTitle>
         </DialogHeader>

@@ -77,7 +77,7 @@ export function ComplianceDashboard({ permits }: ComplianceDashboardProps) {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="font-display text-lg">{t("compliance.title")}</CardTitle>
+          <CardTitle className="text-base font-semibold">{t("compliance.title")}</CardTitle>
           <Badge className={config.badgeClass}>{t(`compliance.${level}`)}</Badge>
         </div>
       </CardHeader>

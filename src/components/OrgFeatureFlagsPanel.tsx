@@ -6,49 +6,26 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Lock } from "lucide-react";
-
-// Labels/descriptions kept local — these are admin-facing only and
-// short-lived (will be replaced by the billing-tier copy in Mês 3).
-const FLAG_META: Record<FeatureFlag, { label: string; description: string }> = {
-  messages: {
-    label: "Mensagens",
-    description: "Envio de emails/WhatsApp, templates e mensagens agendadas",
-  },
-  calendar: {
-    label: "Calendário",
-    description: "Integração com Google Calendar e sincronização de permits",
-  },
-  ai_chat: {
-    label: "AI Chat",
-    description: "Assistente de IA por cliente (aba “AI” no detalhe do cliente)",
-  },
-  ai_reports: {
-    label: "AI Reports",
-    description: "Geração de relatórios de compliance via IA",
-  },
-  finance: {
-    label: "Financeiro",
-    description: "Faturas, financeiro e cobranças",
-  },
-  portal: {
-    label: "Portal do cliente",
-    description: "Acesso externo do cliente final + assinaturas de documentos",
-  },
-  automations: {
-    label: "Automações",
-    description: "Regras automáticas de notificação de vencimento e autopilot",
-  },
-  audit_log: {
-    label: "Trilha de auditoria",
-    description: "Página /audit com histórico de alterações",
-  },
-};
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function OrgFeatureFlagsPanel() {
   const { currentOrg, isOrgOwner, refresh, hasFeature } = useOrg();
   const qc = useQueryClient();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [pending, setPending] = useState<FeatureFlag | null>(null);
+
+  // Resolved at render so labels/descriptions follow the active locale.
+  const FLAG_META: Record<FeatureFlag, { label: string; description: string }> = {
+    messages: { label: t("nav.messages"), description: t("messages.subtitle") },
+    calendar: { label: t("orgFeatureFlags.calendarLabel"), description: t("orgFeatureFlags.calendarDesc") },
+    ai_chat: { label: "AI Chat", description: t("messages.aiDraftPlaceholder") },
+    ai_reports: { label: "AI Reports", description: t("orgFeatureFlags.aiReportsDesc") },
+    finance: { label: t("nav.finance"), description: t("orgFeatureFlags.financeDesc") },
+    portal: { label: t("portal.title") !== "portal.title" ? t("portal.title") : "Client portal", description: t("portal.inviteClient") },
+    automations: { label: t("orgFeatureFlags.automationsLabel"), description: t("orgFeatureFlags.automationsDesc") },
+    audit_log: { label: t("nav.audit"), description: t("orgFeatureFlags.auditDesc") },
+  };
 
   const updateFlag = useMutation({
     mutationFn: async ({ flag, value }: { flag: FeatureFlag; value: boolean }) => {
@@ -64,10 +41,10 @@ export function OrgFeatureFlagsPanel() {
     onSuccess: async () => {
       await refresh();
       qc.invalidateQueries();
-      toast({ title: "Flag atualizada" });
+      toast({ title: t("orgFeatureFlags.flagUpdated") });
     },
     onError: (e: any) => {
-      toast({ title: "Falha ao atualizar", description: e.message, variant: "destructive" });
+      toast({ title: t("orgFeatureFlags.flagFailed"), description: e.message, variant: "destructive" });
     },
     onSettled: () => setPending(null),
   });
@@ -79,7 +56,7 @@ export function OrgFeatureFlagsPanel() {
       <Card className="border-border/50">
         <CardContent className="p-6 flex items-center gap-3 text-muted-foreground">
           <Lock className="w-4 h-4" />
-          <span className="text-sm">Apenas o owner da organização pode alterar feature flags.</span>
+          <span className="text-sm">{t("orgFeatureFlags.ownerOnly")}</span>
         </CardContent>
       </Card>
     );
@@ -89,9 +66,9 @@ export function OrgFeatureFlagsPanel() {
     <Card className="border-border/50">
       <CardContent className="p-6 space-y-4">
         <div>
-          <h3 className="text-base font-semibold">Módulos da organização</h3>
+          <h3 className="text-base font-semibold">{t("orgFeatureFlags.modulesTitle")}</h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Liga ou desliga features para todos os membros da organização. Mudanças entram em vigor após reload.
+            {t("orgFeatureFlags.modulesHint")}
           </p>
         </div>
 

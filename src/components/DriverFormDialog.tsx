@@ -114,7 +114,7 @@ export function DriverFormDialog({ open, onOpenChange, clientId, driver }: Drive
             </div>
           </div>
 
-          <div className="rounded-xl bg-muted/40 border border-border/50 p-4 space-y-3">
+          <div className="rounded-md bg-muted/40 border border-border/50 p-4 space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("drivers.form.cdlSection")}</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="space-y-1.5">
@@ -154,7 +154,7 @@ export function DriverFormDialog({ open, onOpenChange, clientId, driver }: Drive
             </div>
           </div>
 
-          <div className="rounded-xl bg-muted/40 border border-border/50 p-4 space-y-3">
+          <div className="rounded-md bg-muted/40 border border-border/50 p-4 space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("drivers.form.medCardSection")}</p>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">

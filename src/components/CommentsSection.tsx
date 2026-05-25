@@ -33,7 +33,7 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="font-display text-lg flex items-center gap-2">
+        <CardTitle className="text-base font-semibold flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-muted-foreground" />
           {t("comments.title")}
           {comments?.length ? <span className="text-sm font-normal text-muted-foreground">({comments.length})</span> : null}

@@ -50,11 +50,11 @@ export function Mcs150Card({ client }: { client: Client }) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md">
-              <Calendar className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <Calendar className="w-4 h-4 text-secondary-foreground" />
             </div>
             <div>
-              <CardTitle className="font-display text-base">{t("mcs150.title")}</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("mcs150.title")}</CardTitle>
               <p className="text-xs text-muted-foreground">{t("mcs150.subtitle")}</p>
             </div>
           </div>
@@ -67,7 +67,7 @@ export function Mcs150Card({ client }: { client: Client }) {
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               {t("mcs150.nextDue")}
             </p>
-            <p className={`font-display text-2xl font-bold mt-1 ${style.text}`}>
+            <p className={`text-lg font-semibold mt-1 ${style.text}`}>
               {format(new Date(status.nextDueOn), "MMM yyyy")}
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">

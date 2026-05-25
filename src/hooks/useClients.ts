@@ -3,14 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
+import { sanitizeSearchTerm } from "@/lib/utils";
 
 export type Client = Tables<"clients">;
 export type ClientInsert = TablesInsert<"clients">;
 export type ClientUpdate = TablesUpdate<"clients">;
-
-function sanitizeSearch(value: string): string {
-  return value.replace(/[,%().*\\]/g, "");
-}
 
 export function useClients(search?: string) {
   return useQuery({
@@ -18,7 +15,7 @@ export function useClients(search?: string) {
     queryFn: async () => {
       let query = supabase.from("clients").select("*").order("company_name");
       if (search) {
-        const safe = sanitizeSearch(search);
+        const safe = sanitizeSearchTerm(search);
         if (safe) {
           query = query.or(
             `company_name.ilike.%${safe}%,dot.ilike.%${safe}%,mc.ilike.%${safe}%,ein.ilike.%${safe}%`

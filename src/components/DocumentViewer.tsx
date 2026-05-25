@@ -51,7 +51,7 @@ export function DocumentViewer({ open, onOpenChange, url, title, versions }: Doc
       <DialogContent className="max-w-4xl h-[85vh] flex flex-col p-0 gap-0">
         <DialogHeader className="px-6 py-4 border-b flex flex-row items-center justify-between shrink-0">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <DialogTitle className="font-display text-lg truncate">
+            <DialogTitle className="text-base font-semibold truncate">
               {title || t("documents.viewer")}
             </DialogTitle>
             {activeVersion?.is_current && (

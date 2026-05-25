@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Save, Trash2, Fuel, Upload } from "lucide-react";
+import { tNow } from "@/lib/translations";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -83,7 +84,7 @@ export default function IftaRatesAdminPage() {
 
   const upsertMut = useMutation({
     mutationFn: async (rows: { jurisdiction: string; rate_per_gallon: number }[]) => {
-      if (!user || !currentOrg) throw new Error("Sem org/usuário");
+      if (!user || !currentOrg) throw new Error(tNow("iftaRates.noOrgUser"));
       const payload = rows.map((r) => ({
         org_id: currentOrg.id,
         quarter,
@@ -136,18 +137,16 @@ export default function IftaRatesAdminPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
         <div className="relative">
-          <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-2">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-2">
             {t("iftaRates.section")}
           </p>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
             {t("iftaRates.title")}
           </h1>
-          <p className="text-white/70 mt-2 text-sm max-w-2xl">
+          <p className="text-muted-foreground mt-2 text-sm max-w-2xl">
             {t("iftaRates.subtitle")}
           </p>
         </div>
@@ -184,7 +183,7 @@ export default function IftaRatesAdminPage() {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="font-display text-base flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <Fuel className="w-4 h-4" />
               {t("iftaRates.title2").replace("{quarter}", quarter)}
             </CardTitle>

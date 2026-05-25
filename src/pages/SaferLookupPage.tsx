@@ -37,16 +37,14 @@ export default function SaferLookupPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
         <div className="relative">
-          <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-2">FMCSA</p>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-2">FMCSA</p>
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
             {t("safer.title")}
           </h1>
-          <p className="text-white/70 mt-2 text-sm max-w-2xl">{t("safer.subtitle")}</p>
+          <p className="text-muted-foreground mt-2 text-sm max-w-2xl">{t("safer.subtitle")}</p>
         </div>
       </div>
 
@@ -88,14 +86,14 @@ export default function SaferLookupPage() {
               <Card key={String(f.key)}>
                 <CardContent className="pt-5">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center shrink-0">
                       <Icon className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                         {t(f.labelKey)}
                       </p>
-                      <p className="font-display text-base font-bold mt-1 break-words">{String(value)}</p>
+                      <p className="text-sm font-semibold font-bold mt-1 break-words">{String(value)}</p>
                     </div>
                   </div>
                 </CardContent>

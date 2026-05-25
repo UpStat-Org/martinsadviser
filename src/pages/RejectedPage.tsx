@@ -13,7 +13,7 @@ export default function RejectedPage() {
       <Card className="w-full max-w-md">
         <CardContent className="p-8 text-center space-y-4">
           <XCircle className="w-12 h-12 text-destructive mx-auto" />
-          <h2 className="font-display text-xl font-bold text-foreground">{t("rejected.title")}</h2>
+          <h2 className="text-xl font-bold text-foreground">{t("rejected.title")}</h2>
           <p className="text-muted-foreground">{t("rejected.desc")}</p>
           <Button variant="outline" onClick={handleLogout}>{t("nav.logout")}</Button>
         </CardContent>

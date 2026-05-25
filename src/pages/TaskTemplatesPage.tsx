@@ -77,19 +77,17 @@ export default function TaskTemplatesPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
         <div className="relative flex items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-2">Workflows</p>
-            <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-2">{t("common.workflows")}</p>
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
               {t("taskTemplates.title")}
             </h1>
-            <p className="text-white/70 mt-2 text-sm max-w-2xl">{t("taskTemplates.subtitle")}</p>
+            <p className="text-muted-foreground mt-2 text-sm max-w-2xl">{t("taskTemplates.subtitle")}</p>
           </div>
-          <Button onClick={openNew} className="btn-gradient text-white border-0 gap-1.5">
+          <Button onClick={openNew} className="bg-primary text-primary-foreground hover:bg-primary/90 text-foreground border-0 gap-1.5">
             <Plus className="w-4 h-4" />
             {t("taskTemplates.new")}
           </Button>
@@ -105,11 +103,11 @@ export default function TaskTemplatesPage() {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-md">
-                      <ListTodo className="w-4 h-4 text-white" />
+                    <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                      <ListTodo className="w-4 h-4 text-secondary-foreground" />
                     </div>
                     <div>
-                      <CardTitle className="font-display text-base">{tpl.name}</CardTitle>
+                      <CardTitle className="text-sm font-semibold">{tpl.name}</CardTitle>
                       {tpl.description && <p className="text-xs text-muted-foreground mt-0.5">{tpl.description}</p>}
                     </div>
                   </div>

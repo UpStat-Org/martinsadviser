@@ -31,10 +31,10 @@ function ProviderRow({ provider, name, gradient }: { id?: string; provider: EldP
   const conn = connections?.find((c) => c.provider === provider && c.status !== "disconnected");
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-md border border-border/60 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-md`}>
-          <Truck className="w-5 h-5 text-white" />
+        <div className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}>
+          <Truck className="w-5 h-5 text-secondary-foreground" />
         </div>
         <div>
           <div className="flex items-center gap-2">
@@ -102,10 +102,10 @@ export function OrgEldPanel() {
 
   return (
     <Card className="border-border/50 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-sky-500" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
       <CardContent className="p-5 space-y-4">
         <div>
-          <h3 className="font-display font-bold text-sm">{t("eld.title")}</h3>
+          <h3 className="font-bold text-sm">{t("eld.title")}</h3>
           <p className="text-xs text-muted-foreground mt-0.5">{t("eld.subtitle")}</p>
         </div>
 

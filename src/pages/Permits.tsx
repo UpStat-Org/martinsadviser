@@ -58,17 +58,9 @@ import { PermitImportDialog } from "@/components/PermitImportDialog";
 import { EmptyState } from "@/components/EmptyState";
 import { TablePreferencesToolbar, type Density } from "@/components/TablePreferencesToolbar";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
-
-const TYPE_GRADIENTS = [
-  "from-indigo-500 to-violet-500",
-  "from-blue-500 to-cyan-500",
-  "from-emerald-500 to-teal-500",
-  "from-amber-500 to-orange-500",
-  "from-rose-500 to-red-500",
-  "from-fuchsia-500 to-pink-500",
-  "from-sky-500 to-blue-500",
-  "from-purple-500 to-indigo-500",
-];
+import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const defaultPermitColumns = {
   number: true,
@@ -79,12 +71,6 @@ const defaultPermitColumns = {
   status: true,
   doc: true,
 };
-
-function gradientForType(type: string) {
-  let h = 0;
-  for (let i = 0; i < type.length; i++) h = (h * 31 + type.charCodeAt(i)) >>> 0;
-  return TYPE_GRADIENTS[h % TYPE_GRADIENTS.length];
-}
 
 export default function Permits() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -219,119 +205,70 @@ export default function Permits() {
     return { total, active, expiring, expired };
   }, [permits]);
 
+  const kpis: Array<{ label: string; value: number; icon: typeof FileCheck; tone: "neutral" | "warning" | "danger" }> = [
+    { label: t("permits.stats.total"), value: stats.total, icon: FileCheck, tone: "neutral" },
+    { label: t("permits.stats.valid"), value: stats.active, icon: ShieldCheck, tone: "neutral" },
+    { label: t("permits.stats.expiring"), value: stats.expiring, icon: Clock, tone: "warning" },
+    { label: t("permits.stats.expired"), value: stats.expired, icon: AlertTriangle, tone: "danger" },
+  ];
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* ============ HERO HEADER ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
-
-        <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-xl flex-shrink-0">
-              <FileCheck className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
-                {t("permits.title")}
-              </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base max-w-xl">
-                {t("permits.subtitle")}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
+    <div className="space-y-5">
+      <PageHeader
+        title={t("permits.title")}
+        description={t("permits.subtitle")}
+        actions={
+          <>
             {selected.size > 0 && (
-              <button
-                onClick={handleBulkRenew}
-                disabled={bulkRenewing}
-                className="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:shadow-lg transition-all disabled:opacity-60"
-              >
-                <RefreshCw className={`w-4 h-4 ${bulkRenewing ? "animate-spin" : ""}`} />
+              <Button variant="secondary" size="sm" onClick={handleBulkRenew} disabled={bulkRenewing}>
+                <RefreshCw className={cn("w-4 h-4 mr-1.5", bulkRenewing && "animate-spin")} />
                 {t("permits.bulkRenew").replace("{count}", String(selected.size))}
-              </button>
+              </Button>
             )}
-            <button
-              onClick={() => setImportOpen(true)}
-              className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
-            >
-              <Upload className="w-4 h-4" />
+            <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
+              <Upload className="w-4 h-4 mr-1.5" />
               {t("common.import")}
-            </button>
-            <button
-              onClick={handleNew}
-              className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
-            >
-              <Plus className="w-4 h-4" />
+            </Button>
+            <Button size="sm" onClick={handleNew}>
+              <Plus className="w-4 h-4 mr-1.5" />
               {t("permits.new")}
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </>
+        }
+      />
 
-      {/* ============ QUICK STATS ============ */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {[
-          {
-            label: t("permits.stats.total"),
-            value: stats.total,
-            icon: FileCheck,
-            gradient: "from-indigo-500 to-violet-500",
-          },
-          {
-            label: t("permits.stats.valid"),
-            value: stats.active,
-            icon: ShieldCheck,
-            gradient: "from-emerald-500 to-teal-500",
-          },
-          {
-            label: t("permits.stats.expiring"),
-            value: stats.expiring,
-            icon: Clock,
-            gradient: "from-amber-500 to-orange-500",
-          },
-          {
-            label: t("permits.stats.expired"),
-            value: stats.expired,
-            icon: AlertTriangle,
-            gradient: "from-red-500 to-rose-500",
-          },
-        ].map((s) => (
-          <div
-            key={s.label}
-            className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
-          >
+      {/* KPI strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        {kpis.map((s) => {
+          const toneBar =
+            s.tone === "danger" ? "bg-destructive" : s.tone === "warning" ? "bg-warning" : null;
+          return (
             <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
-            />
-            <div className="relative flex items-start justify-between mb-3">
-              <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shadow-md`}
-              >
-                <s.icon className="w-4 h-4 text-white" />
+              key={s.label}
+              className="relative rounded-md border border-border bg-card p-3.5 transition-colors hover:bg-muted/60 overflow-hidden"
+            >
+              {toneBar && (
+                <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1", toneBar)} />
+              )}
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  {s.label}
+                </span>
+                <s.icon className="w-4 h-4 text-muted-foreground/70" />
               </div>
+              <div className="text-2xl font-semibold tracking-tight tabular mt-1.5">{s.value}</div>
             </div>
-            <div className="relative">
-              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                {s.label}
-              </div>
-              <div className="font-display text-3xl font-bold tracking-tight">
-                {s.value}
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* ============ FILTERS ============ */}
-      <div className="rounded-2xl bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div className="rounded-md bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder={t("permits.search")}
-            className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-xl transition-colors"
+            className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-md transition-colors"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -350,7 +287,7 @@ export default function Permits() {
                 onClick={() => setStatusFilter(f.value)}
                 className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all inline-flex items-center gap-1.5 ${
                   active
-                    ? "btn-gradient text-white shadow-md"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 text-white shadow-md"
                     : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
@@ -415,7 +352,7 @@ export default function Permits() {
             !search && !truckFilter ? (
               <button
                 onClick={handleNew}
-                className="h-11 px-6 rounded-xl btn-gradient text-white text-sm font-semibold inline-flex items-center gap-2 hover:shadow-[0_10px_30px_-8px_hsl(234_75%_58%/0.55)] transition-all"
+                className="h-11 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-white text-sm font-semibold inline-flex items-center gap-2 transition-all"
               >
                 <Plus className="w-4 h-4" />
                 {t("permits.registerFirst")}
@@ -427,7 +364,7 @@ export default function Permits() {
                   setStatusFilter("all");
                   setSearchParams({});
                 }}
-                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold"
+                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold"
               >
                 {t("common.clearFilters")}
               </button>
@@ -437,7 +374,7 @@ export default function Permits() {
             !search && !truckFilter ? (
               <button
                 onClick={() => setImportOpen(true)}
-                className="h-11 px-5 rounded-xl bg-muted hover:bg-muted/80 text-sm font-semibold inline-flex items-center gap-2"
+                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold inline-flex items-center gap-2"
               >
                 <Upload className="w-4 h-4" />
                 {t("common.import")}
@@ -521,11 +458,9 @@ export default function Permits() {
                       <TableCell className={density === "compact" ? "py-2" : "py-3"}>
                         <div className="flex items-center gap-3">
                           <div
-                            className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientForType(
-                              permit.permit_type
-                            )} flex items-center justify-center shadow-md flex-shrink-0`}
+                            className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center flex-shrink-0`}
                           >
-                            <FileCheck className="w-4 h-4 text-white" />
+                            <FileCheck className="w-4 h-4 text-secondary-foreground" />
                           </div>
                           <div className="min-w-0">
                             <div className="text-sm font-semibold truncate max-w-[150px]">

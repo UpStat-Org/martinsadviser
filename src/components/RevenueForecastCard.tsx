@@ -80,11 +80,11 @@ export function RevenueForecastCard() {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-              <TrendingUp className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-secondary-foreground" />
             </div>
             <div>
-              <CardTitle className="font-display text-lg">{t("forecast.title")}</CardTitle>
+              <CardTitle className="text-base font-semibold">{t("forecast.title")}</CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">{t("forecast.subtitle")}</p>
             </div>
           </div>
@@ -97,13 +97,13 @@ export function RevenueForecastCard() {
           {buckets.map((b) => (
             <div
               key={b.key}
-              className="relative overflow-hidden rounded-xl border border-border/50 p-4 bg-card"
+              className="relative overflow-hidden rounded-md border border-border/50 p-4 bg-card"
             >
-              <div className={`absolute -top-8 -right-8 w-24 h-24 rounded-full bg-gradient-to-br ${b.gradient} opacity-10 blur-xl`} />
+              <div className={`absolute -top-8 -right-8 w-24 h-24 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-xl`} />
               <p className="relative text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 {b.label}
               </p>
-              <p className="relative font-display text-2xl font-bold mt-1 tabular-nums">
+              <p className="relative text-lg font-semibold mt-1 tabular-nums">
                 {usd.format(b.bucket.total)}
               </p>
               <p className="relative text-xs text-muted-foreground mt-0.5">
@@ -120,13 +120,13 @@ export function RevenueForecastCard() {
             <span>{t("forecast.noData")}</span>
           </div>
         ) : (
-          <div className="rounded-xl border border-border/50 overflow-hidden">
+          <div className="rounded-md border border-border/50 overflow-hidden">
             <div className="max-h-72 overflow-y-auto">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-muted/60 backdrop-blur-sm">
                   <tr className="text-left text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    <th className="px-3 py-2">{t("common.client") || "Cliente"}</th>
-                    <th className="px-3 py-2">Permit</th>
+                    <th className="px-3 py-2">{t("common.client")}</th>
+                    <th className="px-3 py-2">{t("nav.permits")}</th>
                     <th className="px-3 py-2">{t("forecast.expiringIn").replace("{days}", "")}</th>
                     <th className="px-3 py-2 text-right">{usd.format(0).replace("0", "$")}</th>
                   </tr>

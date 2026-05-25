@@ -152,18 +152,16 @@ export default function IftaPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
         <div className="relative">
-          <p className="text-[11px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-2">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-2">
             {t("ifta.section")}
           </p>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold gradient-text leading-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
             {t("ifta.title")}
           </h1>
-          <p className="text-white/70 mt-2 text-sm max-w-2xl">
+          <p className="text-muted-foreground mt-2 text-sm max-w-2xl">
             {t("ifta.subtitle")}
           </p>
         </div>
@@ -207,25 +205,25 @@ export default function IftaPage() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("ifta.stats.miles")}</p>
-                  <p className="font-display text-2xl font-bold tabular-nums">{summary.total_miles.toFixed(0)}</p>
+                  <p className="text-lg font-semibold tabular-nums">{summary.total_miles.toFixed(0)}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("ifta.stats.gallons")}</p>
-                  <p className="font-display text-2xl font-bold tabular-nums">{summary.total_gallons.toFixed(1)}</p>
+                  <p className="text-lg font-semibold tabular-nums">{summary.total_gallons.toFixed(1)}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("ifta.stats.mpg")}</p>
-                  <p className="font-display text-2xl font-bold tabular-nums">{summary.fleet_mpg.toFixed(2)}</p>
+                  <p className="text-lg font-semibold tabular-nums">{summary.fleet_mpg.toFixed(2)}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("ifta.stats.netTax")}</p>
-                  <p className={`font-display text-2xl font-bold tabular-nums ${summary.total_net_tax >= 0 ? "text-destructive" : "text-success"}`}>
+                  <p className={`text-lg font-semibold tabular-nums ${summary.total_net_tax >= 0 ? "text-destructive" : "text-success"}`}>
                     {usd.format(summary.total_net_tax)}
                   </p>
                 </CardContent>
@@ -237,7 +235,7 @@ export default function IftaPage() {
           {summary && summary.by_jurisdiction.length > 0 && (
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="font-display text-base flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Calculator className="w-4 h-4" />
                   {t("ifta.breakdownTitle")}
                 </CardTitle>
@@ -290,7 +288,7 @@ export default function IftaPage() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="font-display text-base flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <MapIcon className="w-4 h-4" />
                   {t("ifta.tripsTitle").replace("{count}", String(trips?.length ?? 0))}
                 </CardTitle>
@@ -336,7 +334,7 @@ export default function IftaPage() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="font-display text-base flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Fuel className="w-4 h-4" />
                   {t("ifta.fuelTitle").replace("{count}", String(fuel?.length ?? 0))}
                 </CardTitle>

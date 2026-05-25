@@ -49,6 +49,8 @@ import { useClientMessages, useRetryMessage } from "@/hooks/useMessages";
 import { useInvoices } from "@/hooks/useInvoices";
 import { usePermitDocuments } from "@/hooks/usePermitDocuments";
 import { Send, RotateCw, MessageCircle, DollarSign } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
+import { cn } from "@/lib/utils";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -241,185 +243,127 @@ export default function ClientDetail() {
   const currency = (v: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v);
 
+  const metricPills: Array<{ label: string; value: string | number; icon: typeof FileCheck }> = [
+    { label: t("permits.title"), value: permits?.length ?? 0, icon: FileCheck },
+    { label: t("trucks.title"), value: trucks?.length ?? 0, icon: TruckIcon },
+    { label: t("compliance.title"), value: `${complianceScore}%`, icon: Sparkles },
+    { label: t("clientDetail.totalBilled"), value: currency(financeSummary.total), icon: DollarSign },
+  ];
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* ============ HERO HEADER ============ */}
-      <div className="relative overflow-hidden rounded-3xl aurora-bg p-6 sm:p-8">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 noise-overlay" />
-        <div className="orb w-80 h-80 bg-primary/30 -top-20 -right-20" />
-        <div className="orb w-64 h-64 bg-accent/20 bottom-0 left-1/3" />
+    <div className="space-y-5">
+      <button
+        onClick={() => navigate("/clients")}
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        {t("common.back")}
+      </button>
 
-        <div className="relative">
-          <button
-            onClick={() => navigate("/clients")}
-            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/10 border border-white/15 backdrop-blur-md text-white text-xs font-semibold hover:bg-white/15 transition-all mb-5"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            {t("common.back")}
-          </button>
+      <PageHeader
+        title={
+          <span className="flex items-center gap-3 min-w-0">
+            <span className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center font-semibold text-sm shrink-0">
+              {clientInitials}
+            </span>
+            <span className="truncate">{client.company_name}</span>
+          </span>
+        }
+        meta={
+          <>
+            <Badge className={status.className}>{status.label}</Badge>
+            {client.dot && (
+              <span className="font-mono text-xs">DOT {client.dot}</span>
+            )}
+            {client.mc && (
+              <span className="font-mono text-xs">MC {client.mc}</span>
+            )}
+          </>
+        }
+        description={
+          <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            {client.phone && (
+              <span className="inline-flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" />{client.phone}</span>
+            )}
+            {client.email && (
+              <span className="inline-flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" />{client.email}</span>
+            )}
+            {client.address && (
+              <span className="inline-flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{client.address}</span>
+            )}
+          </span>
+        }
+        actions={
+          <>
+            {!isViewer && hasFeature("automations") && (
+              <Button variant="outline" size="sm" onClick={() => setAutopilotOpen(true)}>
+                <Wand2 className="w-4 h-4 mr-1.5" />
+                {t("autopilot.run")}
+              </Button>
+            )}
+            {hasFeature("ai_reports") && (
+              <Button variant="outline" size="sm" onClick={handleGenerateReport} disabled={aiLoading}>
+                {aiLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1.5" />}
+                {t("ai.generateReport")}
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={generateCompliancePdf} disabled={!permits?.length}>
+              <FileDown className="w-4 h-4 mr-1.5" />
+              {t("clientDetail.compliancePdf")}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}>
+              <UserPlus className="w-4 h-4 mr-1.5" />
+              {t("portal.inviteClient")}
+            </Button>
+            <Button size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="w-4 h-4 mr-1.5" />
+              {t("common.edit")}
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/40">
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t("clients.removeClient")}</AlertDialogTitle>
+                  <AlertDialogDescription>{t("clients.removeClientDesc")}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>{t("common.delete")}</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        }
+      />
 
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-            <div className="flex items-start gap-4 min-w-0">
-              <div
-                className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${clientGradient} flex items-center justify-center text-white font-display font-bold text-2xl sm:text-3xl shadow-2xl ring-4 ring-white/10 flex-shrink-0`}
-              >
-                {clientInitials}
-              </div>
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <Badge className={status.className}>{status.label}</Badge>
-                  {client.dot && (
-                    <span className="inline-flex items-center h-6 px-2 rounded-md text-[11px] font-bold uppercase tracking-wider bg-white/10 border border-white/15 text-white/80">
-                      DOT {client.dot}
-                    </span>
-                  )}
-                  {client.mc && (
-                    <span className="inline-flex items-center h-6 px-2 rounded-md text-[11px] font-bold uppercase tracking-wider bg-white/10 border border-white/15 text-white/80">
-                      MC {client.mc}
-                    </span>
-                  )}
-                </div>
-                <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold gradient-text leading-tight break-words">
-                  {client.company_name}
-                </h1>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-white/70">
-                  {client.phone && (
-                    <span className="inline-flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5" />
-                      {client.phone}
-                    </span>
-                  )}
-                  {client.email && (
-                    <span className="inline-flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5" />
-                      {client.email}
-                    </span>
-                  )}
-                  {client.address && (
-                    <span className="inline-flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5" />
-                      {client.address}
-                    </span>
-                  )}
-                </div>
-              </div>
+      {/* Quick metrics — flat tiles, no glass */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        {metricPills.map((m) => (
+          <div key={m.label} className="rounded-md border border-border bg-card p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{m.label}</span>
+              <m.icon className="w-4 h-4 text-muted-foreground/70" />
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              {!isViewer && hasFeature("automations") && (
-                <button
-                  onClick={() => setAutopilotOpen(true)}
-                  className="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-500 text-[#06131f] text-sm font-bold inline-flex items-center gap-1.5 hover:shadow-xl transition-all shadow-lg"
-                >
-                  <Wand2 className="w-4 h-4" />
-                  {t("autopilot.run")}
-                </button>
-              )}
-              {hasFeature("ai_reports") && (
-                <button
-                  onClick={handleGenerateReport}
-                  disabled={aiLoading}
-                  className="h-10 px-4 rounded-xl bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg disabled:opacity-60"
-                >
-                  {aiLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-4 h-4" />
-                  )}
-                  {t("ai.generateReport")}
-                </button>
-              )}
-              <button
-                onClick={generateCompliancePdf}
-                disabled={!permits?.length}
-                className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all disabled:opacity-40"
-              >
-                <FileDown className="w-4 h-4" />
-                {t("clientDetail.compliancePdf")}
-              </button>
-              <button
-                onClick={() => setInviteOpen(true)}
-                className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
-              >
-                <UserPlus className="w-4 h-4" />
-                {t("portal.inviteClient")}
-              </button>
-              <button
-                onClick={() => setEditOpen(true)}
-                className="h-10 px-4 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-white text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
-              >
-                <Pencil className="w-4 h-4" />
-                {t("common.edit")}
-              </button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <button className="h-10 w-10 rounded-xl bg-red-500/20 border border-red-400/30 backdrop-blur-md text-white inline-flex items-center justify-center hover:bg-red-500/30 transition-all">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{t("clients.removeClient")}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {t("clients.removeClientDesc")}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete}>
-                      {t("common.delete")}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
+            <div className="text-lg font-semibold tracking-tight tabular mt-1 truncate">{m.value}</div>
           </div>
-
-          {/* Quick metric pills */}
-          <div className="relative mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { label: t("permits.title"), value: permits?.length ?? 0, icon: FileCheck, tint: "from-emerald-400 to-teal-400" },
-              { label: t("trucks.title"), value: trucks?.length ?? 0, icon: TruckIcon, tint: "from-sky-400 to-blue-400" },
-              { label: t("compliance.title"), value: `${complianceScore}%`, icon: Sparkles, tint: "from-fuchsia-400 to-pink-400" },
-              { label: t("clientDetail.totalBilled"), value: currency(financeSummary.total), icon: DollarSign, tint: "from-amber-400 to-orange-400" },
-            ].map((m) => (
-              <div
-                key={m.label}
-                className="relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md p-3 sm:p-4"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div
-                    className={`w-9 h-9 rounded-xl bg-gradient-to-br ${m.tint} flex items-center justify-center shadow-md flex-shrink-0`}
-                  >
-                    <m.icon className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-[10px] font-semibold text-white/60 uppercase tracking-wider">
-                      {m.label}
-                    </div>
-                    <div className="font-display text-lg sm:text-xl font-bold text-white truncate">
-                      {m.value}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* ============ INFO / SERVICES / FINANCE ============ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Info */}
         <Card className="lg:col-span-2 border-border/50 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md">
-                <FileText className="w-4 h-4 text-white" />
+              <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                <FileText className="w-4 h-4 text-secondary-foreground" />
               </div>
-              <CardTitle className="font-display text-base">{t("clients.info")}</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("clients.info")}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -431,7 +375,7 @@ export default function ClientDetail() {
               ].map((f) => (
                 <div
                   key={f.label}
-                  className="rounded-xl bg-muted/40 border border-border/50 p-3"
+                  className="rounded-md bg-muted/40 border border-border/50 p-3"
                 >
                   <p className="text-[10px] text-muted-foreground uppercase tracking-[0.15em] font-semibold mb-1">
                     {f.label}
@@ -492,13 +436,13 @@ export default function ClientDetail() {
         {/* Services + Finance */}
         <div className="space-y-4">
           <Card className="border-border/50 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 to-cyan-500" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center shadow-md">
-                  <FileCheck className="w-4 h-4 text-white" />
+                <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                  <FileCheck className="w-4 h-4 text-secondary-foreground" />
                 </div>
-                <CardTitle className="font-display text-base">
+                <CardTitle className="text-sm font-semibold">
                   {t("clients.services")}
                 </CardTitle>
               </div>
@@ -512,7 +456,7 @@ export default function ClientDetail() {
                       key={s.key}
                       className={`inline-flex items-center h-7 px-3 rounded-lg text-xs font-semibold transition-all ${
                         active
-                          ? "btn-gradient text-white shadow-md"
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90 text-white shadow-md"
                           : "bg-muted/50 text-muted-foreground/60 line-through"
                       }`}
                     >
@@ -525,13 +469,13 @@ export default function ClientDetail() {
           </Card>
 
           <Card className="border-border/50 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-                  <DollarSign className="w-4 h-4 text-white" />
+                <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+                  <DollarSign className="w-4 h-4 text-secondary-foreground" />
                 </div>
-                <CardTitle className="font-display text-base">
+                <CardTitle className="text-sm font-semibold">
                   {t("clientDetail.finance")}
                 </CardTitle>
               </div>
@@ -589,13 +533,13 @@ export default function ClientDetail() {
       <DriversPanel clientId={client.id} />
 
       <Card className="border-border/50 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-blue-500 flex items-center justify-center shadow-md">
-              <Map className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <Map className="w-4 h-4 text-secondary-foreground" />
             </div>
-            <CardTitle className="font-display text-base">{t("map.title")}</CardTitle>
+            <CardTitle className="text-sm font-semibold">{t("map.title")}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -604,7 +548,7 @@ export default function ClientDetail() {
       </Card>
 
       <Tabs defaultValue="trucks">
-        <TabsList className="h-auto p-1.5 bg-muted/50 rounded-2xl flex-wrap gap-1">
+        <TabsList className="h-auto p-1.5 bg-muted/50 rounded-md flex-wrap gap-1">
           <TabsTrigger value="trucks" className="gap-2"><TruckIcon className="w-4 h-4" />{t("trucks.title")} ({trucks?.length || 0})</TabsTrigger>
           <TabsTrigger value="permits" className="gap-2"><FileCheck className="w-4 h-4" />{t("permits.title")} ({permits?.length || 0})</TabsTrigger>
           {hasFeature("portal") && (
@@ -624,7 +568,7 @@ export default function ClientDetail() {
         <TabsContent value="trucks" className="mt-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="font-display text-lg">{t("trucks.title")}</CardTitle>
+              <CardTitle className="text-base font-semibold">{t("trucks.title")}</CardTitle>
               <Button size="sm" onClick={handleNewTruck}><Plus className="w-4 h-4 mr-2" />{t("common.add")}</Button>
             </CardHeader>
             <CardContent className="p-0">
@@ -667,7 +611,7 @@ export default function ClientDetail() {
         <TabsContent value="permits" className="mt-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="font-display text-lg">{t("permits.title")}</CardTitle>
+              <CardTitle className="text-base font-semibold">{t("permits.title")}</CardTitle>
               <Button size="sm" onClick={handleNewPermit}><Plus className="w-4 h-4 mr-2" />{t("common.add")}</Button>
             </CardHeader>
             <CardContent className="p-0">
@@ -720,7 +664,7 @@ export default function ClientDetail() {
         <TabsContent value="signatures" className="mt-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="font-display text-lg">{t("signature.tab")}</CardTitle>
+              <CardTitle className="text-base font-semibold">{t("signature.tab")}</CardTitle>
               <Button size="sm" onClick={() => setSignatureOpen(true)}><Plus className="w-4 h-4 mr-2" />{t("signature.new")}</Button>
             </CardHeader>
             <CardContent>
@@ -731,7 +675,7 @@ export default function ClientDetail() {
         <TabsContent value="messages" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle className="font-display text-lg flex items-center gap-2">
+              <CardTitle className="text-base font-semibold flex items-center gap-2">
                 <Send className="w-5 h-5 text-muted-foreground" /> {t("clientDetail.messagesHistory")}
               </CardTitle>
             </CardHeader>

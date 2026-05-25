@@ -17,11 +17,11 @@ describe("translations", () => {
       expect(getTranslation("es", "nav.clients")).toBe("Clientes");
     });
 
-    it("falls back to Portuguese for missing keys in other languages", () => {
-      // If a key exists in pt but not in en, it should fall back to pt
+    it("falls back to English for missing keys in other languages", () => {
+      // English is the source-of-truth locale; the resolver should fall
+      // back to it before resorting to pt or the raw key.
       const ptValue = getTranslation("pt", "nav.dashboard");
       const enValue = getTranslation("en", "nav.dashboard");
-      // Both should return a non-empty string
       expect(ptValue).toBeTruthy();
       expect(enValue).toBeTruthy();
     });

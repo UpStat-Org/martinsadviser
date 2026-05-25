@@ -33,7 +33,7 @@ export function RiskScorePanel({ clientId }: { clientId: string }) {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="font-display text-lg">{t("risk.title")}</CardTitle>
+          <CardTitle className="text-base font-semibold">{t("risk.title")}</CardTitle>
         </CardHeader>
         <CardContent className="py-6 text-center text-sm text-muted-foreground">
           <ShieldCheck className="w-8 h-8 mx-auto mb-2 opacity-40" />
@@ -52,7 +52,7 @@ export function RiskScorePanel({ clientId }: { clientId: string }) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <CardTitle className="font-display text-lg">{t("risk.title")}</CardTitle>
+            <CardTitle className="text-base font-semibold">{t("risk.title")}</CardTitle>
             <p className="text-xs text-muted-foreground mt-0.5">{t("risk.subtitle")}</p>
           </div>
           <Badge className={style.badge}>{t(bandLabelKey(score.band))}</Badge>
@@ -60,13 +60,13 @@ export function RiskScorePanel({ clientId }: { clientId: string }) {
       </CardHeader>
 
       <CardContent className="space-y-5">
-        <div className={`flex items-center gap-4 rounded-xl ${style.bg} p-4`}>
-          <div className={`w-14 h-14 rounded-xl bg-background ring-2 ${style.ring} flex items-center justify-center shadow-sm`}>
+        <div className={`flex items-center gap-4 rounded-md ${style.bg} p-4`}>
+          <div className={`w-14 h-14 rounded-md bg-background ring-2 ${style.ring} flex items-center justify-center shadow-sm`}>
             <Icon className={`w-7 h-7 ${style.text}`} />
           </div>
           <div className="flex-1">
             <div className="flex items-baseline gap-1">
-              <span className={`font-display text-4xl font-bold tabular-nums ${style.text}`}>{score.score}</span>
+              <span className={`text-2xl font-semibold tracking-tight tabular-nums ${style.text}`}>{score.score}</span>
               <span className="text-xl text-muted-foreground">/100</span>
             </div>
             <Progress value={score.score} className={`h-1.5 mt-1.5 ${style.progress}`} />

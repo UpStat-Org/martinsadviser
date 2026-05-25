@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
+import { sanitizeSearchTerm } from "@/lib/utils";
 
 export type Truck = Tables<"trucks">;
 export type TruckInsert = TablesInsert<"trucks">;
@@ -19,7 +20,15 @@ export function useTrucks(search?: string, clientId?: string) {
         .order("created_at", { ascending: false });
       if (clientId) query = query.eq("client_id", clientId);
       if (search) {
-        query = query.or(`plate.ilike.%${search}%,vin.ilike.%${search}%,make.ilike.%${search}%,model.ilike.%${search}%`);
+        // Sanitize before interpolation: a comma, paren, or dot in the user's
+        // input would otherwise be parsed as PostgREST OR-list syntax and
+        // either error out or — worse — silently match the wrong columns.
+        const safe = sanitizeSearchTerm(search);
+        if (safe) {
+          query = query.or(
+            `plate.ilike.%${safe}%,vin.ilike.%${safe}%,make.ilike.%${safe}%,model.ilike.%${safe}%`,
+          );
+        }
       }
       const { data, error } = await query;
       if (error) throw error;

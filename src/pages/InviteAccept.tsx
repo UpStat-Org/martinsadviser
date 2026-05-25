@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, MailCheck, AlertTriangle, ArrowRight } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // /invite/<token> landing
 //
@@ -45,6 +46,7 @@ export default function InviteAccept() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { refresh } = useOrg();
+  const { t } = useLanguage();
 
   const peek = useQuery({
     queryKey: ["invite", token],
@@ -93,7 +95,7 @@ export default function InviteAccept() {
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
       <div className="w-full max-w-md space-y-6">
         <div className="flex items-center justify-center gap-3">
-          <Logo className="w-10 h-10 rounded-xl shadow-md" />
+          <Logo className="w-10 h-10 rounded-md" />
           <Wordmark size="lg" tone="dark" />
         </div>
 
@@ -108,11 +110,11 @@ export default function InviteAccept() {
         ) : (
           <Card className="border-border/50">
             <CardContent className="p-8 space-y-5 text-center">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+              <div className="w-12 h-12 mx-auto rounded-md bg-primary/10 text-primary flex items-center justify-center">
                 <MailCheck className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="font-display text-2xl font-bold">Você foi convidado</h1>
+                <h1 className="text-lg font-semibold">{t("inviteAccept.youAreInvited")}</h1>
                 <p className="text-sm text-muted-foreground mt-2">
                   <span className="font-semibold text-foreground">{peek.data.org_name}</span> está te
                   convidando como <span className="font-semibold text-foreground capitalize">{peek.data.role}</span>.
@@ -121,7 +123,7 @@ export default function InviteAccept() {
 
               <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-left text-xs space-y-1">
                 <Row label="Email do convite" value={peek.data.email} mono />
-                <Row label="Subdomínio" value={`${peek.data.org_slug}.martinsadviser.com`} mono />
+                <Row label={t("startOrg.subdomainLabel")} value={`${peek.data.org_slug}.martinsadviser.com`} mono />
               </div>
 
               {userEmail === null ? (
@@ -164,33 +166,34 @@ export default function InviteAccept() {
 }
 
 function InvalidCard({ reason }: { reason: string }) {
+  const { t } = useLanguage();
   const copy: Record<string, { title: string; desc: string }> = {
     not_found: {
-      title: "Convite não encontrado",
-      desc: "O link pode ter sido digitado errado ou o convite foi revogado.",
+      title: t("inviteAccept.notFound"),
+      desc: t("inviteAccept.notFoundDesc"),
     },
     expired: {
-      title: "Convite expirado",
-      desc: "Convites valem 7 dias. Peça pro owner gerar um novo.",
+      title: t("inviteAccept.notFound"),
+      desc: t("inviteAccept.notFoundDesc"),
     },
     already_accepted: {
-      title: "Convite já aceito",
-      desc: "Esse convite já foi usado. Faça login normalmente.",
+      title: t("inviteAccept.alreadyAccepted"),
+      desc: t("inviteAccept.alreadyAcceptedDesc"),
     },
   };
   const c = copy[reason] ?? copy.not_found;
   return (
     <Card className="border-destructive/30">
       <CardContent className="p-8 text-center space-y-4">
-        <div className="w-12 h-12 mx-auto rounded-2xl bg-destructive/10 text-destructive flex items-center justify-center">
+        <div className="w-12 h-12 mx-auto rounded-md bg-destructive/10 text-destructive flex items-center justify-center">
           <AlertTriangle className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="font-display text-xl font-bold">{c.title}</h1>
+          <h1 className="text-xl font-bold">{c.title}</h1>
           <p className="text-sm text-muted-foreground mt-1">{c.desc}</p>
         </div>
         <Button asChild variant="outline" className="w-full">
-          <Link to="/login">Ir pro login</Link>
+          <Link to="/login">{t("common.goToLogin")}</Link>
         </Button>
       </CardContent>
     </Card>

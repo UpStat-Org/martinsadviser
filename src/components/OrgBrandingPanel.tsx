@@ -12,6 +12,7 @@ import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Lock, Save, RotateCcw, Upload, Trash2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const DEFAULT_PREVIEW_PRIMARY = "#5B7BFF"; // Matches the built-in indigo theme
 const DEFAULT_PREVIEW_ACCENT = "#F59E0B";  // Matches the original amber accent
@@ -20,6 +21,7 @@ export function OrgBrandingPanel() {
   const { currentOrg, branding, isOrgAdmin, refresh } = useOrg();
   const qc = useQueryClient();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   // Local form state so the live preview updates instantly without writing
   // to the DB on every keystroke.
@@ -30,18 +32,18 @@ export function OrgBrandingPanel() {
   const handleLogoFile = async (file: File | undefined) => {
     if (!file || !currentOrg) return;
     if (file.size > ORG_LOGO_MAX_BYTES) {
-      toast({ title: "Imagem muito grande", description: "O logo deve ter no máximo 2 MB.", variant: "destructive" });
+      toast({ title: t("orgBranding.imageTooLarge"), description: t("orgBranding.imageTooLargeDesc"), variant: "destructive" });
       return;
     }
     if (!ORG_LOGO_ACCEPT.split(",").includes(file.type)) {
-      toast({ title: "Formato não suportado", description: "Use PNG, SVG, JPG ou WebP.", variant: "destructive" });
+      toast({ title: t("orgBranding.formatUnsupported"), description: t("orgBranding.formatUnsupportedDesc"), variant: "destructive" });
       return;
     }
     setUploading(true);
     const url = await uploadOrgLogo(currentOrg.id, file);
     setUploading(false);
     if (!url) {
-      toast({ title: "Falha no upload", description: "Não foi possível enviar a imagem.", variant: "destructive" });
+      toast({ title: t("orgBranding.uploadFailed"), description: t("orgBranding.uploadFailedDesc"), variant: "destructive" });
       return;
     }
     // The file is now in storage; the URL only persists once "Salvar" runs.
@@ -77,10 +79,10 @@ export function OrgBrandingPanel() {
     onSuccess: async () => {
       await refresh();
       qc.invalidateQueries();
-      toast({ title: "Branding atualizado" });
+      toast({ title: t("orgBranding.saved") });
     },
     onError: (e: any) => {
-      toast({ title: "Falha ao salvar", description: e.message, variant: "destructive" });
+      toast({ title: t("orgBranding.saveFailed"), description: e.message, variant: "destructive" });
     },
   });
 
@@ -91,7 +93,7 @@ export function OrgBrandingPanel() {
       <Card className="border-border/50">
         <CardContent className="p-6 flex items-center gap-3 text-muted-foreground">
           <Lock className="w-4 h-4" />
-          <span className="text-sm">Apenas owners e admins da organização podem editar o branding.</span>
+          <span className="text-sm">{t("orgBranding.ownerOnly")}</span>
         </CardContent>
       </Card>
     );
@@ -119,9 +121,9 @@ export function OrgBrandingPanel() {
     <Card className="border-border/50">
       <CardContent className="p-6 space-y-6">
         <div>
-          <h3 className="text-base font-semibold">Identidade visual</h3>
+          <h3 className="text-base font-semibold">{t("orgBranding.identityTitle")}</h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Aplicado no sidebar, título da aba e demais superfícies internas. A URL do logo precisa apontar pra um arquivo público (PNG, SVG ou JPG).
+            {t("orgBranding.appNameHint")}
           </p>
         </div>
 
@@ -136,7 +138,7 @@ export function OrgBrandingPanel() {
               secondary={wordmark.secondary}
               accentColor={draft.accent_color}
             />
-            <span className="ml-auto text-[10px] uppercase tracking-wider text-muted-foreground">Preview</span>
+            <span className="ml-auto text-[10px] uppercase tracking-wider text-muted-foreground">{t("common.preview")}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -145,7 +147,7 @@ export function OrgBrandingPanel() {
               style={{ backgroundColor: primaryValue }}
               tabIndex={-1}
             >
-              Botão primário
+              {t("orgBranding.previewButton")}
             </button>
             <span
               className="h-7 px-2.5 inline-flex items-center rounded-md text-[11px] font-semibold"
@@ -154,7 +156,7 @@ export function OrgBrandingPanel() {
                 color: "#0b0d2e",
               }}
             >
-              Badge accent
+              {t("orgBranding.previewBadge")}
             </span>
             <div
               className="h-2 flex-1 rounded-full"
@@ -167,27 +169,27 @@ export function OrgBrandingPanel() {
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="app_name">Nome da aplicação</Label>
+            <Label htmlFor="app_name">{t("orgBranding.appNameLabel")}</Label>
             <Input
               id="app_name"
               value={draft.app_name}
               onChange={(e) => setDraft((d) => ({ ...d, app_name: e.target.value }))}
               placeholder="MartinsAdviser"
             />
-            <p className="text-[11px] text-muted-foreground">Aparece no título da aba do browser.</p>
+            <p className="text-[11px] text-muted-foreground">{t("orgBranding.appNameHint")}</p>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="tagline">Tagline / segunda linha do wordmark</Label>
+            <Label htmlFor="tagline">{t("orgBranding.taglineLabel")}</Label>
             <Input
               id="tagline"
               value={draft.tagline}
               onChange={(e) => setDraft((d) => ({ ...d, tagline: e.target.value }))}
               placeholder="Adviser"
             />
-            <p className="text-[11px] text-muted-foreground">Opcional. Quando combina com o final do nome, fica em duas linhas estilizadas.</p>
+            <p className="text-[11px] text-muted-foreground">{t("orgBranding.taglineHint")}</p>
           </div>
           <div className="space-y-1.5 sm:col-span-2">
-            <Label>Logo</Label>
+            <Label>{t("orgBranding.logoLabel")}</Label>
             <div className="flex items-center gap-3">
               <Logo
                 src={draft.logo_url}
@@ -214,7 +216,7 @@ export function OrgBrandingPanel() {
                 className="gap-2"
               >
                 {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-                {draft.logo_url ? "Trocar imagem" : "Enviar imagem"}
+                {draft.logo_url ? t("orgBranding.swapImage") : t("orgBranding.uploadImage")}
               </Button>
               {draft.logo_url && (
                 <Button
@@ -224,22 +226,22 @@ export function OrgBrandingPanel() {
                   onClick={() => setDraft((d) => ({ ...d, logo_url: null }))}
                   disabled={uploading}
                   className="gap-1.5 text-muted-foreground"
-                  title="Remover logo"
+                  title={t("orgBranding.removeLogo")}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
               )}
             </div>
-            <p className="text-[11px] text-muted-foreground">PNG, SVG, JPG ou WebP até 2 MB. Em branco mantém o logo padrão (truck SVG).</p>
+            <p className="text-[11px] text-muted-foreground">{t("orgBranding.uploadHint")}</p>
             <Input
               value={draft.logo_url ?? ""}
               onChange={(e) => setDraft((d) => ({ ...d, logo_url: e.target.value.trim() || null }))}
-              placeholder="ou cole uma URL pública: https://cdn.exemplo.com/logo.svg"
+              placeholder={t("orgBranding.logoUrlPlaceholder")}
               className="font-mono text-xs"
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="primary_color">Cor primária</Label>
+            <Label htmlFor="primary_color">{t("orgBranding.primaryColor")}</Label>
             <div className="flex items-center gap-2">
               <input
                 id="primary_color"
@@ -264,18 +266,18 @@ export function OrgBrandingPanel() {
                   size="sm"
                   onClick={() => setDraft((d) => ({ ...d, primary_color: null }))}
                   className="gap-1.5 shrink-0"
-                  title="Voltar ao padrão"
+                  title={t("orgBranding.resetTitle")}
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                 </Button>
               )}
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Botões, focus ring e item ativo do sidebar.
+              {t("orgBranding.primaryHint")}
             </p>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="accent_color">Cor de destaque</Label>
+            <Label htmlFor="accent_color">{t("orgBranding.accentColor")}</Label>
             <div className="flex items-center gap-2">
               <input
                 id="accent_color"
@@ -300,14 +302,14 @@ export function OrgBrandingPanel() {
                   size="sm"
                   onClick={() => setDraft((d) => ({ ...d, accent_color: null }))}
                   className="gap-1.5 shrink-0"
-                  title="Voltar ao padrão"
+                  title={t("orgBranding.resetTitle")}
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                 </Button>
               )}
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Barra do wordmark, badges e highlights secundários.
+              {t("orgBranding.accentHint")}
             </p>
           </div>
         </div>
@@ -319,7 +321,7 @@ export function OrgBrandingPanel() {
               onClick={() => setDraft(branding)}
               disabled={saveBranding.isPending}
             >
-              Descartar
+              {t("common.cancel")}
             </Button>
           )}
           <Button
@@ -334,7 +336,7 @@ export function OrgBrandingPanel() {
             className="gap-2"
           >
             {saveBranding.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-            Salvar
+            {t("common.save")}
           </Button>
         </div>
       </CardContent>
