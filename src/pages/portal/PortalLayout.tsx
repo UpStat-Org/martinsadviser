@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building2, LogOut } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { TruckLoadingScreen } from "@/components/TruckLoadingScreen";
+import { PortalSidebar } from "@/components/PortalSidebar";
 
 export default function PortalLayout() {
   const [loading, setLoading] = useState(true);
   const [clientId, setClientId] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState("");
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string>("overview");
   const navigate = useNavigate();
   const { t } = useLanguage();
 
@@ -26,13 +26,14 @@ export default function PortalLayout() {
         .eq("user_id", user.id)
         .single();
 
-      if (!portalLink) { 
+      if (!portalLink) {
         await supabase.auth.signOut();
-        navigate("/portal/login"); 
-        return; 
+        navigate("/portal/login");
+        return;
       }
 
       setClientId(portalLink.client_id);
+      setUserEmail(user.email ?? null);
 
       const { data: client } = await supabase
         .from("clients")
@@ -46,9 +47,12 @@ export default function PortalLayout() {
     check();
   }, [navigate]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/portal/login");
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+    const el = document.getElementById(`portal-section-${section}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   if (loading) {
@@ -56,26 +60,30 @@ export default function PortalLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <LanguageSwitcher />
-      <header className="border-b bg-card">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-primary-foreground" />
+    <div className="flex h-screen overflow-hidden bg-background">
+      <PortalSidebar
+        companyName={companyName}
+        userEmail={userEmail}
+        activeSection={activeSection}
+        onSectionChange={handleSectionChange}
+      />
+      <main className="flex-1 overflow-auto">
+        {/* Top bar mirrors AppLayout: flat, hairline border, no blur. */}
+        <div className="sticky top-0 z-10 bg-background border-b border-border">
+          <div className="max-w-screen-2xl mx-auto pl-14 pr-4 lg:px-8 h-12 flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-medium text-foreground truncate">
+                {companyName}
+              </div>
             </div>
-            <div>
-              <h1 className="font-semibold text-lg leading-tight">{companyName}</h1>
-              <Badge variant="outline" className="text-xs">{t("portal.readOnly")}</Badge>
-            </div>
+            <Badge variant="outline" className="text-[10px] shrink-0">
+              {t("portal.readOnly")}
+            </Badge>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            <LogOut className="w-4 h-4 mr-2" />{t("portal.logout")}
-          </Button>
         </div>
-      </header>
-      <main className="max-w-6xl mx-auto px-4 py-6">
-        <Outlet context={{ clientId }} />
+        <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-screen-2xl mx-auto">
+          <Outlet context={{ clientId, activeSection, setActiveSection }} />
+        </div>
       </main>
     </div>
   );
