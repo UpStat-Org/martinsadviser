@@ -11,7 +11,7 @@ export interface HostOrg {
 
 /**
  * Resolves the tenant pointed to by the current URL, fetching the public
- * branding via the get_org_by_slug RPC. Returns:
+ * branding via the get_org_by_hostname RPC. Returns:
  *
  *   - { hostOrg: <row>, isDev: false }   → enforce this org post-login
  *   - { hostOrg: null,  isDev: false }   → subdomain doesn't match any org
@@ -23,25 +23,27 @@ export interface HostOrg {
  * the Login page to render the tenant's branding.
  */
 export function useHostnameOrg() {
-  const { slug, isDev } = getHostnameOrg();
+  const { slug, hostname, isDev, isStrict } = getHostnameOrg();
 
   const query = useQuery({
-    queryKey: ["hostnameOrg", slug],
+    queryKey: ["hostnameOrg", hostname, slug],
     queryFn: async (): Promise<HostOrg | null> => {
-      if (!slug) return null;
+      if (!hostname) return null;
       const { data, error } = await supabase
-        .rpc("get_org_by_slug", { p_slug: slug })
+        .rpc("get_org_by_hostname", { p_hostname: hostname })
         .maybeSingle();
       if (error) throw error;
       return (data as HostOrg) ?? null;
     },
-    enabled: !!slug,
+    enabled: !!hostname && isStrict,
     staleTime: 5 * 60 * 1000, // branding rarely changes; safe to cache
   });
 
   return {
     slug,
+    hostname,
     isDev,
+    isStrict,
     hostOrg: query.data ?? null,
     loading: query.isLoading,
     error: query.error,

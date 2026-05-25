@@ -39,7 +39,7 @@ export default function Login() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [searchParams] = useSearchParams();
-  const { hostOrg, slug, isDev, loading: orgLoading } = useHostnameOrg();
+  const { hostOrg, slug, hostname, isStrict, loading: orgLoading } = useHostnameOrg();
 
   // Branding shown on this Login page. When the URL points at a tenant
   // subdomain we render that org's logo/name; in dev mode (no subdomain
@@ -76,8 +76,9 @@ export default function Login() {
     accent_color: brandingAccent,
   });
 
-  // Subdomain points at a slug we don't have an org for → 404-ish state.
-  const subdomainNotFound = !isDev && !!slug && !orgLoading && !hostOrg;
+  // Strict host points at a tenant subdomain/custom domain we don't have an
+  // org for → 404-ish state.
+  const hostNotFound = isStrict && !orgLoading && !hostOrg;
 
   // Surface cross-org redirect from OrgProvider as a toast on first paint.
   useEffect(() => {
@@ -93,17 +94,18 @@ export default function Login() {
     }
   }, [searchParams, toast]);
 
-  // Subdomain doesn't match any org → warn once and let the user proceed
+  // Host doesn't match any org → warn once and let the user proceed
   // anyway (the auth will still work; OrgProvider will then redirect them).
   useEffect(() => {
-    if (subdomainNotFound) {
+    if (hostNotFound) {
+      const label = slug ?? hostname;
       toast({
         title: t("login.orgNotFound"),
-        description: `Não existe organização com slug "${slug}". Verifique o endereço.`,
+        description: `Não existe organização para "${label}". Verifique o endereço.`,
         variant: "destructive",
       });
     }
-  }, [subdomainNotFound, slug, toast]);
+  }, [hostNotFound, hostname, slug, toast, t]);
 
   // If we arrived from /invite/<token> the URL carries ?invite=<token>; after
   // a successful sign-in we still need to redeem the invitation. We do it

@@ -154,15 +154,22 @@ export function OrgProvider({ children }: { children: ReactNode }) {
         role: r.role as OrgRole,
       }));
 
-    // Host-based routing: when the URL points at a tenant subdomain (or the
-    // root, which maps to the cliente 0 slug), that's the only org the user
-    // can be in for this session. Cross-tenant access is denied even if the
-    // user has memberships in other orgs.
+    // Host-based routing: when the URL points at a tenant subdomain or a
+    // mapped custom domain, that's the only org the user can be in for this
+    // session. Cross-tenant access is denied even if the user has memberships
+    // in other orgs.
     const hostInfo = getHostnameOrg();
     let active: string | null = null;
 
-    if (hostInfo.slug && !hostInfo.isDev) {
-      const matched = mlist.find((m) => m.organization.slug === hostInfo.slug);
+    if (hostInfo.isStrict && hostInfo.hostname) {
+      const { data: hostOrg, error: hostErr } = await supabase
+        .rpc("get_org_by_hostname", { p_hostname: hostInfo.hostname })
+        .maybeSingle();
+      const matched = hostOrg?.id
+        ? mlist.find((m) => m.organization.id === hostOrg.id)
+        : hostErr && hostInfo.slug
+          ? mlist.find((m) => m.organization.slug === hostInfo.slug)
+          : null;
       if (matched) {
         active = matched.organization.id;
         // Keep profile.active_org_id in sync so OrgSwitcher and other surfaces
@@ -179,7 +186,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
         // to /login on the same host with an explanatory query param.
         await supabase.auth.signOut();
         if (typeof window !== "undefined") {
-          window.location.assign(`/login?error=cross_org&host=${encodeURIComponent(hostInfo.slug)}`);
+          window.location.assign(`/login?error=cross_org&host=${encodeURIComponent(hostInfo.slug ?? hostInfo.hostname)}`);
         }
         setMemberships([]);
         setCurrentOrgId(null);

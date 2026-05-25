@@ -7,6 +7,7 @@
 //
 // Routing convention:
 //   - <slug>.martinsadviser.com        → tenant <slug> — strict enforcement
+//   - any mapped custom domain          → tenant by exact hostname lookup
 //                                        (signs out users who aren't members)
 //   - martinsadviser.com (apex)        → permissive mode: pick the user's
 //                                        profile.active_org_id, never force
@@ -18,7 +19,15 @@
 //     *.netlify.app / IPs
 // ============================================================================
 
+const PLATFORM_DOMAIN = "martinsadviser.com";
 const RESERVED_SUBDOMAINS = new Set(["www", "app", "api", "admin", "status"]);
+
+function normalizeHostname(hostname: string): string {
+  return hostname
+    .toLowerCase()
+    .replace(/:\d+$/, "")
+    .replace(/\.$/, "");
+}
 
 function isDevHost(hostname: string): boolean {
   if (hostname === "localhost" || hostname === "127.0.0.1") return true;
@@ -32,8 +41,12 @@ function isDevHost(hostname: string): boolean {
 export interface HostnameOrg {
   /** Slug parsed from the URL (always lowercase). null = no strict scoping. */
   slug: string | null;
+  /** Normalized browser hostname. null = no host lookup needed. */
+  hostname: string | null;
   /** Whether host-based enforcement is off (dev hosts, previews, or apex). */
   isDev: boolean;
+  /** Whether this host must resolve to exactly one organization. */
+  isStrict: boolean;
 }
 
 /**
@@ -41,22 +54,29 @@ export interface HostnameOrg {
  * `slug=null` when there's no real subdomain to enforce against.
  */
 export function parseHostnameOrg(hostname: string): HostnameOrg {
-  const host = hostname.toLowerCase();
-  if (isDevHost(host)) return { slug: null, isDev: true };
+  const host = normalizeHostname(hostname);
+  if (isDevHost(host)) return { slug: null, hostname: null, isDev: true, isStrict: false };
 
   const parts = host.split(".");
-  // Apex (martinsadviser.com / example.com): no subdomain to bind to. Treat
-  // as permissive — the OrgProvider will fall back to active_org_id and
-  // never sign a user out because of where they typed the URL.
-  if (parts.length < 3) return { slug: null, isDev: true };
 
-  const sub = parts[0];
-  if (RESERVED_SUBDOMAINS.has(sub)) return { slug: null, isDev: true };
+  if (host === PLATFORM_DOMAIN) {
+    return { slug: null, hostname: null, isDev: true, isStrict: false };
+  }
 
-  return { slug: sub, isDev: false };
+  if (host.endsWith(`.${PLATFORM_DOMAIN}`)) {
+    const sub = parts[0];
+    if (RESERVED_SUBDOMAINS.has(sub)) {
+      return { slug: null, hostname: null, isDev: true, isStrict: false };
+    }
+    return { slug: sub, hostname: host, isDev: false, isStrict: true };
+  }
+
+  return { slug: null, hostname: host, isDev: false, isStrict: true };
 }
 
 export function getHostnameOrg(): HostnameOrg {
-  if (typeof window === "undefined") return { slug: null, isDev: true };
+  if (typeof window === "undefined") {
+    return { slug: null, hostname: null, isDev: true, isStrict: false };
+  }
   return parseHostnameOrg(window.location.hostname);
 }

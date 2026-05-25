@@ -67,7 +67,7 @@ const queryClient = new QueryClient();
 function HomeIndex() {
   const { user, loading } = useAuth();
   const host = getHostnameOrg();
-  const isApex = !host.slug || host.isDev;
+  const isApex = !host.isStrict;
 
   if (loading) return <TruckLoadingScreen />;
   if (isApex && !user) return <LandingPage />;

@@ -28,6 +28,7 @@ import { OrgBrandingPanel } from "@/components/OrgBrandingPanel";
 import { OrgBillingPanel } from "@/components/OrgBillingPanel";
 import { OrgMembersPanel } from "@/components/OrgMembersPanel";
 import { OrgEldPanel } from "@/components/OrgEldPanel";
+import { OrgDomainsPanel } from "@/components/OrgDomainsPanel";
 
 export default function SettingsPage() {
   const { t } = useLanguage();
@@ -482,6 +483,7 @@ export default function SettingsPage() {
             {isOrgOwner && <OrgBillingPanel />}
             {isOrgOwner && <OrgMembersPanel />}
             <OrgBrandingPanel />
+            <OrgDomainsPanel />
             {isOrgOwner && <OrgFeatureFlagsPanel />}
           </TabsContent>
         )}

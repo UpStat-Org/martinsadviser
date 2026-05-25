@@ -2820,6 +2820,29 @@ export type Database = {
           slug: string
         }[]
       }
+      get_org_by_hostname: {
+        Args: { p_hostname: string }
+        Returns: {
+          branding: Json
+          id: string
+          name: string
+          slug: string
+        }[]
+      }
+      request_org_domain: {
+        Args: { p_org_id: string; p_domain: string }
+        Returns: {
+          created_at: string
+          domain: string
+          id: string
+          last_checked_at: string | null
+          organization_id: string
+          status: string
+          updated_at: string
+          verification_token: string
+          verified_at: string | null
+        }[]
+      }
       get_portal_client_id: { Args: { _user_id: string }; Returns: string }
       has_org_role: {
         Args: {
