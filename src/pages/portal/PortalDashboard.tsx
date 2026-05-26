@@ -433,7 +433,7 @@ export default function PortalDashboard() {
                       <TableRow key={permit.id}>
                         <TableCell className="font-medium">{permit.permit_type}</TableCell>
                         <TableCell className="font-mono text-xs">{permit.permit_number || "—"}</TableCell>
-                        <TableCell>{permit.trucks?.plate || "—"}</TableCell>
+                        <TableCell>{(permit.truck_id && truckPlateById.get(permit.truck_id)) || "—"}</TableCell>
                         <TableCell>{permit.state || "—"}</TableCell>
                         <TableCell>
                           {permit.expiration_date
