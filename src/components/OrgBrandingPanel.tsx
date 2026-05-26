@@ -52,7 +52,7 @@ export function OrgBrandingPanel() {
 
   useEffect(() => {
     setDraft(branding);
-  }, [branding.app_name, branding.tagline, branding.logo_url, branding.primary_color, branding.accent_color]);
+  }, [branding]);
 
   const saveBranding = useMutation({
     mutationFn: async (values: OrgBranding) => {

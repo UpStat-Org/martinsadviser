@@ -92,7 +92,7 @@ export default function Login() {
         variant: "destructive",
       });
     }
-  }, [searchParams, toast]);
+  }, [searchParams, toast, t]);
 
   // Host doesn't match any org → warn once and let the user proceed
   // anyway (the auth will still work; OrgProvider will then redirect them).

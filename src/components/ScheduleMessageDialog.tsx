@@ -45,7 +45,9 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
   const create = useCreateScheduledMessage();
   const selectedClient = clients?.find((c) => c.id === clientId) || null;
   const { t, language } = useLanguage();
-  const aiEnabled = useFeatureFlag("ai_chat") || useFeatureFlag("ai_reports");
+  const aiChatEnabled = useFeatureFlag("ai_chat");
+  const aiReportsEnabled = useFeatureFlag("ai_reports");
+  const aiEnabled = aiChatEnabled || aiReportsEnabled;
   const { toast } = useToast();
 
   useEffect(() => {

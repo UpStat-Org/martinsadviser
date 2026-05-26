@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";

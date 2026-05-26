@@ -97,7 +97,7 @@ export function TruckFormDialog({ open, onOpenChange, truck, defaultClientId }: 
             }
       );
     }
-  }, [open, truck]);
+  }, [open, truck, defaultClientId, form]);
 
   const onSubmit = async (values: FormValues) => {
     const payload = {

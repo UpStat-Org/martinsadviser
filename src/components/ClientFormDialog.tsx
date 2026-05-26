@@ -180,7 +180,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
             }
       );
     }
-  }, [open, client]);
+  }, [open, client, form]);
 
   const onSubmit = async (values: FormValues) => {
     const payload = {

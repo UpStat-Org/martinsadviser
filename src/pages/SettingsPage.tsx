@@ -99,6 +99,10 @@ export default function SettingsPage() {
       window.history.replaceState({}, "", "/settings");
       checkConnection();
     }
+    // Run once on mount: read the gcal=connected query param after the OAuth
+    // redirect and clear it from the URL. Adding t/toast as deps would re-fire
+    // the toast each time the language changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function checkConnection() {

@@ -11,7 +11,8 @@ describe("cn (classname merge)", () => {
   });
 
   it("handles conditional classes", () => {
-    expect(cn("base", false && "hidden", "extra")).toBe("base extra");
+    const show = false;
+    expect(cn("base", show && "hidden", "extra")).toBe("base extra");
   });
 
   it("handles undefined and null", () => {
