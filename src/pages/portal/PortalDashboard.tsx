@@ -100,6 +100,12 @@ export default function PortalDashboard() {
     [trucks],
   );
 
+  const truckPlateById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const tr of trucks ?? []) if (tr.plate) m.set(tr.id, tr.plate);
+    return m;
+  }, [trucks]);
+
   const upcomingPermits = useMemo(() => {
     if (!permits) return [] as Permit[];
     const now = new Date();
