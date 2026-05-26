@@ -21,6 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import {
   ArrowLeft,
   ArrowRight,
@@ -42,7 +44,11 @@ import {
   MapPin,
   Hash,
   User,
+  Calendar as CalendarIcon,
 } from "lucide-react";
+import { format, parseISO, isValid } from "date-fns";
+import { pt, enUS, es } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import { useCreateClient, useCheckClientDuplicate } from "@/hooks/useClients";
 import { useCreateTruck } from "@/hooks/useTrucks";
 import { useCreatePermit, PERMIT_TYPES } from "@/hooks/usePermits";
@@ -50,6 +56,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useFmcsaLookup } from "@/hooks/useFmcsaLookup";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { tNow } from "@/lib/translations";
+
+const dateLocales = { pt, en: enUS, es };
 
 // --- Schemas ---
 const clientSchema = z.object({
@@ -102,7 +110,7 @@ const steps = [
 export default function ClientOnboarding() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const createClient = useCreateClient();
   const createTruck = useCreateTruck();
   const createPermit = useCreatePermit();
@@ -826,7 +834,7 @@ export default function ClientOnboarding() {
         {step === 2 && (
           <div className="space-y-5">
             <p className="text-sm text-muted-foreground">
-              Adicione os caminhões da frota. Este passo é opcional.
+              {t("onboarding.trucksDesc")}
             </p>
 
             {trucks.length > 0 && (
@@ -933,7 +941,9 @@ export default function ClientOnboarding() {
                         {[
                           p.state && `${t("onboarding.statePrefix")} ${p.state}`,
                           p.truck_index !== null && `🚛 ${trucks[p.truck_index]?.plate}`,
-                          p.expiration_date && `${t("onboarding.expPrefix")} ${p.expiration_date}`,
+                          p.expiration_date &&
+                            isValid(parseISO(p.expiration_date)) &&
+                            `${t("onboarding.expPrefix")} ${format(parseISO(p.expiration_date), "dd MMM yyyy", { locale: dateLocales[language] })}`,
                         ]
                           .filter(Boolean)
                           .join(" · ")}
@@ -986,14 +996,44 @@ export default function ClientOnboarding() {
                   onChange={(e) => setPermitDraft({ ...permitDraft, state: e.target.value })}
                   className="h-11 rounded-md bg-background"
                 />
-                <Input
-                  type="date"
-                  value={permitDraft.expiration_date}
-                  onChange={(e) =>
-                    setPermitDraft({ ...permitDraft, expiration_date: e.target.value })
-                  }
-                  className="h-11 rounded-md bg-background"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "h-11 w-full justify-start text-left font-normal rounded-md bg-background",
+                        !permitDraft.expiration_date && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                      {permitDraft.expiration_date && isValid(parseISO(permitDraft.expiration_date))
+                        ? format(parseISO(permitDraft.expiration_date), "dd MMM yyyy", {
+                            locale: dateLocales[language],
+                          })
+                        : t("common.expiration")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={
+                        permitDraft.expiration_date && isValid(parseISO(permitDraft.expiration_date))
+                          ? parseISO(permitDraft.expiration_date)
+                          : undefined
+                      }
+                      onSelect={(d) =>
+                        setPermitDraft({
+                          ...permitDraft,
+                          expiration_date: d ? format(d, "yyyy-MM-dd") : "",
+                        })
+                      }
+                      initialFocus
+                      locale={dateLocales[language]}
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
                 <Select
                   value={
                     permitDraft.truck_index !== null

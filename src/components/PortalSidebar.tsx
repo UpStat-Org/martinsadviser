@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Building2, LayoutDashboard, FileCheck, Truck as TruckIcon, LogOut,
   ChevronsLeft, ChevronsRight, Menu, X, Sun, Moon, MoreHorizontal,
+  FolderOpen, Map as MapIcon,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -46,6 +47,7 @@ export function PortalSidebar({
       label: t("sidebar.section.overview"),
       items: [
         { hash: "overview", icon: LayoutDashboard, label: t("portal.overview") },
+        { hash: "coverage", icon: MapIcon, label: t("portal.coverage") },
       ],
     },
     {
@@ -53,6 +55,7 @@ export function PortalSidebar({
       items: [
         { hash: "permits", icon: FileCheck, label: t("portal.yourPermits") },
         { hash: "trucks", icon: TruckIcon, label: t("portal.yourTrucks") },
+        { hash: "documents", icon: FolderOpen, label: t("portal.yourDocuments") },
       ],
     },
   ], [t]);
