@@ -70,28 +70,28 @@ function renderEmailHtml(opts: {
   <tr><td align="center">
     <table role="presentation" cellpadding="0" cellspacing="0" width="520" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(11,13,46,0.08)">
       <tr><td style="padding:32px 32px 12px">
-        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:${primaryColor};font-weight:700;margin-bottom:8px">Portal do Cliente</div>
-        <h1 style="margin:0;font-size:24px;line-height:1.25;color:#0b0d2e">Seu acesso ao portal está pronto</h1>
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:${primaryColor};font-weight:700;margin-bottom:8px">Client Portal</div>
+        <h1 style="margin:0;font-size:24px;line-height:1.25;color:#0b0d2e">Your portal access is ready</h1>
         <p style="margin:14px 0 0;font-size:15px;line-height:1.55;color:#4a4e6a">
-          <strong>${safeOrg}</strong> liberou um portal para você consultar seus permits, caminhões e documentos em tempo real.
+          <strong>${safeOrg}</strong> has given you portal access to view your permits, trucks, and documents in real time.
         </p>
         <p style="margin:14px 0 0;font-size:15px;line-height:1.55;color:#4a4e6a">
-          Acesso vinculado ao email <strong>${safeEmail}</strong>.
+          Access linked to the email <strong>${safeEmail}</strong>.
         </p>
       </td></tr>
       <tr><td align="center" style="padding:16px 32px 24px">
         <a href="${accessUrl}" style="display:inline-block;background:${primaryColor};color:#fff;text-decoration:none;font-weight:600;padding:13px 28px;border-radius:10px;font-size:15px">
-          Acessar Portal
+          Access Portal
         </a>
       </td></tr>
       <tr><td style="padding:8px 32px 28px">
         <div style="font-size:12px;line-height:1.55;color:#7c80a0">
-          Se o botão não funcionar, abra este link no navegador:<br>
+          If the button doesn't work, open this link in your browser:<br>
           <span style="word-break:break-all;color:#0b0d2e">${htmlEscape(accessUrl)}</span>
         </div>
         <hr style="margin:24px 0;border:none;border-top:1px solid #ecedf3">
         <div style="font-size:11px;color:#a4a8c4">
-          Este link expira em ${ACCESS_TOKEN_TTL_DAYS} dias. Se você não esperava receber, pode ignorar.
+          This link expires in ${ACCESS_TOKEN_TTL_DAYS} days. If you weren't expecting this email, you can ignore it.
         </div>
       </td></tr>
     </table>
@@ -196,7 +196,7 @@ Deno.serve(async (req) => {
     const accessUrl = `${appUrl}/portal/login?access=${accessToken}`;
     const orgName = org?.name ?? client.company_name ?? "Portal";
 
-    const subject = `Acesso ao portal — ${orgName}`;
+    const subject = `Portal access — ${orgName}`;
     const html = renderEmailHtml({ orgName, email, accessUrl, primaryColor });
 
     const res = await fetch("https://api.resend.com/emails", {
