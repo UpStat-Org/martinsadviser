@@ -339,7 +339,7 @@ export default function PortalDashboard() {
                             )}
                           </div>
                           <div className="text-xs text-muted-foreground truncate">
-                            {[p.state, p.trucks?.plate].filter(Boolean).join(" · ") || "—"}
+                            {[p.state, p.truck_id ? truckPlateById.get(p.truck_id) : null].filter(Boolean).join(" · ") || "—"}
                           </div>
                         </div>
                       </div>
