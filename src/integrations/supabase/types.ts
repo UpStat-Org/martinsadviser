@@ -367,23 +367,32 @@ export type Database = {
       }
       client_portal_users: {
         Row: {
+          access_token: string | null
+          access_token_expires_at: string | null
           client_id: string
           created_at: string
           id: string
+          initial_password_encrypted: string | null
           org_id: string
           user_id: string
         }
         Insert: {
+          access_token?: string | null
+          access_token_expires_at?: string | null
           client_id: string
           created_at?: string
           id?: string
+          initial_password_encrypted?: string | null
           org_id?: string
           user_id: string
         }
         Update: {
+          access_token?: string | null
+          access_token_expires_at?: string | null
           client_id?: string
           created_at?: string
           id?: string
+          initial_password_encrypted?: string | null
           org_id?: string
           user_id?: string
         }

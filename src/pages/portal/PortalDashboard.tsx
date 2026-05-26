@@ -100,6 +100,12 @@ export default function PortalDashboard() {
     [trucks],
   );
 
+  const truckPlateById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const tr of trucks ?? []) if (tr.plate) m.set(tr.id, tr.plate);
+    return m;
+  }, [trucks]);
+
   const upcomingPermits = useMemo(() => {
     if (!permits) return [] as Permit[];
     const now = new Date();
@@ -333,7 +339,7 @@ export default function PortalDashboard() {
                             )}
                           </div>
                           <div className="text-xs text-muted-foreground truncate">
-                            {[p.state, p.trucks?.plate].filter(Boolean).join(" · ") || "—"}
+                            {[p.state, p.truck_id ? truckPlateById.get(p.truck_id) : null].filter(Boolean).join(" · ") || "—"}
                           </div>
                         </div>
                       </div>
@@ -427,7 +433,7 @@ export default function PortalDashboard() {
                       <TableRow key={permit.id}>
                         <TableCell className="font-medium">{permit.permit_type}</TableCell>
                         <TableCell className="font-mono text-xs">{permit.permit_number || "—"}</TableCell>
-                        <TableCell>{permit.trucks?.plate || "—"}</TableCell>
+                        <TableCell>{(permit.truck_id && truckPlateById.get(permit.truck_id)) || "—"}</TableCell>
                         <TableCell>{permit.state || "—"}</TableCell>
                         <TableCell>
                           {permit.expiration_date
