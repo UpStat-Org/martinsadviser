@@ -20,83 +20,28 @@ export default defineConfig(({ mode }) => ({
     dedupe: ["react", "react-dom", "react/jsx-runtime"],
   },
   build: {
-    chunkSizeWarningLimit: 800,
-    rollupOptions: {
-      output: {
-        // Conservative chunk strategy: only carve out genuinely independent
-        // leaf libraries that don't transitively import React. Splitting
-        // React itself (or libraries that share its internals — Radix,
-        // floating-ui, react-remove-scroll, etc.) caused module-evaluation
-        // crashes ("Cannot read properties of undefined (reading
-        // 'useLayoutEffect')") because the resulting chunk graph had
-        // circular imports that didn't initialize in the right order.
-        //
-        // The cost: a larger single `vendor` chunk. The benefit: stable
-        // loading, and the React/Radix/Router/Query versions move together
-        // anyway, so we don't lose much cache granularity.
-        manualChunks(id) {
-          if (!id.includes("node_modules")) return;
+    // Bump the warning ceiling — without manualChunks the auto-generated
+    // vendor chunk approaches ~1 MB raw. That is expected for a CRM with
+    // React + Radix + Supabase + TanStack Query + Recharts and is gated
+    // behind gzip + HTTP/2 multiplexing in practice.
+    chunkSizeWarningLimit: 1200,
 
-          // Recharts (+ its d3-* deps) — only used on chart routes.
-          if (
-            id.includes("/recharts/") ||
-            id.match(/[/\\]d3-[^/\\]+[/\\]/)
-          ) {
-            return "vendor-charts";
-          }
-
-          // Supabase client — leaf, no UI.
-          if (id.includes("/@supabase/")) {
-            return "vendor-supabase";
-          }
-
-          // Lucide icons — pure SVG components, no internal React-ecosystem
-          // dependencies beyond React itself (which loads from the main
-          // vendor chunk).
-          if (id.includes("/lucide-react/")) {
-            return "vendor-icons";
-          }
-
-          // Markdown — react-markdown + remark/rehype/unified ecosystem.
-          // Lazy-loaded only inside the AI report dialog.
-          if (
-            id.includes("/react-markdown/") ||
-            id.includes("/remark") ||
-            id.includes("/rehype") ||
-            id.includes("/unified") ||
-            id.includes("/micromark") ||
-            id.includes("/mdast") ||
-            id.includes("/hast") ||
-            id.includes("/vfile") ||
-            id.includes("/unist") ||
-            id.includes("/bail/") ||
-            id.includes("/trough/") ||
-            id.includes("/decode-named-character-reference/") ||
-            id.includes("/character-entities") ||
-            id.includes("/property-information/") ||
-            id.includes("/space-separated-tokens/") ||
-            id.includes("/comma-separated-tokens/") ||
-            id.includes("/zwitch/") ||
-            id.includes("/longest-streak/") ||
-            id.includes("/ccount/") ||
-            id.includes("/escape-string-regexp/")
-          ) {
-            return "vendor-markdown";
-          }
-
-          // Date-fns — leaf, used by formatters across the app.
-          if (id.includes("/date-fns/")) {
-            return "vendor-date";
-          }
-
-          // Everything else — React, ReactDOM, scheduler, Radix, router,
-          // TanStack Query, hook-form, zod, cmdk, sonner, next-themes,
-          // cva, clsx, tailwind-merge, floating-ui, react-remove-scroll,
-          // vaul, embla, day-picker, etc. — ships as one vendor chunk so
-          // there are no circular-import surprises at chunk boundaries.
-          return "vendor";
-        },
-      },
-    },
+    // We intentionally do NOT define `rollupOptions.output.manualChunks`.
+    //
+    // Two earlier attempts at manual chunking produced runtime crashes:
+    //   • Splitting React, Radix, charts, etc. into dedicated vendor
+    //     chunks caused TDZ errors like "Cannot access 'A' before
+    //     initialization" because libraries share transitive deps Rollup
+    //     could not cleanly partition.
+    //   • Even a minimal split that only carved out `vendor-markdown`
+    //     ended up re-pulled by the entry chunk because Rollup tracked
+    //     a shared dep into the markdown bucket.
+    //
+    // The route-level `React.lazy` boundaries in src/App.tsx and the
+    // dialog-level lazy splits in ClientDetail / TruckDetail / PermitDetail
+    // already do the bulk of the work. Rollup's default shared-chunk
+    // extraction takes care of the rest — recharts naturally lands in a
+    // shared async chunk reachable only from the chart routes, xlsx only
+    // loads on import dialogs, and so on.
   },
 }));
