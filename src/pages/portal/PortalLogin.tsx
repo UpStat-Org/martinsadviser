@@ -95,8 +95,8 @@ export default function PortalLogin() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center">
-              <Building2 className="w-7 h-7 text-primary-foreground" />
+            <div className="w-12 h-12 rounded-md bg-primary flex items-center justify-center">
+              <Building2 className="w-6 h-6 text-primary-foreground" />
             </div>
           </div>
           <CardTitle className="text-2xl">{t("portal.login")}</CardTitle>

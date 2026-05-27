@@ -1,12 +1,8 @@
-import { useState, useMemo } from "react";
-import ReactMarkdown from "react-markdown";
+import { lazy, Suspense, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useClient, useDeleteClient } from "@/hooks/useClients";
 import { useTrucks, useDeleteTruck, type Truck } from "@/hooks/useTrucks";
 import { usePermits, useDeletePermit, getExpirationStatus, type Permit } from "@/hooks/usePermits";
-import { ClientFormDialog } from "@/components/ClientFormDialog";
-import { TruckFormDialog } from "@/components/TruckFormDialog";
-import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { ComplianceDashboard } from "@/components/ComplianceDashboard";
 import { ComplianceScorecard } from "@/components/ComplianceScorecard";
 import { RiskScorePanel } from "@/components/RiskScorePanel";
@@ -20,12 +16,53 @@ import { AccidentsPanel } from "@/components/AccidentsPanel";
 import { ClientTagsEditor } from "@/components/ClientTagsEditor";
 import { ApplyTemplateButton } from "@/components/ApplyTemplateButton";
 import { DriversPanel } from "@/components/DriversPanel";
-import { DocumentViewer } from "@/components/DocumentViewer";
-import { ActivityTimeline } from "@/components/ActivityTimeline";
-import { InvitePortalDialog } from "@/components/InvitePortalDialog";
-import { SignatureDialog } from "@/components/SignatureDialog";
-import { SignatureViewer } from "@/components/SignatureViewer";
 import { PermitCoverageMap } from "@/components/PermitCoverageMap";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Lazy: only ever rendered when the user clicks something (open a dialog,
+// switch to a tab). Each ships in its own chunk, keeping the initial
+// ClientDetail payload focused on the always-visible panels.
+const ClientFormDialog = lazy(() =>
+  import("@/components/ClientFormDialog").then((m) => ({ default: m.ClientFormDialog })),
+);
+const TruckFormDialog = lazy(() =>
+  import("@/components/TruckFormDialog").then((m) => ({ default: m.TruckFormDialog })),
+);
+const PermitFormDialog = lazy(() =>
+  import("@/components/PermitFormDialog").then((m) => ({ default: m.PermitFormDialog })),
+);
+const DocumentViewer = lazy(() =>
+  import("@/components/DocumentViewer").then((m) => ({ default: m.DocumentViewer })),
+);
+const InvitePortalDialog = lazy(() =>
+  import("@/components/InvitePortalDialog").then((m) => ({ default: m.InvitePortalDialog })),
+);
+const SignatureDialog = lazy(() =>
+  import("@/components/SignatureDialog").then((m) => ({ default: m.SignatureDialog })),
+);
+const SignatureViewer = lazy(() =>
+  import("@/components/SignatureViewer").then((m) => ({ default: m.SignatureViewer })),
+);
+const ComplianceAutopilotDialog = lazy(() =>
+  import("@/components/ComplianceAutopilotDialog").then((m) => ({
+    default: m.ComplianceAutopilotDialog,
+  })),
+);
+const ActivityTimeline = lazy(() =>
+  import("@/components/ActivityTimeline").then((m) => ({ default: m.ActivityTimeline })),
+);
+const CommentsSection = lazy(() =>
+  import("@/components/CommentsSection").then((m) => ({ default: m.CommentsSection })),
+);
+const InternalNotesSection = lazy(() =>
+  import("@/components/InternalNotesSection").then((m) => ({ default: m.InternalNotesSection })),
+);
+const AIChatPanel = lazy(() =>
+  import("@/components/AIChatPanel").then((m) => ({ default: m.AIChatPanel })),
+);
+// ReactMarkdown only renders inside the AI report dialog. Pulling it inline
+// dragged its (sizeable) parser into the initial chunk.
+const ReactMarkdown = lazy(() => import("react-markdown"));
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,10 +77,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { CommentsSection } from "@/components/CommentsSection";
-import { InternalNotesSection } from "@/components/InternalNotesSection";
-import { AIChatPanel } from "@/components/AIChatPanel";
-import { ComplianceAutopilotDialog } from "@/components/ComplianceAutopilotDialog";
 import { Lock } from "lucide-react";
 import { useClientMessages, useRetryMessage } from "@/hooks/useMessages";
 import { useInvoices } from "@/hooks/useInvoices";
@@ -392,8 +425,8 @@ export default function ClientDetail() {
                     href={`tel:${client.phone}`}
                     className="flex items-center gap-2.5 p-2.5 rounded-lg hover:bg-muted/60 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-3.5 h-3.5 text-emerald-500" />
+                    <div className="w-8 h-8 rounded-md bg-success/10 border border-success/20 flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-3.5 h-3.5 text-success" />
                     </div>
                     <span className="text-sm truncate">{client.phone}</span>
                   </a>
@@ -403,7 +436,7 @@ export default function ClientDetail() {
                     href={`mailto:${client.email}`}
                     className="flex items-center gap-2.5 p-2.5 rounded-lg hover:bg-muted/60 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-md bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center flex-shrink-0">
                       <Mail className="w-3.5 h-3.5 text-indigo-500" />
                     </div>
                     <span className="text-sm truncate">{client.email}</span>
@@ -411,8 +444,8 @@ export default function ClientDetail() {
                 )}
                 {client.address && (
                   <div className="flex items-center gap-2.5 p-2.5 rounded-lg">
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-3.5 h-3.5 text-amber-500" />
+                    <div className="w-8 h-8 rounded-md bg-warning/10 border border-warning/20 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-3.5 h-3.5 text-warning" />
                     </div>
                     <span className="text-sm truncate">{client.address}</span>
                   </div>
@@ -454,7 +487,7 @@ export default function ClientDetail() {
                   return (
                     <span
                       key={s.key}
-                      className={`inline-flex items-center h-7 px-3 rounded-lg text-xs font-semibold transition-all ${
+                      className={`inline-flex items-center h-7 px-3 rounded-md text-xs font-semibold transition-all ${
                         active
                           ? "bg-primary text-primary-foreground hover:bg-primary/90 text-white shadow-md"
                           : "bg-muted/50 text-muted-foreground/60 line-through"
@@ -483,8 +516,8 @@ export default function ClientDetail() {
             <CardContent className="space-y-2">
               {[
                 { label: t("clientDetail.totalBilled"), value: financeSummary.total, color: "text-foreground" },
-                { label: t("clientDetail.received"), value: financeSummary.paid, color: "text-emerald-600 dark:text-emerald-400" },
-                { label: t("clientDetail.pending"), value: financeSummary.pending, color: "text-amber-600 dark:text-amber-400" },
+                { label: t("clientDetail.received"), value: financeSummary.paid, color: "text-success" },
+                { label: t("clientDetail.pending"), value: financeSummary.pending, color: "text-warning" },
               ].map((r) => (
                 <div
                   key={r.label}
@@ -668,7 +701,9 @@ export default function ClientDetail() {
               <Button size="sm" onClick={() => setSignatureOpen(true)}><Plus className="w-4 h-4 mr-2" />{t("signature.new")}</Button>
             </CardHeader>
             <CardContent>
-              <SignatureViewer clientId={id!} />
+              <Suspense fallback={<Skeleton className="h-32 w-full" />}>
+                <SignatureViewer clientId={id!} />
+              </Suspense>
             </CardContent>
           </Card>
         </TabsContent>
@@ -743,46 +778,93 @@ export default function ClientDetail() {
           </Card>
         </TabsContent>
         <TabsContent value="activity" className="mt-4">
-          {id && <ActivityTimeline clientId={id} />}
+          {id && (
+            <Suspense fallback={<Skeleton className="h-32 w-full" />}>
+              <ActivityTimeline clientId={id} />
+            </Suspense>
+          )}
         </TabsContent>
           <TabsContent value="comments" className="mt-4">
-            <CommentsSection entityType="client" entityId={id!} />
+            <Suspense fallback={<Skeleton className="h-32 w-full" />}>
+              <CommentsSection entityType="client" entityId={id!} />
+            </Suspense>
           </TabsContent>
           <TabsContent value="notes" className="mt-4">
-            <InternalNotesSection clientId={id!} />
+            <Suspense fallback={<Skeleton className="h-32 w-full" />}>
+              <InternalNotesSection clientId={id!} />
+            </Suspense>
           </TabsContent>
           {hasFeature("ai_chat") && (
             <TabsContent value="ai" className="mt-4">
-              <AIChatPanel clientId={id!} clientName={client.company_name} />
+              <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+                <AIChatPanel clientId={id!} clientName={client.company_name} />
+              </Suspense>
             </TabsContent>
           )}
       </Tabs>
 
-      <ClientFormDialog open={editOpen} onOpenChange={setEditOpen} client={client} />
-      <TruckFormDialog open={truckDialogOpen} onOpenChange={setTruckDialogOpen} truck={editingTruck} defaultClientId={id} />
-      <PermitFormDialog open={permitDialogOpen} onOpenChange={setPermitDialogOpen} permit={editingPermit} defaultClientId={id} />
-      {viewDocUrl && (
-        <DocumentViewer
-          open={!!viewDocUrl}
-          onOpenChange={(v) => { if (!v) { setViewDocUrl(null); setViewDocPermitId(null); } }}
-          url={viewDocUrl}
-          title={viewDocTitle}
-          versions={docVersions}
-        />
-      )}
-      <InvitePortalDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={client.id} clientName={client.company_name} />
-      <SignatureDialog open={signatureOpen} onOpenChange={setSignatureOpen} clientId={client.id} />
-      <ComplianceAutopilotDialog
-        open={autopilotOpen}
-        onOpenChange={setAutopilotOpen}
-        client={client}
-        permits={permits}
-        trucks={trucks}
-        invoices={clientInvoices}
-        messages={clientMessages}
-      />
+      {/* Dialogs only render — and therefore only download their chunk —
+          when the user opens them. Wrapped in a single Suspense so the
+          modal-open click feels instant; the fallback is invisible because
+          the dialog backdrop animates in on top. */}
+      <Suspense fallback={null}>
+        {editOpen && (
+          <ClientFormDialog open={editOpen} onOpenChange={setEditOpen} client={client} />
+        )}
+        {truckDialogOpen && (
+          <TruckFormDialog
+            open={truckDialogOpen}
+            onOpenChange={setTruckDialogOpen}
+            truck={editingTruck}
+            defaultClientId={id}
+          />
+        )}
+        {permitDialogOpen && (
+          <PermitFormDialog
+            open={permitDialogOpen}
+            onOpenChange={setPermitDialogOpen}
+            permit={editingPermit}
+            defaultClientId={id}
+          />
+        )}
+        {viewDocUrl && (
+          <DocumentViewer
+            open={!!viewDocUrl}
+            onOpenChange={(v) => { if (!v) { setViewDocUrl(null); setViewDocPermitId(null); } }}
+            url={viewDocUrl}
+            title={viewDocTitle}
+            versions={docVersions}
+          />
+        )}
+        {inviteOpen && (
+          <InvitePortalDialog
+            open={inviteOpen}
+            onOpenChange={setInviteOpen}
+            clientId={client.id}
+            clientName={client.company_name}
+          />
+        )}
+        {signatureOpen && (
+          <SignatureDialog
+            open={signatureOpen}
+            onOpenChange={setSignatureOpen}
+            clientId={client.id}
+          />
+        )}
+        {autopilotOpen && (
+          <ComplianceAutopilotDialog
+            open={autopilotOpen}
+            onOpenChange={setAutopilotOpen}
+            client={client}
+            permits={permits}
+            trucks={trucks}
+            invoices={clientInvoices}
+            messages={clientMessages}
+          />
+        )}
+      </Suspense>
 
-      {/* AI Report Dialog */}
+      {/* AI Report Dialog — ReactMarkdown only loads when open. */}
       <Dialog open={aiReportOpen} onOpenChange={setAiReportOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -792,7 +874,11 @@ export default function ClientDetail() {
             </DialogTitle>
           </DialogHeader>
           <div className="prose prose-sm dark:prose-invert max-w-none">
-            <ReactMarkdown>{aiReport || ""}</ReactMarkdown>
+            {aiReportOpen && (
+              <Suspense fallback={<Skeleton className="h-48 w-full" />}>
+                <ReactMarkdown>{aiReport || ""}</ReactMarkdown>
+              </Suspense>
+            )}
           </div>
         </DialogContent>
       </Dialog>

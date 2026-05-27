@@ -73,9 +73,9 @@ const COLUMNS = [
     labelKey: "kanban.column.waiting",
     icon: PauseCircle,
     gradient: "from-amber-500 to-orange-500",
-    tint: "bg-amber-500/5",
-    border: "border-amber-500/20",
-    dot: "bg-amber-500",
+    tint: "bg-warning/5",
+    border: "border-warning/20",
+    dot: "bg-warning",
   },
   {
     id: "in_progress",
@@ -91,18 +91,18 @@ const COLUMNS = [
     labelKey: "kanban.column.completed",
     icon: CheckCircle2,
     gradient: "from-emerald-500 to-teal-500",
-    tint: "bg-emerald-500/5",
-    border: "border-emerald-500/20",
-    dot: "bg-emerald-500",
+    tint: "bg-success/5",
+    border: "border-success/20",
+    dot: "bg-success",
   },
   {
     id: "discarded",
     labelKey: "kanban.column.discarded",
     icon: XCircle,
     gradient: "from-rose-500 to-red-500",
-    tint: "bg-rose-500/5",
-    border: "border-rose-500/20",
-    dot: "bg-rose-500",
+    tint: "bg-destructive/5",
+    border: "border-destructive/20",
+    dot: "bg-destructive",
   },
 ];
 
@@ -112,11 +112,11 @@ const TASK_TYPES = [
 
 const PRIORITY_STYLES: Record<string, { bar: string; badge: string; labelKey: string }> = {
   high: {
-    bar: "bg-secondary text-secondary-foreground border border-border",    badge: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+    bar: "bg-secondary text-secondary-foreground border border-border",    badge: "bg-destructive/10 text-destructive border-destructive/20",
     labelKey: "priority.high",
   },
   medium: {
-    bar: "bg-secondary text-secondary-foreground border border-border",    badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    bar: "bg-secondary text-secondary-foreground border border-border",    badge: "bg-warning/10 text-warning border-warning/20",
     labelKey: "priority.medium",
   },
   low: {
@@ -341,7 +341,7 @@ export default function KanbanPage() {
                 <div className="flex items-center justify-between mt-1">
                   <div className="flex items-center gap-2 min-w-0">
                     <div
-                      className={`w-8 h-8 rounded-lg bg-secondary text-secondary-foreground border border-border flex items-center justify-center shadow-sm flex-shrink-0`}
+                      className={`w-8 h-8 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center shadow-sm flex-shrink-0`}
                     >
                       <Icon className="w-4 h-4 text-secondary-foreground" />
                     </div>
@@ -356,7 +356,7 @@ export default function KanbanPage() {
                   </div>
                   <button
                     onClick={() => openNew(col.id)}
-                    className="w-7 h-7 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                    className="w-7 h-7 rounded-md hover:bg-muted flex items-center justify-center transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -519,9 +519,9 @@ export default function KanbanPage() {
                               <span
                                 className={`inline-flex items-center gap-1 text-[10px] font-semibold ${
                                   overdue
-                                    ? "text-red-500"
+                                    ? "text-destructive"
                                     : today
-                                    ? "text-amber-500"
+                                    ? "text-warning"
                                     : "text-muted-foreground"
                                 }`}
                               >
@@ -557,7 +557,7 @@ export default function KanbanPage() {
         <DialogContent className="max-w-lg rounded-md">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
                 {editingTask ? (
                   <Pencil className="w-4 h-4 text-secondary-foreground" />
                 ) : (
@@ -757,7 +757,7 @@ export default function KanbanPage() {
         <DialogContent className="sm:max-w-lg rounded-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
+              <div className="w-8 h-8 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
                 <MessageSquare className="w-4 h-4 text-secondary-foreground" />
               </div>
               {t("kanban.taskComments")}

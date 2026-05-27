@@ -178,7 +178,7 @@ export default function StartOrg() {
           {step === "done" ? (
             <Card className="border-border/50">
               <CardContent className="p-8 text-center space-y-4">
-                <div className="w-12 h-12 mx-auto rounded-md bg-emerald-500/15 text-emerald-600 flex items-center justify-center">
+                <div className="w-12 h-12 mx-auto rounded-md bg-success/15 text-success flex items-center justify-center">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div>

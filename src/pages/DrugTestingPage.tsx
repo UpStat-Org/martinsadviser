@@ -29,7 +29,7 @@ import { format } from "date-fns";
 
 const RESULT_STYLE: Record<string, string> = {
   pending: "bg-muted text-muted-foreground border-border",
-  negative: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+  negative: "bg-success/10 text-success border-success/30",
   positive: "bg-destructive/10 text-destructive border-destructive/30",
   refused: "bg-destructive/10 text-destructive border-destructive/30",
   cancelled: "bg-muted text-muted-foreground border-border",
@@ -252,7 +252,7 @@ export default function DrugTestingPage() {
                     <TableRow key={ev.id}>
                       <TableCell>{d?.full_name ?? "—"}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={ev.substance === "drug" ? "bg-violet-500/10 text-violet-600 border-violet-500/30" : "bg-amber-500/10 text-amber-600 border-amber-500/30"}>
+                        <Badge variant="outline" className={ev.substance === "drug" ? "bg-violet-500/10 text-violet-600 border-violet-500/30" : "bg-warning/10 text-warning border-warning/30"}>
                           {ev.substance === "drug" ? t("drugTest.subst.drug") : t("drugTest.subst.alcohol")}
                         </Badge>
                       </TableCell>

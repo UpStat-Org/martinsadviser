@@ -82,14 +82,13 @@ import { EmptyState } from "@/components/EmptyState";
 import { TablePreferencesToolbar, type Density } from "@/components/TablePreferencesToolbar";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 
-const STATUS_STYLES: Record<string, string> = {
-  pending:
-    "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-  paid:
-    "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-  overdue:
-    "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
-  cancelled: "bg-muted text-muted-foreground border-border",
+import { StatusBadge, type StatusTone } from "@/components/StatusBadge";
+
+const STATUS_TONES: Record<string, StatusTone> = {
+  pending: "warning",
+  paid: "success",
+  overdue: "danger",
+  cancelled: "neutral",
 };
 
 const PIE_COLORS = [
@@ -718,10 +717,10 @@ export default function FinancePage() {
                         <TableCell className="font-mono text-xs text-right">
                           {fmt(row.avgTicket)}
                         </TableCell>
-                        <TableCell className="text-emerald-600 dark:text-emerald-400 font-mono text-xs text-right">
+                        <TableCell className="text-success font-mono text-xs text-right">
                           {fmt(row.paid)}
                         </TableCell>
-                        <TableCell className="text-amber-600 dark:text-amber-400 font-mono text-xs text-right">
+                        <TableCell className="text-warning font-mono text-xs text-right">
                           {fmt(row.pending)}
                         </TableCell>
                         <TableCell className="font-bold font-mono text-xs text-right">
@@ -739,16 +738,16 @@ export default function FinancePage() {
 
       {/* ============ DELINQUENT ============ */}
       {delinquentClients.length > 0 && (
-        <Card className="border-red-500/30 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
+        <Card className="border-destructive/30 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-destructive" />
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
-                  <AlertTriangle className="w-4 h-4 text-secondary-foreground" />
+                <div className="w-10 h-10 rounded-md bg-destructive/10 border border-destructive/20 flex items-center justify-center">
+                  <AlertTriangle className="w-4 h-4 text-destructive" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-base text-red-600 dark:text-red-400">
+                  <h2 className="font-semibold text-base text-destructive">
                     {t("finance.delinquentClients")}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -756,9 +755,9 @@ export default function FinancePage() {
                   </p>
                 </div>
               </div>
-              <span className="inline-flex items-center h-7 px-3 rounded-lg text-xs font-bold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+              <StatusBadge tone="danger" size="lg">
                 {delinquentClients.length}
-              </span>
+              </StatusBadge>
             </div>
             <div className="rounded-md border border-border/50 overflow-hidden">
               <Table>
@@ -781,7 +780,7 @@ export default function FinancePage() {
                       <TableCell className="text-sm font-semibold">
                         {row.name}
                       </TableCell>
-                      <TableCell className="text-right font-mono font-bold text-sm text-red-600 dark:text-red-400">
+                      <TableCell className="text-right font-mono font-bold text-sm text-destructive">
                         {fmt(row.overdue)}
                       </TableCell>
                       <TableCell>
@@ -829,7 +828,7 @@ export default function FinancePage() {
             ))}
           </SelectContent>
         </Select>
-        <span className="sm:ml-auto inline-flex items-center gap-1.5 h-7 px-2.5 rounded-lg bg-primary/10 text-primary border border-primary/15 text-xs font-bold">
+        <span className="sm:ml-auto inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md bg-primary/10 text-primary border border-primary/15 text-xs font-bold">
           {filtered.length} {t(filtered.length === 1 ? "finance.invoice" : "finance.invoices")}
         </span>
         <TablePreferencesToolbar
@@ -854,7 +853,7 @@ export default function FinancePage() {
         </div>
       ) : !filtered.length ? (
         <EmptyState
-          icon={<Receipt className="w-9 h-9 text-emerald-500" />}
+          icon={<Receipt className="w-9 h-9 text-success" />}
           title={t("finance.noInvoices")}
           description={
             filterStatus !== "all" || filterClient !== "all"
@@ -936,17 +935,15 @@ export default function FinancePage() {
                     {format(new Date(inv.due_date), "dd/MM/yyyy")}
                   </TableCell>}
                   {columns.status !== false && <TableCell>
-                    <span
-                      className={`inline-flex items-center justify-center h-6 min-w-[92px] whitespace-nowrap px-2.5 rounded-md text-xs font-semibold border ${STATUS_STYLES[inv.status]}`}
-                    >
+                    <StatusBadge tone={STATUS_TONES[inv.status] ?? "neutral"}>
                       {statusLabel(inv.status)}
-                    </span>
+                    </StatusBadge>
                   </TableCell>}
                   <TableCell>
                     <div className="flex items-center justify-center gap-1.5">
                       <Link
                         to={`/finance/${inv.id}`}
-                        className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                        className="w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors"
                         title={t("common.openInvoice")}
                       >
                         <Eye className="w-3.5 h-3.5 text-muted-foreground" />
@@ -955,13 +952,13 @@ export default function FinancePage() {
                         <>
                         <button
                           onClick={() => openEdit(inv)}
-                          className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                          className="w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <button className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors">
+                            <button className="w-8 h-8 rounded-md hover:bg-destructive/10 flex items-center justify-center transition-colors">
                               <Trash2 className="w-3.5 h-3.5 text-destructive" />
                             </button>
                           </AlertDialogTrigger>

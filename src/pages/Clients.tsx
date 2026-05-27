@@ -2,8 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -14,16 +13,12 @@ import {
 } from "@/components/ui/table";
 import {
   Plus,
-  Search,
-  Loader2,
   Upload,
   Users,
   FileCheck,
   Truck as TruckIcon,
   ShieldAlert,
   ShieldCheck as ShieldOk,
-  X,
-  Filter,
   TrendingUp,
   Eye,
 } from "lucide-react";
@@ -49,7 +44,15 @@ import { ScoreBadge } from "@/components/ComplianceScorecard";
 import { RiskBadge } from "@/components/RiskBadge";
 import { useRiskScores, type RiskScoreWithClient } from "@/hooks/useRiskScores";
 import { PageHeader } from "@/components/PageHeader";
-import { cn } from "@/lib/utils";
+import { KpiCard } from "@/components/KpiCard";
+import { StatusBadge } from "@/components/StatusBadge";
+import {
+  FilterBar,
+  FilterChip,
+  FilterChipGroup,
+  FilterClearChip,
+  FilterDivider,
+} from "@/components/FilterBar";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -269,21 +272,6 @@ export default function Clients() {
     setPage(1);
   }, [search, serviceFilter]);
 
-  const statusMap: Record<string, { label: string; className: string }> = {
-    active: {
-      label: t("common.active"),
-      className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400",
-    },
-    inactive: {
-      label: t("common.inactive"),
-      className: "bg-muted text-muted-foreground border-border",
-    },
-    pending: {
-      label: t("common.pending"),
-      className: "bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400",
-    },
-  };
-
   // Quick stats
   const stats = useMemo(() => {
     const total = clients?.length ?? 0;
@@ -331,148 +319,107 @@ export default function Clients() {
       />
 
       {/* KPI strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-        {kpiCards.map((s) => {
-          const toneBar =
-            s.tone === "danger" ? "bg-destructive" : s.tone === "warning" ? "bg-warning" : null;
-          return (
-            <div
-              key={s.label}
-              className="relative rounded-md border border-border bg-card p-3.5 transition-colors hover:bg-muted/60 overflow-hidden"
-            >
-              {toneBar && (
-                <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1", toneBar)} />
-              )}
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  {s.label}
-                </span>
-                <s.icon className="w-4 h-4 text-muted-foreground/70" />
-              </div>
-              <div className="text-2xl font-semibold tracking-tight tabular mt-1.5">{s.value}</div>
-            </div>
-          );
-        })}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+        {kpiCards.map((s) => (
+          <KpiCard
+            key={s.label}
+            label={s.label}
+            value={s.value}
+            icon={s.icon}
+            tone={s.tone}
+          />
+        ))}
       </div>
 
       {/* ============ FILTERS ============ */}
-      <div className="rounded-md bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder={t("clients.search")}
-            className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-md transition-colors"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="hidden sm:block h-8 w-px bg-border/60" />
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground mr-1">
-            <Filter className="w-3.5 h-3.5" />
-            {t("clients.servicesLabel")}
-          </div>
-          {serviceLabels.map((s) => {
-            const active = serviceFilter === s.key;
-            return (
-              <button
-                key={s.key}
-                onClick={() => setServiceFilter(active ? null : s.key)}
-                className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all ${
-                  active
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90 text-white shadow-md"
-                    : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                {s.label}
-              </button>
-            );
-          })}
-          {serviceFilter && (
-            <button
-              onClick={() => setServiceFilter(null)}
-              className="h-8 px-2.5 rounded-lg text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex items-center gap-1"
+      <FilterBar
+        searchValue={search}
+        onSearchChange={setSearch}
+        searchPlaceholder={t("clients.search")}
+        trailing={
+          <>
+            <SavedViewsToolbar
+              scope="clients"
+              currentFilters={{ search, serviceFilter, tagFilter }}
+              onApply={(f) => {
+                const filters = f as { search?: string; serviceFilter?: ServiceKey | null; tagFilter?: string | null };
+                setSearch(filters.search ?? "");
+                setServiceFilter(filters.serviceFilter ?? null);
+                setTagFilter(filters.tagFilter ?? null);
+              }}
+            />
+            <TablePreferencesToolbar
+              density={density}
+              onDensityChange={setDensity}
+              columns={columns}
+              onColumnsChange={setColumns}
+              columnOptions={[
+                { key: "dot", label: "DOT" },
+                { key: "mc", label: "MC" },
+                { key: "phone", label: t("clients.phone") },
+                { key: "services", label: t("clients.services") },
+                { key: "permits", label: "Permits" },
+                { key: "trucks", label: "Trucks" },
+                { key: "risk", label: t("common.risk") },
+                { key: "score", label: "Score" },
+                { key: "status", label: t("clients.status") },
+              ]}
+            />
+          </>
+        }
+      >
+        <FilterDivider />
+        <FilterChipGroup label={t("clients.servicesLabel")}>
+          {serviceLabels.map((s) => (
+            <FilterChip
+              key={s.key}
+              active={serviceFilter === s.key}
+              onClick={() => setServiceFilter(serviceFilter === s.key ? null : s.key)}
             >
-              <X className="w-3 h-3" />
+              {s.label}
+            </FilterChip>
+          ))}
+          {serviceFilter && (
+            <FilterClearChip onClick={() => setServiceFilter(null)}>
               {t("common.clear")}
-            </button>
+            </FilterClearChip>
           )}
-        </div>
+        </FilterChipGroup>
         {availableTags.length > 0 && (
           <>
-            <div className="hidden sm:block h-8 w-px bg-border/60" />
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground mr-1">
-                <Filter className="w-3.5 h-3.5" />
-                {t("tags.filterBy")}:
-              </div>
-              {availableTags.map((tg) => {
-                const active = tagFilter === tg;
-                return (
-                  <button
-                    key={tg}
-                    onClick={() => setTagFilter(active ? null : tg)}
-                    className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all ${
-                      active
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90 text-white shadow-md"
-                        : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                  >
-                    {tg}
-                  </button>
-                );
-              })}
-              {tagFilter && (
-                <button
-                  onClick={() => setTagFilter(null)}
-                  className="h-8 px-2.5 rounded-lg text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex items-center gap-1"
+            <FilterDivider />
+            <FilterChipGroup label={`${t("tags.filterBy")}:`}>
+              {availableTags.map((tg) => (
+                <FilterChip
+                  key={tg}
+                  active={tagFilter === tg}
+                  onClick={() => setTagFilter(tagFilter === tg ? null : tg)}
                 >
-                  <X className="w-3 h-3" />
+                  {tg}
+                </FilterChip>
+              ))}
+              {tagFilter && (
+                <FilterClearChip onClick={() => setTagFilter(null)}>
                   {t("common.clear")}
-                </button>
+                </FilterClearChip>
               )}
-            </div>
+            </FilterChipGroup>
           </>
         )}
-        <div className="sm:ml-auto flex items-center gap-2">
-          <SavedViewsToolbar
-            scope="clients"
-            currentFilters={{ search, serviceFilter, tagFilter }}
-            onApply={(f) => {
-              const filters = f as { search?: string; serviceFilter?: ServiceKey | null; tagFilter?: string | null };
-              setSearch(filters.search ?? "");
-              setServiceFilter(filters.serviceFilter ?? null);
-              setTagFilter(filters.tagFilter ?? null);
-            }}
-          />
-          <TablePreferencesToolbar
-            density={density}
-            onDensityChange={setDensity}
-            columns={columns}
-            onColumnsChange={setColumns}
-            columnOptions={[
-              { key: "dot", label: "DOT" },
-              { key: "mc", label: "MC" },
-              { key: "phone", label: t("clients.phone") },
-              { key: "services", label: t("clients.services") },
-              { key: "permits", label: "Permits" },
-              { key: "trucks", label: "Trucks" },
-              { key: "risk", label: t("common.risk") },
-              { key: "score", label: "Score" },
-              { key: "status", label: t("clients.status") },
-            ]}
-          />
-        </div>
-      </div>
+      </FilterBar>
 
       {/* ============ TABLE ============ */}
       {isLoading ? (
-        <div className="flex justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </div>
+        <Card className="overflow-hidden border-border/50">
+          <CardContent className="p-3 space-y-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-11 w-full" />
+            ))}
+          </CardContent>
+        </Card>
       ) : !filteredClients?.length ? (
         <EmptyState
-          icon={<Users className="w-9 h-9 text-indigo-500" />}
+          icon={<Users className="w-9 h-9 text-primary" />}
           title={search || serviceFilter ? t("clients.noResults") : t("clients.empty")}
           description={
             search || serviceFilter
@@ -481,34 +428,29 @@ export default function Clients() {
           }
           action={
             !search && !serviceFilter ? (
-              <button
-                onClick={() => navigate("/clients/onboarding")}
-                className="h-11 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-white text-sm font-semibold inline-flex items-center gap-2 transition-all"
-              >
-                <Plus className="w-4 h-4" />
+              <Button size="lg" onClick={() => navigate("/clients/onboarding")}>
+                <Plus className="w-4 h-4 mr-2" />
                 {t("clients.registerFirst")}
-              </button>
+              </Button>
             ) : undefined
           }
           secondaryAction={
             search || serviceFilter ? (
-              <button
+              <Button
+                size="lg"
+                variant="secondary"
                 onClick={() => {
                   setSearch("");
                   setServiceFilter(null);
                 }}
-                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold"
               >
                 {t("common.clearFilters")}
-              </button>
+              </Button>
             ) : (
-              <button
-                onClick={() => setImportOpen(true)}
-                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold inline-flex items-center gap-2"
-              >
-                <Upload className="w-4 h-4" />
+              <Button size="lg" variant="secondary" onClick={() => setImportOpen(true)}>
+                <Upload className="w-4 h-4 mr-2" />
                 {t("import.title")}
-              </button>
+              </Button>
             )
           }
         />
@@ -572,7 +514,6 @@ export default function Clients() {
             </TableHeader>
             <TableBody>
               {paginatedClients.map((client) => {
-                const status = statusMap[client.status] || statusMap.active;
                 const activeServices = serviceLabels.filter((s) => client[s.key]);
                 const permitCount = permitCountByClient[client.id] || 0;
                 const truckCount = truckCountByClient[client.id] || 0;
@@ -591,7 +532,7 @@ export default function Clients() {
                     <TableCell className={density === "compact" ? "py-2" : "py-3"}>
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center text-white font-semibold text-sm flex-shrink-0`}
+                          className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center font-semibold text-sm flex-shrink-0"
                         >
                           {initials(client.company_name)}
                         </div>
@@ -644,13 +585,13 @@ export default function Clients() {
                     </TableCell>}
                     {columns.permits !== false && <TableCell className="text-center">
                       <div className="inline-flex items-center gap-1.5 px-2 h-6 rounded-md bg-muted/60 text-xs font-semibold">
-                        <FileCheck className="w-3 h-3 text-emerald-500" />
+                        <FileCheck className="w-3 h-3 text-success" />
                         {permitCount}
                       </div>
                     </TableCell>}
                     {columns.trucks !== false && <TableCell className="text-center">
                       <div className="inline-flex items-center gap-1.5 px-2 h-6 rounded-md bg-muted/60 text-xs font-semibold">
-                        <TruckIcon className="w-3 h-3 text-sky-500" />
+                        <TruckIcon className="w-3 h-3 text-primary" />
                         {truckCount}
                       </div>
                     </TableCell>}
@@ -662,29 +603,20 @@ export default function Clients() {
                           showLabel
                         />
                       ) : riskByClient[client.id] === "danger" ? (
-                        <Badge
-                          className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20 gap-1"
-                          variant="outline"
-                        >
+                        <StatusBadge tone="danger">
                           <ShieldAlert className="w-3 h-3" />
                           {t("common.urgent")}
-                        </Badge>
+                        </StatusBadge>
                       ) : riskByClient[client.id] === "warning" ? (
-                        <Badge
-                          className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 gap-1"
-                          variant="outline"
-                        >
+                        <StatusBadge tone="warning">
                           <ShieldAlert className="w-3 h-3" />
                           {t("common.attention")}
-                        </Badge>
+                        </StatusBadge>
                       ) : permitCount > 0 ? (
-                        <Badge
-                          className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 gap-1"
-                          variant="outline"
-                        >
+                        <StatusBadge tone="success">
                           <ShieldOk className="w-3 h-3" />
                           OK
-                        </Badge>
+                        </StatusBadge>
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
@@ -720,7 +652,8 @@ export default function Clients() {
                       <Link
                         to={`/clients/${client.id}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="mx-auto w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                        aria-label={t("common.openClient")}
+                        className="mx-auto w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                         title={t("common.openClient")}
                       >
                         <Eye className="w-3.5 h-3.5" />

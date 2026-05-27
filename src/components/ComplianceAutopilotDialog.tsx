@@ -74,10 +74,10 @@ type Props = {
 };
 
 const toneClass: Record<ActionTone, string> = {
-  critical: "border-red-500/25 bg-red-500/5",
-  warning: "border-amber-500/25 bg-amber-500/5",
+  critical: "border-destructive/25 bg-destructive/5",
+  warning: "border-warning/25 bg-warning/5",
   info: "border-sky-500/25 bg-sky-500/5",
-  success: "border-emerald-500/25 bg-emerald-500/5",
+  success: "border-success/25 bg-success/5",
 };
 
 const toneIcon: Record<ActionTone, typeof AlertTriangle> = {
@@ -401,10 +401,10 @@ export function ComplianceAutopilotDialog({
                 <Badge
                   className={cn(
                     analysis.level === "critical"
-                      ? "bg-red-500 text-white"
+                      ? "bg-destructive text-white"
                       : analysis.level === "attention"
-                        ? "bg-amber-500 text-white"
-                        : "bg-emerald-500 text-white",
+                        ? "bg-warning text-white"
+                        : "bg-success text-white",
                   )}
                 >
                   {levelLabel}

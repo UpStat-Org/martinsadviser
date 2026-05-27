@@ -299,7 +299,7 @@ export default function SettingsPage() {
 
               <div className="mt-4 rounded-md bg-secondary text-secondary-foreground border border-border border border-primary/10 p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
                     <Key className="w-3.5 h-3.5 text-secondary-foreground" />
                   </div>
                   <div>
@@ -377,7 +377,7 @@ export default function SettingsPage() {
                       </h2>
                       {!loading &&
                         (isConnected ? (
-                          <span className="inline-flex items-center gap-1 h-5 px-2 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                          <span className="inline-flex items-center gap-1 h-5 px-2 rounded-md text-[10px] font-bold bg-success/10 text-success border border-success/20">
                             <Check className="w-2.5 h-2.5" />
                             Conectado
                           </span>
@@ -399,8 +399,8 @@ export default function SettingsPage() {
               </div>
 
               {!loading && isConnected && (
-                <div className="mt-5 rounded-md bg-emerald-500/5 border border-emerald-500/15 p-4 flex items-start gap-3">
-                  <ShieldCheck className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                <div className="mt-5 rounded-md bg-success/5 border border-success/15 p-4 flex items-start gap-3">
+                  <ShieldCheck className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
                   <div className="text-xs text-muted-foreground">
                     Sua conta do Google está conectada. Os vencimentos de
                     permits são sincronizados automaticamente com seu calendário.

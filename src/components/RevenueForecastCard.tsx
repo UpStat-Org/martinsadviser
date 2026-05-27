@@ -21,10 +21,10 @@ const usd = new Intl.NumberFormat("en-US", {
 
 function SourceTag({ source, t }: { source: PermitForecast["source"]; t: (k: string) => string }) {
   if (source === "client_history") {
-    return <span className="text-[10px] font-semibold text-emerald-600">{t("forecast.source.history")}</span>;
+    return <span className="text-[10px] font-semibold text-success">{t("forecast.source.history")}</span>;
   }
   if (source === "org_average") {
-    return <span className="text-[10px] font-semibold text-amber-600">{t("forecast.source.orgAvg")}</span>;
+    return <span className="text-[10px] font-semibold text-warning">{t("forecast.source.orgAvg")}</span>;
   }
   return <span className="text-[10px] font-semibold text-muted-foreground">{t("forecast.source.noData")}</span>;
 }
@@ -157,8 +157,8 @@ export function RevenueForecastCard() {
                             variant="outline"
                             className={
                               urgent
-                                ? "bg-rose-500/10 text-rose-600 border-rose-500/30"
-                                : "bg-amber-500/10 text-amber-600 border-amber-500/30"
+                                ? "bg-destructive/10 text-destructive border-destructive/30"
+                                : "bg-warning/10 text-warning border-warning/30"
                             }
                           >
                             {t("forecast.expiringIn").replace("{days}", String(item.daysUntilExpiration))}

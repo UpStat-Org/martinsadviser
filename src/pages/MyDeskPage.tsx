@@ -61,9 +61,9 @@ interface ActionItem {
 }
 
 const severityStyles: Record<ActionSeverity, string> = {
-  critical: "bg-red-500/10 text-red-600 border-red-500/20",
+  critical: "bg-destructive/10 text-destructive border-destructive/20",
   high: "bg-orange-500/10 text-orange-600 border-orange-500/20",
-  medium: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+  medium: "bg-warning/10 text-warning border-warning/20",
   low: "bg-sky-500/10 text-sky-600 border-sky-500/20",
 };
 
@@ -347,7 +347,7 @@ export default function MyDeskPage() {
                   <c.icon className="w-5 h-5 text-foreground" />
                 </div>
                 {isZero ? (
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500/70" />
+                  <CheckCircle2 className="w-5 h-5 text-success/70" />
                 ) : (
                   <Flame className="w-5 h-5 text-orange-500 animate-pulse" />
                 )}
@@ -396,7 +396,7 @@ export default function MyDeskPage() {
                 <button
                   key={filter.key}
                   onClick={() => setActiveKind(filter.key as ActionKind)}
-                  className={`h-8 px-3 rounded-lg text-xs font-semibold transition-colors ${
+                  className={`h-8 px-3 rounded-md text-xs font-semibold transition-colors ${
                     activeKind === filter.key
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -411,8 +411,8 @@ export default function MyDeskPage() {
         <CardContent>
           {!filteredActions.length ? (
             <div className="text-center py-10">
-              <div className="w-14 h-14 mx-auto rounded-md bg-emerald-500/10 flex items-center justify-center mb-3">
-                <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+              <div className="w-14 h-14 mx-auto rounded-md bg-success/10 flex items-center justify-center mb-3">
+                <CheckCircle2 className="w-6 h-6 text-success" />
               </div>
               <p className="text-sm font-semibold">{t("mydesk.noActions")}</p>
               <p className="text-xs text-muted-foreground mt-1">{t("mydesk.noActionsDesc")}</p>
@@ -442,7 +442,7 @@ export default function MyDeskPage() {
                       {item.actionLabel && item.onAction && (
                         <button
                           onClick={item.onAction}
-                          className="h-8 px-2.5 rounded-lg bg-muted hover:bg-muted/80 text-xs font-semibold inline-flex items-center gap-1.5"
+                          className="h-8 px-2.5 rounded-md bg-muted hover:bg-muted/80 text-xs font-semibold inline-flex items-center gap-1.5"
                         >
                           {item.kind === "messages" ? <RotateCcw className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
                           {item.actionLabel}
@@ -450,7 +450,7 @@ export default function MyDeskPage() {
                       )}
                       <button
                         onClick={() => navigate(item.route)}
-                        className="h-8 px-2.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold"
+                        className="h-8 px-2.5 rounded-md bg-primary text-primary-foreground text-xs font-semibold"
                       >
                         {t("common.open")}
                       </button>
@@ -500,8 +500,8 @@ export default function MyDeskPage() {
               </div>
             ) : !permits?.length ? (
               <div className="text-center py-10">
-                <div className="w-14 h-14 mx-auto rounded-md bg-emerald-500/10 flex items-center justify-center mb-3">
-                  <Target className="w-6 h-6 text-emerald-500" />
+                <div className="w-14 h-14 mx-auto rounded-md bg-success/10 flex items-center justify-center mb-3">
+                  <Target className="w-6 h-6 text-success" />
                 </div>
                 <p className="text-sm font-semibold text-foreground mb-1">
                   {t("myDesk.nothingHere")}
@@ -525,12 +525,12 @@ export default function MyDeskPage() {
                         <div
                           className={`w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 ${
                             overdue
-                              ? "bg-secondary text-secondary-foreground border border-border border border-red-500/20"
-                              : "bg-secondary text-secondary-foreground border border-border border border-emerald-500/20"
+                              ? "bg-secondary text-secondary-foreground border border-border border border-destructive/20"
+                              : "bg-secondary text-secondary-foreground border border-border border border-success/20"
                           }`}
                         >
                           <FileCheck
-                            className={`w-4 h-4 ${overdue ? "text-red-500" : "text-emerald-500"}`}
+                            className={`w-4 h-4 ${overdue ? "text-destructive" : "text-success"}`}
                           />
                         </div>
                         <div className="min-w-0">
@@ -623,12 +623,12 @@ export default function MyDeskPage() {
                         <div
                           className={`w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 ${
                             overdue
-                              ? "bg-secondary text-secondary-foreground border border-border border border-red-500/20"
+                              ? "bg-secondary text-secondary-foreground border border-border border border-destructive/20"
                               : "bg-secondary text-secondary-foreground border border-border border border-indigo-500/20"
                           }`}
                         >
                           {overdue ? (
-                            <AlertTriangle className="w-4 h-4 text-red-500" />
+                            <AlertTriangle className="w-4 h-4 text-destructive" />
                           ) : (
                             <ClipboardList className="w-4 h-4 text-indigo-500" />
                           )}
@@ -647,7 +647,7 @@ export default function MyDeskPage() {
                                 <span
                                   className={
                                     overdue
-                                      ? "text-red-500 font-semibold"
+                                      ? "text-destructive font-semibold"
                                       : "text-muted-foreground"
                                   }
                                 >

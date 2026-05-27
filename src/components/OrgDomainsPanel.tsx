@@ -37,7 +37,7 @@ const DOMAIN_REGEX = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0
 
 function statusBadge(status: OrgDomain["status"], t: (key: string) => string) {
   if (status === "active") {
-    return <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">{t("orgDomains.statusActive")}</Badge>;
+    return <Badge className="bg-success text-white hover:bg-success">{t("orgDomains.statusActive")}</Badge>;
   }
   if (status === "disabled") {
     return <Badge variant="secondary">{t("orgDomains.statusDisabled")}</Badge>;
@@ -217,9 +217,9 @@ export function OrgDomainsPanel() {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     {domain.status === "active" ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
                     ) : (
-                      <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <AlertCircle className="w-4 h-4 text-warning shrink-0" />
                     )}
                     <span className="font-mono text-sm font-semibold truncate">{domain.domain}</span>
                   </div>

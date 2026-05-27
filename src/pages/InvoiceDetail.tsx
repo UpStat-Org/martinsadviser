@@ -22,9 +22,9 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  paid: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-  overdue: "bg-red-500/10 text-red-600 border-red-500/20",
+  pending: "bg-warning/10 text-warning border-warning/20",
+  paid: "bg-success/10 text-success border-success/20",
+  overdue: "bg-destructive/10 text-destructive border-destructive/20",
   cancelled: "bg-muted text-muted-foreground border-border",
 };
 
@@ -282,9 +282,9 @@ function StatusTile({
   tone: "emerald" | "amber" | "red" | "muted";
 }) {
   const toneClass = {
-    emerald: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-    amber: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-    red: "bg-red-500/10 text-red-600 border-red-500/20",
+    emerald: "bg-success/10 text-success border-success/20",
+    amber: "bg-warning/10 text-warning border-warning/20",
+    red: "bg-destructive/10 text-destructive border-destructive/20",
     muted: "bg-muted text-muted-foreground border-border",
   }[tone];
   return (

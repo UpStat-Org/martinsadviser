@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { ArrowLeft, Building2, Calendar, FileCheck, Hash, Pencil, Plus, Receipt, Truck as TruckIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,12 +11,17 @@ import { usePermits } from "@/hooks/usePermits";
 import { useInvoices } from "@/hooks/useInvoices";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import { CommentsSection } from "@/components/CommentsSection";
-import { TruckFormDialog } from "@/components/TruckFormDialog";
-import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { MaintenancePanel } from "@/components/MaintenancePanel";
+
+const TruckFormDialog = lazy(() =>
+  import("@/components/TruckFormDialog").then((m) => ({ default: m.TruckFormDialog })),
+);
+const PermitFormDialog = lazy(() =>
+  import("@/components/PermitFormDialog").then((m) => ({ default: m.PermitFormDialog })),
+);
 
 export default function TruckDetail() {
   const { id } = useParams();
@@ -186,13 +191,19 @@ export default function TruckDetail() {
 
       <CommentsSection entityType="truck" entityId={truck.id} />
 
-      <TruckFormDialog open={editOpen} onOpenChange={setEditOpen} truck={truck} />
-      <PermitFormDialog
-        open={permitOpen}
-        onOpenChange={setPermitOpen}
-        defaultClientId={truck.client_id}
-        defaultTruckId={truck.id}
-      />
+      <Suspense fallback={null}>
+        {editOpen && (
+          <TruckFormDialog open={editOpen} onOpenChange={setEditOpen} truck={truck} />
+        )}
+        {permitOpen && (
+          <PermitFormDialog
+            open={permitOpen}
+            onOpenChange={setPermitOpen}
+            defaultClientId={truck.client_id}
+            defaultTruckId={truck.id}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
@@ -207,9 +218,9 @@ function StatusTile({
   tone: "emerald" | "amber" | "red" | "muted";
 }) {
   const toneClass = {
-    emerald: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-    amber: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-    red: "bg-red-500/10 text-red-600 border-red-500/20",
+    emerald: "bg-success/10 text-success border-success/20",
+    amber: "bg-warning/10 text-warning border-warning/20",
+    red: "bg-destructive/10 text-destructive border-destructive/20",
     muted: "bg-muted text-muted-foreground border-border",
   }[tone];
   return (

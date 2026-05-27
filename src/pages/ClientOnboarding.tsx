@@ -374,7 +374,7 @@ export default function ClientOnboarding() {
           <div className="relative text-center">
             <button
               onClick={() => navigate("/clients")}
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-card border border-border text-foreground text-xs font-semibold hover:bg-white/15 transition-all mb-6"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-card border border-border text-foreground text-xs font-semibold hover:bg-white/15 transition-all mb-6"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               {t("common.back")}
@@ -445,7 +445,7 @@ export default function ClientOnboarding() {
         <div className="relative">
           <button
             onClick={() => navigate("/clients")}
-            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-card border border-border text-foreground text-xs font-semibold hover:bg-white/15 transition-all mb-5"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-card border border-border text-foreground text-xs font-semibold hover:bg-white/15 transition-all mb-5"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             {t("common.back")}
@@ -663,7 +663,7 @@ export default function ClientOnboarding() {
               {/* DOT lookup highlight card */}
               <div className="rounded-md bg-secondary text-secondary-foreground border border-border border border-primary/15 p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
                     <Sparkles className="w-3.5 h-3.5 text-secondary-foreground" />
                   </div>
                   <div>
@@ -856,7 +856,7 @@ export default function ClientOnboarding() {
                     </div>
                     <button
                       onClick={() => removeTruck(i)}
-                      className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-md hover:bg-destructive/10 flex items-center justify-center transition-colors"
                     >
                       <X className="w-4 h-4 text-destructive" />
                     </button>
@@ -951,7 +951,7 @@ export default function ClientOnboarding() {
                     </div>
                     <button
                       onClick={() => removePermit(i)}
-                      className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-md hover:bg-destructive/10 flex items-center justify-center transition-colors"
                     >
                       <X className="w-4 h-4 text-destructive" />
                     </button>
@@ -1124,7 +1124,7 @@ export default function ClientOnboarding() {
                         .map((s) => (
                           <span
                             key={s.key}
-                            className={`inline-flex items-center h-7 px-3 rounded-lg text-xs font-semibold bg-secondary text-secondary-foreground border border-border text-foreground shadow-sm`}
+                            className={`inline-flex items-center h-7 px-3 rounded-md text-xs font-semibold bg-secondary text-secondary-foreground border border-border text-foreground shadow-sm`}
                           >
                             {s.label}
                           </span>

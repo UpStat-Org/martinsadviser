@@ -44,6 +44,8 @@ import { PermitCoverageMap } from "@/components/PermitCoverageMap";
 import { RevenueForecastCard } from "@/components/RevenueForecastCard";
 import { PortfolioRiskCard } from "@/components/PortfolioRiskCard";
 import { PageHeader, SectionHeader } from "@/components/PageHeader";
+import { KpiCard } from "@/components/KpiCard";
+import { Sparkline } from "@/components/Sparkline";
 import { cn } from "@/lib/utils";
 
 const dateLocales = { pt, en: enUS, es };
@@ -54,56 +56,6 @@ const TOOLTIP_STYLE = {
   background: "hsl(var(--popover))",
   fontSize: 12,
 };
-
-// KPI card — flat, monochrome, one accent line on top for the urgent variant.
-function KpiCard({
-  label,
-  value,
-  loading,
-  hint,
-  onClick,
-  icon: Icon,
-  tone = "neutral",
-}: {
-  label: string;
-  value: number | string;
-  loading?: boolean;
-  hint?: string;
-  onClick?: () => void;
-  icon: typeof Users;
-  tone?: "neutral" | "warning" | "danger";
-}) {
-  // Tone bar overlays the left edge as an absolute element so neutral cards
-  // keep a clean uniform 1px border on all four sides. Previously the
-  // pattern was `border-l-2 border-l-transparent` which removed the left
-  // border on neutral cards and made them look unfinished next to the
-  // colored ones.
-  const toneBar =
-    tone === "danger" ? "bg-destructive" : tone === "warning" ? "bg-warning" : null;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="relative group text-left rounded-md border border-border bg-card hover:bg-muted/60 transition-colors p-3.5 overflow-hidden"
-    >
-      {toneBar && (
-        <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1", toneBar)} />
-      )}
-      <div className="flex items-start justify-between gap-2">
-        <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-          {label}
-        </div>
-        <Icon className="w-4 h-4 text-muted-foreground/70 group-hover:text-foreground transition-colors" />
-      </div>
-      {loading ? (
-        <Skeleton className="h-7 w-16 mt-2" />
-      ) : (
-        <div className="text-2xl font-semibold tracking-tight tabular mt-1.5">{value}</div>
-      )}
-      {hint && <div className="text-[11px] text-muted-foreground mt-1">{hint}</div>}
-    </button>
-  );
-}
 
 export default function Dashboard() {
   const { data: clients, isLoading: loadingClients } = useClients();
@@ -264,7 +216,7 @@ export default function Dashboard() {
       />
 
       {/* KPI strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2.5">
         <KpiCard
           label={t("dashboard.clients")}
           value={clients?.length ?? 0}
@@ -394,29 +346,15 @@ export default function Dashboard() {
               {revenueDelta >= 0 ? "+" : ""}
               {revenueDelta.toFixed(1)}% vs {t("common.previousMonth")}
             </div>
-            <div className="mt-4">
-              <ResponsiveContainer width="100%" height={110}>
-                <AreaChart data={revenueTrend} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                  <defs>
-                    <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.22} />
-                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <Tooltip
-                    contentStyle={TOOLTIP_STYLE}
-                    formatter={(v: number) => [`$${v.toFixed(2)}`, t("dashboard.revenue")]}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                    fill="url(#revenueGrad)"
-                    dot={false}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+            <div className="mt-4 h-[110px]">
+              <Sparkline
+                data={revenueTrend}
+                value={(p) => p.revenue}
+                tooltip={(p) => `${p.month}: $${p.revenue.toFixed(2)}`}
+                color="hsl(var(--primary))"
+                strokeWidth={2}
+                aria-label={t("dashboard.revenue")}
+              />
             </div>
           </CardContent>
         </Card>

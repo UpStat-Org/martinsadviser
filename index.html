@@ -3,13 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
     <title>Martins Adviser | Dashboard</title>
     <meta name="description" content="Sistema de gerenciamento de clientes, permits e frota para transportadoras">
     <meta name="author" content="MartinsAdviser" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
+    <!-- Preconnect to Google Fonts so the Inter request fires in parallel
+         with the JS bundle download — saves ~150ms on a cold load. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/201c9bed-5a55-461b-a18a-488c8762dcad/id-preview-fcae563c--f9c24426-5361-4a44-ac6f-cd7dc76ef821.lovable.app-1773003216712.png">
@@ -18,10 +21,79 @@
     <meta name="twitter:site" content="@Lovable" />
     <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/201c9bed-5a55-461b-a18a-488c8762dcad/id-preview-fcae563c--f9c24426-5361-4a44-ac6f-cd7dc76ef821.lovable.app-1773003216712.png">
     <meta property="og:title" content="Martins Adviser | Dashboard">
-  <meta name="twitter:title" content="Martins Adviser | Dashboard">
-  <meta property="og:description" content="Sistema de gerenciamento de clientes, permits e frota para transportadoras">
-  <meta name="twitter:description" content="Sistema de gerenciamento de clientes, permits e frota para transportadoras">
-</head>
+    <meta name="twitter:title" content="Martins Adviser | Dashboard">
+    <meta property="og:description" content="Sistema de gerenciamento de clientes, permits e frota para transportadoras">
+    <meta name="twitter:description" content="Sistema de gerenciamento de clientes, permits e frota para transportadoras">
+
+    <!-- ============ CRITICAL INLINE CSS ============
+         Painted before any external stylesheet downloads. Three goals:
+         1. Match the app background so there is no white flash before the
+            real CSS arrives (and no flash again when the React tree mounts).
+         2. Respect light/dark via prefers-color-scheme — we also set the
+            theme class from localStorage in the bootstrap script below so a
+            returning dark-mode user does not see a light flash.
+         3. Show an immediate spinner inside #root so users see motion in the
+            first ~50 ms instead of a blank screen. React replaces the spinner
+            when it hydrates.
+    -->
+    <style>
+      :root {
+        color-scheme: light dark;
+        --boot-bg: #fcfcfd;
+        --boot-fg: #1a1f2e;
+        --boot-muted: #6b7280;
+        --boot-ring: #2c40bf;
+      }
+      html.dark {
+        --boot-bg: #10131a;
+        --boot-fg: #ebeef5;
+        --boot-muted: #9aa3b8;
+        --boot-ring: #5b6fe6;
+      }
+      html, body {
+        margin: 0;
+        background: var(--boot-bg);
+        color: var(--boot-fg);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      #root:empty {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+      }
+      #root:empty::before {
+        content: "";
+        width: 36px;
+        height: 36px;
+        border-radius: 9999px;
+        border: 2.5px solid color-mix(in srgb, var(--boot-muted) 25%, transparent);
+        border-top-color: var(--boot-ring);
+        animation: boot-spin 0.7s linear infinite;
+      }
+      @keyframes boot-spin {
+        to { transform: rotate(360deg); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #root:empty::before { animation: none; }
+      }
+    </style>
+
+    <!-- Apply the saved theme class before paint so dark-mode users never see
+         a light flash. Matches the storageKey used by next-themes
+         (`martins-theme` — see ThemeProvider in App.tsx). -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("martins-theme");
+          if (t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches)) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) { /* SSR-safe fallback */ }
+      })();
+    </script>
+  </head>
 
   <body>
     <div id="root"></div>

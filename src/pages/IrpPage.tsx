@@ -25,7 +25,7 @@ const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" 
 const STATUS_BADGE: Record<IrpRegistration["status"], string> = {
   draft: "bg-muted text-muted-foreground border-border",
   filed: "bg-sky-500/10 text-sky-600 border-sky-500/30",
-  paid: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+  paid: "bg-success/10 text-success border-success/30",
 };
 
 const availableYears = (() => {

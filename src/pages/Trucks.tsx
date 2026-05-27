@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -26,7 +27,6 @@ import {
   Search,
   Pencil,
   Trash2,
-  Loader2,
   Truck as TruckIcon,
   CheckCircle2,
   XCircle,
@@ -41,8 +41,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/EmptyState";
+import { StatusBadge } from "@/components/StatusBadge";
 import { TablePreferencesToolbar, type Density } from "@/components/TablePreferencesToolbar";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { cn } from "@/lib/utils";
 
 const PLATE_GRADIENTS = [
   "from-indigo-500 to-violet-500",
@@ -173,12 +175,16 @@ export default function Trucks() {
 
       {/* ============ TABLE ============ */}
       {isLoading ? (
-        <div className="flex justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </div>
+        <Card className="overflow-hidden border-border/50">
+          <CardContent className="p-3 space-y-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-11 w-full" />
+            ))}
+          </CardContent>
+        </Card>
       ) : !trucks?.length ? (
         <EmptyState
-          icon={<TruckIcon className="w-9 h-9 text-indigo-500" />}
+          icon={<TruckIcon className="w-9 h-9 text-primary" />}
           title={search ? t("trucks.noResults") : t("trucks.empty")}
           description={
             search
@@ -304,33 +310,30 @@ export default function Trucks() {
                         )}
                       </TableCell>}
                       {columns.status !== false && <TableCell>
-                        <span
-                          className={`inline-flex items-center gap-1.5 h-6 min-w-[82px] justify-center whitespace-nowrap px-2.5 rounded-md text-xs font-semibold border ${
-                            active
-                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                              : "bg-muted text-muted-foreground border-border"
-                          }`}
-                        >
+                        <StatusBadge tone={active ? "success" : "neutral"}>
                           <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              active ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/50"
-                            }`}
+                            className={cn(
+                              "w-1.5 h-1.5 rounded-full",
+                              active ? "bg-success animate-pulse" : "bg-muted-foreground/50",
+                            )}
                           />
                           {active ? t("common.active") : t("common.inactive")}
-                        </span>
+                        </StatusBadge>
                       </TableCell>}
                       <TableCell>
                         <div className="flex items-center justify-center gap-1.5">
                           <Link
                             to={`/trucks/${truck.id}`}
-                            className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                            aria-label={t("common.openTruck")}
+                            className="w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                             title={t("common.openTruck")}
                           >
                             <Eye className="w-3.5 h-3.5 text-muted-foreground" />
                           </Link>
                           <button
                             onClick={() => handleEdit(truck)}
-                            className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                            aria-label={t("common.edit")}
+                            className="w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                             title={t("common.edit")}
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -338,7 +341,8 @@ export default function Trucks() {
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <button
-                                className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors"
+                                aria-label={t("common.delete")}
+                                className="w-8 h-8 rounded-md hover:bg-destructive/10 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-1"
                                 title={t("common.delete")}
                               >
                                 <Trash2 className="w-3.5 h-3.5 text-destructive" />

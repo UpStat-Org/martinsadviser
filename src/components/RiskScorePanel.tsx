@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AreaChart, Area, ResponsiveContainer, YAxis, Tooltip } from "recharts";
+import { Sparkline } from "@/components/Sparkline";
 import { ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useClientRiskScore, useClientRiskHistory } from "@/hooks/useRiskScores";
@@ -73,17 +73,14 @@ export function RiskScorePanel({ clientId }: { clientId: string }) {
           </div>
           {history && history.length > 1 && (
             <div className="w-24 h-12 shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={history} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
-                  <YAxis domain={[0, 100]} hide />
-                  <Tooltip
-                    formatter={(v: number) => [`${v}/100`, t("risk.scoreLabel")]}
-                    labelFormatter={(_, p) => (p?.[0]?.payload?.scored_date ?? "")}
-                    contentStyle={{ borderRadius: "8px", fontSize: "11px" }}
-                  />
-                  <Area type="monotone" dataKey="score" stroke="hsl(var(--destructive))" fill="hsl(var(--destructive))" fillOpacity={0.15} strokeWidth={1.5} />
-                </AreaChart>
-              </ResponsiveContainer>
+              <Sparkline
+                data={history}
+                value={(p) => p.score}
+                tooltip={(p) => `${p.scored_date}: ${p.score}/100`}
+                color="hsl(var(--destructive))"
+                domain={[0, 100]}
+                aria-label={t("risk.scoreLabel")}
+              />
             </div>
           )}
         </div>

@@ -135,8 +135,8 @@ export function NotificationCenter() {
             </div>
           ) : !notifications?.length ? (
             <div className="p-10 text-center">
-              <div className="w-16 h-16 mx-auto rounded-md bg-secondary text-secondary-foreground border border-border border border-emerald-500/20 flex items-center justify-center mb-4">
-                <Sparkles className="h-7 w-7 text-emerald-500" />
+              <div className="w-16 h-16 mx-auto rounded-md bg-secondary text-secondary-foreground border border-border border border-success/20 flex items-center justify-center mb-4">
+                <Sparkles className="h-7 w-7 text-success" />
               </div>
               <p className="text-sm font-semibold text-foreground mb-1">{t("notifications.emptyTitle")}</p>
               <p className="text-xs text-muted-foreground max-w-[240px] mx-auto">

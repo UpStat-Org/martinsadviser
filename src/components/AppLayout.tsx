@@ -1,12 +1,19 @@
+import { lazy, Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationCenter } from "./NotificationCenter";
-import { CommandPalette } from "./CommandPalette";
 import { SubscriptionBlockedScreen, isSubscriptionBlocked } from "./SubscriptionGate";
 import { SubscriptionBanner } from "./SubscriptionBanner";
 import { useOrg } from "@/contexts/OrgContext";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
+
+// Command palette is keyboard-triggered (Cmd+K) and renders nothing visible
+// until then. Lazy-loading it (and its `cmdk` dependency) keeps the layout
+// shell light on first paint.
+const CommandPalette = lazy(() =>
+  import("./CommandPalette").then((m) => ({ default: m.CommandPalette })),
+);
 
 export function AppLayout() {
   const { currentOrg, loading: orgLoading } = useOrg();
@@ -28,7 +35,9 @@ export function AppLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <CommandPalette />
+      <Suspense fallback={null}>
+        <CommandPalette />
+      </Suspense>
       <AppSidebar />
       <main className="flex-1 overflow-auto">
         <SubscriptionBanner />

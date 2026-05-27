@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { ArrowLeft, Building2, CalendarDays, FileCheck, FileText, Hash, History, Pencil, Receipt, Truck } from "lucide-react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,12 +11,17 @@ import { usePermitDocuments } from "@/hooks/usePermitDocuments";
 import { usePermitHistory } from "@/hooks/usePermitHistory";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import { CommentsSection } from "@/components/CommentsSection";
-import { PermitFormDialog } from "@/components/PermitFormDialog";
-import { DocumentViewer } from "@/components/DocumentViewer";
 import { DocumentLink } from "@/components/DocumentLink";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+
+const PermitFormDialog = lazy(() =>
+  import("@/components/PermitFormDialog").then((m) => ({ default: m.PermitFormDialog })),
+);
+const DocumentViewer = lazy(() =>
+  import("@/components/DocumentViewer").then((m) => ({ default: m.DocumentViewer })),
+);
 
 export default function PermitDetail() {
   const { id } = useParams();
@@ -210,16 +215,20 @@ export default function PermitDetail() {
 
       <CommentsSection entityType="permit" entityId={permit.id} />
 
-      <PermitFormDialog open={editOpen} onOpenChange={setEditOpen} permit={permit} />
-      {documentUrl && (
-        <DocumentViewer
-          open={docOpen}
-          onOpenChange={setDocOpen}
-          url={documentUrl}
-          title={`${permit.permit_type} ${permit.permit_number || ""}`}
-          versions={documents}
-        />
-      )}
+      <Suspense fallback={null}>
+        {editOpen && (
+          <PermitFormDialog open={editOpen} onOpenChange={setEditOpen} permit={permit} />
+        )}
+        {documentUrl && docOpen && (
+          <DocumentViewer
+            open={docOpen}
+            onOpenChange={setDocOpen}
+            url={documentUrl}
+            title={`${permit.permit_type} ${permit.permit_number || ""}`}
+            versions={documents}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
@@ -234,9 +243,9 @@ function StatusTile({
   tone: "emerald" | "amber" | "red" | "muted";
 }) {
   const toneClass = {
-    emerald: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-    amber: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-    red: "bg-red-500/10 text-red-600 border-red-500/20",
+    emerald: "bg-success/10 text-success border-success/20",
+    amber: "bg-warning/10 text-warning border-warning/20",
+    red: "bg-destructive/10 text-destructive border-destructive/20",
     muted: "bg-muted text-muted-foreground border-border",
   }[tone];
   return (

@@ -141,7 +141,7 @@ export default function InviteAccept() {
                 </div>
               ) : userEmail !== peek.data.email.toLowerCase() ? (
                 <div className="space-y-2">
-                  <div className="text-xs text-amber-600 dark:text-amber-400 flex items-start gap-2 text-left p-3 rounded-md bg-amber-500/5 border border-amber-500/20">
+                  <div className="text-xs text-warning flex items-start gap-2 text-left p-3 rounded-md bg-warning/5 border border-warning/20">
                     <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>
                       Você está logado como <strong>{userEmail}</strong>. Este convite foi enviado pra <strong>{peek.data.email}</strong>.

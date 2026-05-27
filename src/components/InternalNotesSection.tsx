@@ -24,10 +24,10 @@ export function InternalNotesSection({ clientId }: { clientId: string }) {
   };
 
   return (
-    <Card className="border-amber-500/30 bg-amber-50/40 dark:bg-amber-950/10">
+    <Card className="border-warning/30 bg-warning/5">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <Lock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+          <Lock className="w-4 h-4 text-warning" />
           {t("notes.internal.title")}
           <span className="text-xs font-normal text-muted-foreground">
             {t("notes.internal.private")}
@@ -64,7 +64,7 @@ export function InternalNotesSection({ clientId }: { clientId: string }) {
         ) : (
           <div className="space-y-3">
             {notes.map((n) => (
-              <div key={n.id} className={`flex gap-3 group p-3 rounded-lg ${n.pinned ? "bg-amber-100/60 dark:bg-amber-950/30 border border-amber-300/40" : "bg-background/60"}`}>
+              <div key={n.id} className={`flex gap-3 group p-3 rounded-lg ${n.pinned ? "bg-warning/10 border border-warning/30" : "bg-background/60"}`}>
                 <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
                   <User className="w-4 h-4 text-muted-foreground" />
                 </div>
@@ -74,7 +74,7 @@ export function InternalNotesSection({ clientId }: { clientId: string }) {
                     <span className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: pt })}
                     </span>
-                    {n.pinned && <Pin className="w-3 h-3 text-amber-600" />}
+                    {n.pinned && <Pin className="w-3 h-3 text-warning" />}
                   </div>
                   <p className="text-sm mt-0.5 whitespace-pre-wrap">{n.body}</p>
                 </div>

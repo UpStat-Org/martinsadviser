@@ -356,7 +356,7 @@ export default function WorkloadPage() {
                             {r.name}
                           </span>
                           {overloaded && (
-                            <span className="inline-flex items-center gap-1 h-5 px-1.5 rounded text-[10px] font-bold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                            <span className="inline-flex items-center gap-1 h-5 px-1.5 rounded text-[10px] font-bold bg-destructive/10 text-destructive border border-destructive/20">
                               <Flame className="w-2.5 h-2.5" />
                               Sobrecarga
                             </span>
@@ -392,7 +392,7 @@ export default function WorkloadPage() {
                           <div
                             className={`text-xl font-bold tracking-tight ${
                               r.overdue > 0
-                                ? "text-red-500"
+                                ? "text-destructive"
                                 : "text-muted-foreground"
                             }`}
                           >
@@ -411,7 +411,7 @@ export default function WorkloadPage() {
                           </div>
                         </div>
                         <div className="text-center min-w-[60px]">
-                          <div className="text-xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400 inline-flex items-center gap-1">
+                          <div className="text-xl font-bold tracking-tight text-success inline-flex items-center gap-1">
                             <CheckCircle2 className="w-4 h-4" />
                             {r.completed}
                           </div>
@@ -443,7 +443,7 @@ export default function WorkloadPage() {
                       <div className="text-center">
                         <div
                           className={`text-sm font-bold ${
-                            r.overdue > 0 ? "text-red-500" : ""
+                            r.overdue > 0 ? "text-destructive" : ""
                           }`}
                         >
                           {r.overdue}
@@ -461,7 +461,7 @@ export default function WorkloadPage() {
                         </div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-bold text-emerald-600">
+                        <div className="text-sm font-bold text-success">
                           {r.completed}
                         </div>
                         <div className="text-[9px] text-muted-foreground uppercase">

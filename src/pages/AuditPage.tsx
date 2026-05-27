@@ -67,17 +67,17 @@ const ACTION_CONFIG: Record<
   created: {
     icon: Plus,
     gradient: "from-emerald-500 to-teal-500",
-    badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    badge: "bg-success/10 text-success border-success/20",
   },
   updated: {
     icon: Pencil,
     gradient: "from-amber-500 to-orange-500",
-    badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    badge: "bg-warning/10 text-warning border-warning/20",
   },
   deleted: {
     icon: Trash2,
     gradient: "from-red-500 to-rose-500",
-    badge: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+    badge: "bg-destructive/10 text-destructive border-destructive/20",
   },
 };
 
@@ -243,7 +243,7 @@ export default function AuditPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="inline-flex items-center h-7 px-2.5 rounded-lg bg-primary/10 text-primary border border-primary/15 text-xs font-bold">
+              <span className="inline-flex items-center h-7 px-2.5 rounded-md bg-primary/10 text-primary border border-primary/15 text-xs font-bold">
                 {filtered.length} {t("reports.results")}
               </span>
               {activeFilters > 0 && (
@@ -405,7 +405,7 @@ export default function AuditPage() {
                     <TableCell>
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div
-                          className={`w-8 h-8 rounded-lg bg-secondary text-secondary-foreground border border-border flex items-center justify-center text-foreground font-semibold text-[11px] shadow-sm flex-shrink-0`}
+                          className={`w-8 h-8 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center text-foreground font-semibold text-[11px] shadow-sm flex-shrink-0`}
                         >
                           {initials(userName)}
                         </div>

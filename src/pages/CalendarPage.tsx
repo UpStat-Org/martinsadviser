@@ -237,23 +237,23 @@ export default function CalendarPage() {
               }}
               modifiersClassNames={{
                 expired:
-                  "bg-red-500/15 text-red-600 dark:text-red-400 font-bold rounded-md",
+                  "bg-destructive/15 text-destructive font-bold rounded-md",
                 warning:
-                  "bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold rounded-md",
-                ok: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold rounded-md",
+                  "bg-warning/15 text-warning font-bold rounded-md",
+                ok: "bg-success/15 text-success font-bold rounded-md",
               }}
             />
             <div className="flex flex-wrap gap-3 text-xs pt-4 mt-4 border-t border-border/50 w-full justify-center">
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-md bg-red-500/20 border border-red-500/40" />
+                <span className="w-3 h-3 rounded-md bg-destructive/20 border border-destructive/40" />
                 <span className="font-medium">{t("calendar.expiredUrgent")}</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-md bg-amber-500/20 border border-amber-500/40" />
+                <span className="w-3 h-3 rounded-md bg-warning/20 border border-warning/40" />
                 <span className="font-medium">{t("calendar.days31_90")}</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-md bg-emerald-500/20 border border-emerald-500/40" />
+                <span className="w-3 h-3 rounded-md bg-success/20 border border-success/40" />
                 <span className="font-medium">{t("common.valid")}</span>
               </span>
             </div>
@@ -295,8 +295,8 @@ export default function CalendarPage() {
               </div>
             ) : selectedPermits.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-14 h-14 mx-auto rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">
-                  <CalendarCheck className="w-6 h-6 text-emerald-500" />
+                <div className="w-14 h-14 mx-auto rounded-md bg-success/10 border border-success/20 flex items-center justify-center mb-3">
+                  <CalendarCheck className="w-6 h-6 text-success" />
                 </div>
                 <p className="text-sm font-semibold text-foreground mb-1">
                   {t("calendar.dayFree")}
@@ -367,8 +367,8 @@ export default function CalendarPage() {
             <Skeleton className="h-40 w-full" />
           ) : heatmapMax === 0 ? (
             <div className="text-center py-12">
-              <div className="w-14 h-14 mx-auto rounded-md bg-emerald-500/10 flex items-center justify-center mb-3">
-                <CheckCircle className="w-6 h-6 text-emerald-500" />
+              <div className="w-14 h-14 mx-auto rounded-md bg-success/10 flex items-center justify-center mb-3">
+                <CheckCircle className="w-6 h-6 text-success" />
               </div>
               <p className="text-sm text-muted-foreground">
                 {t("calendar.heatmapEmpty")}
@@ -440,8 +440,8 @@ export default function CalendarPage() {
             </div>
           ) : upcomingPermits.length === 0 ? (
             <div className="text-center py-10">
-              <div className="w-14 h-14 mx-auto rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">
-                <CheckCircle className="w-6 h-6 text-emerald-500" />
+              <div className="w-14 h-14 mx-auto rounded-md bg-success/10 border border-success/20 flex items-center justify-center mb-3">
+                <CheckCircle className="w-6 h-6 text-success" />
               </div>
               <p className="text-sm font-semibold mb-1">{t("calendar.allClear")} 🎉</p>
               <p className="text-xs text-muted-foreground">

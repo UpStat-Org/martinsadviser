@@ -24,7 +24,7 @@ import {
 import { format } from "date-fns";
 
 const SEVERITY_BADGE: Record<HosSeverity, string> = {
-  minor: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+  minor: "bg-warning/10 text-warning border-warning/30",
   serious: "bg-orange-500/10 text-orange-600 border-orange-500/30",
   critical: "bg-destructive/10 text-destructive border-destructive/30",
 };

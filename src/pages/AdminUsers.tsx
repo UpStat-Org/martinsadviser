@@ -103,11 +103,11 @@ export default function AdminUsers() {
 
   const statusStyles: Record<string, string> = {
     pending:
-      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+      "bg-warning/10 text-warning border-warning/20",
     approved:
-      "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+      "bg-success/10 text-success border-success/20",
     rejected:
-      "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+      "bg-destructive/10 text-destructive border-destructive/20",
   };
   const statusLabel: Record<string, string> = {
     pending: t("common.pending"),
@@ -348,7 +348,7 @@ export default function AdminUsers() {
               <button
                 key={f.value}
                 onClick={() => setFilterStatus(f.value)}
-                className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all ${
+                className={`h-8 px-3 rounded-md text-xs font-semibold transition-all ${
                   active
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 text-foreground shadow-md"
                     : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -481,7 +481,7 @@ export default function AdminUsers() {
                               })
                             }
                             disabled={updateStatus.isPending}
-                            className="h-8 px-2.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold inline-flex items-center gap-1 transition-colors disabled:opacity-50"
+                            className="h-8 px-2.5 rounded-md bg-success/10 hover:bg-success/20 border border-success/20 text-success text-xs font-semibold inline-flex items-center gap-1 transition-colors disabled:opacity-50"
                           >
                             <Check className="w-3.5 h-3.5" />
                             {t("admin.approve")}
@@ -496,7 +496,7 @@ export default function AdminUsers() {
                               })
                             }
                             disabled={updateStatus.isPending}
-                            className="h-8 px-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold inline-flex items-center gap-1 transition-colors disabled:opacity-50"
+                            className="h-8 px-2.5 rounded-md bg-warning/10 hover:bg-warning/20 border border-warning/20 text-warning text-xs font-semibold inline-flex items-center gap-1 transition-colors disabled:opacity-50"
                           >
                             <X className="w-3.5 h-3.5" />
                             {t("admin.reject")}
@@ -505,7 +505,7 @@ export default function AdminUsers() {
                         <button
                           onClick={() => setDeleteUserId(profile.id)}
                           disabled={deleteUser.isPending}
-                          className="w-8 h-8 rounded-lg bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 flex items-center justify-center transition-colors disabled:opacity-50"
+                          className="w-8 h-8 rounded-md bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 flex items-center justify-center transition-colors disabled:opacity-50"
                         >
                           <Trash2 className="w-3.5 h-3.5 text-destructive" />
                         </button>

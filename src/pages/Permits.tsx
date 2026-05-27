@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -23,22 +23,18 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Plus,
-  Search,
   Pencil,
   Trash2,
-  Loader2,
   FileText,
   FileCheck,
   RefreshCw,
   History,
   Upload,
-  Filter,
   ShieldCheck,
   AlertTriangle,
   Clock,
   CheckCircle2,
   Eye,
-  X,
 } from "lucide-react";
 import { usePermits, useDeletePermit, getExpirationStatus } from "@/hooks/usePermits";
 import { PermitFormDialog } from "@/components/PermitFormDialog";
@@ -60,6 +56,15 @@ import { TablePreferencesToolbar, type Density } from "@/components/TablePrefere
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import { KpiCard } from "@/components/KpiCard";
+import { StatusBadge } from "@/components/StatusBadge";
+import {
+  FilterBar,
+  FilterChip,
+  FilterChipGroup,
+  FilterClearChip,
+  FilterDivider,
+} from "@/components/FilterBar";
 import { cn } from "@/lib/utils";
 
 const defaultPermitColumns = {
@@ -238,75 +243,24 @@ export default function Permits() {
       />
 
       {/* KPI strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-        {kpis.map((s) => {
-          const toneBar =
-            s.tone === "danger" ? "bg-destructive" : s.tone === "warning" ? "bg-warning" : null;
-          return (
-            <div
-              key={s.label}
-              className="relative rounded-md border border-border bg-card p-3.5 transition-colors hover:bg-muted/60 overflow-hidden"
-            >
-              {toneBar && (
-                <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1", toneBar)} />
-              )}
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  {s.label}
-                </span>
-                <s.icon className="w-4 h-4 text-muted-foreground/70" />
-              </div>
-              <div className="text-2xl font-semibold tracking-tight tabular mt-1.5">{s.value}</div>
-            </div>
-          );
-        })}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+        {kpis.map((s) => (
+          <KpiCard
+            key={s.label}
+            label={s.label}
+            value={s.value}
+            icon={s.icon}
+            tone={s.tone}
+          />
+        ))}
       </div>
 
       {/* ============ FILTERS ============ */}
-      <div className="rounded-md bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder={t("permits.search")}
-            className="pl-10 h-10 bg-muted/40 border-border/60 focus:bg-background rounded-md transition-colors"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="hidden sm:block h-8 w-px bg-border/60" />
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground mr-1">
-            <Filter className="w-3.5 h-3.5" />
-            {t("clients.status")}:
-          </div>
-          {statusFilters.map((f) => {
-            const active = statusFilter === f.value;
-            return (
-              <button
-                key={f.value}
-                onClick={() => setStatusFilter(f.value)}
-                className={`h-8 px-3 rounded-lg text-xs font-semibold transition-all inline-flex items-center gap-1.5 ${
-                  active
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90 text-white shadow-md"
-                    : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                <f.icon className="w-3.5 h-3.5" />
-                {f.label}
-              </button>
-            );
-            })}
-          {truckFilter && (
-            <button
-              onClick={() => setSearchParams({})}
-              className="h-8 px-2.5 rounded-lg text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex items-center gap-1"
-            >
-              <X className="w-3 h-3" />
-              {t("common.truck")}
-            </button>
-          )}
-        </div>
-        <div className="sm:ml-auto">
+      <FilterBar
+        searchValue={search}
+        onSearchChange={setSearch}
+        searchPlaceholder={t("permits.search")}
+        trailing={
           <TablePreferencesToolbar
             density={density}
             onDensityChange={setDensity}
@@ -322,8 +276,27 @@ export default function Permits() {
               { key: "doc", label: t("common.doc") },
             ]}
           />
-        </div>
-      </div>
+        }
+      >
+        <FilterDivider />
+        <FilterChipGroup label={`${t("clients.status")}:`}>
+          {statusFilters.map((f) => (
+            <FilterChip
+              key={f.value}
+              active={statusFilter === f.value}
+              onClick={() => setStatusFilter(f.value)}
+              icon={<f.icon className="w-3.5 h-3.5" />}
+            >
+              {f.label}
+            </FilterChip>
+          ))}
+          {truckFilter && (
+            <FilterClearChip onClick={() => setSearchParams({})}>
+              {t("common.truck")}
+            </FilterClearChip>
+          )}
+        </FilterChipGroup>
+      </FilterBar>
 
       <SavedFiltersBar
         page="permits"
@@ -336,12 +309,16 @@ export default function Permits() {
 
       {/* ============ TABLE ============ */}
       {isLoading ? (
-        <div className="flex justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </div>
+        <Card className="overflow-hidden border-border/50">
+          <CardContent className="p-3 space-y-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-11 w-full" />
+            ))}
+          </CardContent>
+        </Card>
       ) : !visiblePermits.length ? (
         <EmptyState
-          icon={<FileCheck className="w-9 h-9 text-emerald-500" />}
+          icon={<FileCheck className="w-9 h-9 text-success" />}
           title={search || truckFilter ? t("permits.noResults") : t("permits.empty")}
           description={
             search || truckFilter
@@ -350,35 +327,30 @@ export default function Permits() {
           }
           action={
             !search && !truckFilter ? (
-              <button
-                onClick={handleNew}
-                className="h-11 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-white text-sm font-semibold inline-flex items-center gap-2 transition-all"
-              >
-                <Plus className="w-4 h-4" />
+              <Button size="lg" onClick={handleNew}>
+                <Plus className="w-4 h-4 mr-2" />
                 {t("permits.registerFirst")}
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
+                size="lg"
+                variant="secondary"
                 onClick={() => {
                   setSearch("");
                   setStatusFilter("all");
                   setSearchParams({});
                 }}
-                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold"
               >
                 {t("common.clearFilters")}
-              </button>
+              </Button>
             )
           }
           secondaryAction={
             !search && !truckFilter ? (
-              <button
-                onClick={() => setImportOpen(true)}
-                className="h-11 px-5 rounded-md bg-muted hover:bg-muted/80 text-sm font-semibold inline-flex items-center gap-2"
-              >
-                <Upload className="w-4 h-4" />
+              <Button size="lg" variant="secondary" onClick={() => setImportOpen(true)}>
+                <Upload className="w-4 h-4 mr-2" />
                 {t("common.import")}
-              </button>
+              </Button>
             ) : undefined
           }
         />
@@ -509,13 +481,14 @@ export default function Permits() {
                             </span>
                             {diff !== null && (
                               <span
-                                className={`text-[10px] font-semibold ${
+                                className={cn(
+                                  "text-[10px] font-semibold",
                                   diff < 0
-                                    ? "text-red-500"
+                                    ? "text-destructive"
                                     : diff <= 30
-                                    ? "text-amber-500"
-                                    : "text-muted-foreground"
-                                }`}
+                                    ? "text-warning"
+                                    : "text-muted-foreground",
+                                )}
                               >
                                 {diff < 0
                                   ? t("common.daysOverdue").replace("{days}", String(Math.abs(diff)))
@@ -545,7 +518,8 @@ export default function Permits() {
                                     `${permit.permit_type} - ${permit.permit_number || ""}`
                                   );
                                 }}
-                                className="mx-auto w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 flex items-center justify-center transition-colors"
+                                aria-label={t("documents.viewer")}
+                                className="mx-auto w-8 h-8 rounded-md bg-primary/10 hover:bg-primary/20 border border-primary/20 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                               >
                                 <FileText className="w-3.5 h-3.5 text-primary" />
                               </button>
@@ -560,7 +534,8 @@ export default function Permits() {
                         <div className="flex items-center justify-center gap-1.5">
                           <Link
                             to={`/permits/${permit.id}`}
-                            className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                            aria-label={t("common.openPermit")}
+                            className="w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                             title={t("common.openPermit")}
                           >
                             <Eye className="w-3.5 h-3.5 text-muted-foreground" />
@@ -572,14 +547,16 @@ export default function Permits() {
                                 `${permit.permit_type} ${permit.permit_number || ""}`
                               );
                             }}
-                            className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                            aria-label={t("history.title")}
+                            className="w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                             title={t("history.title")}
                           >
                             <History className="w-3.5 h-3.5 text-muted-foreground" />
                           </button>
                           <button
                             onClick={() => handleEdit(permit)}
-                            className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                            aria-label={t("common.edit")}
+                            className="w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                             title={t("common.edit")}
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -587,7 +564,8 @@ export default function Permits() {
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <button
-                                className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors"
+                                aria-label={t("common.delete")}
+                                className="w-8 h-8 rounded-md hover:bg-destructive/10 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-1"
                                 title={t("common.delete")}
                               >
                                 <Trash2 className="w-3.5 h-3.5 text-destructive" />

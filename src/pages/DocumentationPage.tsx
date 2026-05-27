@@ -16,7 +16,7 @@ function Tip({ children, variant = "info" }: { children: ReactNode; variant?: "i
     <div
       className={`relative overflow-hidden flex gap-3 rounded-md p-4 my-3 border ${
         isWarning
-          ? "bg-amber-500/5 border-amber-500/20"
+          ? "bg-warning/5 border-warning/20"
           : "bg-primary/5 border-primary/15"
       }`}
     >
@@ -26,7 +26,7 @@ function Tip({ children, variant = "info" }: { children: ReactNode; variant?: "i
             ? "bg-secondary text-secondary-foreground border border-border"            : "bg-secondary text-secondary-foreground border border-border"        }`}
       />
       <div
-        className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${
+        className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 shadow-sm ${
           isWarning
             ? "bg-secondary text-secondary-foreground border border-border"
             : "bg-secondary text-secondary-foreground border border-border"
@@ -48,7 +48,7 @@ function Steps({ items }: { items: string[] }) {
     <ol className="space-y-3 my-4">
       {items.map((item, i) => (
         <li key={i} className="flex gap-3 items-start group">
-          <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-secondary text-secondary-foreground border border-border text-xs font-bold shrink-0 mt-0.5 shadow-sm ring-2 ring-background group-hover:scale-105 transition-transform">
+          <span className="flex items-center justify-center w-7 h-7 rounded-md bg-secondary text-secondary-foreground border border-border text-xs font-bold shrink-0 mt-0.5 shadow-sm ring-2 ring-background group-hover:scale-105 transition-transform">
             {i + 1}
           </span>
           <span className="text-sm text-foreground leading-relaxed">{item}</span>
@@ -122,10 +122,10 @@ export default function DocumentationPage() {
               <span className="inline-flex items-center h-6 px-2 rounded-md text-[10px] font-bold bg-primary/10 text-primary border border-primary/15">
                 {sections.length} seções
               </span>
-              <span className="inline-flex items-center h-6 px-2 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="inline-flex items-center h-6 px-2 rounded-md text-[10px] font-bold bg-success/10 text-success border border-success/20">
                 Passo a passo
               </span>
-              <span className="inline-flex items-center h-6 px-2 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+              <span className="inline-flex items-center h-6 px-2 rounded-md text-[10px] font-bold bg-warning/10 text-warning border border-warning/20">
                 Dicas
               </span>
             </div>
@@ -178,7 +178,7 @@ function getPtSections(): DocSection[] {
     {
       id: "getting-started",
       icon: CheckCircle2,
-      color: "bg-emerald-100 text-emerald-600",
+      color: "bg-success/15 text-success",
       title: "Primeiros Passos",
       description: "Login, cadastro e aprovação de conta",
       steps: [
@@ -252,7 +252,7 @@ function getPtSections(): DocSection[] {
     {
       id: "permits",
       icon: FileCheck,
-      color: "bg-emerald-100 text-emerald-600",
+      color: "bg-success/15 text-success",
       title: "Permits",
       description: "Cadastro, controle de vencimentos e status",
       steps: [
@@ -325,7 +325,7 @@ function getPtSections(): DocSection[] {
     {
       id: "kanban",
       icon: ClipboardList,
-      color: "bg-amber-100 text-amber-600",
+      color: "bg-warning/15 text-warning",
       title: "Tarefas (Kanban)",
       description: "Quadro de tarefas internas com prioridades",
       steps: [
@@ -395,7 +395,7 @@ function getPtSections(): DocSection[] {
     {
       id: "admin",
       icon: ShieldCheck,
-      color: "bg-red-100 text-red-600",
+      color: "bg-destructive/15 text-destructive",
       title: "Administração",
       description: "Gerenciamento de usuários, permissões e auditoria (somente admin)",
       steps: [
@@ -419,7 +419,7 @@ function getEnSections(): DocSection[] {
     {
       id: "getting-started",
       icon: CheckCircle2,
-      color: "bg-emerald-100 text-emerald-600",
+      color: "bg-success/15 text-success",
       title: "Getting Started",
       description: "Login, signup and account approval",
       steps: [
@@ -493,7 +493,7 @@ function getEnSections(): DocSection[] {
     {
       id: "permits",
       icon: FileCheck,
-      color: "bg-emerald-100 text-emerald-600",
+      color: "bg-success/15 text-success",
       title: "Permits",
       description: "Registration, expiration control and status",
       steps: [
@@ -566,7 +566,7 @@ function getEnSections(): DocSection[] {
     {
       id: "kanban",
       icon: ClipboardList,
-      color: "bg-amber-100 text-amber-600",
+      color: "bg-warning/15 text-warning",
       title: "Tasks (Kanban)",
       description: "Internal task board with priorities",
       steps: [
@@ -636,7 +636,7 @@ function getEnSections(): DocSection[] {
     {
       id: "admin",
       icon: ShieldCheck,
-      color: "bg-red-100 text-red-600",
+      color: "bg-destructive/15 text-destructive",
       title: "Administration",
       description: "User management, permissions and audit (admin only)",
       steps: [
@@ -660,7 +660,7 @@ function getEsSections(): DocSection[] {
     {
       id: "getting-started",
       icon: CheckCircle2,
-      color: "bg-emerald-100 text-emerald-600",
+      color: "bg-success/15 text-success",
       title: "Primeros Pasos",
       description: "Login, registro y aprobación de cuenta",
       steps: [
@@ -734,7 +734,7 @@ function getEsSections(): DocSection[] {
     {
       id: "permits",
       icon: FileCheck,
-      color: "bg-emerald-100 text-emerald-600",
+      color: "bg-success/15 text-success",
       title: "Permisos",
       description: "Registro, control de vencimientos y estado",
       steps: [
@@ -807,7 +807,7 @@ function getEsSections(): DocSection[] {
     {
       id: "kanban",
       icon: ClipboardList,
-      color: "bg-amber-100 text-amber-600",
+      color: "bg-warning/15 text-warning",
       title: "Tareas (Kanban)",
       description: "Tablero de tareas internas con prioridades",
       steps: [
@@ -877,7 +877,7 @@ function getEsSections(): DocSection[] {
     {
       id: "admin",
       icon: ShieldCheck,
-      color: "bg-red-100 text-red-600",
+      color: "bg-destructive/15 text-destructive",
       title: "Administración",
       description: "Gestión de usuarios, permisos y auditoría (solo admin)",
       steps: [

@@ -427,7 +427,7 @@ function OrgDetailsDrawer({
                       className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md border border-border/50 text-xs"
                     >
                       <span className="font-mono">{flag}</span>
-                      <span className={on ? "text-emerald-600" : "text-muted-foreground"}>
+                      <span className={on ? "text-success" : "text-muted-foreground"}>
                         {on ? "on" : "off"}
                       </span>
                     </div>

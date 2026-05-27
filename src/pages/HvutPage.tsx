@@ -22,11 +22,13 @@ import { format } from "date-fns";
 
 const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
-const STATUS_BADGE: Record<HvutFiling["status"], string> = {
-  pending: "bg-muted text-muted-foreground border-border",
-  filed: "bg-sky-500/10 text-sky-600 border-sky-500/30",
-  paid: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
-  amended: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+import { StatusBadge, type StatusTone } from "@/components/StatusBadge";
+
+const STATUS_TONE: Record<HvutFiling["status"], StatusTone> = {
+  pending: "neutral",
+  filed: "info",
+  paid: "success",
+  amended: "warning",
 };
 
 function Schedule1Cell({ filing }: { filing: HvutFiling }) {
@@ -230,11 +232,11 @@ export default function HvutPage() {
                         {f.taxable_gross_weight_lbs ? `${f.taxable_gross_weight_lbs.toLocaleString()} lbs` : "—"}
                       </TableCell>
                       <TableCell>
-                        {f.suspended ? <Badge variant="outline" className="bg-amber-500/10 text-amber-600">{t("hvut.suspendedYes")}</Badge> : "—"}
+                        {f.suspended ? <StatusBadge tone="warning">{t("hvut.suspendedYes")}</StatusBadge> : "—"}
                       </TableCell>
                       <TableCell className="font-mono text-sm">{usd.format(Number(f.tax_amount ?? 0))}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={STATUS_BADGE[f.status]}>{f.status}</Badge>
+                        <StatusBadge tone={STATUS_TONE[f.status]}>{f.status}</StatusBadge>
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
                         {f.filed_at ? format(new Date(f.filed_at), "MMM dd, yyyy") : "—"}

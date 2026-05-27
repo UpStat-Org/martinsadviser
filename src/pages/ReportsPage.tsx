@@ -512,7 +512,7 @@ export default function ReportsPage() {
       {/* ============ RESULTS ============ */}
       <div className="flex items-center justify-between">
         <div className="inline-flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-lg bg-primary/10 text-primary border border-primary/15 text-xs font-bold">
+          <span className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md bg-primary/10 text-primary border border-primary/15 text-xs font-bold">
             <BarChart3 className="w-3.5 h-3.5" />
             {filtered.length} {t("reports.results")}
           </span>

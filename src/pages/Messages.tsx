@@ -52,6 +52,7 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { StatusBadge, type StatusTone } from "@/components/StatusBadge";
 
 const dateLocales = { pt: ptBR, en: enUS, es };
 
@@ -111,32 +112,14 @@ export default function Messages() {
   }, [pendingMsgs, sentMsgs, rules]);
 
   const statusBadge = (s: string) => {
-    const map: Record<string, { label: string; className: string }> = {
-      pending: {
-        label: t("common.pending"),
-        className: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-      },
-      sent: {
-        label: t("common.sent"),
-        className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-      },
-      failed: {
-        label: t("common.failed"),
-        className: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
-      },
-      cancelled: {
-        label: t("common.cancelled"),
-        className: "bg-muted text-muted-foreground border-border",
-      },
+    const map: Record<string, { label: string; tone: StatusTone }> = {
+      pending: { label: t("common.pending"), tone: "warning" },
+      sent: { label: t("common.sent"), tone: "success" },
+      failed: { label: t("common.failed"), tone: "danger" },
+      cancelled: { label: t("common.cancelled"), tone: "neutral" },
     };
-    const m = map[s] || { label: s, className: "" };
-    return (
-      <span
-        className={`inline-flex items-center h-6 px-2 rounded-md text-[11px] font-semibold border ${m.className}`}
-      >
-        {m.label}
-      </span>
-    );
+    const m = map[s] || { label: s, tone: "neutral" as StatusTone };
+    return <StatusBadge tone={m.tone}>{m.label}</StatusBadge>;
   };
 
   const handleSendNow = async () => {
@@ -293,8 +276,8 @@ export default function Messages() {
           ) : !pendingMsgs?.length ? (
             <Card className="border-border/50">
               <CardContent className="p-16 text-center">
-                <div className="w-20 h-20 rounded-md bg-secondary text-secondary-foreground border border-border border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
-                  <Mail className="w-9 h-9 text-amber-500" />
+                <div className="w-20 h-20 rounded-md bg-warning/10 border border-warning/20 flex items-center justify-center mx-auto mb-5">
+                  <Mail className="w-9 h-9 text-warning" />
                 </div>
                 <p className="text-base font-semibold font-semibold mb-1">
                   {t("messages.noScheduled")}
@@ -373,19 +356,19 @@ export default function Messages() {
                                 });
                               }
                             }}
-                            className="w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 flex items-center justify-center transition-colors"
+                            className="w-8 h-8 rounded-md bg-primary/10 hover:bg-primary/20 border border-primary/20 flex items-center justify-center transition-colors"
                           >
                             <Send className="w-3.5 h-3.5 text-primary" />
                           </button>
                           <button
                             onClick={() => setPreviewMsg(m)}
-                            className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                            className="w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors"
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => cancelMsg.mutate(m.id)}
-                            className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors"
+                            className="w-8 h-8 rounded-md hover:bg-destructive/10 flex items-center justify-center transition-colors"
                           >
                             <XCircle className="w-3.5 h-3.5 text-destructive" />
                           </button>
@@ -408,8 +391,8 @@ export default function Messages() {
           ) : !sentAndFailed.length ? (
             <Card className="border-border/50">
               <CardContent className="p-16 text-center">
-                <div className="w-20 h-20 rounded-md bg-secondary text-secondary-foreground border border-border border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
-                  <CheckCircle2 className="w-9 h-9 text-emerald-500" />
+                <div className="w-20 h-20 rounded-md bg-success/10 border border-success/20 flex items-center justify-center mx-auto mb-5">
+                  <CheckCircle2 className="w-9 h-9 text-success" />
                 </div>
                 <p className="text-muted-foreground">{t("messages.noSent")}</p>
               </CardContent>
@@ -553,13 +536,13 @@ export default function Messages() {
                           setEditRule(r);
                           setAutomationOpen(true);
                         }}
-                        className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                        className="w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => deleteRule.mutate(r.id)}
-                        className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors"
+                        className="w-8 h-8 rounded-md hover:bg-destructive/10 flex items-center justify-center transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5 text-destructive" />
                       </button>
@@ -634,13 +617,13 @@ export default function Messages() {
                               setEditTemplate(tmpl);
                               setTemplateOpen(true);
                             }}
-                            className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+                            className="w-8 h-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors"
                           >
                             <Pencil className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => deleteTemplate.mutate(tmpl.id)}
-                            className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors"
+                            className="w-8 h-8 rounded-md hover:bg-destructive/10 flex items-center justify-center transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5 text-destructive" />
                           </button>
@@ -683,7 +666,7 @@ export default function Messages() {
         <DialogContent className="sm:max-w-lg rounded-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center">
                 <Eye className="w-4 h-4 text-secondary-foreground" />
               </div>
               {t("messages.preview")}

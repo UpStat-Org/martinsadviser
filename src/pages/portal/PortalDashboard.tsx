@@ -13,8 +13,9 @@ import { DocumentViewer } from "@/components/DocumentViewer";
 import { ComplianceDashboard } from "@/components/ComplianceDashboard";
 import { PermitCoverageMap } from "@/components/PermitCoverageMap";
 import { PageHeader, SectionHeader } from "@/components/PageHeader";
+import { KpiCard } from "@/components/KpiCard";
 import {
-  FileCheck, Truck as TruckIcon, FileText, Loader2, Phone, Mail, MapPin,
+  FileCheck, Truck as TruckIcon, FileText, Phone, Mail, MapPin,
   LayoutDashboard, FolderOpen, AlertTriangle, Clock, ShieldCheck,
   Map as MapIconLucide, CalendarClock, FileWarning,
 } from "lucide-react";
@@ -28,44 +29,6 @@ interface PortalOutletContext {
   clientId: string;
   activeSection: string;
   setActiveSection: (section: string) => void;
-}
-
-function KpiTile({
-  label,
-  value,
-  icon: Icon,
-  tone = "neutral",
-  loading,
-}: {
-  label: string;
-  value: number | string;
-  icon: typeof FileCheck;
-  tone?: "neutral" | "warning" | "danger" | "success";
-  loading?: boolean;
-}) {
-  const toneBar =
-    tone === "danger" ? "bg-destructive" :
-    tone === "warning" ? "bg-warning" :
-    tone === "success" ? "bg-success" :
-    null;
-  return (
-    <div className="relative rounded-md border border-border bg-card p-3.5 overflow-hidden">
-      {toneBar && (
-        <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1", toneBar)} />
-      )}
-      <div className="flex items-start justify-between gap-2">
-        <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-          {label}
-        </div>
-        <Icon className="w-4 h-4 text-muted-foreground/70" />
-      </div>
-      {loading ? (
-        <Skeleton className="h-7 w-16 mt-2" />
-      ) : (
-        <div className="text-2xl font-semibold tracking-tight tabular mt-1.5">{value}</div>
-      )}
-    </div>
-  );
 }
 
 export default function PortalDashboard() {
@@ -160,8 +123,14 @@ export default function PortalDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      <div className="space-y-4">
+        <Skeleton className="h-9 w-72" />
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2.5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-[88px] w-full" />
+          ))}
+        </div>
+        <Skeleton className="h-64 w-full" />
       </div>
     );
   }
@@ -189,35 +158,35 @@ export default function PortalDashboard() {
         />
 
         {/* KPI strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5">
-          <KpiTile
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2.5">
+          <KpiCard
             label={t("dashboard.activePermits")}
             value={metrics.valid + metrics.in60}
             icon={FileCheck}
           />
-          <KpiTile
+          <KpiCard
             label={t("dashboard.expiring30d")}
             value={metrics.in30}
             icon={AlertTriangle}
             tone={metrics.in30 > 0 ? "warning" : "neutral"}
           />
-          <KpiTile
+          <KpiCard
             label={t("dashboard.expired")}
             value={metrics.expired}
             icon={Clock}
             tone={metrics.expired > 0 ? "danger" : "neutral"}
           />
-          <KpiTile
+          <KpiCard
             label={t("portal.activeTrucks")}
             value={activeTrucks}
             icon={TruckIcon}
           />
-          <KpiTile
+          <KpiCard
             label={t("portal.documentsAvailable")}
             value={metrics.withDoc}
             icon={FolderOpen}
           />
-          <KpiTile
+          <KpiCard
             label={t("compliance.score")}
             value={
               metrics.total === 0

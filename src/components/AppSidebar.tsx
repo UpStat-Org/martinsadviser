@@ -258,7 +258,7 @@ export function AppSidebar() {
                   : <><Moon className="w-3.5 h-3.5 mr-2" /> {t("sidebar.darkMode")}</>}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-red-500 focus:text-red-500">
+              <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                 <LogOut className="w-3.5 h-3.5 mr-2" /> {t("nav.logout")}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -309,7 +309,7 @@ export function AppSidebar() {
               <button
                 onClick={handleLogout}
                 title={t("nav.logout")}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-destructive/10 hover:text-destructive transition-colors"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -336,7 +336,7 @@ export function AppSidebar() {
             <button
               onClick={handleLogout}
               title={t("nav.logout")}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-destructive/10 hover:text-destructive transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>

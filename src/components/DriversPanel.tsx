@@ -28,9 +28,9 @@ function ExpiryCell({ date }: { date: string | null }) {
 }
 
 const STATUS_BADGE: Record<Driver["status"], string> = {
-  active: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+  active: "bg-success/10 text-success border-success/30",
   inactive: "bg-muted text-muted-foreground border-border",
-  terminated: "bg-rose-500/10 text-rose-600 border-rose-500/30",
+  terminated: "bg-destructive/10 text-destructive border-destructive/30",
 };
 
 export function DriversPanel({ clientId }: { clientId: string }) {

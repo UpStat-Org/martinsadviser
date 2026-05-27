@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,47 +16,51 @@ import { SuperAdminRoute } from "./components/SuperAdminRoute";
 import { TruckLoadingScreen } from "./components/TruckLoadingScreen";
 import { useAuth } from "./hooks/useAuth";
 import { getHostnameOrg } from "./lib/orgHost";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import PendingApproval from "./pages/PendingApproval";
-import RejectedPage from "./pages/RejectedPage";
-import Dashboard from "./pages/Dashboard";
-import Clients from "./pages/Clients";
-import ClientDetail from "./pages/ClientDetail";
-import ClientOnboarding from "./pages/ClientOnboarding";
-import Trucks from "./pages/Trucks";
-import TruckDetail from "./pages/TruckDetail";
-import Permits from "./pages/Permits";
-import PermitDetail from "./pages/PermitDetail";
-import Messages from "./pages/Messages";
-import CalendarPage from "./pages/CalendarPage";
-import SettingsPage from "./pages/SettingsPage";
-import AdminUsers from "./pages/AdminUsers";
-import NotFound from "./pages/NotFound";
-import ReportsPage from "./pages/ReportsPage";
-import KanbanPage from "./pages/KanbanPage";
-import FinancePage from "./pages/FinancePage";
-import InvoiceDetail from "./pages/InvoiceDetail";
-import AuditPage from "./pages/AuditPage";
-import DocumentationPage from "./pages/DocumentationPage";
-import ComplianceCalendarPage from "./pages/ComplianceCalendarPage";
-import DrugTestingPage from "./pages/DrugTestingPage";
-import HvutPage from "./pages/HvutPage";
-import IftaPage from "./pages/IftaPage";
-import IftaRatesAdminPage from "./pages/IftaRatesAdminPage";
-import IrpPage from "./pages/IrpPage";
-import SaferLookupPage from "./pages/SaferLookupPage";
-import TaskTemplatesPage from "./pages/TaskTemplatesPage";
-import ProfitPerClientPage from "./pages/ProfitPerClientPage";
-import MyDeskPage from "./pages/MyDeskPage";
-import SuperAdmin from "./pages/SuperAdmin";
-import StartOrg from "./pages/StartOrg";
-import InviteAccept from "./pages/InviteAccept";
-import WorkloadPage from "./pages/WorkloadPage";
-import PortalLogin from "./pages/portal/PortalLogin";
-import PortalLayout from "./pages/portal/PortalLayout";
-import PortalDashboard from "./pages/portal/PortalDashboard";
-import LandingPage from "./pages/LandingPage";
+
+// All page modules are code-split. Each route ships only the JS/CSS it
+// needs — the initial bundle no longer drags Recharts, the import dialogs'
+// xlsx parser, the landing-page 3D scene, or 30+ other route modules.
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const PendingApproval = lazy(() => import("./pages/PendingApproval"));
+const RejectedPage = lazy(() => import("./pages/RejectedPage"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Clients = lazy(() => import("./pages/Clients"));
+const ClientDetail = lazy(() => import("./pages/ClientDetail"));
+const ClientOnboarding = lazy(() => import("./pages/ClientOnboarding"));
+const Trucks = lazy(() => import("./pages/Trucks"));
+const TruckDetail = lazy(() => import("./pages/TruckDetail"));
+const Permits = lazy(() => import("./pages/Permits"));
+const PermitDetail = lazy(() => import("./pages/PermitDetail"));
+const Messages = lazy(() => import("./pages/Messages"));
+const CalendarPage = lazy(() => import("./pages/CalendarPage"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const AdminUsers = lazy(() => import("./pages/AdminUsers"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const ReportsPage = lazy(() => import("./pages/ReportsPage"));
+const KanbanPage = lazy(() => import("./pages/KanbanPage"));
+const FinancePage = lazy(() => import("./pages/FinancePage"));
+const InvoiceDetail = lazy(() => import("./pages/InvoiceDetail"));
+const AuditPage = lazy(() => import("./pages/AuditPage"));
+const DocumentationPage = lazy(() => import("./pages/DocumentationPage"));
+const ComplianceCalendarPage = lazy(() => import("./pages/ComplianceCalendarPage"));
+const DrugTestingPage = lazy(() => import("./pages/DrugTestingPage"));
+const HvutPage = lazy(() => import("./pages/HvutPage"));
+const IftaPage = lazy(() => import("./pages/IftaPage"));
+const IftaRatesAdminPage = lazy(() => import("./pages/IftaRatesAdminPage"));
+const IrpPage = lazy(() => import("./pages/IrpPage"));
+const SaferLookupPage = lazy(() => import("./pages/SaferLookupPage"));
+const TaskTemplatesPage = lazy(() => import("./pages/TaskTemplatesPage"));
+const ProfitPerClientPage = lazy(() => import("./pages/ProfitPerClientPage"));
+const MyDeskPage = lazy(() => import("./pages/MyDeskPage"));
+const SuperAdmin = lazy(() => import("./pages/SuperAdmin"));
+const StartOrg = lazy(() => import("./pages/StartOrg"));
+const InviteAccept = lazy(() => import("./pages/InviteAccept"));
+const WorkloadPage = lazy(() => import("./pages/WorkloadPage"));
+const PortalLogin = lazy(() => import("./pages/portal/PortalLogin"));
+const PortalLayout = lazy(() => import("./pages/portal/PortalLayout"));
+const PortalDashboard = lazy(() => import("./pages/portal/PortalDashboard"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 
 const queryClient = new QueryClient();
 
@@ -85,6 +90,7 @@ const App = () => (
         <LanguageSwitcher />
         <BrowserRouter>
           <ErrorBoundary>
+          <Suspense fallback={<TruckLoadingScreen />}>
           <Routes>
             <Route path="/" element={<HomeIndex />} />
             <Route path="/lp" element={<LandingPage />} />
@@ -138,6 +144,7 @@ const App = () => (
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
           </ErrorBoundary>
         </BrowserRouter>
       </TooltipProvider>

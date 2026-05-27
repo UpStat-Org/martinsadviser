@@ -98,12 +98,12 @@ export function SubscriptionBanner() {
         "border-b px-4 lg:px-8 py-2.5 flex items-center gap-3",
         variant === "danger"
           ? "bg-destructive/10 border-destructive/30 text-destructive-foreground"
-          : "bg-amber-500/10 border-amber-500/30 text-foreground",
+          : "bg-warning/10 border-warning/30 text-foreground",
       )}
     >
       <div className={cn(
         "shrink-0 w-7 h-7 rounded-full flex items-center justify-center",
-        variant === "danger" ? "bg-destructive/20 text-destructive" : "bg-amber-500/20 text-amber-700 dark:text-amber-300",
+        variant === "danger" ? "bg-destructive/20 text-destructive" : "bg-warning/20 text-warning",
       )}>
         {isPastDue ? <AlertTriangle className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
       </div>
