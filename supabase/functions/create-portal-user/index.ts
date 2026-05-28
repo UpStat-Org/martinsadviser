@@ -155,12 +155,17 @@ Deno.serve(async (req) => {
       throw new Error("Not authorized");
     }
 
-    // Generate password and create auth user (auto-confirmed)
+    // Generate password and create auth user (auto-confirmed).
+    // The `intent: 'portal-user'` flag tells handle_new_user to take Path C —
+    // it creates the profile (approved, no active_org_id) but skips the
+    // organization_members insert, so portal accounts don't leak into the
+    // default org's /admin/users list.
     const password = generatePassword(16);
     const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
+      user_metadata: { intent: "portal-user" },
     });
     if (createError) throw createError;
 
