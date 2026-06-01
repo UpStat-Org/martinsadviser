@@ -549,6 +549,59 @@ export type Database = {
           },
         ]
       }
+      compliance_automation_settings: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          hvut_enabled: boolean
+          ifta_enabled: boolean
+          kyu_enabled: boolean
+          lead_days: number
+          mcs150_enabled: boolean
+          nm_enabled: boolean
+          notify: boolean
+          org_id: string
+          ucr_enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          hvut_enabled?: boolean
+          ifta_enabled?: boolean
+          kyu_enabled?: boolean
+          lead_days?: number
+          mcs150_enabled?: boolean
+          nm_enabled?: boolean
+          notify?: boolean
+          org_id: string
+          ucr_enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          hvut_enabled?: boolean
+          ifta_enabled?: boolean
+          kyu_enabled?: boolean
+          lead_days?: number
+          mcs150_enabled?: boolean
+          nm_enabled?: boolean
+          notify?: boolean
+          org_id?: string
+          ucr_enabled?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_automation_settings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compliance_risk_scores: {
         Row: {
           band: string
@@ -593,6 +646,71 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_task_log: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          dedupe_key: string
+          due_date: string
+          id: string
+          kind: string
+          org_id: string
+          task_id: string | null
+          truck_id: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          dedupe_key: string
+          due_date: string
+          id?: string
+          kind: string
+          org_id?: string
+          task_id?: string | null
+          truck_id?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          dedupe_key?: string
+          due_date?: string
+          id?: string
+          kind?: string
+          org_id?: string
+          task_id?: string | null
+          truck_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_task_log_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_task_log_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_task_log_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_task_log_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
             referencedColumns: ["id"]
           },
         ]
@@ -941,6 +1059,92 @@ export type Database = {
             foreignKeyName: "drug_test_events_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dunning_log: {
+        Row: {
+          created_at: string
+          enqueued: boolean
+          id: string
+          invoice_id: string
+          org_id: string
+          stage: number
+        }
+        Insert: {
+          created_at?: string
+          enqueued?: boolean
+          id?: string
+          invoice_id: string
+          org_id?: string
+          stage: number
+        }
+        Update: {
+          created_at?: string
+          enqueued?: boolean
+          id?: string
+          invoice_id?: string
+          org_id?: string
+          stage?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dunning_log_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dunning_log_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dunning_settings: {
+        Row: {
+          auto_send: boolean
+          body: string
+          channels: string[]
+          created_at: string
+          enabled: boolean
+          org_id: string
+          stage_days: number[]
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          auto_send?: boolean
+          body?: string
+          channels?: string[]
+          created_at?: string
+          enabled?: boolean
+          org_id: string
+          stage_days?: number[]
+          subject?: string
+          updated_at?: string
+        }
+        Update: {
+          auto_send?: boolean
+          body?: string
+          channels?: string[]
+          created_at?: string
+          enabled?: boolean
+          org_id?: string
+          stage_days?: number[]
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dunning_settings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
