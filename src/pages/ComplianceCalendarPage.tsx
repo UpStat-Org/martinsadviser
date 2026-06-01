@@ -14,6 +14,7 @@ import {
 import { format } from "date-fns";
 import { pt, enUS, es } from "date-fns/locale";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ComplianceAutomationPanel } from "@/components/ComplianceAutomationPanel";
 
 const LOCALES = { pt, en: enUS, es } as const;
 
@@ -89,6 +90,9 @@ export default function ComplianceCalendarPage() {
           </Button>
         </div>
       </div>
+
+      {/* Task automation engine */}
+      <ComplianceAutomationPanel />
 
       {/* Month navigator */}
       <div className="flex items-center justify-between">

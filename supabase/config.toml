@@ -29,3 +29,9 @@ verify_jwt = false
 
 [functions.redeem-portal-token]
 verify_jwt = false
+
+[functions.generate-compliance-tasks]
+verify_jwt = false
+
+[functions.generate-dunning]
+verify_jwt = false
