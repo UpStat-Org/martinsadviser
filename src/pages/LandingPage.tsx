@@ -79,17 +79,20 @@ export default function LandingPage() {
     // resolve to the pinned values via the same CSS vars.
     <div className="min-h-screen bg-background text-foreground" style={LANDING_THEME}>
       <Navbar />
-      <Hero />
-      <ValueProps />
-      <FeatureDashboard />
-      <FeatureTasks />
-      <FeatureWhiteLabel />
-      <Included />
-      <Pricing />
-      <Faq />
-      <FinalCta />
+      <main>
+        <Hero />
+        <ValueProps />
+        <FeatureDashboard />
+        <FeatureTasks />
+        <FeatureWhiteLabel />
+        <Included />
+        <Pricing />
+        <Faq />
+        <FinalCta />
+      </main>
       <Footer />
     </div>
+
   );
 }
 
