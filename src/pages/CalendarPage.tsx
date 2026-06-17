@@ -92,12 +92,12 @@ export default function CalendarPage() {
   );
 
   const heatColor = (count: number) => {
-    if (count === 0) return "bg-muted/40";
+    if (count === 0) return "bg-muted/50 border border-border/40";
     const ratio = heatmapMax ? count / heatmapMax : 0;
-    if (ratio < 0.25) return "bg-secondary text-secondary-foreground border border-border";
-    if (ratio < 0.5) return "bg-secondary text-secondary-foreground border border-border";
-    if (ratio < 0.75) return "bg-secondary text-secondary-foreground border border-border";
-    return "bg-secondary text-secondary-foreground border border-border";
+    if (ratio <= 0.25) return "bg-primary/20 border border-primary/20";
+    if (ratio <= 0.5) return "bg-primary/40 border border-primary/30";
+    if (ratio <= 0.75) return "bg-primary/65 border border-primary/40";
+    return "bg-primary border border-primary";
   };
 
   const upcomingPermits = useMemo(() => {
@@ -141,11 +141,11 @@ export default function CalendarPage() {
     <div className="space-y-6">
       {/* ============ HERO ============ */}
       <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
-
+        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
         <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-md bg-card border border-border flex items-center justify-center flex-shrink-0">
-              <CalendarDays className="w-6 h-6 text-secondary-foreground" />
+            <div className="w-14 h-14 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+              <CalendarDays className="w-6 h-6 text-primary" />
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
@@ -159,7 +159,7 @@ export default function CalendarPage() {
 
           <button
             onClick={() => setDate(new Date())}
-            className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
+            className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-muted hover:border-primary/30 transition-all"
           >
             <CalendarCheck className="w-4 h-4" />
             {t("common.today")}
@@ -174,46 +174,63 @@ export default function CalendarPage() {
             label: t("calendar.expiringToday"),
             value: stats.today,
             icon: Flame,
-            gradient: "from-red-500 to-rose-500",
+            accent: "bg-destructive",
+            iconWrap: "bg-destructive/10 border-destructive/20",
+            iconColor: "text-destructive",
+            glow: "bg-destructive/15",
+            active: stats.today > 0,
           },
           {
             label: t("calendar.next7"),
             value: stats.next7,
             icon: AlertTriangle,
-            gradient: "from-amber-500 to-orange-500",
+            accent: "bg-warning",
+            iconWrap: "bg-warning/10 border-warning/20",
+            iconColor: "text-warning",
+            glow: "bg-warning/15",
+            active: stats.next7 > 0,
           },
           {
             label: t("calendar.next30"),
             value: stats.next30,
             icon: Clock,
-            gradient: "from-sky-500 to-blue-500",
+            accent: "bg-primary",
+            iconWrap: "bg-primary/10 border-primary/20",
+            iconColor: "text-primary",
+            glow: "bg-primary/15",
+            active: stats.next30 > 0,
           },
           {
             label: t("permits.stats.expired"),
             value: stats.expired,
             icon: ShieldAlert,
-            gradient: "from-slate-500 to-zinc-500",
+            accent: "bg-muted-foreground/50",
+            iconWrap: "bg-muted border-border",
+            iconColor: "text-muted-foreground",
+            glow: "bg-muted-foreground/10",
+            active: stats.expired > 0,
           },
         ].map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative overflow-hidden rounded-md bg-card border border-border/60 p-4 hover:-translate-y-0.5 hover:shadow-lg hover:border-border transition-all duration-200"
           >
+            <div className={`absolute left-0 top-0 bottom-0 w-1 ${s.accent} ${s.active ? "opacity-100" : "opacity-25"} transition-opacity`} />
             <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
+              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full ${s.glow} blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
             />
             <div className="relative flex items-start justify-between mb-3">
               <div
-                className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
+                className={`w-10 h-10 rounded-md border flex items-center justify-center ${s.iconWrap}`}
               >
-                <s.icon className="w-4 h-4 text-foreground" />
+                <s.icon className={`w-4 h-4 ${s.iconColor}`} />
               </div>
             </div>
             <div className="relative">
               <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
                 {s.label}
               </div>
-              <div className="text-xl font-semibold tracking-tight tracking-tight">
+              <div className={`text-2xl font-bold tracking-tight tabular-nums ${s.active ? "text-foreground" : "text-muted-foreground/70"}`}>
                 {s.value}
               </div>
             </div>
@@ -223,13 +240,27 @@ export default function CalendarPage() {
 
       {/* ============ CALENDAR + DAY DETAIL ============ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-1 border-border/50 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
+        <Card className="lg:col-span-1 border-border/60 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-primary/30" />
           <CardContent className="p-4 flex flex-col items-center">
             <Calendar
               mode="single"
               selected={date}
               onSelect={setDate}
+              className="w-full p-0"
+              classNames={{
+                months: "w-full",
+                month: "w-full space-y-4",
+                caption: "flex justify-center pt-1 relative items-center mb-1",
+                caption_label: "text-base font-semibold capitalize",
+                table: "w-full border-collapse",
+                head_row: "flex w-full",
+                head_cell:
+                  "text-muted-foreground font-medium text-[0.7rem] uppercase tracking-wide flex-1 text-center pb-1.5",
+                row: "flex w-full mt-1.5",
+                cell: "flex-1 aspect-square text-center text-sm p-0.5 relative focus-within:relative focus-within:z-20",
+                day: "h-full w-full p-0 font-medium rounded-md transition-colors hover:bg-muted aria-selected:opacity-100 flex items-center justify-center",
+              }}
               modifiers={{
                 expired: expirationDates.expired,
                 warning: expirationDates.warning,
@@ -237,10 +268,10 @@ export default function CalendarPage() {
               }}
               modifiersClassNames={{
                 expired:
-                  "bg-destructive/15 text-destructive font-bold rounded-md",
+                  "bg-destructive/15 text-destructive font-bold hover:bg-destructive/25",
                 warning:
-                  "bg-warning/15 text-warning font-bold rounded-md",
-                ok: "bg-success/15 text-success font-bold rounded-md",
+                  "bg-warning/15 text-warning font-bold hover:bg-warning/25",
+                ok: "bg-success/15 text-success font-bold hover:bg-success/25",
               }}
             />
             <div className="flex flex-wrap gap-3 text-xs pt-4 mt-4 border-t border-border/50 w-full justify-center">
@@ -260,13 +291,13 @@ export default function CalendarPage() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 border-border/50 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
+        <Card className="lg:col-span-2 border-border/60 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-primary/30" />
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
-                  <CalendarDays className="w-4 h-4 text-secondary-foreground" />
+                <div className="w-10 h-10 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center">
+                  <CalendarDays className="w-4 h-4 text-primary" />
                 </div>
                 <div>
                   <h2 className="font-bold text-base leading-tight">
@@ -313,11 +344,11 @@ export default function CalendarPage() {
                     <button
                       key={p.id}
                       onClick={() => navigate("/permits")}
-                      className="group w-full flex items-center justify-between p-3 rounded-md hover:bg-muted/60 transition-all text-left"
+                      className="group w-full flex items-center justify-between p-3 rounded-md border border-transparent hover:bg-muted/50 hover:border-border/60 transition-all text-left"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border border border-indigo-500/20 flex items-center justify-center flex-shrink-0">
-                          <AlertTriangle className="w-4 h-4 text-indigo-500" />
+                        <div className="w-10 h-10 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                          <AlertTriangle className="w-4 h-4 text-primary" />
                         </div>
                         <div className="min-w-0">
                           <div className="text-sm font-semibold truncate">
@@ -346,12 +377,12 @@ export default function CalendarPage() {
       </div>
 
       {/* ============ HEATMAP ============ */}
-      <Card className="border-border/50 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
+      <Card className="border-border/60 relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning to-warning/30" />
         <CardContent className="p-5">
           <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
-              <Flame className="w-4 h-4 text-secondary-foreground" />
+            <div className="w-10 h-10 rounded-md bg-warning/10 border border-warning/20 flex items-center justify-center">
+              <Flame className="w-4 h-4 text-warning" />
             </div>
             <div>
               <h2 className="font-bold text-base">
@@ -398,11 +429,11 @@ export default function CalendarPage() {
                 <span className="font-medium">{t("calendar.heatmapRange")}</span>
                 <div className="flex items-center gap-1.5">
                   <span>{t("calendar.less")}</span>
-                  <span className="w-3 h-3 rounded-sm bg-muted/40" />
-                  <span className="w-3 h-3 rounded-sm bg-secondary text-secondary-foreground border border-border" />
-                  <span className="w-3 h-3 rounded-sm bg-secondary text-secondary-foreground border border-border" />
-                  <span className="w-3 h-3 rounded-sm bg-secondary text-secondary-foreground border border-border" />
-                  <span className="w-3 h-3 rounded-sm bg-secondary text-secondary-foreground border border-border" />
+                  <span className="w-3 h-3 rounded-sm bg-muted/50 border border-border/40" />
+                  <span className="w-3 h-3 rounded-sm bg-primary/20 border border-primary/20" />
+                  <span className="w-3 h-3 rounded-sm bg-primary/40 border border-primary/30" />
+                  <span className="w-3 h-3 rounded-sm bg-primary/65 border border-primary/40" />
+                  <span className="w-3 h-3 rounded-sm bg-primary border border-primary" />
                   <span>{t("calendar.more")}</span>
                 </div>
               </div>
@@ -412,13 +443,13 @@ export default function CalendarPage() {
       </Card>
 
       {/* ============ UPCOMING ============ */}
-      <Card className="border-border/50 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
+      <Card className="border-border/60 relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-destructive to-destructive/30" />
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
-                <ShieldAlert className="w-4 h-4 text-secondary-foreground" />
+              <div className="w-10 h-10 rounded-md bg-destructive/10 border border-destructive/20 flex items-center justify-center">
+                <ShieldAlert className="w-4 h-4 text-destructive" />
               </div>
               <div>
                 <h2 className="font-bold text-base">
@@ -456,12 +487,12 @@ export default function CalendarPage() {
                   (new Date(p.expiration_date!).getTime() - new Date().getTime()) /
                     86400000
                 );
-                const urgencyGradient =
+                const urgencyTone =
                   diff <= 0
-                    ? "from-red-500 to-rose-500"
+                    ? "bg-destructive/10 border-destructive/20 text-destructive"
                     : diff <= 7
-                    ? "from-amber-500 to-orange-500"
-                    : "from-sky-500 to-blue-500";
+                    ? "bg-warning/10 border-warning/20 text-warning"
+                    : "bg-primary/10 border-primary/20 text-primary";
                 return (
                   <button
                     key={p.id}
@@ -469,13 +500,13 @@ export default function CalendarPage() {
                       setDate(new Date(p.expiration_date!));
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
-                    className="group flex items-center justify-between p-3 rounded-md bg-muted/30 border border-border/50 hover:bg-muted/60 hover:border-border transition-all text-left"
+                    className="group flex items-center justify-between p-3 rounded-md bg-muted/30 border border-border/50 hover:bg-muted/60 hover:border-border hover:shadow-sm transition-all text-left"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div
-                        className={`w-11 h-11 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center flex-shrink-0`}
+                        className={`w-11 h-11 rounded-md border flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform ${urgencyTone}`}
                       >
-                        <AlertTriangle className="w-4 h-4 text-secondary-foreground" />
+                        <AlertTriangle className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
                         <div className="text-sm font-semibold truncate">
