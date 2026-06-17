@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Martins Adviser | Dashboard</title>
-    <meta name="description" content="Sistema de gerenciamento de clientes, permits e frota para transportadoras">
+    <title>MartinsAdviser — CRM for Permit Services & Fleet Management</title>
+    <meta name="description" content="Multi-tenant CRM for US, Brazil and Spain transport fleets: permits (IRP, IFTA, UCR), DQF, ELD compliance, invoicing and a client portal." />
     <meta name="author" content="MartinsAdviser" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://martinsadviser.lovable.app/" />
 
     <!-- Preconnect to Google Fonts so the Inter request fires in parallel
          with the JS bundle download — saves ~150ms on a cold load. -->
@@ -15,15 +16,59 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/201c9bed-5a55-461b-a18a-488c8762dcad/id-preview-fcae563c--f9c24426-5361-4a44-ac6f-cd7dc76ef821.lovable.app-1773003216712.png">
+    <meta property="og:url" content="https://martinsadviser.lovable.app/" />
+    <meta property="og:title" content="MartinsAdviser — CRM for Permit Services & Fleet Management" />
+    <meta property="og:description" content="Multi-tenant CRM for US, Brazil and Spain transport fleets: permits (IRP, IFTA, UCR), DQF, ELD compliance, invoicing and a client portal." />
+    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/201c9bed-5a55-461b-a18a-488c8762dcad/id-preview-fcae563c--f9c24426-5361-4a44-ac6f-cd7dc76ef821.lovable.app-1773003216712.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/201c9bed-5a55-461b-a18a-488c8762dcad/id-preview-fcae563c--f9c24426-5361-4a44-ac6f-cd7dc76ef821.lovable.app-1773003216712.png">
-    <meta property="og:title" content="Martins Adviser | Dashboard">
-    <meta name="twitter:title" content="Martins Adviser | Dashboard">
-    <meta property="og:description" content="Sistema de gerenciamento de clientes, permits e frota para transportadoras">
-    <meta name="twitter:description" content="Sistema de gerenciamento de clientes, permits e frota para transportadoras">
+    <meta name="twitter:title" content="MartinsAdviser — CRM for Permit Services & Fleet Management" />
+    <meta name="twitter:description" content="Multi-tenant CRM for US, Brazil and Spain transport fleets: permits (IRP, IFTA, UCR), DQF, ELD compliance, invoicing and a client portal." />
+    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/201c9bed-5a55-461b-a18a-488c8762dcad/id-preview-fcae563c--f9c24426-5361-4a44-ac6f-cd7dc76ef821.lovable.app-1773003216712.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "MartinsAdviser",
+        "url": "https://martinsadviser.lovable.app/",
+        "logo": "https://martinsadviser.lovable.app/favicon.svg"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "MartinsAdviser",
+        "url": "https://martinsadviser.lovable.app/"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "MartinsAdviser",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "url": "https://martinsadviser.lovable.app/",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "category": "free trial" }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "Do I need a card to start the trial?", "acceptedAnswer": { "@type": "Answer", "text": "No. The 14 days start immediately. You only add a card when you decide to continue — from Settings → Organization in your account." } },
+          { "@type": "Question", "name": "Is my data isolated from other tenants on the platform?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Each organization lives in its own data space (RLS on PostgreSQL with 38 isolation assertions in production). No tenant reads another's data — tested and measured." } },
+          { "@type": "Question", "name": "Can I use my own domain instead of a subdomain?", "acceptedAnswer": { "@type": "Answer", "text": "Custom domains are part of the enterprise plan. By default, your org lives at yourcompany.domain.com with automatic SSL." } },
+          { "@type": "Question", "name": "Which countries does the platform cover?", "acceptedAnswer": { "@type": "Answer", "text": "US (50 states), Brazil (27 states) and Spain (17 autonomous communities). Coverage maps and pre-configured state lists for all three." } },
+          { "@type": "Question", "name": "How does cancellation work?", "acceptedAnswer": { "@type": "Answer", "text": "One click from the Stripe portal inside the app. No questions, no retention dance. Access stays active until the end of the current billing cycle." } },
+          { "@type": "Question", "name": "Do you help migrating data from another system?", "acceptedAnswer": { "@type": "Answer", "text": "Assisted Excel/CSV import for the first customers. Talk to us." } }
+        ]
+      }
+    </script>
 
     <!-- ============ CRITICAL INLINE CSS ============
          Painted before any external stylesheet downloads. Three goals:
