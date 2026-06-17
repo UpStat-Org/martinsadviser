@@ -8,12 +8,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCreateDriver, useUpdateDriver, type Driver, type DriverInsert } from "@/hooks/useDrivers";
+import { useClients } from "@/hooks/useClients";
 
 interface DriverFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  clientId: string;
+  /** When omitted (e.g. the Drivers hub), the dialog shows a client picker. */
+  clientId?: string;
   driver?: Driver | null;
+  /** Prefill values for a new driver (e.g. name/email from an ELD match). */
+  defaults?: Partial<Omit<DriverInsert, "client_id" | "user_id">>;
+  /** Called after a successful create with the new driver row. */
+  onCreated?: (driver: Driver) => void;
 }
 
 const EMPTY: Omit<DriverInsert, "client_id" | "user_id"> = {
@@ -36,29 +42,37 @@ const EMPTY: Omit<DriverInsert, "client_id" | "user_id"> = {
   notes: null,
 };
 
-export function DriverFormDialog({ open, onOpenChange, clientId, driver }: DriverFormDialogProps) {
+export function DriverFormDialog({ open, onOpenChange, clientId, driver, defaults, onCreated }: DriverFormDialogProps) {
   const { user } = useAuth();
   const { t } = useLanguage();
   const createMut = useCreateDriver();
   const updateMut = useUpdateDriver();
   const [form, setForm] = useState(EMPTY);
+  // Only fetch the client list when we actually need the picker (hub usage).
+  const needsClientPicker = !clientId && !driver;
+  const { data: clients } = useClients(needsClientPicker ? "" : undefined);
+  const [pickedClient, setPickedClient] = useState<string>("");
 
   useEffect(() => {
     if (driver) {
       const { id, org_id, created_at, updated_at, client_id, user_id, ...rest } = driver;
       setForm(rest);
     } else {
-      setForm(EMPTY);
+      setForm({ ...EMPTY, ...defaults });
+      setPickedClient("");
     }
   }, [driver, open]);
+
+  const targetClientId = clientId ?? pickedClient;
 
   const handleSubmit = async () => {
     if (driver) {
       await updateMut.mutateAsync({ id: driver.id, patch: form });
     } else {
-      if (!user) return;
-      const payload: DriverInsert = { ...form, client_id: clientId, user_id: user.id };
-      await createMut.mutateAsync(payload);
+      if (!user || !targetClientId) return;
+      const payload: DriverInsert = { ...form, client_id: targetClientId, user_id: user.id };
+      const created = await createMut.mutateAsync(payload);
+      onCreated?.(created);
     }
     onOpenChange(false);
   };
@@ -76,6 +90,19 @@ export function DriverFormDialog({ open, onOpenChange, clientId, driver }: Drive
         </DialogHeader>
 
         <div className="space-y-4">
+          {needsClientPicker && (
+            <div className="space-y-1.5">
+              <Label>{t("drivers.form.client")}</Label>
+              <Select value={pickedClient} onValueChange={setPickedClient}>
+                <SelectTrigger><SelectValue placeholder={t("drivers.form.selectClient")} /></SelectTrigger>
+                <SelectContent>
+                  {(clients ?? []).map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.company_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label>{t("drivers.form.fullName")}</Label>
             <Input value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
@@ -187,7 +214,7 @@ export function DriverFormDialog({ open, onOpenChange, clientId, driver }: Drive
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
-          <Button onClick={handleSubmit} disabled={saving || !form.full_name.trim()}>
+          <Button onClick={handleSubmit} disabled={saving || !form.full_name.trim() || (!driver && !targetClientId)}>
             {saving ? t("common.saving") : t("common.save")}
           </Button>
         </DialogFooter>

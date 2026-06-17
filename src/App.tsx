@@ -30,6 +30,8 @@ const ClientDetail = lazy(() => import("./pages/ClientDetail"));
 const ClientOnboarding = lazy(() => import("./pages/ClientOnboarding"));
 const Trucks = lazy(() => import("./pages/Trucks"));
 const TruckDetail = lazy(() => import("./pages/TruckDetail"));
+const DriversPage = lazy(() => import("./pages/DriversPage"));
+const DriverDetailPage = lazy(() => import("./pages/DriverDetailPage"));
 const Permits = lazy(() => import("./pages/Permits"));
 const PermitDetail = lazy(() => import("./pages/PermitDetail"));
 const Messages = lazy(() => import("./pages/Messages"));
@@ -119,6 +121,8 @@ const App = () => (
               <Route path="/clients/:id" element={<ClientDetail />} />
               <Route path="/trucks" element={<Trucks />} />
               <Route path="/trucks/:id" element={<TruckDetail />} />
+              <Route path="/drivers" element={<DriversPage />} />
+              <Route path="/drivers/:id" element={<DriverDetailPage />} />
               <Route path="/permits" element={<Permits />} />
               <Route path="/permits/:id" element={<PermitDetail />} />
               <Route path="/messages" element={<FeatureGate flag="messages"><Messages /></FeatureGate>} />

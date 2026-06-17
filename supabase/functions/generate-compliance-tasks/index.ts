@@ -29,7 +29,10 @@ type Kind =
   | "nmQuarter"
   | "hvutAnnual"
   | "ucrAnnual"
-  | "mcs150Biennial";
+  | "mcs150Biennial"
+  | "cdlRenewal"
+  | "medicalCardRenewal"
+  | "mvrAnnual";
 
 interface Deadline {
   date: string; // YYYY-MM-DD (UTC)
@@ -141,6 +144,9 @@ Deno.serve(async (req) => {
       const leadDays = Math.min(Math.max(Number(s.lead_days) || 30, 1), 180);
       const windowEndMs = todayMs + leadDays * DAY_MS;
 
+      // `driver_enabled` is a single toggle covering all three driver kinds.
+      // Older settings rows without the column read as undefined → default on.
+      const driverEnabled = s.driver_enabled ?? true;
       const enabledByKind: Record<Kind, boolean> = {
         iftaQuarter: s.ifta_enabled,
         kyuQuarter: s.kyu_enabled,
@@ -148,6 +154,9 @@ Deno.serve(async (req) => {
         hvutAnnual: s.hvut_enabled,
         ucrAnnual: s.ucr_enabled,
         mcs150Biennial: s.mcs150_enabled,
+        cdlRenewal: driverEnabled,
+        medicalCardRenewal: driverEnabled,
+        mvrAnnual: driverEnabled,
       };
 
       // Fetch this org's clients (with service flags) and trucks once.
@@ -169,7 +178,7 @@ Deno.serve(async (req) => {
 
       // ── Build the work list: { kind, date, period, client, truck? } ──────────
       const fixed = generateFixedDeadlines(todayMs, windowEndMs);
-      type Job = { kind: Kind; date: string; period: Deadline["period"]; client: any; truck?: any };
+      type Job = { kind: Kind; date: string; period: Deadline["period"]; client: any; truck?: any; driver?: any };
       const jobs: Job[] = [];
 
       for (const d of fixed) {
@@ -203,13 +212,59 @@ Deno.serve(async (req) => {
         }
       }
 
+      // ── Driver deadlines (CDL / medical card renewals, annual MVR) ──────────
+      if (driverEnabled) {
+        const { data: driverRows } = await supabase
+          .from("drivers")
+          .select("id, user_id, client_id, full_name, status, cdl_expires_on, medical_card_expires_on")
+          .eq("org_id", s.org_id)
+          .eq("status", "active");
+
+        // Latest MVR per driver anchors the annual-pull due date.
+        const { data: mvrDocs } = await supabase
+          .from("driver_documents")
+          .select("driver_id, kind, expires_on, created_at")
+          .eq("org_id", s.org_id)
+          .eq("kind", "mvr")
+          .order("created_at", { ascending: false });
+        const latestMvr = new Map<string, { expires_on: string | null; created_at: string }>();
+        for (const d of mvrDocs ?? []) if (!latestMvr.has(d.driver_id)) latestMvr.set(d.driver_id, d);
+
+        const inWindow = (dateStr: string) => {
+          const ms = new Date(dateStr).getTime();
+          return ms >= todayMs && ms <= windowEndMs;
+        };
+
+        for (const dr of driverRows ?? []) {
+          const client = clientList.find((c) => c.id === dr.client_id);
+          const driver = { ...dr, _driverName: dr.full_name };
+          if (dr.cdl_expires_on && inWindow(dr.cdl_expires_on)) {
+            jobs.push({ kind: "cdlRenewal", date: dr.cdl_expires_on, period: null, client, driver });
+          }
+          if (dr.medical_card_expires_on && inWindow(dr.medical_card_expires_on)) {
+            jobs.push({ kind: "medicalCardRenewal", date: dr.medical_card_expires_on, period: null, client, driver });
+          }
+          // MVR must be pulled annually; due = explicit expiry, else last pull + 365d.
+          const mvr = latestMvr.get(dr.id);
+          if (mvr) {
+            const dueMs = mvr.expires_on
+              ? new Date(mvr.expires_on).getTime()
+              : new Date(mvr.created_at).getTime() + 365 * DAY_MS;
+            const dueStr = new Date(dueMs).toISOString().slice(0, 10);
+            if (inWindow(dueStr)) {
+              jobs.push({ kind: "mvrAnnual", date: dueStr, period: null, client, driver });
+            }
+          }
+        }
+      }
+
       // ── Materialise each job (dedupe-first) ──────────────────────────────────
       for (const job of jobs) {
-        const ownerId = job.truck?.user_id ?? job.client?.user_id;
-        const clientId = job.client?.id ?? null;
+        const ownerId = job.driver?.user_id ?? job.truck?.user_id ?? job.client?.user_id;
+        const clientId = job.client?.id ?? job.driver?.client_id ?? null;
         if (!ownerId) continue; // can't attribute the task; skip safely
 
-        const dedupeKey = `${job.kind}:${job.date}:${clientId ?? "-"}:${job.truck?.id ?? "-"}`;
+        const dedupeKey = `${job.kind}:${job.date}:${clientId ?? "-"}:${job.truck?.id ?? "-"}:${job.driver?.id ?? "-"}`;
 
         const { error: logErr } = await supabase
           .from("compliance_task_log")
@@ -243,6 +298,9 @@ Deno.serve(async (req) => {
           case "ucrAnnual": name = `UCR ${year} - ${company}`; break;
           case "hvutAnnual": name = `HVUT 2290 ${year} - ${company}${job.truck?.plate ? ` (${job.truck.plate})` : ""}`; break;
           case "mcs150Biennial": name = `MCS-150 - ${company} (DOT ${String(job.client?.dot ?? "").trim()})`; break;
+          case "cdlRenewal": name = `CDL renewal - ${job.driver?._driverName ?? job.driver?.full_name ?? "Driver"}`; break;
+          case "medicalCardRenewal": name = `Medical card renewal - ${job.driver?._driverName ?? job.driver?.full_name ?? "Driver"}`; break;
+          case "mvrAnnual": name = `Annual MVR - ${job.driver?._driverName ?? job.driver?.full_name ?? "Driver"}`; break;
         }
 
         const { data: task, error: taskErr } = await supabase

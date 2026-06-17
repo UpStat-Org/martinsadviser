@@ -72,17 +72,13 @@ export function useConnectEld() {
   const { toast } = useToast();
   return useMutation({
     mutationFn: async ({ provider, apiKey }: { provider: EldProvider; apiKey: string }) => {
-      const { error } = await db.from("eld_connections").upsert(
-        {
-          org_id: currentOrg?.id,
-          provider,
-          api_key: apiKey,
-          status: "connected",
-          last_error: null,
-        },
-        { onConflict: "org_id,provider" },
-      );
-      if (error) throw new Error(error.message);
+      // The credential is encrypted server-side (eld-connect edge function); the
+      // browser never writes the raw api_key to the table.
+      const { data, error } = await supabase.functions.invoke("eld-connect", {
+        body: { org_id: currentOrg?.id, provider, api_key: apiKey },
+      });
+      if (error) throw error;
+      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["eld_connections"] });
@@ -128,5 +124,82 @@ export function useSyncEldNow() {
       toast({ title: tNow("eld.toastSynced") });
     },
     onError: (e: Error) => toast({ title: tNow("eld.toastSyncFailed"), description: e.message, variant: "destructive" }),
+  });
+}
+
+// ── ELD driver matching ──────────────────────────────────────────────────────
+// eld-sync records ELD driver identities it couldn't map to a local driver in
+// eld_driver_matches. The Drivers hub lists the unmatched ones and lets the
+// operator link them to an existing driver, create a new one, or ignore them.
+export interface EldDriverMatch {
+  id: string;
+  org_id: string;
+  provider: EldProvider;
+  external_key: string;
+  external_email: string | null;
+  external_name: string | null;
+  driver_id: string | null;
+  status: "unmatched" | "linked" | "ignored";
+  violations_pending: number;
+  last_seen_at: string;
+}
+
+export function useEldDriverMatches() {
+  return useQuery({
+    queryKey: ["eld_driver_matches", "unmatched"],
+    queryFn: async () => {
+      const { data, error } = await db
+        .from("eld_driver_matches")
+        .select("id, org_id, provider, external_key, external_email, external_name, driver_id, status, violations_pending, last_seen_at")
+        .eq("status", "unmatched")
+        .order("last_seen_at", { ascending: false });
+      if (error) throw new Error(error.message);
+      return (data ?? []) as EldDriverMatch[];
+    },
+  });
+}
+
+export function useLinkEldMatch() {
+  const queryClient = useQueryClient();
+  const { currentOrg } = useOrg();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: async ({ id, driverId, provider }: { id: string; driverId: string; provider: EldProvider }) => {
+      const { error } = await db
+        .from("eld_driver_matches")
+        .update({ driver_id: driverId, status: "linked", violations_pending: 0 })
+        .eq("id", id);
+      if (error) throw new Error(error.message);
+      // Force the next sync to re-pull the default window so this driver's
+      // previously-skipped violations are imported (dedup keeps it safe).
+      if (currentOrg?.id) {
+        await db
+          .from("eld_connections")
+          .update({ last_sync_at: null })
+          .eq("org_id", currentOrg.id)
+          .eq("provider", provider);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["eld_driver_matches"] });
+      toast({ title: tNow("eldMatch.toastLinked") });
+    },
+    onError: (e: Error) => toast({ title: tNow("common.error"), description: e.message, variant: "destructive" }),
+  });
+}
+
+export function useIgnoreEldMatch() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await db.from("eld_driver_matches").update({ status: "ignored" }).eq("id", id);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["eld_driver_matches"] });
+      toast({ title: tNow("eldMatch.toastIgnored") });
+    },
+    onError: (e: Error) => toast({ title: tNow("common.error"), description: e.message, variant: "destructive" }),
   });
 }

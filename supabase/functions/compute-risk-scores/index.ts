@@ -22,16 +22,33 @@ const corsHeaders = {
 
 // ── Scoring model ───────────────────────────────────────────────────────────
 // Each category contributes risk points up to a cap; the total is clamped to
-// 100. Caps sum to 105 so a maximally-bad client still saturates at 100.
+// 100. Caps deliberately over-sum (120) so a client can saturate from several
+// independent failure modes — driver-file gaps alone shouldn't max the score,
+// but combined with permit/insurance/CSA problems they push a carrier critical.
 const CAPS = {
   permits: 30,
   insurance: 20,
   csa: 20,
   hos: 15,
+  drivers: 15,
   fmcsa: 10,
   invoices: 5,
   mcs150: 5,
 } as const;
+
+// Driver Qualification File — mirrors src/lib/dqf.ts. Required kinds are
+// everything except "other"; annual docs (MVR) go stale after 12 months even
+// without an explicit expiration date.
+const REQUIRED_DQF_KINDS = [
+  "application", "mvr", "road_test", "employment_verification",
+  "medical_exam", "drug_test", "training",
+] as const;
+const ANNUAL_DQF_KINDS = new Set<string>(["mvr"]);
+function isDqfDocCurrent(doc: { kind: string; expires_on: string | null; created_at: string }, refMs: number): boolean {
+  if (doc.expires_on) return new Date(doc.expires_on).getTime() > refMs;
+  if (!ANNUAL_DQF_KINDS.has(doc.kind)) return true;
+  return refMs - new Date(doc.created_at).getTime() < 365 * 86_400_000;
+}
 
 // CSA BASIC intervention thresholds (general property carriers) — mirrors
 // src/lib/csa.ts. A score >= threshold is an "alert"; within 15 below is a
@@ -133,15 +150,17 @@ Deno.serve(async (req) => {
       { data: hos },
       { data: invoices },
       { data: fmcsa },
+      { data: driverDocs },
     ] = await Promise.all([
       supabase.from("clients").select("id, user_id, org_id, company_name, dot, status, mcs_150_last_filed_at").neq("status", "inactive"),
       supabase.from("permits").select("client_id, status, expiration_date"),
       supabase.from("insurance_certificates").select("client_id, expiration_date"),
       supabase.from("csa_snapshots").select("client_id, measurement_period, unsafe_driving, hours_of_service, driver_fitness, controlled_substances, vehicle_maintenance, hazmat_compliance, crash_indicator").order("measurement_period", { ascending: false }),
-      supabase.from("drivers").select("id, client_id"),
+      supabase.from("drivers").select("id, client_id, status, cdl_expires_on, medical_card_expires_on"),
       supabase.from("hos_violations").select("driver_id, severity, occurred_at, resolved_at").is("resolved_at", null),
       supabase.from("invoices").select("client_id, status, due_date"),
       supabase.from("fmcsa_snapshots").select("client_id, safety_rating, status_code, fetched_at").order("fetched_at", { ascending: false }),
+      supabase.from("driver_documents").select("driver_id, kind, expires_on, created_at").order("created_at", { ascending: false }),
     ]);
     if (clientsErr) throw clientsErr;
 
@@ -181,6 +200,49 @@ Deno.serve(async (req) => {
       else if (v.severity === "serious") agg.serious++;
       else agg.minor++;
       hosBy.set(clientId, agg);
+    }
+
+    // Driver Qualification File rollup per client. Only active drivers count —
+    // terminated/inactive drivers can't incur an active compliance liability.
+    const docsByDriver = new Map<string, Array<{ kind: string; expires_on: string | null; created_at: string }>>();
+    for (const d of (driverDocs as any[]) ?? []) {
+      const arr = docsByDriver.get(d.driver_id) ?? [];
+      arr.push(d);
+      docsByDriver.set(d.driver_id, arr);
+    }
+    const refMs = ref.getTime();
+    type DriverAgg = {
+      cdlExpired: number; cdlExpiring: number;
+      medExpired: number; medExpiring: number;
+      mvrOverdue: number; dqfIncomplete: number;
+    };
+    const driversBy = new Map<string, DriverAgg>();
+    for (const d of (drivers as any[]) ?? []) {
+      if (d.status && d.status !== "active") continue;
+      const clientId = d.client_id;
+      if (!clientId) continue;
+      const agg = driversBy.get(clientId) ?? { cdlExpired: 0, cdlExpiring: 0, medExpired: 0, medExpiring: 0, mvrOverdue: 0, dqfIncomplete: 0 };
+
+      const cdl = daysUntil(d.cdl_expires_on, ref);
+      if (cdl < 0) agg.cdlExpired++; else if (cdl <= 30) agg.cdlExpiring++;
+      const med = daysUntil(d.medical_card_expires_on, ref);
+      if (med < 0) agg.medExpired++; else if (med <= 30) agg.medExpiring++;
+
+      // Latest doc per kind (rows already newest-first) → DQF completeness.
+      const latestByKind = new Map<string, { kind: string; expires_on: string | null; created_at: string }>();
+      for (const doc of docsByDriver.get(d.id) ?? []) {
+        if (!latestByKind.has(doc.kind)) latestByKind.set(doc.kind, doc);
+      }
+      let missingOrStale = 0;
+      for (const kind of REQUIRED_DQF_KINDS) {
+        const latest = latestByKind.get(kind);
+        if (!latest || !isDqfDocCurrent(latest, refMs)) missingOrStale++;
+      }
+      if (missingOrStale > 0) agg.dqfIncomplete++;
+      const mvr = latestByKind.get("mvr");
+      if (!mvr || !isDqfDocCurrent(mvr, refMs)) agg.mvrOverdue++;
+
+      driversBy.set(clientId, agg);
     }
 
     let scored = 0;
@@ -246,6 +308,21 @@ Deno.serve(async (req) => {
           { code: "hos_serious", count: agg.serious, per: 3 },
           { code: "hos_minor", count: agg.minor, per: 1 },
         ]);
+      }
+
+      // ── Driver Qualification File (cap 15) ──
+      {
+        const agg = driversBy.get(client.id);
+        if (agg) {
+          total += accumulate(factors, CAPS.drivers, [
+            { code: "driver_cdl_expired", count: agg.cdlExpired, per: 6 },
+            { code: "driver_medical_expired", count: agg.medExpired, per: 6 },
+            { code: "driver_cdl_expiring", count: agg.cdlExpiring, per: 2 },
+            { code: "driver_medical_expiring", count: agg.medExpiring, per: 2 },
+            { code: "driver_mvr_overdue", count: agg.mvrOverdue, per: 2 },
+            { code: "driver_dqf_incomplete", count: agg.dqfIncomplete, per: 2 },
+          ]);
+        }
       }
 
       // ── FMCSA status / safety rating (cap 10) ──

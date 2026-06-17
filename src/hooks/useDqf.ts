@@ -2,6 +2,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
+// DQF kind metadata lives in the pure lib (single source of truth, unit-tested).
+// Re-exported here so existing callers keep importing from the hook.
+import { DQF_KINDS, type DqfKind } from "@/lib/dqf";
+export { DQF_KINDS, type DqfKind };
 
 // Same Lovable-types caveat as useDrivers — see comment there.
 const db = supabase as unknown as {
@@ -12,16 +16,6 @@ const db = supabase as unknown as {
     delete: () => any;
   };
 };
-
-export type DqfKind =
-  | "application"
-  | "mvr"
-  | "road_test"
-  | "employment_verification"
-  | "medical_exam"
-  | "drug_test"
-  | "training"
-  | "other";
 
 export interface DriverDocument {
   id: string;
@@ -39,17 +33,6 @@ export interface DriverDocument {
 
 export type DriverDocumentInsert = Omit<DriverDocument, "id" | "org_id" | "created_at" | "updated_at">;
 
-export const DQF_KINDS: Array<{ kind: DqfKind; label: string; annual: boolean }> = [
-  { kind: "application", label: "Application", annual: false },
-  { kind: "mvr", label: "MVR (Motor Vehicle Record)", annual: true },
-  { kind: "road_test", label: "Road Test Certificate", annual: false },
-  { kind: "employment_verification", label: "Employment Verification", annual: false },
-  { kind: "medical_exam", label: "Medical Exam Certificate", annual: false },
-  { kind: "drug_test", label: "Drug Test Result", annual: false },
-  { kind: "training", label: "Training Record", annual: false },
-  { kind: "other", label: "Other", annual: false },
-];
-
 export function useDriverDocuments(driverId: string | undefined) {
   return useQuery({
     queryKey: ["driver_documents", driverId],
@@ -62,6 +45,31 @@ export function useDriverDocuments(driverId: string | undefined) {
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
       return (data ?? []) as DriverDocument[];
+    },
+  });
+}
+
+// Org-wide fetch of every driver document in one round-trip (RLS scopes it to
+// the caller's org). The Drivers hub uses this to compute DQF readiness for the
+// whole roster without firing one query per driver. Returns a Map keyed by
+// driver_id with each driver's docs newest-first (matching summarizeDqf's
+// expectation).
+export function useAllDriverDocuments() {
+  return useQuery({
+    queryKey: ["driver_documents", "all"],
+    queryFn: async () => {
+      const { data, error } = await db
+        .from("driver_documents")
+        .select("id, driver_id, kind, expires_on, created_at")
+        .order("created_at", { ascending: false });
+      if (error) throw new Error(error.message);
+      const byDriver = new Map<string, DriverDocument[]>();
+      for (const d of (data ?? []) as DriverDocument[]) {
+        const arr = byDriver.get(d.driver_id) ?? [];
+        arr.push(d);
+        byDriver.set(d.driver_id, arr);
+      }
+      return byDriver;
     },
   });
 }
