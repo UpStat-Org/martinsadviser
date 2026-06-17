@@ -552,6 +552,7 @@ export type Database = {
       compliance_automation_settings: {
         Row: {
           created_at: string
+          driver_enabled: boolean
           enabled: boolean
           hvut_enabled: boolean
           ifta_enabled: boolean
@@ -566,6 +567,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          driver_enabled?: boolean
           enabled?: boolean
           hvut_enabled?: boolean
           ifta_enabled?: boolean
@@ -580,6 +582,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          driver_enabled?: boolean
           enabled?: boolean
           hvut_enabled?: boolean
           ifta_enabled?: boolean
@@ -1190,6 +1193,66 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "eld_connections_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eld_driver_matches: {
+        Row: {
+          created_at: string
+          driver_id: string | null
+          external_email: string | null
+          external_key: string
+          external_name: string | null
+          id: string
+          last_seen_at: string
+          org_id: string
+          provider: string
+          status: string
+          updated_at: string
+          violations_pending: number
+        }
+        Insert: {
+          created_at?: string
+          driver_id?: string | null
+          external_email?: string | null
+          external_key: string
+          external_name?: string | null
+          id?: string
+          last_seen_at?: string
+          org_id?: string
+          provider: string
+          status?: string
+          updated_at?: string
+          violations_pending?: number
+        }
+        Update: {
+          created_at?: string
+          driver_id?: string | null
+          external_email?: string | null
+          external_key?: string
+          external_name?: string | null
+          id?: string
+          last_seen_at?: string
+          org_id?: string
+          provider?: string
+          status?: string
+          updated_at?: string
+          violations_pending?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eld_driver_matches_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eld_driver_matches_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
