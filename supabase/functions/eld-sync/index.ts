@@ -105,7 +105,7 @@ async function fetchMotive(apiKey: string, sinceISO: string): Promise<Normalized
       const v = w?.violation ?? w;
       out.push({
         driverEmail: v?.driver?.email ?? null,
-        driverName: v?.driver?.name ?? [v?.driver?.first_name, v?.driver?.last_name].filter(Boolean).join(" ") || null,
+        driverName: v?.driver?.name ?? ([v?.driver?.first_name, v?.driver?.last_name].filter(Boolean).join(" ") || null),
         occurredAt: v?.start_time ?? v?.violation_start_time ?? new Date().toISOString(),
         rule: mapRule(v?.type ?? v?.violation_type ?? ""),
         severity: mapSeverity(v?.severity),
