@@ -1,0 +1,12 @@
+# MartinsAdviser
+
+> Multi-tenant CRM for transport fleets in the US, Brazil and Spain — permits (IRP, IFTA, UCR), DQF and ELD compliance, invoicing, messaging and a read-only client portal.
+
+MartinsAdviser is a SaaS platform that permit-services and trucking back-offices use to keep client fleets compliant: tracking expirations across 50 US states, surfacing FMCSA/CSA signals, generating compliance and dunning tasks, and giving end-clients a portal to view their own status.
+
+## Pages
+
+- [Home](/): Product overview, features, pricing and FAQ.
+- [Sign in](/login): Account sign-in for operators and admins.
+- [Start a free trial](/signup): Create an organization (14-day trial, no card).
+- [Create organization](/start): Onboard a new tenant with a custom slug.
