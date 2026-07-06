@@ -46,10 +46,10 @@ export default function Login() {
   // routing) we fall back to the default look.
   const brandingApp = hostOrg
     ? ((hostOrg.branding as { app_name?: string })?.app_name ?? hostOrg.name)
-    : "MartinsAdviser";
+    : "DotPilot";
   const brandingTagline = hostOrg
     ? ((hostOrg.branding as { tagline?: string })?.tagline ?? "")
-    : "Adviser";
+    : "Pilot";
   const brandingLogo = hostOrg
     ? ((hostOrg.branding as { logo_url?: string | null })?.logo_url ?? null)
     : null;

@@ -123,7 +123,7 @@ export default function InviteAccept() {
 
               <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-left text-xs space-y-1">
                 <Row label="Email do convite" value={peek.data.email} mono />
-                <Row label={t("startOrg.subdomainLabel")} value={`${peek.data.org_slug}.martinsadviser.com`} mono />
+                <Row label={t("startOrg.subdomainLabel")} value={`${peek.data.org_slug}.dotpilot.online`} mono />
               </div>
 
               {userEmail === null ? (

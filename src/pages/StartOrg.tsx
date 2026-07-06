@@ -46,7 +46,7 @@ function redirectToOrg(slug: string, navigate: (to: string) => void) {
 }
 
 const SLUG_REGEX = /^[a-z0-9][a-z0-9-]*$/;
-const RESERVED = new Set(["www", "app", "api", "admin", "status", "martinsadviser"]);
+const RESERVED = new Set(["www", "app", "api", "admin", "status", "dotpilot", "martinsadviser"]);
 
 export default function StartOrg() {
   const navigate = useNavigate();
@@ -205,7 +205,7 @@ export default function StartOrg() {
                 <div className="rounded-lg border border-border/50 bg-muted/30 p-3 text-left text-xs space-y-1">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-muted-foreground">{t("startOrg.subdomainLabel")}</span>
-                    <span className="font-mono font-semibold">{slug}.martinsadviser.com</span>
+                    <span className="font-mono font-semibold">{slug}.dotpilot.online</span>
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-muted-foreground">{t("common.status")}</span>
@@ -244,7 +244,7 @@ export default function StartOrg() {
                   <Field
                     label={t("startOrg.subdomainLabel")}
                     required
-                    hint={slug ? `${slug}.martinsadviser.com` : t("startOrg.subdomainHint")}
+                    hint={slug ? `${slug}.dotpilot.online` : t("startOrg.subdomainHint")}
                     error={slugError}
                   >
                     <Input

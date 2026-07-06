@@ -36,7 +36,7 @@ import printBranding from "@/images/print_3.png";
 // internal app: Inter, 6px radii, neutral surfaces, no aurora/mesh/orb.
 // Real product screenshots carry the weight — copy keeps short and direct.
 
-// Marketing surfaces stay on the MartinsAdviser brand colors. The OrgProvider
+// Marketing surfaces stay on the DotPilot brand colors. The OrgProvider
 // also writes to `document.documentElement.style` when a tenant has custom
 // branding, which would leak its primary/accent into the landing. Pinning
 // the tokens on the landing root overrides those at the cascade level and
@@ -205,7 +205,7 @@ function Hero() {
 
         {/* Real screenshot — leads the hero */}
         <div className="mt-12 max-w-6xl mx-auto">
-          <ScreenshotFrame src={printDashboard} alt="MartinsAdviser dashboard" />
+          <ScreenshotFrame src={printDashboard} alt="DotPilot dashboard" />
         </div>
 
         {/* Stats strip — small, sits below the screenshot */}
@@ -589,7 +589,7 @@ function ScreenshotFrame({ src, alt }: { src: string; alt: string }) {
         <div className="flex-1 mx-3 h-6 rounded bg-background border border-border flex items-center px-2.5">
           <Globe2 className="w-3 h-3 text-muted-foreground mr-1.5" />
           <span className="text-[11px] font-mono text-foreground/80">
-            martinsadviser<span className="text-muted-foreground">.com</span>
+            dotpilot<span className="text-muted-foreground">.online</span>
           </span>
         </div>
       </div>

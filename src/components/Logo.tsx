@@ -11,7 +11,7 @@ interface LogoProps {
   src?: string | null;
 }
 
-export function Logo({ className = "w-10 h-10", title = "MartinsAdviser", src }: LogoProps) {
+export function Logo({ className = "w-10 h-10", title = "DotPilot", src }: LogoProps) {
   if (src) {
     return (
       <img

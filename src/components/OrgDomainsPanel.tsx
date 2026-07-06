@@ -56,7 +56,7 @@ export function OrgDomainsPanel() {
   const inputError = useMemo(() => {
     if (!normalized) return null;
     if (!DOMAIN_REGEX.test(normalized)) return t("orgDomains.invalidDomain");
-    if (normalized === "martinsadviser.com" || normalized.endsWith(".martinsadviser.com")) {
+    if (normalized === "dotpilot.online" || normalized.endsWith(".dotpilot.online")) {
       return t("orgDomains.platformDomainError");
     }
     return null;
@@ -209,7 +209,7 @@ export function OrgDomainsPanel() {
           )}
 
           {domainsQuery.data?.map((domain) => {
-            const txtName = `_martinsadviser.${domain.domain}`;
+            const txtName = `_dotpilot.${domain.domain}`;
             const verifying = verifyDomain.isPending;
 
             return (
@@ -252,7 +252,7 @@ export function OrgDomainsPanel() {
                 <div className="grid gap-2 text-xs">
                   <DnsRow label={t("orgDomains.txtName")} value={txtName} copyLabel={t("orgDomains.copy")} onCopy={() => copy(txtName)} />
                   <DnsRow label={t("orgDomains.txtValue")} value={domain.verification_token} copyLabel={t("orgDomains.copy")} onCopy={() => copy(domain.verification_token)} />
-                  <DnsRow label={t("orgDomains.appHost")} value="martinsadviser.com" copyLabel={t("orgDomains.copy")} onCopy={() => copy("martinsadviser.com")} />
+                  <DnsRow label={t("orgDomains.appHost")} value="dotpilot.online" copyLabel={t("orgDomains.copy")} onCopy={() => copy("dotpilot.online")} />
                 </div>
 
                 <p className="text-[11px] text-muted-foreground">

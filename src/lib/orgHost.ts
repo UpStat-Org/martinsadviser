@@ -6,10 +6,10 @@
 // mid-session), so the OrgProvider and the Login page can stay in sync.
 //
 // Routing convention:
-//   - <slug>.martinsadviser.com        → tenant <slug> — strict enforcement
+//   - <slug>.dotpilot.online        → tenant <slug> — strict enforcement
 //   - any mapped custom domain          → tenant by exact hostname lookup
 //                                        (signs out users who aren't members)
-//   - martinsadviser.com (apex)        → permissive mode: pick the user's
+//   - dotpilot.online (apex)        → permissive mode: pick the user's
 //                                        profile.active_org_id, never force
 //                                        a sign-out. Lets owners of any org
 //                                        get into the app while the wildcard
@@ -19,7 +19,7 @@
 //     *.netlify.app / IPs
 // ============================================================================
 
-const PLATFORM_DOMAIN = "martinsadviser.com";
+const PLATFORM_DOMAIN = "dotpilot.online";
 const RESERVED_SUBDOMAINS = new Set(["www", "app", "api", "admin", "status"]);
 
 function normalizeHostname(hostname: string): string {

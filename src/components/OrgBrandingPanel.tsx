@@ -174,7 +174,7 @@ export function OrgBrandingPanel() {
               id="app_name"
               value={draft.app_name}
               onChange={(e) => setDraft((d) => ({ ...d, app_name: e.target.value }))}
-              placeholder="MartinsAdviser"
+              placeholder="DotPilot"
             />
             <p className="text-[11px] text-muted-foreground">{t("orgBranding.appNameHint")}</p>
           </div>
@@ -184,7 +184,7 @@ export function OrgBrandingPanel() {
               id="tagline"
               value={draft.tagline}
               onChange={(e) => setDraft((d) => ({ ...d, tagline: e.target.value }))}
-              placeholder="Adviser"
+              placeholder="Pilot"
             />
             <p className="text-[11px] text-muted-foreground">{t("orgBranding.taglineHint")}</p>
           </div>

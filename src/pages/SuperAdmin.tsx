@@ -99,7 +99,7 @@ export default function SuperAdmin() {
           </div>
           <h1 className="text-lg font-semibold">{t("superadmin.title")}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Cross-tenant view of every org in the system. Only MartinsAdviser owners see this page.
+            Cross-tenant view of every org in the system. Only DotPilot owners see this page.
           </p>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2">
@@ -235,7 +235,7 @@ function CreateOrgDialog({
               className="font-mono"
             />
             <p className="text-[11px] text-muted-foreground">
-              {slug || "<slug>"}.martinsadviser.com
+              {slug || "<slug>"}.dotpilot.online
             </p>
           </div>
           <div className="space-y-1.5">
@@ -330,7 +330,7 @@ function OrgDetailsDrawer({
         <SheetHeader>
           <SheetTitle>{details?.org.name ?? "Carregando..."}</SheetTitle>
           <SheetDescription className="font-mono text-xs">
-            {details?.org.slug}.martinsadviser.com
+            {details?.org.slug}.dotpilot.online
           </SheetDescription>
         </SheetHeader>
 

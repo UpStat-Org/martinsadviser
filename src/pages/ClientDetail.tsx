@@ -170,7 +170,7 @@ export default function ClientDetail() {
         <thead><tr><th>${escapeHtml(t("common.type"))}</th><th>${escapeHtml(t("common.number"))}</th><th>${escapeHtml(t("common.state"))}</th><th>${escapeHtml(t("common.expiration"))}</th><th>${escapeHtml(t("clients.status"))}</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
-      <div class="footer">MartinsAdviser — ${escapeHtml(t("compliance.reportFooter"))}</div>
+      <div class="footer">DotPilot — ${escapeHtml(t("compliance.reportFooter"))}</div>
     </body></html>`;
 
     const win = window.open("", "_blank");

@@ -60,7 +60,7 @@ export function SubscriptionBlockedScreen({ org }: { org: Organization }) {
           </div>
           <div className="flex flex-col gap-2">
             <Button asChild>
-              <a href="mailto:suporte@martinsadviser.com">{t("subscription.contactSupport")}</a>
+              <a href="mailto:suporte@dotpilot.online">{t("subscription.contactSupport")}</a>
             </Button>
             <Button variant="ghost" onClick={handleSignOut} className="gap-2">
               <LogOut className="w-3.5 h-3.5" />

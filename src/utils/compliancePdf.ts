@@ -109,7 +109,7 @@ export function generateBatchCompliancePdf(clientsWithPermits: Array<{ client: C
       <div class="summary-item"><div class="number">${avgScore}%</div><div class="label">Score Médio</div></div>
     </div>
     ${sections}
-    <div class="footer">MartinsAdviser — Batch Compliance Report</div>
+    <div class="footer">DotPilot — Batch Compliance Report</div>
   </body></html>`;
 
   const win = window.open("", "_blank");

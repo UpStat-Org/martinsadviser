@@ -138,13 +138,13 @@ export function toICS(events: ComplianceEvent[], t: (key: string) => string): st
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//MartinsAdviser//Compliance Calendar//EN",
+    "PRODID:-//DotPilot//Compliance Calendar//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
   ];
   for (const e of events) {
     const dt = e.date.replace(/-/g, "");
-    const uid = `${dt}-${e.category}@martinsadviser`;
+    const uid = `${dt}-${e.category}@dotpilot`;
     const dtEnd = new Date(new Date(e.date).getTime() + 86_400_000).toISOString().slice(0, 10).replace(/-/g, "");
     lines.push(
       "BEGIN:VEVENT",

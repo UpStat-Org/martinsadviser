@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Returns true when the current user is an owner/admin of the MartinsAdviser
+ * Returns true when the current user is an owner/admin of the DotPilot
  * cliente 0 org — i.e. authorized to operate the super-admin panel.
  *
  * The check is server-side (is_super_admin RPC) so a curious frontend can't

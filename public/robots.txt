@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://martinsadviser.lovable.app/sitemap.xml
+Sitemap: https://dotpilot.lovable.app/sitemap.xml

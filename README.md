@@ -1,6 +1,6 @@
-# MartinsAdviser
+# DotPilot
 
-MartinsAdviser é um sistema web para operação e gestão de transportadoras, com foco em controle de caminhões, permits, clientes, mensagens, financeiro, auditoria e acompanhamento do trabalho interno.  
+DotPilot é um sistema web para operação e gestão de transportadoras, com foco em controle de caminhões, permits, clientes, mensagens, financeiro, auditoria e acompanhamento do trabalho interno.  
 O projeto também inclui um portal do cliente, uma página de apresentação do sistema e recursos de apoio com automação e análise com IA.
 
 ## O que o sistema faz

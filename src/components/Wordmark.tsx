@@ -29,8 +29,8 @@ export function Wordmark({
   size = "md",
   tone = "dark",
   className,
-  primary = "Martins",
-  secondary = "Adviser",
+  primary = "Dot",
+  secondary = "Pilot",
   accentColor,
 }: WordmarkProps) {
   const s = sizeMap[size];

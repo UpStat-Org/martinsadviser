@@ -53,9 +53,9 @@ export interface OrgBranding {
 // Fallback brand used when:
 //   - there's no org loaded yet (apex, pre-auth)
 //   - an org row has empty branding AND we have no other name to use
-// New orgs DON'T default to MartinsAdviser anymore — see parseBranding.
-const FALLBACK_APP_NAME = "MartinsAdviser";
-const FALLBACK_TAGLINE = "Adviser";
+// New orgs DON'T default to DotPilot anymore — see parseBranding.
+const FALLBACK_APP_NAME = "DotPilot";
+const FALLBACK_TAGLINE = "Pilot";
 
 function parseBranding(raw: unknown, fallbackName?: string | null): OrgBranding {
   const obj = (raw && typeof raw === "object") ? raw as Record<string, unknown> : {};
@@ -63,7 +63,7 @@ function parseBranding(raw: unknown, fallbackName?: string | null): OrgBranding 
   const storedTagline = typeof obj.tagline === "string" ? obj.tagline : null;
   // When we fall back to the org's company name, use a blank tagline so
   // the wordmark renders single-line. Only the operator brand (no
-  // fallbackName at all) gets the "Adviser" subtitle by default.
+  // fallbackName at all) gets the "Pilot" subtitle by default.
   const usingOrgName = !storedAppName && !!fallbackName;
 
   return {
@@ -78,7 +78,7 @@ function parseBranding(raw: unknown, fallbackName?: string | null): OrgBranding 
 
 /**
  * Splits the app name into a 2-line wordmark when the tagline is a suffix
- * of the app name (e.g. "MartinsAdviser" + "Adviser" → "Martins" / "Adviser").
+ * of the app name (e.g. "DotPilot" + "Pilot" → "Dot" / "Pilot").
  * For orgs that just set app_name without a tagline, returns the name as
  * primary and an empty secondary — the Wordmark will render a single line.
  */

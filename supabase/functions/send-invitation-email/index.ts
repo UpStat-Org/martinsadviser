@@ -17,7 +17,7 @@ const corsHeaders = {
 
 const DEFAULT_FROM = Deno.env.get("INVITATION_EMAIL_FROM")
   ?? Deno.env.get("EMAIL_FROM")
-  ?? "MartinsAdviser <noreply@upstat.online>";
+  ?? "DotPilot <noreply@upstat.online>";
 
 function htmlEscape(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
@@ -62,7 +62,7 @@ function renderHtml(opts: {
         </div>
       </td></tr>
     </table>
-    <div style="margin-top:16px;font-size:11px;color:#a4a8c4">Powered by MartinsAdviser</div>
+    <div style="margin-top:16px;font-size:11px;color:#a4a8c4">Powered by DotPilot</div>
   </td></tr>
 </table>
 </body></html>`;
@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const appUrl = Deno.env.get("APP_URL") ?? "https://martinsadviser.com";
+    const appUrl = Deno.env.get("APP_URL") ?? "https://dotpilot.online";
 
     // Authenticate the caller (cheap, no extra round-trip).
     const callerClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {

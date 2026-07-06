@@ -13,22 +13,22 @@ describe("parseHostnameOrg", () => {
   });
 
   it("returns no slug for the apex host", () => {
-    expect(parseHostnameOrg("martinsadviser.com")).toEqual(permissive);
+    expect(parseHostnameOrg("dotpilot.online")).toEqual(permissive);
   });
 
   it("returns the subdomain as slug for a tenant host", () => {
-    expect(parseHostnameOrg("acme.martinsadviser.com")).toEqual({
+    expect(parseHostnameOrg("acme.dotpilot.online")).toEqual({
       slug: "acme",
-      hostname: "acme.martinsadviser.com",
+      hostname: "acme.dotpilot.online",
       isDev: false,
       isStrict: true,
     });
   });
 
   it("normalizes uppercase hosts to lowercase slugs", () => {
-    expect(parseHostnameOrg("Acme.MARTINSadviser.com")).toEqual({
+    expect(parseHostnameOrg("Acme.DOTPILOT.online")).toEqual({
       slug: "acme",
-      hostname: "acme.martinsadviser.com",
+      hostname: "acme.dotpilot.online",
       isDev: false,
       isStrict: true,
     });
@@ -36,7 +36,7 @@ describe("parseHostnameOrg", () => {
 
   it("treats reserved subdomains as apex", () => {
     for (const reserved of ["www", "app", "api", "admin", "status"]) {
-      expect(parseHostnameOrg(`${reserved}.martinsadviser.com`)).toEqual(permissive);
+      expect(parseHostnameOrg(`${reserved}.dotpilot.online`)).toEqual(permissive);
     }
   });
 

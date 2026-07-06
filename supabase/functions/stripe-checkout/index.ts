@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     const priceId = Deno.env.get("STRIPE_PRICE_ID");
-    const appUrl = Deno.env.get("APP_URL") ?? "https://martinsadviser.com";
+    const appUrl = Deno.env.get("APP_URL") ?? "https://dotpilot.online";
 
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not configured");
     if (!priceId) throw new Error("STRIPE_PRICE_ID not configured");

@@ -5,7 +5,7 @@
 
 ## Contexto e visão
 
-O MartinsAdviser foi originalmente construído como single-tenant pra uma cliente específica (consultoria de permits/trucking nos EUA). A cliente não tá usando o produto, mas o sistema tá completo e tem potencial comercial. **A decisão foi transformá-lo em um SaaS vertical white-label pra empresas de permit services / trucking nos EUA**, com a MartinsAdviser virando o "cliente 0" e novos clientes onboardando como organizations isoladas.
+O DotPilot foi originalmente construído como single-tenant pra uma cliente específica (consultoria de permits/trucking nos EUA). A cliente não tá usando o produto, mas o sistema tá completo e tem potencial comercial. **A decisão foi transformá-lo em um SaaS vertical white-label pra empresas de permit services / trucking nos EUA**, com a DotPilot virando o "cliente 0" e novos clientes onboardando como organizations isoladas.
 
 **Não é um CRM genérico** — é vertical (mantém FMCSA, permits, trucks, workload, kanban de permits). O diferencial está justamente em ser focado no nicho. Cliente cresceria entre 300-2k/mês por org.
 
@@ -53,7 +53,7 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 
 | Fase                                    | Escopo                                                    | Status                                                         |
 | --------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------- |
-| **Week 1** — Foundation                 | Tabelas de tenancy + helpers + seed MartinsAdviser        | ✅ Done                                                        |
+| **Week 1** — Foundation                 | Tabelas de tenancy + helpers + seed DotPilot        | ✅ Done                                                        |
 | **Week 2** — org_id rollout             | 19 tabelas com `org_id` + policies reescritas             | ✅ Done                                                        |
 | **Week 3** — Frontend                   | OrgContext, JWT hook (deferred), signup trigger           | ✅ Done                                                        |
 | **Week 4** — Hardening                  | Edge functions restantes + testes isolamento cross-tenant | ✅ Done (38/38 asserções de isolamento passaram em 2026-05-20) |
@@ -67,7 +67,7 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 
 | Arquivo                                             | Conteúdo                                                                                                  | Aplicado?                                  |
 | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| `20260519175109_multitenancy_foundation.sql`        | Organizations, members, invitations, helpers, seed MartinsAdviser                                         | ✅                                         |
+| `20260519175109_multitenancy_foundation.sql`        | Organizations, members, invitations, helpers, seed DotPilot                                         | ✅                                         |
 | `20260519180000_clients_multitenancy.sql`           | org_id em `clients`                                                                                       | ✅                                         |
 | `20260519181000_trucks_permits_multitenancy.sql`    | org_id em `trucks`, `permits`, `permit_history`, `permit_documents`                                       | ✅                                         |
 | `20260519182000_tasks_invoices_multitenancy.sql`    | org_id em `tasks`, `invoices`                                                                             | ✅                                         |
@@ -127,7 +127,7 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 2. Testar frontend local:
 
    ```bash
-   cd "/home/yago/Área de trabalho/martinsadviser"
+   cd "/home/yago/Área de trabalho/dotpilot"
    bun run dev
    ```
 
@@ -170,12 +170,12 @@ CREATE POLICY "..." ON public.X FOR INSERT TO authenticated WITH CHECK (is_org_m
 
 | Hostname                                               | Resolução                                                              |
 | ------------------------------------------------------ | ---------------------------------------------------------------------- |
-| `<slug>.martinsadviser.com`                            | **Strict**: enforça org `<slug>`, signs out se user não for membro     |
-| `martinsadviser.com` (apex)                            | **Permissivo**: usa `profile.active_org_id`, nunca expulsa por host    |
+| `<slug>.dotpilot.online`                            | **Strict**: enforça org `<slug>`, signs out se user não for membro     |
+| `dotpilot.online` (apex)                            | **Permissivo**: usa `profile.active_org_id`, nunca expulsa por host    |
 | `www` / `app` / `api` / `admin` / `status` subdomains  | Tratados como apex (permissivo)                                        |
 | `localhost`, `*.lovable.app`, `*.netlify.app`, IPs raw | Modo dev — mesma lógica permissiva                                     |
 
-Apex foi flexibilizado em 2026-05-20 porque sem o wildcard DNS configurado, owners de orgs não-MartinsAdviser ficavam presos no `cross_org` redirect. Quando o wildcard estiver ativo e a estratégia mudar pra "apex = landing/marketing only", basta restaurar o branch que retornava ROOT_ORG_SLUG no apex em `orgHost.ts`.
+Apex foi flexibilizado em 2026-05-20 porque sem o wildcard DNS configurado, owners de orgs não-DotPilot ficavam presos no `cross_org` redirect. Quando o wildcard estiver ativo e a estratégia mudar pra "apex = landing/marketing only", basta restaurar o branch que retornava ROOT_ORG_SLUG no apex em `orgHost.ts`.
 
 ### Como o frontend resolve
 
@@ -196,14 +196,14 @@ Apex foi flexibilizado em 2026-05-20 porque sem o wildcard DNS configurado, owne
    - Cloudflare SSL/TLS → modo "Full" (Cloudflare ↔ Netlify via HTTPS)
    - Cloudflare emite o cert wildcard sozinho. Netlify recebe a request via Cloudflare e serve o SPA. Funciona pros 2 hosts (apex + subdomain).
 2. **Adicionar cada subdomain manualmente** no Netlify
-   - Pra cada org nova: Domain management → Add domain alias → `<slug>.martinsadviser.com`
+   - Pra cada org nova: Domain management → Add domain alias → `<slug>.dotpilot.online`
    - DNS provider: CNAME individual pra `<site>.netlify.app`
    - SSL: Netlify provisiona via Let's Encrypt
    - Funciona pros primeiros 5-10 clientes (sales-led), não escala
 3. **Migrar pra Vercel**: wildcard SSL nativo no plano free, mas exige redeploy/redirect dos usuários atuais
 4. **Upgrade Netlify Pro** ($19/mês): wildcard nativo via UI
 
-**Estado atual:** sem DNS wildcard ativo. `orgHost.ts` deixa o apex **permissivo** (qualquer user loga em `martinsadviser.com` e cai na sua org via `active_org_id`). Subdomains não funcionam até o DNS ser configurado.
+**Estado atual:** sem DNS wildcard ativo. `orgHost.ts` deixa o apex **permissivo** (qualquer user loga em `dotpilot.online` e cai na sua org via `active_org_id`). Subdomains não funcionam até o DNS ser configurado.
 
 **Testar antes de ativar DNS:** editar `/etc/hosts` mapeando subdomain pra `127.0.0.1` (ou IP da instância) e rodar `bun run dev --host`.
 
@@ -212,11 +212,11 @@ Apex foi flexibilizado em 2026-05-20 porque sem o wildcard DNS configurado, owne
 Editar `/etc/hosts`:
 
 ```
-127.0.0.1   acme.martinsadviser.com
-127.0.0.1   martinsadviser.com
+127.0.0.1   acme.dotpilot.online
+127.0.0.1   dotpilot.online
 ```
 
-E rodar `bun run dev`. Acessar `http://acme.martinsadviser.com:5173` simulará o tenant Acme. **Limitação:** Vite dev server precisa do flag `--host` ou ajuste em `vite.config.ts` para escutar em todos os hosts. Em produção (build estático no Netlify) isso não é problema.
+E rodar `bun run dev`. Acessar `http://acme.dotpilot.online:5173` simulará o tenant Acme. **Limitação:** Vite dev server precisa do flag `--host` ou ajuste em `vite.config.ts` para escutar em todos os hosts. Em produção (build estático no Netlify) isso não é problema.
 
 ## Mês 3 — Stripe billing (2026-05-20)
 
@@ -241,7 +241,7 @@ E rodar `bun run dev`. Acessar `http://acme.martinsadviser.com:5173` simulará o
 
 ### Setup no Stripe Dashboard
 
-1. **Product**: `Dashboard → Products → Add product`. Nome: "MartinsAdviser SaaS" (ou similar).
+1. **Product**: `Dashboard → Products → Add product`. Nome: "DotPilot SaaS" (ou similar).
 2. **Price** (recurring): mensal, em USD ou BRL conforme decidido. Anotar o `price_id` (ex.: `price_1Q...`).
 3. **Customer Portal**: `Dashboard → Settings → Billing → Customer portal`. Habilitar pelo menos: "Update payment method", "Cancel subscription", "View invoices". Salvar.
 4. **Webhook endpoint**: `Dashboard → Developers → Webhooks → Add endpoint`.
@@ -257,7 +257,7 @@ E rodar `bun run dev`. Acessar `http://acme.martinsadviser.com:5173` simulará o
 | `STRIPE_SECRET_KEY`        | `sk_test_...` ou `sk_live_...`                      |
 | `STRIPE_WEBHOOK_SECRET`    | `whsec_...` do endpoint criado acima               |
 | `STRIPE_PRICE_ID`          | `price_...` do Price recorrente                    |
-| `APP_URL`                  | `https://martinsadviser.com` (success/cancel redirect base) |
+| `APP_URL`                  | `https://dotpilot.online` (success/cancel redirect base) |
 
 ### Testar end-to-end
 
@@ -294,16 +294,16 @@ E rodar `bun run dev`. Acessar `http://acme.martinsadviser.com:5173` simulará o
 | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | RLS policy faltando `org_id` em alguma operação → vazamento cross-tenant      | Suite de testes de isolamento (Week 4 pendente)                            |
 | Edge function service_role esquecendo `org_id` em INSERT                      | Auditoria Week 4; já cobertas as 3 que escrevem em tabelas com `org_id`    |
-| Trigger `handle_new_user` hardcoda MartinsAdviser UUID                        | Documentado — quebra quando signup multi-tenant for implementado (Phase 2) |
+| Trigger `handle_new_user` hardcoda DotPilot UUID                        | Documentado — quebra quando signup multi-tenant for implementado (Phase 2) |
 | JWT hook não registrado → `current_org_id()` usa fallback frágil em multi-org | OK pra single-org; bloqueia Phase 2 até registrar                          |
 | `user_roles` legacy ainda em uso (via `has_role()` no frontend)               | Funciona em single-org; migrar callers em Phase 2                          |
 | Realtime / Storage policies não auditados ainda                               | Week 4                                                                     |
 
 ## Referências rápidas
 
-- **Org default UUID:** `00000000-0000-0000-0000-000000000001` (MartinsAdviser)
+- **Org default UUID:** `00000000-0000-0000-0000-000000000001` (DotPilot)
 - **Supabase project ref:** `zidfrlzgftaqhnvedpnm`
-- **Production URL:** martinsadviser.com (Netlify)
+- **Production URL:** dotpilot.online (Netlify)
 - **Cron jobs:**
   - `check-permit-expirations-daily` — `0 9 * * *` (UTC)
   - `send-emails-every-5min` — `*/5 * * * *`

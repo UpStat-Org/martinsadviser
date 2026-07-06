@@ -292,7 +292,7 @@ export default function Signup() {
           </div>
 
           <p className="text-center text-xs text-muted-foreground mt-5">
-            © {new Date().getFullYear()} MartinsAdviser · {t("common.allRightsReserved")}
+            © {new Date().getFullYear()} DotPilot · {t("common.allRightsReserved")}
           </p>
         </div>
       </div>

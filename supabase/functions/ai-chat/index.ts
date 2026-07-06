@@ -46,7 +46,7 @@ serve(async (req) => {
       es: "Responda en Español.",
     };
 
-    const systemPrompt = `Você é um assistente operacional para a equipe da MartinsAdviser, uma consultoria de compliance de transporte (permits IFTA, CT, NY, KYU, NM, BOC-3, MCS-150). ${langMap[language] || langMap.pt}
+    const systemPrompt = `Você é um assistente operacional para a equipe da DotPilot, uma consultoria de compliance de transporte (permits IFTA, CT, NY, KYU, NM, BOC-3, MCS-150). ${langMap[language] || langMap.pt}
 
 Você está conversando com um FUNCIONÁRIO interno (não com o cliente final). Seja direto, prático e use markdown. Quando rascunhar emails, use tom profissional. Sempre baseie respostas no contexto fornecido. Se algo não estiver no contexto, diga claramente.
 

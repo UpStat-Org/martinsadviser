@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
     if (!domain) throw new Error("Domain not found");
 
     const row = domain as DomainRow;
-    const txtName = `_martinsadviser.${row.domain}`;
+    const txtName = `_dotpilot.${row.domain}`;
     const records = await fetchTxt(txtName);
     const verified = records.some((record) => record === row.verification_token || record.includes(row.verification_token));
     const now = new Date().toISOString();

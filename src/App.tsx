@@ -83,7 +83,7 @@ function HomeIndex() {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="light" storageKey="martins-theme">
+    <ThemeProvider attribute="class" defaultTheme="light" storageKey="dotpilot-theme">
     <LanguageProvider>
       <OrgProvider>
       <TooltipProvider>

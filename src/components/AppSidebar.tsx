@@ -28,7 +28,7 @@ import {
 type NavItem = { to: string; icon: LucideIcon; label: string; external?: boolean; feature?: FeatureFlag };
 
 export function AppSidebar() {
-  const [collapsed, setCollapsed] = useLocalStorageState("martins-sidebar-collapsed", false);
+  const [collapsed, setCollapsed] = useLocalStorageState("dotpilot-sidebar-collapsed", false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ export function AppSidebar() {
         items: filterByFeature([
           { to: "/dashboard", icon: LayoutDashboard, label: t("nav.dashboard") },
           { to: "/my", icon: Briefcase, label: t("mydesk.title") },
-          { to: "https://status.martinsadviser.com", icon: Server, label: t("sidebar.systemStatus"), external: true },
+          { to: "https://status.dotpilot.online", icon: Server, label: t("sidebar.systemStatus"), external: true },
         ]),
       },
       {

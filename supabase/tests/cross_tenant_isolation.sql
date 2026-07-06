@@ -15,7 +15,7 @@
 --
 -- ASSUMPTIONS:
 --   - Caller is postgres / service_role (Lovable SQL Editor satisfies this)
---   - MartinsAdviser org id is 00000000-0000-0000-0000-000000000001
+--   - DotPilot org id is 00000000-0000-0000-0000-000000000001
 --   - The schema matches the multi-tenancy Week 1-3 migrations
 -- ============================================================================
 
@@ -42,7 +42,7 @@ VALUES
    'authenticated', 'authenticated', 'iso_b@isolation.test', '',
    now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now());
 
--- Org B (Org A = MartinsAdviser default, already exists)
+-- Org B (Org A = DotPilot default, already exists)
 INSERT INTO public.organizations (id, slug, name)
 VALUES ('cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid, 'isolation-test-b', 'IsolationTest B');
 

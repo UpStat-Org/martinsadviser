@@ -127,7 +127,7 @@ ${permitLines || "- No critical permits found."}${invoiceLine}
 
 Please send any updated documents or renewal information as soon as possible so we can keep your operation compliant.
 
-MartinsAdviser`;
+DotPilot`;
 }
 
 export function ComplianceAutopilotDialog({

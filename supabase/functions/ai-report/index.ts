@@ -58,7 +58,7 @@ serve(async (req) => {
       es: "Responda en Español.",
     };
 
-    const systemPrompt = `You are an expert compliance and operations analyst for a trucking permit management company called MartinsAdviser. ${langMap[language] || langMap.pt}
+    const systemPrompt = `You are an expert compliance and operations analyst for a trucking permit management company called DotPilot. ${langMap[language] || langMap.pt}
 
 Analyze the client data provided and generate a comprehensive report with:
 1. **General Status Summary** - Overall health of the client's compliance

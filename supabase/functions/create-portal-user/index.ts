@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const DEFAULT_FROM = Deno.env.get("INVITATION_EMAIL_FROM")
   ?? Deno.env.get("EMAIL_FROM")
-  ?? "MartinsAdviser <noreply@upstat.online>";
+  ?? "DotPilot <noreply@upstat.online>";
 
 const ACCESS_TOKEN_TTL_DAYS = 7;
 
@@ -95,7 +95,7 @@ function renderEmailHtml(opts: {
         </div>
       </td></tr>
     </table>
-    <div style="margin-top:16px;font-size:11px;color:#a4a8c4">Powered by MartinsAdviser</div>
+    <div style="margin-top:16px;font-size:11px;color:#a4a8c4">Powered by DotPilot</div>
   </td></tr>
 </table>
 </body></html>`;
@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const resendKey = Deno.env.get("RESEND_API_KEY");
     const encryptionKey = Deno.env.get("PORTAL_ENCRYPTION_KEY");
-    const appUrl = Deno.env.get("APP_URL") ?? "https://martinsadviser.com";
+    const appUrl = Deno.env.get("APP_URL") ?? "https://dotpilot.online";
 
     if (!resendKey) throw new Error("RESEND_API_KEY not configured");
     if (!encryptionKey || encryptionKey.length < 16) {

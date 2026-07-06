@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
     }
 
     // Redirect back to app settings
-    const appUrl = Deno.env.get("SITE_URL") || "https://martinsadviser.lovable.app";
+    const appUrl = Deno.env.get("SITE_URL") || "https://dotpilot.lovable.app";
     return new Response(null, {
       status: 302,
       headers: { Location: `${appUrl}/settings?gcal=connected` },
