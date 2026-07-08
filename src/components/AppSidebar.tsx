@@ -4,7 +4,7 @@ import {
   Settings, LogOut, ChevronsLeft, ChevronsRight, ShieldCheck, BarChart3,
   ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen, Sun, Moon,
   Briefcase, Activity, MoreHorizontal, Server, Receipt, Beaker, Fuel, MapPin, Search, TrendingUp,
-  IdCard,
+  IdCard, Target, FileText, Wallet, Repeat, Package,
   type LucideIcon,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
@@ -71,6 +71,13 @@ export function AppSidebar() {
         ]),
       },
       {
+        label: t("sidebar.section.sales"),
+        items: filterByFeature([
+          { to: "/leads", icon: Target, label: t("nav.leads"), feature: "crm" },
+          { to: "/quotes", icon: FileText, label: t("nav.quotes"), feature: "crm" },
+        ]),
+      },
+      {
         label: t("sidebar.section.communication"),
         items: filterByFeature([
           { to: "/messages", icon: MessageSquare, label: t("nav.messages"), feature: "messages" },
@@ -83,6 +90,8 @@ export function AppSidebar() {
         items: filterByFeature([
           { to: "/reports", icon: BarChart3, label: t("nav.reports") },
           { to: "/finance", icon: DollarSign, label: t("nav.finance"), feature: "finance" },
+          { to: "/expenses", icon: Wallet, label: t("sidebar.expenses"), feature: "finance" },
+          { to: "/recurring-plans", icon: Repeat, label: t("sidebar.recurring"), feature: "finance" },
           { to: "/profit-per-client", icon: TrendingUp, label: t("sidebar.profitPerClient") },
         ]),
       },
@@ -95,6 +104,7 @@ export function AppSidebar() {
           { to: "/admin/users", icon: ShieldCheck, label: t("nav.users") },
           { to: "/admin/ifta-rates", icon: Fuel, label: t("sidebar.iftaRates") },
           { to: "/admin/task-templates", icon: ClipboardList, label: t("sidebar.taskTemplates") },
+          { to: "/admin/services", icon: Package, label: t("sidebar.services"), feature: "crm" },
           { to: "/audit", icon: ScrollText, label: t("nav.audit"), feature: "audit_log" },
         ]),
       });

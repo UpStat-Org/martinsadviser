@@ -22,6 +22,7 @@ export const FEATURE_FLAGS = [
   "portal",
   "automations",
   "audit_log",
+  "crm",
 ] as const;
 
 export type FeatureFlag = (typeof FEATURE_FLAGS)[number];
@@ -38,6 +39,7 @@ const FLAG_DEFAULTS: Record<FeatureFlag, boolean> = {
   portal: true,
   automations: true,
   audit_log: true,
+  crm: true,
 };
 
 export interface OrgBranding {

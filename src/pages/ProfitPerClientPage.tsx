@@ -6,6 +6,7 @@ import { DollarSign, Clock, TrendingUp, TrendingDown } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useClients } from "@/hooks/useClients";
 import { useInvoices } from "@/hooks/useInvoices";
+import { useExpenses } from "@/hooks/useExpenses";
 import { useOrg } from "@/contexts/OrgContext";
 import { useAllTimeEntries } from "@/hooks/useTimeTracking";
 
@@ -16,6 +17,7 @@ export default function ProfitPerClientPage() {
   const { currentOrg } = useOrg();
   const { data: clients } = useClients();
   const { data: invoices } = useInvoices();
+  const { data: expenses } = useExpenses();
   const { data: timeEntries } = useAllTimeEntries();
 
   // Hourly rate lives on the org row. Default 50 until the user changes it.
@@ -33,19 +35,27 @@ export default function ProfitPerClientPage() {
       if (!e.client_id) continue;
       minutesByClient.set(e.client_id, (minutesByClient.get(e.client_id) ?? 0) + (e.minutes || 0));
     }
+    // Direct costs logged against each client feed into cost alongside labor.
+    const expensesByClient = new Map<string, number>();
+    for (const ex of expenses ?? []) {
+      if (!ex.client_id) continue;
+      expensesByClient.set(ex.client_id, (expensesByClient.get(ex.client_id) ?? 0) + Number(ex.amount || 0));
+    }
     return clients
       .map((c) => {
         const revenue = revenueByClient.get(c.id) ?? 0;
         const minutes = minutesByClient.get(c.id) ?? 0;
         const hours = minutes / 60;
-        const cost = hours * hourlyRate;
+        const laborCost = hours * hourlyRate;
+        const directExpenses = expensesByClient.get(c.id) ?? 0;
+        const cost = laborCost + directExpenses;
         const profit = revenue - cost;
         const margin = revenue > 0 ? (profit / revenue) * 100 : 0;
         return { client: c, revenue, hours, cost, profit, margin };
       })
-      .filter((r) => r.revenue > 0 || r.hours > 0)
+      .filter((r) => r.revenue > 0 || r.hours > 0 || r.cost > 0)
       .sort((a, b) => b.profit - a.profit);
-  }, [clients, invoices, timeEntries, hourlyRate]);
+  }, [clients, invoices, expenses, timeEntries, hourlyRate]);
 
   const totalRevenue = rows.reduce((s, r) => s + r.revenue, 0);
   const totalCost = rows.reduce((s, r) => s + r.cost, 0);

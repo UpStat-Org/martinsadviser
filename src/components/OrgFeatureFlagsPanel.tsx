@@ -25,6 +25,7 @@ export function OrgFeatureFlagsPanel() {
     portal: { label: t("portal.title") !== "portal.title" ? t("portal.title") : "Client portal", description: t("portal.inviteClient") },
     automations: { label: t("orgFeatureFlags.automationsLabel"), description: t("orgFeatureFlags.automationsDesc") },
     audit_log: { label: t("nav.audit"), description: t("orgFeatureFlags.auditDesc") },
+    crm: { label: t("sidebar.section.sales"), description: t("orgFeatureFlags.crmDesc") },
   };
 
   const updateFlag = useMutation({

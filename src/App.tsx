@@ -54,6 +54,12 @@ const IrpPage = lazy(() => import("./pages/IrpPage"));
 const SaferLookupPage = lazy(() => import("./pages/SaferLookupPage"));
 const TaskTemplatesPage = lazy(() => import("./pages/TaskTemplatesPage"));
 const ProfitPerClientPage = lazy(() => import("./pages/ProfitPerClientPage"));
+const ExpensesPage = lazy(() => import("./pages/ExpensesPage"));
+const RecurringPlansPage = lazy(() => import("./pages/RecurringPlansPage"));
+const LeadsPage = lazy(() => import("./pages/LeadsPage"));
+const QuotesPage = lazy(() => import("./pages/QuotesPage"));
+const QuoteDetail = lazy(() => import("./pages/QuoteDetail"));
+const ServicesPage = lazy(() => import("./pages/ServicesPage"));
 const MyDeskPage = lazy(() => import("./pages/MyDeskPage"));
 const SuperAdmin = lazy(() => import("./pages/SuperAdmin"));
 const StartOrg = lazy(() => import("./pages/StartOrg"));
@@ -132,6 +138,12 @@ const App = () => (
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/finance" element={<FeatureGate flag="finance"><FinancePage /></FeatureGate>} />
               <Route path="/finance/:id" element={<FeatureGate flag="finance"><InvoiceDetail /></FeatureGate>} />
+              <Route path="/expenses" element={<FeatureGate flag="finance"><ExpensesPage /></FeatureGate>} />
+              <Route path="/recurring-plans" element={<FeatureGate flag="finance"><RecurringPlansPage /></FeatureGate>} />
+              <Route path="/leads" element={<FeatureGate flag="crm"><LeadsPage /></FeatureGate>} />
+              <Route path="/quotes" element={<FeatureGate flag="crm"><QuotesPage /></FeatureGate>} />
+              <Route path="/quotes/:id" element={<FeatureGate flag="crm"><QuoteDetail /></FeatureGate>} />
+              <Route path="/admin/services" element={<FeatureGate flag="crm"><ServicesPage /></FeatureGate>} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/audit" element={<FeatureGate flag="audit_log"><AuditPage /></FeatureGate>} />
               <Route path="/docs" element={<DocumentationPage />} />
