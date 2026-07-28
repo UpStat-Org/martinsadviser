@@ -1301,6 +1301,73 @@ export type Database = {
           },
         ]
       }
+      expenses: {
+        Row: {
+          amount: number
+          billable: boolean
+          category: string
+          client_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          incurred_on: string
+          invoice_id: string | null
+          org_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          billable?: boolean
+          category?: string
+          client_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          incurred_on?: string
+          invoice_id?: string | null
+          org_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          billable?: boolean
+          category?: string
+          client_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          incurred_on?: string
+          invoice_id?: string | null
+          org_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fmcsa_snapshots: {
         Row: {
           carrier_operation: string | null
@@ -2014,6 +2081,87 @@ export type Database = {
           },
         ]
       }
+      leads: {
+        Row: {
+          assigned_to: string | null
+          company_name: string
+          contact_name: string | null
+          converted_client_id: string | null
+          created_at: string
+          dot: string | null
+          email: string | null
+          estimated_value: number | null
+          id: string
+          lost_reason: string | null
+          mc: string | null
+          notes: string | null
+          org_id: string
+          phone: string | null
+          position: number
+          source: string | null
+          stage: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          company_name: string
+          contact_name?: string | null
+          converted_client_id?: string | null
+          created_at?: string
+          dot?: string | null
+          email?: string | null
+          estimated_value?: number | null
+          id?: string
+          lost_reason?: string | null
+          mc?: string | null
+          notes?: string | null
+          org_id?: string
+          phone?: string | null
+          position?: number
+          source?: string | null
+          stage?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          company_name?: string
+          contact_name?: string | null
+          converted_client_id?: string | null
+          created_at?: string
+          dot?: string | null
+          email?: string | null
+          estimated_value?: number | null
+          id?: string
+          lost_reason?: string | null
+          mc?: string | null
+          notes?: string | null
+          org_id?: string
+          phone?: string | null
+          position?: number
+          source?: string | null
+          stage?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_converted_client_id_fkey"
+            columns: ["converted_client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maintenance_records: {
         Row: {
           cost: number | null
@@ -2558,6 +2706,231 @@ export type Database = {
           },
         ]
       }
+      quote_items: {
+        Row: {
+          billing_type: string
+          created_at: string
+          description: string
+          id: string
+          org_id: string
+          position: number
+          quantity: number
+          quote_id: string
+          service_id: string | null
+          unit_price: number
+        }
+        Insert: {
+          billing_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          org_id?: string
+          position?: number
+          quantity?: number
+          quote_id: string
+          service_id?: string | null
+          unit_price?: number
+        }
+        Update: {
+          billing_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          org_id?: string
+          position?: number
+          quantity?: number
+          quote_id?: string
+          service_id?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_items_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_items_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_items_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          accepted_at: string | null
+          client_id: string | null
+          converted_at: string | null
+          created_at: string
+          discount: number
+          id: string
+          lead_id: string | null
+          notes: string | null
+          org_id: string
+          quote_number: string | null
+          sent_at: string | null
+          status: string
+          subtotal: number
+          title: string
+          total: number
+          updated_at: string
+          user_id: string
+          valid_until: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          client_id?: string | null
+          converted_at?: string | null
+          created_at?: string
+          discount?: number
+          id?: string
+          lead_id?: string | null
+          notes?: string | null
+          org_id?: string
+          quote_number?: string | null
+          sent_at?: string | null
+          status?: string
+          subtotal?: number
+          title?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+          valid_until?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          client_id?: string | null
+          converted_at?: string | null
+          created_at?: string
+          discount?: number
+          id?: string
+          lead_id?: string | null
+          notes?: string | null
+          org_id?: string
+          quote_number?: string | null
+          sent_at?: string | null
+          status?: string
+          subtotal?: number
+          title?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recurring_plans: {
+        Row: {
+          amount: number
+          client_id: string
+          created_at: string
+          description: string | null
+          frequency: string
+          id: string
+          invoices_generated: number
+          last_invoice_on: string | null
+          name: string
+          net_days: number
+          next_run_on: string
+          org_id: string
+          service_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          client_id: string
+          created_at?: string
+          description?: string | null
+          frequency?: string
+          id?: string
+          invoices_generated?: number
+          last_invoice_on?: string | null
+          name: string
+          net_days?: number
+          next_run_on?: string
+          org_id?: string
+          service_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          frequency?: string
+          id?: string
+          invoices_generated?: number
+          last_invoice_on?: string | null
+          name?: string
+          net_days?: number
+          next_run_on?: string
+          org_id?: string
+          service_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_plans_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_plans_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_plans_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       roadside_inspections: {
         Row: {
           client_id: string
@@ -2810,6 +3183,53 @@ export type Database = {
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "message_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          active: boolean
+          billing_type: string
+          created_at: string
+          default_price: number
+          description: string | null
+          id: string
+          name: string
+          org_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          billing_type?: string
+          created_at?: string
+          default_price?: number
+          description?: string | null
+          id?: string
+          name: string
+          org_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          active?: boolean
+          billing_type?: string
+          created_at?: string
+          default_price?: number
+          description?: string | null
+          id?: string
+          name?: string
+          org_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
