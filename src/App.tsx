@@ -16,6 +16,10 @@ import { SuperAdminRoute } from "./components/SuperAdminRoute";
 import { TruckLoadingScreen } from "./components/TruckLoadingScreen";
 import { useAuth } from "./hooks/useAuth";
 import { getHostnameOrg } from "./lib/orgHost";
+// Static, unlike every other page below: FeatureGate and SuperAdminRoute render
+// NotFound synchronously, so lazy() never moved it out of the entry chunk — it
+// only produced a "dynamically and statically imported" build warning.
+import NotFound from "./pages/NotFound";
 
 // All page modules are code-split. Each route ships only the JS/CSS it
 // needs — the initial bundle no longer drags Recharts, the import dialogs'
@@ -38,7 +42,6 @@ const Messages = lazy(() => import("./pages/Messages"));
 const CalendarPage = lazy(() => import("./pages/CalendarPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers"));
-const NotFound = lazy(() => import("./pages/NotFound"));
 const ReportsPage = lazy(() => import("./pages/ReportsPage"));
 const KanbanPage = lazy(() => import("./pages/KanbanPage"));
 const FinancePage = lazy(() => import("./pages/FinancePage"));

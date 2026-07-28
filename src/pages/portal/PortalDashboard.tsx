@@ -549,7 +549,7 @@ export default function PortalDashboard() {
                         </Badge>
                         {doc.expirationDate && (
                           <span className="text-[10px] text-muted-foreground tabular">
-                            {format(new Date(doc.expirationDate), "dd/MM/yyyy")}
+                            {format(new Date(doc.expirationDate), "MM/dd/yyyy")}
                           </span>
                         )}
                       </div>

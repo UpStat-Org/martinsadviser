@@ -41,6 +41,22 @@ interface PeekResultInvalid {
 
 type PeekResult = PeekResultValid | PeekResultInvalid;
 
+/**
+ * Renders a translated sentence, bolding each `{placeholder}` it substitutes.
+ * Needed because the two emails sit at different positions depending on the
+ * language, so the markup can't be hard-coded around them.
+ */
+function BoldPlaceholders({ template, values }: { template: string; values: Record<string, string> }) {
+  return (
+    <>
+      {template.split(/(\{\w+\})/).map((part, i) => {
+        const key = part.startsWith("{") ? part.slice(1, -1) : null;
+        return key && key in values ? <strong key={i}>{values[key]}</strong> : part;
+      })}
+    </>
+  );
+}
+
 export default function InviteAccept() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
@@ -77,11 +93,11 @@ export default function InviteAccept() {
       const { error } = await supabase.rpc("accept_invitation", { p_token: token });
       if (error) throw error;
       await refresh();
-      toast({ title: "Convite aceito!" });
+      toast({ title: t("inviteAccept.accepted") });
       // Send the user into the dashboard of the org they just joined.
       navigate("/?welcome=invite");
     } catch (e: any) {
-      toast({ title: "Falha ao aceitar", description: e.message, variant: "destructive" });
+      toast({ title: t("inviteAccept.acceptFailed"), description: e.message, variant: "destructive" });
       setAccepting(false);
     }
   };
@@ -130,12 +146,12 @@ export default function InviteAccept() {
                 <div className="space-y-2">
                   <Button asChild className="w-full">
                     <Link to={`/login?invite=${token}&email=${encodeURIComponent(peek.data.email)}`}>
-                      Já tenho conta — entrar
+                      {t("inviteAccept.haveAccount")}
                     </Link>
                   </Button>
                   <Button asChild variant="outline" className="w-full">
                     <Link to={`/signup?invite=${token}&email=${encodeURIComponent(peek.data.email)}`}>
-                      Criar conta
+                      {t("inviteAccept.createAccount")}
                     </Link>
                   </Button>
                 </div>
@@ -144,17 +160,22 @@ export default function InviteAccept() {
                   <div className="text-xs text-warning flex items-start gap-2 text-left p-3 rounded-md bg-warning/5 border border-warning/20">
                     <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>
-                      Você está logado como <strong>{userEmail}</strong>. Este convite foi enviado pra <strong>{peek.data.email}</strong>.
+                      {/* Split on the placeholders so the two emails stay bold
+                          regardless of where the sentence puts them. */}
+                      <BoldPlaceholders
+                        template={t("inviteAccept.wrongAccount")}
+                        values={{ current: userEmail, invited: peek.data.email }}
+                      />
                     </span>
                   </div>
                   <Button onClick={handleSignOutRetry} className="w-full">
-                    Sair e trocar de conta
+                    {t("inviteAccept.switchAccount")}
                   </Button>
                 </div>
               ) : (
                 <Button onClick={handleAccept} disabled={accepting} className="w-full gap-2">
                   {accepting ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                  Aceitar convite
+                  {t("inviteAccept.acceptCta")}
                 </Button>
               )}
             </CardContent>

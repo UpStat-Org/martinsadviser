@@ -23,7 +23,7 @@
 -- ---------------------------------------------------------------------------
 -- 1) compliance_automation_settings (per-org config)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.compliance_automation_settings (
+CREATE TABLE IF NOT EXISTS public.compliance_automation_settings (
   org_id       uuid PRIMARY KEY REFERENCES public.organizations(id) ON DELETE CASCADE,
   enabled      boolean NOT NULL DEFAULT true,
   -- How many days ahead of a deadline to open the task.
@@ -43,14 +43,17 @@ CREATE TABLE public.compliance_automation_settings (
 
 ALTER TABLE public.compliance_automation_settings ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org members read compliance automation settings" ON public.compliance_automation_settings;
 CREATE POLICY "org members read compliance automation settings"
   ON public.compliance_automation_settings FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "org admins upsert compliance automation settings" ON public.compliance_automation_settings;
 CREATE POLICY "org admins upsert compliance automation settings"
   ON public.compliance_automation_settings FOR INSERT TO authenticated
   WITH CHECK (public.is_org_admin(org_id));
 
+DROP POLICY IF EXISTS "org admins update compliance automation settings" ON public.compliance_automation_settings;
 CREATE POLICY "org admins update compliance automation settings"
   ON public.compliance_automation_settings FOR UPDATE TO authenticated
   USING (public.is_org_admin(org_id))
@@ -68,7 +71,7 @@ ON CONFLICT (org_id) DO NOTHING;
 -- ---------------------------------------------------------------------------
 -- 2) compliance_task_log (idempotency ledger)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.compliance_task_log (
+CREATE TABLE IF NOT EXISTS public.compliance_task_log (
   id          uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   org_id      uuid NOT NULL DEFAULT public.current_org_id()
                 REFERENCES public.organizations(id) ON DELETE CASCADE,
@@ -89,6 +92,7 @@ ALTER TABLE public.compliance_task_log ENABLE ROW LEVEL SECURITY;
 
 -- Read-only for org members; all writes come from the service_role engine
 -- (which bypasses RLS). No authenticated INSERT/UPDATE policy on purpose.
+DROP POLICY IF EXISTS "org members read compliance task log" ON public.compliance_task_log;
 CREATE POLICY "org members read compliance task log"
   ON public.compliance_task_log FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));

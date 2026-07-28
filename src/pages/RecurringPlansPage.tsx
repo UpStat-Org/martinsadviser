@@ -333,7 +333,7 @@ export default function RecurringPlansPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-sm">
-                      {format(new Date(plan.next_run_on), "dd/MM/yyyy")}
+                      {format(new Date(plan.next_run_on), "MM/dd/yyyy")}
                     </TableCell>
                     <TableCell>
                       <StatusBadge tone={STATUS_TONES[plan.status] ?? "neutral"}>

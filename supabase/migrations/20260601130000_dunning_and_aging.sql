@@ -24,7 +24,7 @@
 -- ---------------------------------------------------------------------------
 -- 1) dunning_settings (per-org config)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.dunning_settings (
+CREATE TABLE IF NOT EXISTS public.dunning_settings (
   org_id      uuid PRIMARY KEY REFERENCES public.organizations(id) ON DELETE CASCADE,
   enabled     boolean NOT NULL DEFAULT true,
   -- false ⇒ drafts land in the approval queue; true ⇒ enqueued for sending.
@@ -42,14 +42,17 @@ CREATE TABLE public.dunning_settings (
 
 ALTER TABLE public.dunning_settings ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org members read dunning settings" ON public.dunning_settings;
 CREATE POLICY "org members read dunning settings"
   ON public.dunning_settings FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "org admins insert dunning settings" ON public.dunning_settings;
 CREATE POLICY "org admins insert dunning settings"
   ON public.dunning_settings FOR INSERT TO authenticated
   WITH CHECK (public.is_org_admin(org_id));
 
+DROP POLICY IF EXISTS "org admins update dunning settings" ON public.dunning_settings;
 CREATE POLICY "org admins update dunning settings"
   ON public.dunning_settings FOR UPDATE TO authenticated
   USING (public.is_org_admin(org_id))
@@ -66,7 +69,7 @@ ON CONFLICT (org_id) DO NOTHING;
 -- ---------------------------------------------------------------------------
 -- 2) dunning_log (idempotency ledger)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.dunning_log (
+CREATE TABLE IF NOT EXISTS public.dunning_log (
   id          uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   org_id      uuid NOT NULL DEFAULT public.current_org_id()
                 REFERENCES public.organizations(id) ON DELETE CASCADE,
@@ -83,6 +86,7 @@ CREATE INDEX idx_dunning_log_invoice ON public.dunning_log(invoice_id);
 ALTER TABLE public.dunning_log ENABLE ROW LEVEL SECURITY;
 
 -- Read-only for org members; all writes come from the service_role engine.
+DROP POLICY IF EXISTS "org members read dunning log" ON public.dunning_log;
 CREATE POLICY "org members read dunning log"
   ON public.dunning_log FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));

@@ -1,4 +1,4 @@
-CREATE TABLE public.permit_documents (
+CREATE TABLE IF NOT EXISTS public.permit_documents (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   permit_id UUID REFERENCES public.permits(id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,

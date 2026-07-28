@@ -219,7 +219,7 @@ export default function QuoteDetail() {
               <div className="text-xs text-muted-foreground">
                 {t("quotes.validUntil")}:{" "}
                 {quote.valid_until
-                  ? format(new Date(quote.valid_until), "dd/MM/yyyy")
+                  ? format(new Date(quote.valid_until), "MM/dd/yyyy")
                   : "—"}
               </div>
             </div>

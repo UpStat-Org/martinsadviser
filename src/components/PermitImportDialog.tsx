@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { parseSpreadsheet, UnsupportedLegacyXlsError } from "@/lib/spreadsheet";
 
 interface Props {
   open: boolean;
@@ -67,28 +68,23 @@ export function PermitImportDialog({ open, onOpenChange }: Props) {
   };
 
   const handleFile = useCallback(async (file: File) => {
-    const XLSX = await import("xlsx");
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json<Record<string, string>>(sheet, { defval: "" });
-        if (!json.length) {
-          toast({ title: t("import.emptyFile"), variant: "destructive" });
-          return;
-        }
-        const hdrs = Object.keys(json[0]);
-        setHeaders(hdrs);
-        setRows(json);
-        setMapping(detectMapping(hdrs));
-        setStep("mapping");
-      } catch {
-        toast({ title: t("import.readError"), variant: "destructive" });
+    try {
+      const json = await parseSpreadsheet(file);
+      if (!json.length) {
+        toast({ title: t("import.emptyFile"), variant: "destructive" });
+        return;
       }
-    };
-    reader.readAsArrayBuffer(file);
+      const hdrs = Object.keys(json[0]);
+      setHeaders(hdrs);
+      setRows(json);
+      setMapping(detectMapping(hdrs));
+      setStep("mapping");
+    } catch (err) {
+      toast({
+        title: err instanceof UnsupportedLegacyXlsError ? t("import.legacyXls") : t("import.readError"),
+        variant: "destructive",
+      });
+    }
   }, [toast, t]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -239,7 +235,7 @@ export function PermitImportDialog({ open, onOpenChange }: Props) {
             <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">{t("import.dragFile")}</p>
             <p className="text-xs text-muted-foreground mt-1">{t("import.fileTypes")}</p>
-            <input id="permit-import-file-input" type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleInput} />
+            <input id="permit-import-file-input" type="file" accept=".xlsx,.csv" className="hidden" onChange={handleInput} />
           </div>
         )}
 

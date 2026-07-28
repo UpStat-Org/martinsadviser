@@ -52,7 +52,7 @@ function ProviderRow({ provider, name, gradient }: { id?: string; provider: EldP
           </div>
           <p className="text-xs text-muted-foreground">
             {conn?.last_sync_at
-              ? `${t("eld.lastSync")}: ${format(new Date(conn.last_sync_at), "dd/MM HH:mm")}`
+              ? `${t("eld.lastSync")}: ${format(new Date(conn.last_sync_at), "MM/dd HH:mm")}`
               : t("eld.notConnected")}
           </p>
           {conn?.status === "error" && conn.last_error && (
@@ -125,7 +125,7 @@ export function OrgEldPanel() {
               {logs.map((l) => (
                 <li key={l.id} className="flex items-center justify-between gap-2 text-xs text-muted-foreground" title={l.message ?? undefined}>
                   <span className="capitalize">{l.provider}</span>
-                  <span>{format(new Date(l.started_at), "dd/MM HH:mm")}</span>
+                  <span>{format(new Date(l.started_at), "MM/dd HH:mm")}</span>
                   <span className="tabular-nums">{l.hos_imported} HOS</span>
                   <span className={l.status === "ok" ? "text-success" : l.status === "error" ? "text-destructive" : ""}>{l.status}</span>
                 </li>

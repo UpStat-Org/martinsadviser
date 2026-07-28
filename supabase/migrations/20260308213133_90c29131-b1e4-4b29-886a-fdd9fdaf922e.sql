@@ -11,6 +11,7 @@ CREATE TABLE public.client_portal_users (
 ALTER TABLE public.client_portal_users ENABLE ROW LEVEL SECURITY;
 
 -- Portal users can read their own link
+DROP POLICY IF EXISTS "Portal users can view own links" ON public.client_portal_users;
 CREATE POLICY "Portal users can view own links"
   ON public.client_portal_users FOR SELECT
   USING (auth.uid() = user_id);
@@ -21,6 +22,7 @@ CREATE POLICY "Admins can manage portal users"
   USING (public.has_role(auth.uid(), 'admin'));
 
 -- Allow portal users to view clients they're linked to
+DROP POLICY IF EXISTS "Portal users can view their client" ON public.clients;
 CREATE POLICY "Portal users can view their client"
   ON public.clients FOR SELECT
   USING (
@@ -32,6 +34,7 @@ CREATE POLICY "Portal users can view their client"
   );
 
 -- Allow portal users to view trucks of their client
+DROP POLICY IF EXISTS "Portal users can view their trucks" ON public.trucks;
 CREATE POLICY "Portal users can view their trucks"
   ON public.trucks FOR SELECT
   USING (
@@ -43,6 +46,7 @@ CREATE POLICY "Portal users can view their trucks"
   );
 
 -- Allow portal users to view permits of their client
+DROP POLICY IF EXISTS "Portal users can view their permits" ON public.permits;
 CREATE POLICY "Portal users can view their permits"
   ON public.permits FOR SELECT
   USING (

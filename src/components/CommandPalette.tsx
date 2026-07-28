@@ -27,6 +27,7 @@ import {
   Search,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOrg, type FeatureFlag } from "@/contexts/OrgContext";
 import { useClients } from "@/hooks/useClients";
 import { useTrucks } from "@/hooks/useTrucks";
 import { usePermits } from "@/hooks/usePermits";
@@ -41,6 +42,7 @@ export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { hasFeature } = useOrg();
   const { data: clients } = useClients();
   const { data: trucks } = useTrucks();
   const { data: permits } = usePermits();
@@ -61,22 +63,26 @@ export function CommandPalette() {
     navigate(path);
   };
 
-  const nav: Array<{ to: string; labelKey: string; icon: typeof Users }> = [
-    { to: "/dashboard", labelKey: "cmdk.nav.dashboard", icon: LayoutDashboard },
-    { to: "/clients", labelKey: "cmdk.nav.clients", icon: Users },
-    { to: "/trucks", labelKey: "cmdk.nav.trucks", icon: Truck },
-    { to: "/permits", labelKey: "cmdk.nav.permits", icon: FileCheck },
-    { to: "/tasks", labelKey: "cmdk.nav.tasks", icon: ClipboardList },
-    { to: "/calendar", labelKey: "cmdk.nav.calendar", icon: CalendarDays },
-    { to: "/compliance-calendar", labelKey: "cmdk.nav.compliance", icon: CalendarDays },
-    { to: "/drug-testing", labelKey: "cmdk.nav.drugTesting", icon: ShieldCheck },
-    { to: "/ifta", labelKey: "cmdk.nav.ifta", icon: Fuel },
-    { to: "/irp", labelKey: "cmdk.nav.irp", icon: MapPin },
-    { to: "/hvut", labelKey: "cmdk.nav.hvut", icon: Receipt },
-    { to: "/reports", labelKey: "cmdk.nav.reports", icon: BarChart3 },
-    { to: "/finance", labelKey: "cmdk.nav.finance", icon: DollarSign },
-    { to: "/settings", labelKey: "cmdk.nav.settings", icon: Settings },
-  ];
+  // Same feature gating the sidebar applies — without it Cmd+K would happily
+  // navigate to a route that FeatureGate renders as NotFound.
+  const nav = (
+    [
+      { to: "/dashboard", labelKey: "cmdk.nav.dashboard", icon: LayoutDashboard },
+      { to: "/clients", labelKey: "cmdk.nav.clients", icon: Users },
+      { to: "/trucks", labelKey: "cmdk.nav.trucks", icon: Truck },
+      { to: "/permits", labelKey: "cmdk.nav.permits", icon: FileCheck },
+      { to: "/tasks", labelKey: "cmdk.nav.tasks", icon: ClipboardList },
+      { to: "/calendar", labelKey: "cmdk.nav.calendar", icon: CalendarDays, feature: "calendar" },
+      { to: "/compliance-calendar", labelKey: "cmdk.nav.compliance", icon: CalendarDays },
+      { to: "/drug-testing", labelKey: "cmdk.nav.drugTesting", icon: ShieldCheck },
+      { to: "/ifta", labelKey: "cmdk.nav.ifta", icon: Fuel },
+      { to: "/irp", labelKey: "cmdk.nav.irp", icon: MapPin },
+      { to: "/hvut", labelKey: "cmdk.nav.hvut", icon: Receipt },
+      { to: "/reports", labelKey: "cmdk.nav.reports", icon: BarChart3 },
+      { to: "/finance", labelKey: "cmdk.nav.finance", icon: DollarSign, feature: "finance" },
+      { to: "/settings", labelKey: "cmdk.nav.settings", icon: Settings },
+    ] as Array<{ to: string; labelKey: string; icon: typeof Users; feature?: FeatureFlag }>
+  ).filter((n) => !n.feature || hasFeature(n.feature));
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>

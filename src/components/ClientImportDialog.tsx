@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { lookupCarrier, type FmcsaResult } from "@/hooks/useFmcsaLookup";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2, Hash, Search } from "lucide-react";
-// xlsx is dynamically imported to avoid bundling issues
+import { parseSpreadsheet, UnsupportedLegacyXlsError } from "@/lib/spreadsheet";
 
 interface DotRow {
   dot: string;
@@ -142,28 +142,23 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
   const dotSelectedCount = dotRows.filter((r) => r.selected && r.result).length;
 
   const handleFile = useCallback(async (file: File) => {
-    const XLSX = await import("xlsx");
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json<Record<string, string>>(sheet, { defval: "" });
-        if (!json.length) {
-          toast({ title: t("import.emptyFile"), variant: "destructive" });
-          return;
-        }
-        const hdrs = Object.keys(json[0]);
-        setHeaders(hdrs);
-        setRows(json);
-        setMapping(detectMapping(hdrs));
-        setStep("mapping");
-      } catch {
-        toast({ title: t("import.parseError"), variant: "destructive" });
+    try {
+      const json = await parseSpreadsheet(file);
+      if (!json.length) {
+        toast({ title: t("import.emptyFile"), variant: "destructive" });
+        return;
       }
-    };
-    reader.readAsArrayBuffer(file);
+      const hdrs = Object.keys(json[0]);
+      setHeaders(hdrs);
+      setRows(json);
+      setMapping(detectMapping(hdrs));
+      setStep("mapping");
+    } catch (err) {
+      toast({
+        title: err instanceof UnsupportedLegacyXlsError ? t("import.legacyXls") : t("import.parseError"),
+        variant: "destructive",
+      });
+    }
   }, [toast, t]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -264,7 +259,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
                 <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                 <p className="text-sm text-muted-foreground">{t("import.dragDrop")}</p>
                 <p className="text-xs text-muted-foreground mt-1">{t("import.fileTypes")}</p>
-                <input id="import-file-input" type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleInput} />
+                <input id="import-file-input" type="file" accept=".xlsx,.csv" className="hidden" onChange={handleInput} />
               </div>
             ) : (
               <div className="space-y-3">

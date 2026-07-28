@@ -137,7 +137,7 @@ export default function ClientDetail() {
         <td>${escapeHtml(p.permit_type)}</td>
         <td>${escapeHtml(p.permit_number || "—")}</td>
         <td>${escapeHtml(p.state || "—")}</td>
-        <td>${exp ? format(exp, "dd/MM/yyyy") : "—"}</td>
+        <td>${exp ? format(exp, "MM/dd/yyyy") : "—"}</td>
         <td style="color:${!exp || diff! < 0 ? "#dc2626" : diff! <= 30 ? "#dc2626" : diff! <= 90 ? "#d97706" : "#16a34a"}">${status}</td>
       </tr>`;
     }).join("");
@@ -664,7 +664,7 @@ export default function ClientDetail() {
                           <TableCell className="font-mono text-xs">{permit.permit_number || "—"}</TableCell>
                           <TableCell>{(permit as any).trucks?.plate || "—"}</TableCell>
                           <TableCell>{permit.state || "—"}</TableCell>
-                          <TableCell>{permit.expiration_date ? format(new Date(permit.expiration_date), "dd/MM/yyyy") : "—"}</TableCell>
+                          <TableCell>{permit.expiration_date ? format(new Date(permit.expiration_date), "MM/dd/yyyy") : "—"}</TableCell>
                           <TableCell><Badge className={expStatus.color}>{expStatus.label}</Badge></TableCell>
                           <TableCell>
                             {permit.document_url ? (
@@ -753,8 +753,8 @@ export default function ClientDetail() {
                               {msg.status === "sent" ? t("clientDetail.msgSent") : msg.status === "pending" ? t("clientDetail.msgPending") : msg.status === "failed" ? t("clientDetail.msgFailed") : t("clientDetail.msgCancelled")}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-sm">{format(new Date(msg.scheduled_at), "dd/MM/yyyy HH:mm")}</TableCell>
-                          <TableCell className="text-sm">{msg.sent_at ? format(new Date(msg.sent_at), "dd/MM/yyyy HH:mm") : "—"}</TableCell>
+                          <TableCell className="text-sm">{format(new Date(msg.scheduled_at), "MM/dd/yyyy HH:mm")}</TableCell>
+                          <TableCell className="text-sm">{msg.sent_at ? format(new Date(msg.sent_at), "MM/dd/yyyy HH:mm") : "—"}</TableCell>
                           <TableCell>
                             {msg.status === "failed" && (
                               <Button

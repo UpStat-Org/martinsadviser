@@ -1,6 +1,6 @@
 
 -- Migration 1: compliance task automation
-CREATE TABLE public.compliance_automation_settings (
+CREATE TABLE IF NOT EXISTS public.compliance_automation_settings (
   org_id       uuid PRIMARY KEY REFERENCES public.organizations(id) ON DELETE CASCADE,
   enabled      boolean NOT NULL DEFAULT true,
   lead_days    integer NOT NULL DEFAULT 30 CHECK (lead_days BETWEEN 1 AND 180),
@@ -20,14 +20,17 @@ GRANT ALL ON public.compliance_automation_settings TO service_role;
 
 ALTER TABLE public.compliance_automation_settings ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org members read compliance automation settings" ON public.compliance_automation_settings;
 CREATE POLICY "org members read compliance automation settings"
   ON public.compliance_automation_settings FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "org admins upsert compliance automation settings" ON public.compliance_automation_settings;
 CREATE POLICY "org admins upsert compliance automation settings"
   ON public.compliance_automation_settings FOR INSERT TO authenticated
   WITH CHECK (public.is_org_admin(org_id));
 
+DROP POLICY IF EXISTS "org admins update compliance automation settings" ON public.compliance_automation_settings;
 CREATE POLICY "org admins update compliance automation settings"
   ON public.compliance_automation_settings FOR UPDATE TO authenticated
   USING (public.is_org_admin(org_id))
@@ -41,7 +44,7 @@ INSERT INTO public.compliance_automation_settings (org_id)
 VALUES ('00000000-0000-0000-0000-000000000001')
 ON CONFLICT (org_id) DO NOTHING;
 
-CREATE TABLE public.compliance_task_log (
+CREATE TABLE IF NOT EXISTS public.compliance_task_log (
   id          uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   org_id      uuid NOT NULL DEFAULT public.current_org_id()
                 REFERENCES public.organizations(id) ON DELETE CASCADE,
@@ -62,6 +65,7 @@ CREATE INDEX idx_compliance_task_log_client ON public.compliance_task_log(client
 
 ALTER TABLE public.compliance_task_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org members read compliance task log" ON public.compliance_task_log;
 CREATE POLICY "org members read compliance task log"
   ON public.compliance_task_log FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
@@ -93,7 +97,7 @@ END
 $$;
 
 -- Migration 2: dunning + aging
-CREATE TABLE public.dunning_settings (
+CREATE TABLE IF NOT EXISTS public.dunning_settings (
   org_id      uuid PRIMARY KEY REFERENCES public.organizations(id) ON DELETE CASCADE,
   enabled     boolean NOT NULL DEFAULT true,
   auto_send   boolean NOT NULL DEFAULT false,
@@ -111,14 +115,17 @@ GRANT ALL ON public.dunning_settings TO service_role;
 
 ALTER TABLE public.dunning_settings ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org members read dunning settings" ON public.dunning_settings;
 CREATE POLICY "org members read dunning settings"
   ON public.dunning_settings FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "org admins insert dunning settings" ON public.dunning_settings;
 CREATE POLICY "org admins insert dunning settings"
   ON public.dunning_settings FOR INSERT TO authenticated
   WITH CHECK (public.is_org_admin(org_id));
 
+DROP POLICY IF EXISTS "org admins update dunning settings" ON public.dunning_settings;
 CREATE POLICY "org admins update dunning settings"
   ON public.dunning_settings FOR UPDATE TO authenticated
   USING (public.is_org_admin(org_id))
@@ -132,7 +139,7 @@ INSERT INTO public.dunning_settings (org_id)
 VALUES ('00000000-0000-0000-0000-000000000001')
 ON CONFLICT (org_id) DO NOTHING;
 
-CREATE TABLE public.dunning_log (
+CREATE TABLE IF NOT EXISTS public.dunning_log (
   id          uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   org_id      uuid NOT NULL DEFAULT public.current_org_id()
                 REFERENCES public.organizations(id) ON DELETE CASCADE,
@@ -151,6 +158,7 @@ CREATE INDEX idx_dunning_log_invoice ON public.dunning_log(invoice_id);
 
 ALTER TABLE public.dunning_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org members read dunning log" ON public.dunning_log;
 CREATE POLICY "org members read dunning log"
   ON public.dunning_log FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));

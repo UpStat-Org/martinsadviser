@@ -39,19 +39,23 @@ CREATE TRIGGER update_organization_domains_updated_at
 
 ALTER TABLE public.organization_domains ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "org admins read domains" ON public.organization_domains;
 CREATE POLICY "org admins read domains"
   ON public.organization_domains FOR SELECT TO authenticated
   USING (public.is_org_admin(organization_id));
 
+DROP POLICY IF EXISTS "org admins insert domains" ON public.organization_domains;
 CREATE POLICY "org admins insert domains"
   ON public.organization_domains FOR INSERT TO authenticated
   WITH CHECK (public.is_org_admin(organization_id));
 
+DROP POLICY IF EXISTS "org admins update domains" ON public.organization_domains;
 CREATE POLICY "org admins update domains"
   ON public.organization_domains FOR UPDATE TO authenticated
   USING (public.is_org_admin(organization_id))
   WITH CHECK (public.is_org_admin(organization_id));
 
+DROP POLICY IF EXISTS "org admins delete domains" ON public.organization_domains;
 CREATE POLICY "org admins delete domains"
   ON public.organization_domains FOR DELETE TO authenticated
   USING (public.is_org_admin(organization_id));

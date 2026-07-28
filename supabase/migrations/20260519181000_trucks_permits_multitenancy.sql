@@ -52,6 +52,7 @@ CREATE POLICY "org members delete trucks"
   ON public.trucks FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "Portal users can view their trucks" ON public.trucks;
 CREATE POLICY "Portal users can view their trucks"
   ON public.trucks FOR SELECT TO authenticated
   USING (
@@ -105,6 +106,7 @@ CREATE POLICY "org members delete permits"
   ON public.permits FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "Portal users can view their permits" ON public.permits;
 CREATE POLICY "Portal users can view their permits"
   ON public.permits FOR SELECT TO authenticated
   USING (

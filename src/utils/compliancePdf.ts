@@ -1,4 +1,8 @@
 import { format } from "date-fns";
+import { tNow } from "@/lib/translations";
+
+// tNow (not the useLanguage hook) because this module builds an HTML document
+// outside React — same pattern as ErrorBoundary.
 
 function escapeHtml(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -25,7 +29,9 @@ function getPermitStats(permits: PermitData[]) {
     return new Date(p.expiration_date) > now;
   });
   const score = permits.length > 0 ? Math.round((valid.length / permits.length) * 100) : 0;
-  const healthLabel = score >= 80 ? "Saudável" : score >= 50 ? "Atenção" : "Crítico";
+  const healthLabel = tNow(
+    score >= 80 ? "compliancePdf.healthy" : score >= 50 ? "compliancePdf.warning" : "compliancePdf.critical",
+  );
   const healthColor = score >= 80 ? "#16a34a" : score >= 50 ? "#d97706" : "#dc2626";
   return { score, healthLabel, healthColor, validCount: valid.length };
 }
@@ -34,13 +40,19 @@ function generatePermitRows(permits: PermitData[]): string {
   return permits.map((p) => {
     const exp = p.expiration_date ? new Date(p.expiration_date) : null;
     const diff = exp ? Math.ceil((exp.getTime() - Date.now()) / 86400000) : null;
-    const status = !exp ? "Sem data" : diff! < 0 ? "Vencido" : diff! <= 30 ? `${diff}d restantes` : diff! <= 90 ? `${diff}d restantes` : "Válido";
+    const status = !exp
+      ? tNow("compliancePdf.noDate")
+      : diff! < 0
+        ? tNow("compliancePdf.expired")
+        : diff! <= 90
+          ? tNow("compliancePdf.daysLeft").replace("{days}", String(diff))
+          : tNow("compliancePdf.valid");
     const color = !exp || diff! < 0 ? "#dc2626" : diff! <= 30 ? "#dc2626" : diff! <= 90 ? "#d97706" : "#16a34a";
     return `<tr>
       <td>${escapeHtml(p.permit_type)}</td>
       <td>${escapeHtml(p.permit_number || "—")}</td>
       <td>${escapeHtml(p.state || "—")}</td>
-      <td>${exp ? format(exp, "dd/MM/yyyy") : "—"}</td>
+      <td>${exp ? format(exp, "MM/dd/yyyy") : "—"}</td>
       <td style="color:${color}">${status}</td>
     </tr>`;
   }).join("");
@@ -61,13 +73,15 @@ export function generateClientComplianceSection(client: ClientData, permits: Per
         <span style="font-size:24px;font-weight:bold;color:${healthColor}">${score}%</span>
         <span style="font-size:12px;color:${healthColor};margin-left:8px;">${healthLabel}</span>
       </div>
-      <p style="font-size:12px;color:#666;margin-bottom:8px">${validCount} de ${permits.length} permits em dia</p>
+      <p style="font-size:12px;color:#666;margin-bottom:8px">${tNow("compliancePdf.upToDate")
+        .replace("{valid}", String(validCount))
+        .replace("{total}", String(permits.length))}</p>
       ${permits.length > 0 ? `
         <table>
-          <thead><tr><th>Tipo</th><th>Número</th><th>Estado</th><th>Validade</th><th>Status</th></tr></thead>
+          <thead><tr><th>${tNow("compliancePdf.colType")}</th><th>${tNow("compliancePdf.colNumber")}</th><th>${tNow("compliancePdf.colState")}</th><th>${tNow("compliancePdf.colExpiry")}</th><th>${tNow("compliancePdf.colStatus")}</th></tr></thead>
           <tbody>${generatePermitRows(permits)}</tbody>
         </table>
-      ` : '<p style="font-size:12px;color:#999;">Nenhum permit cadastrado</p>'}
+      ` : `<p style="font-size:12px;color:#999;">${tNow("compliancePdf.noPermits")}</p>`}
     </div>
   `;
 }
@@ -86,7 +100,7 @@ export function generateBatchCompliancePdf(clientsWithPermits: Array<{ client: C
       }, 0) / clientsWithPermits.length)
     : 0;
 
-  const html = `<!DOCTYPE html><html><head><title>Relatório de Compliance em Lote</title>
+  const html = `<!DOCTYPE html><html><head><title>${tNow("compliancePdf.batchTitle")}</title>
     <style>
       body{font-family:Arial,sans-serif;margin:40px;color:#1a1a1a}
       h1{font-size:22px;margin-bottom:4px}
@@ -101,12 +115,12 @@ export function generateBatchCompliancePdf(clientsWithPermits: Array<{ client: C
       .footer{margin-top:24px;font-size:10px;color:#999;text-align:right}
       @media print { .client-section { page-break-inside: avoid; } }
     </style></head><body>
-    <h1>Relatório de Compliance em Lote</h1>
-    <div class="meta">${new Date().toLocaleDateString()} — ${totalClients} clientes</div>
+    <h1>${tNow("compliancePdf.batchTitle")}</h1>
+    <div class="meta">${new Date().toLocaleDateString()} — ${tNow("compliancePdf.clientsCount").replace("{count}", String(totalClients))}</div>
     <div class="summary">
-      <div class="summary-item"><div class="number">${totalClients}</div><div class="label">Clientes</div></div>
-      <div class="summary-item"><div class="number">${totalPermits}</div><div class="label">Permits</div></div>
-      <div class="summary-item"><div class="number">${avgScore}%</div><div class="label">Score Médio</div></div>
+      <div class="summary-item"><div class="number">${totalClients}</div><div class="label">${tNow("compliancePdf.clients")}</div></div>
+      <div class="summary-item"><div class="number">${totalPermits}</div><div class="label">${tNow("compliancePdf.permits")}</div></div>
+      <div class="summary-item"><div class="number">${avgScore}%</div><div class="label">${tNow("compliancePdf.avgScore")}</div></div>
     </div>
     ${sections}
     <div class="footer">DotPilot — Batch Compliance Report</div>

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { tNow } from "@/lib/translations";
-
-const FMCSA_WEB_KEY = import.meta.env.VITE_FMCSA_WEB_KEY || "";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface FmcsaResult {
   company_name: string;
@@ -22,34 +21,24 @@ export interface FmcsaResult {
  * Bare FMCSA QC lookup — no toasts, no React state. Returns the parsed carrier
  * or null when not found / on error. Used by the single-DOT hook and by the
  * bulk DOT importer (which manages its own progress UI).
+ *
+ * Goes through the `fmcsa-lookup` edge function rather than calling the FMCSA
+ * QC API from the browser: the web key is a server-side secret (a VITE_ var
+ * would ship in the bundle) and the function already proxies around the
+ * upstream TLS issue. The function returns this exact shape.
  */
 export async function lookupCarrier(dotNumber: string): Promise<FmcsaResult | null> {
   const trimmed = dotNumber?.trim();
   if (!trimmed) return null;
 
-  const apiUrl = `https://mobile.fmcsa.dot.gov/qc/services/carriers/${trimmed}?webKey=${FMCSA_WEB_KEY}`;
-  const response = await fetch(apiUrl, { headers: { Accept: "application/json" } });
-  if (!response.ok) return null;
+  const { data, error } = await supabase.functions.invoke<FmcsaResult>("fmcsa-lookup", {
+    body: { dot_number: trimmed },
+  });
+  // The function answers 400 for "carrier not found" as well as for real
+  // failures, so both collapse to null — same contract as before.
+  if (error || !data) return null;
 
-  const data = await response.json();
-  const carrier = data?.content?.carrier;
-  if (!carrier) return null;
-
-  return {
-    company_name: carrier.legalName || carrier.dbaName || "",
-    phone: carrier.phyPhone || "",
-    address: [carrier.phyStreet, carrier.phyCity, carrier.phyState, carrier.phyZipcode]
-      .filter(Boolean)
-      .join(", "),
-    mc: carrier.mcNumber != null ? String(carrier.mcNumber) : "",
-    ein: carrier.ein != null ? String(carrier.ein) : "",
-    dot: String(carrier.dotNumber || trimmed),
-    totalDrivers: carrier.totalDrivers || 0,
-    totalPowerUnits: carrier.totalPowerUnits || 0,
-    carrierOperation: carrier.carrierOperation?.carrierOperationDesc || "",
-    safetyRating: carrier.safetyRating || "",
-    statusCode: carrier.statusCode || "",
-  };
+  return data;
 }
 
 export function useFmcsaLookup() {

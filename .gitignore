@@ -26,3 +26,9 @@ dist-ssr
 .codex/
 .claude/
 .agents/
+
+# Local env. The VITE_* vars are public by design (they ship in the bundle),
+# but the file has held a real API key before — see .env.example for the shape.
+.env
+.env.*
+!.env.example

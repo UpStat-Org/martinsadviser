@@ -42,7 +42,7 @@ export function LanguageSwitcher() {
           aria-hidden
           className="absolute top-1 bottom-1 rounded-full bg-primary text-primary-foreground hover:bg-primary/90
                      shadow-[0_6px_18px_-4px_hsl(234_75%_58%/0.6)]
-                     transition-[left,width] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+                     transition-[left,width] [transition-duration:450ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]"
           style={{ left: indicator.left, width: indicator.width }}
         />
 

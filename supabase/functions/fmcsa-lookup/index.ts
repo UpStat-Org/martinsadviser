@@ -69,8 +69,10 @@ Deno.serve(async (req) => {
       ]
         .filter(Boolean)
         .join(", "),
-      mc: carrier.mcNumber || "",
-      ein: carrier.ein || "",
+      // Stringified: the QC API returns these as numbers and every caller
+      // binds them straight into text inputs.
+      mc: carrier.mcNumber != null ? String(carrier.mcNumber) : "",
+      ein: carrier.ein != null ? String(carrier.ein) : "",
       dot: String(carrier.dotNumber || dot_number),
       totalDrivers: carrier.totalDrivers || 0,
       totalPowerUnits: carrier.totalPowerUnits || 0,

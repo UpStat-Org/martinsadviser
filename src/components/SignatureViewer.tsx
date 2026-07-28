@@ -45,7 +45,7 @@ export function SignatureViewer({ clientId }: SignatureViewerProps) {
                 <p className="text-xs text-muted-foreground mt-1">{sig.signer_name} {sig.signer_email && `• ${sig.signer_email}`}</p>
               </div>
               <Badge variant="outline" className="text-xs">
-                {format(new Date(sig.signed_at), "dd/MM/yyyy HH:mm")}
+                {format(new Date(sig.signed_at), "MM/dd/yyyy HH:mm")}
               </Badge>
             </div>
             <div className="border rounded-lg p-2 bg-muted/30">

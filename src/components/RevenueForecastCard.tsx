@@ -44,7 +44,7 @@ export function RevenueForecastCard() {
     return (
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground text-sm">
-          {t("common.loading") || "Carregando..."}
+          {t("common.loading")}
         </CardContent>
       </Card>
     );

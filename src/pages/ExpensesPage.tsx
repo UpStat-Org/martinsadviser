@@ -439,7 +439,7 @@ export default function ExpensesPage() {
                       {fmt(Number(exp.amount))}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {format(new Date(exp.incurred_on), "dd/MM/yyyy")}
+                      {format(new Date(exp.incurred_on), "MM/dd/yyyy")}
                     </TableCell>
                     <TableCell>
                       <StatusBadge tone={exp.billable ? "success" : "neutral"}>

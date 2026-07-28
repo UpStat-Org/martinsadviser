@@ -1,13 +1,21 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { verifyState } from "../_shared/oauthState.ts";
 
 Deno.serve(async (req) => {
   try {
     const url = new URL(req.url);
     const code = url.searchParams.get("code");
-    const userId = url.searchParams.get("state");
 
-    if (!code || !userId) {
-      return new Response("Missing code or state", { status: 400 });
+    if (!code) {
+      return new Response("Missing code", { status: 400 });
+    }
+
+    // This endpoint is public (Google calls it), so the state must prove it
+    // came from our own google-calendar-auth — otherwise the user_id below is
+    // just whatever the caller typed into the query string.
+    const userId = await verifyState(url.searchParams.get("state"));
+    if (!userId) {
+      return new Response("Invalid or expired state", { status: 400 });
     }
 
     const clientId = Deno.env.get("GOOGLE_CLIENT_ID")!;
@@ -55,7 +63,9 @@ Deno.serve(async (req) => {
     }
 
     // Redirect back to app settings
-    const appUrl = Deno.env.get("SITE_URL") || "https://dotpilot.lovable.app";
+    // Falls back through APP_URL (what every other function uses) before the
+    // platform domain, so the post-rebrand default matches the rest.
+    const appUrl = Deno.env.get("SITE_URL") || Deno.env.get("APP_URL") || "https://dotpilot.online";
     return new Response(null, {
       status: 302,
       headers: { Location: `${appUrl}/settings?gcal=connected` },

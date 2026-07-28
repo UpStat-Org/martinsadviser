@@ -277,7 +277,7 @@ export default function QuotesPage() {
                     </TableCell>
                     <TableCell className="text-sm">
                       {q.valid_until
-                        ? format(new Date(q.valid_until), "dd/MM/yyyy")
+                        ? format(new Date(q.valid_until), "MM/dd/yyyy")
                         : "—"}
                     </TableCell>
                     <TableCell>

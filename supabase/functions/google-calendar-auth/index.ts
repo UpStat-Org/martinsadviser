@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { issueState } from "../_shared/oauthState.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -44,7 +45,9 @@ Deno.serve(async (req) => {
       scope: scopes,
       access_type: "offline",
       prompt: "consent",
-      state: userId,
+      // Signed + time-limited: the callback is public, so a raw user_id here
+      // would let anyone bind their Google account to another user's row.
+      state: await issueState(userId),
     });
 
     const url = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;

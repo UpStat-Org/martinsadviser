@@ -16,6 +16,7 @@
 // real endpoints is isolated to fetchMotive() / fetchSamsara().
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { requireServiceRole } from "../_shared/serviceRoleGuard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -189,6 +190,12 @@ Deno.serve(async (req) => {
         .maybeSingle();
       if (!membership || !["owner", "admin"].includes(membership.role)) throw new Error("Forbidden");
       orgFilter = body.org_id;
+    } else {
+      // No org_id means the global cron run across every connection. Only the
+      // scheduler may ask for that — otherwise any signed-in user could sync
+      // (and rate-limit) every other tenant's ELD provider.
+      const denied = requireServiceRole(req, corsHeaders);
+      if (denied) return denied;
     }
 
     let q = supabase.from("eld_connections").select("*").eq("status", "connected");
@@ -273,7 +280,7 @@ Deno.serve(async (req) => {
             if (decided?.status === "ignored") continue; // operator chose to ignore
 
             // Resolve the target driver: explicit link first, then auto-match.
-            let driver =
+            const driver =
               (decided?.status === "linked" && decided.driver_id && driverById.get(decided.driver_id)) ||
               (rec.driverEmail && byEmail.get(rec.driverEmail.toLowerCase())) ||
               (rec.driverName && byName.get(rec.driverName.toLowerCase())) ||

@@ -83,7 +83,7 @@ export default function PermitDetail() {
             <Info label={t("permitDetail.fieldNumber")} value={permit.permit_number || "—"} icon={<Hash className="w-4 h-4" />} />
             <Info
               label={t("permitDetail.fieldExpiration")}
-              value={permit.expiration_date ? format(new Date(permit.expiration_date), "dd/MM/yyyy") : "—"}
+              value={permit.expiration_date ? format(new Date(permit.expiration_date), "MM/dd/yyyy") : "—"}
               icon={<CalendarDays className="w-4 h-4" />}
             />
           </CardContent>
@@ -142,7 +142,7 @@ export default function PermitDetail() {
                     className="flex items-center justify-between rounded-md bg-muted/40 border border-border/50 p-3 hover:bg-muted"
                   >
                     <span className="text-sm font-semibold">v{doc.version}</span>
-                    <span className="text-xs text-muted-foreground">{format(new Date(doc.created_at), "dd/MM/yyyy")}</span>
+                    <span className="text-xs text-muted-foreground">{format(new Date(doc.created_at), "MM/dd/yyyy")}</span>
                   </DocumentLink>
                 ))}
               </>
@@ -165,7 +165,7 @@ export default function PermitDetail() {
                 <div key={entry.id} className="rounded-md bg-muted/40 border border-border/50 p-3">
                   <div className="text-sm font-semibold">{entry.change_type}</div>
                   <div className="text-xs text-muted-foreground">
-                    {format(new Date(entry.created_at), "dd/MM/yyyy HH:mm")}
+                    {format(new Date(entry.created_at), "MM/dd/yyyy HH:mm")}
                   </div>
                   {entry.notes && <p className="text-sm text-muted-foreground mt-1">{entry.notes}</p>}
                 </div>

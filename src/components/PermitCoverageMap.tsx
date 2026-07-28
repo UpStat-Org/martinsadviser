@@ -304,7 +304,7 @@ export function PermitCoverageMap({ permits, compact = false, defaultCountry }: 
                       <div className="flex items-center gap-2 shrink-0">
                         {p.expiration_date && (
                           <span className="text-xs text-muted-foreground">
-                            {format(new Date(p.expiration_date), "dd/MM/yyyy")}
+                            {format(new Date(p.expiration_date), "MM/dd/yyyy")}
                           </span>
                         )}
                         {getStatusBadge(p)}

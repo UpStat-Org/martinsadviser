@@ -1,5 +1,14 @@
 project_id = "zidfrlzgftaqhnvedpnm"
 
+# Only functions that MUST be reachable without a Supabase JWT belong here.
+# Everything else keeps verify_jwt at its default (true) so the gateway rejects
+# unsigned callers before our code runs.
+#
+# Deliberately NOT listed: generate-notifications, generate-compliance-tasks,
+# generate-dunning. They are cron-only batches that run service-role across
+# every org; pg_cron already sends `Bearer <service_role_key>`, so gateway
+# verification costs nothing and their requireServiceRole() guard relies on it.
+
 [functions.create-portal-user]
 verify_jwt = false
 
@@ -15,23 +24,17 @@ verify_jwt = false
 [functions.google-calendar-auth]
 verify_jwt = false
 
+# OAuth redirect target — Google calls it with no Supabase JWT.
 [functions.google-calendar-callback]
 verify_jwt = false
 
 [functions.google-calendar-sync]
 verify_jwt = false
 
-[functions.generate-notifications]
-verify_jwt = false
-
+# Stripe calls this with its own HMAC signature, verified in the handler.
 [functions.stripe-webhook]
 verify_jwt = false
 
+# Public by design: exchanges a one-time portal token for credentials.
 [functions.redeem-portal-token]
-verify_jwt = false
-
-[functions.generate-compliance-tasks]
-verify_jwt = false
-
-[functions.generate-dunning]
 verify_jwt = false

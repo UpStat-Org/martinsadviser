@@ -40,6 +40,7 @@ DROP POLICY IF EXISTS "Admins can manage portal users" ON public.client_portal_u
 
 -- Portal user reading their own link (used by the portal frontend to resolve
 -- which client they have access to). Independent of org membership.
+DROP POLICY IF EXISTS "Portal users can view own links" ON public.client_portal_users;
 CREATE POLICY "Portal users can view own links"
   ON public.client_portal_users FOR SELECT TO authenticated
   USING (auth.uid() = user_id);

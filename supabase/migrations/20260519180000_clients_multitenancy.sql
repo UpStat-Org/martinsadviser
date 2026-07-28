@@ -62,6 +62,7 @@ CREATE POLICY "org members delete clients"
 -- Portal user access: a portal user (linked via client_portal_users) can read
 -- their own client. The link table itself is org-scoped in a later migration,
 -- which transitively guarantees the same-org invariant.
+DROP POLICY IF EXISTS "Portal users can view their client" ON public.clients;
 CREATE POLICY "Portal users can view their client"
   ON public.clients FOR SELECT TO authenticated
   USING (

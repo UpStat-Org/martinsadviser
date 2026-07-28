@@ -41,9 +41,11 @@ CREATE POLICY "Authenticated users can view all clients"
 CREATE POLICY "Authenticated users can create clients"
   ON public.clients FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Authenticated users can update clients" ON public.clients;
 CREATE POLICY "Authenticated users can update clients"
   ON public.clients FOR UPDATE TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can delete clients" ON public.clients;
 CREATE POLICY "Authenticated users can delete clients"
   ON public.clients FOR DELETE TO authenticated USING (true);
 

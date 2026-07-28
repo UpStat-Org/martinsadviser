@@ -82,7 +82,7 @@ export default function SettingsPage() {
       toast({ title: t("settings.profileUpdated") });
     } catch (e: any) {
       toast({
-        title: "Erro ao salvar",
+        title: t("settings.saveError"),
         description: e.message,
         variant: "destructive",
       });

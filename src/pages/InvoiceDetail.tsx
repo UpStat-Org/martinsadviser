@@ -120,8 +120,8 @@ export default function InvoiceDetail() {
           <CardContent className="grid sm:grid-cols-2 gap-4 text-sm">
             <Info label={t("common.client")} value={invoice.clients?.company_name || "—"} to={`/clients/${invoice.client_id}`} icon={<Building2 className="w-4 h-4" />} />
             <Info label={t("common.value")} value={fmt(Number(invoice.amount))} icon={<DollarSign className="w-4 h-4" />} />
-            <Info label={t("common.dueDate")} value={format(new Date(invoice.due_date), "dd/MM/yyyy")} icon={<CalendarDays className="w-4 h-4" />} />
-            <Info label={t("common.paymentDate")} value={invoice.paid_date ? format(new Date(invoice.paid_date), "dd/MM/yyyy") : "—"} icon={<CalendarDays className="w-4 h-4" />} />
+            <Info label={t("common.dueDate")} value={format(new Date(invoice.due_date), "MM/dd/yyyy")} icon={<CalendarDays className="w-4 h-4" />} />
+            <Info label={t("common.paymentDate")} value={invoice.paid_date ? format(new Date(invoice.paid_date), "MM/dd/yyyy") : "—"} icon={<CalendarDays className="w-4 h-4" />} />
           </CardContent>
         </Card>
 
@@ -152,7 +152,7 @@ export default function InvoiceDetail() {
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <FileCheck className="w-4 h-4" />
-              Documentos relacionados
+              {t("invoiceDetail.relatedDocs")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">

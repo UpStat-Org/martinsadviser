@@ -20,12 +20,16 @@ interface BillingInfo {
   is_master_org: boolean;
 }
 
-const STATUS_BADGE: Record<string, { label: string; tone: "default" | "secondary" | "outline" | "destructive" }> = {
-  trialing: { label: "Em trial", tone: "secondary" },
-  active: { label: "Ativa", tone: "default" },
-  past_due: { label: "Pagamento atrasado", tone: "destructive" },
-  canceled: { label: "Cancelada", tone: "destructive" },
-  suspended: { label: "Suspensa", tone: "destructive" },
+type BadgeTone = "default" | "secondary" | "outline" | "destructive";
+
+// Label keys, not labels — the tone is static but the text has to follow the
+// active language.
+const STATUS_BADGE: Record<string, { labelKey: string; tone: BadgeTone }> = {
+  trialing: { labelKey: "orgBilling.status.trialing", tone: "secondary" },
+  active: { labelKey: "orgBilling.status.active", tone: "default" },
+  past_due: { labelKey: "orgBilling.status.pastDue", tone: "destructive" },
+  canceled: { labelKey: "orgBilling.status.canceled", tone: "destructive" },
+  suspended: { labelKey: "orgBilling.status.suspended", tone: "destructive" },
 };
 
 export function OrgBillingPanel() {
@@ -38,8 +42,10 @@ export function OrgBillingPanel() {
   useEffect(() => {
     const billing = searchParams.get("billing");
     if (!billing) return;
-    if (billing === "success") toast({ title: "Assinatura iniciada!", description: "Pode levar alguns segundos pra refletir aqui." });
-    if (billing === "canceled") toast({ title: "Checkout cancelado", variant: "destructive" });
+    if (billing === "success") {
+      toast({ title: tNow("orgBilling.checkoutSuccess"), description: tNow("orgBilling.checkoutSuccessDesc") });
+    }
+    if (billing === "canceled") toast({ title: tNow("orgBilling.checkoutCanceled"), variant: "destructive" });
     // Clean the query so refresh doesn't re-trigger the toast.
     const next = new URLSearchParams(searchParams);
     next.delete("billing");
@@ -78,7 +84,7 @@ export function OrgBillingPanel() {
       if (!data?.url) throw new Error(tNow("orgBilling.stripeNoCheckoutUrl"));
       window.location.href = data.url;
     },
-    onError: (e: any) => toast({ title: "Falha ao iniciar checkout", description: e.message, variant: "destructive" }),
+    onError: (e: any) => toast({ title: tNow("orgBilling.checkoutFailed"), description: e.message, variant: "destructive" }),
   });
 
   const openPortal = useMutation({
@@ -92,7 +98,7 @@ export function OrgBillingPanel() {
       if (!data?.url) throw new Error(tNow("orgBilling.stripeNoPortalUrl"));
       window.location.href = data.url;
     },
-    onError: (e: any) => toast({ title: "Falha ao abrir portal", description: e.message, variant: "destructive" }),
+    onError: (e: any) => toast({ title: tNow("orgBilling.portalFailed"), description: e.message, variant: "destructive" }),
   });
 
   if (!currentOrg) return null;
@@ -110,7 +116,10 @@ export function OrgBillingPanel() {
 
   const info = billing.data;
   const status = info?.subscription_status ?? currentOrg.subscription_status ?? "trialing";
-  const badge = STATUS_BADGE[status] ?? { label: status, tone: "outline" as const };
+  const badgeMeta = STATUS_BADGE[status];
+  // Unknown status (a Stripe state we don't map yet) falls back to the raw
+  // value rather than an empty badge.
+  const badge = { label: badgeMeta ? t(badgeMeta.labelKey) : status, tone: badgeMeta?.tone ?? ("outline" as const) };
   const hasSubscription = !!info?.stripe_subscription_id;
 
   // Master orgs (cliente 0) don't go through Stripe — show a different
@@ -142,10 +151,10 @@ export function OrgBillingPanel() {
           <div>
             <h3 className="text-base font-semibold flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
-              Assinatura
+              {t("orgBilling.title")}
             </h3>
             <p className="text-xs text-muted-foreground mt-1">
-              Plano flat mensal. Pagamento processado via Stripe.
+              {t("orgBilling.subtitle")}
             </p>
           </div>
           <Badge variant={badge.tone}>{badge.label}</Badge>
@@ -159,12 +168,12 @@ export function OrgBillingPanel() {
           <div className="space-y-4">
             {info?.trial_ends_at && status === "trialing" && (
               <div className="rounded-md border border-border/50 bg-muted/30 px-3 py-2 text-xs">
-                Trial termina em {format(new Date(info.trial_ends_at), "dd/MM/yyyy")}.
+                {t("orgBilling.trialEndsAt").replace("{date}", format(new Date(info.trial_ends_at), "MM/dd/yyyy"))}
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <Field label="Status" value={badge.label} />
+              <Field label={t("orgBilling.fieldStatus")} value={badge.label} />
               <Field
                 label="Stripe customer"
                 value={info?.stripe_customer_id ? maskId(info.stripe_customer_id) : "—"}
@@ -175,19 +184,19 @@ export function OrgBillingPanel() {
                 value={info?.stripe_subscription_id ? maskId(info.stripe_subscription_id) : "—"}
                 mono
               />
-              <Field label="Trial" value={info?.trial_ends_at ? format(new Date(info.trial_ends_at), "dd/MM/yyyy") : "—"} />
+              <Field label={t("orgBilling.fieldTrial")} value={info?.trial_ends_at ? format(new Date(info.trial_ends_at), "MM/dd/yyyy") : "—"} />
             </div>
 
             <div className="flex flex-wrap gap-2 pt-2">
               {!hasSubscription ? (
                 <Button onClick={() => startCheckout.mutate()} disabled={startCheckout.isPending} className="gap-2">
                   {startCheckout.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                  Iniciar assinatura
+                  {t("orgBilling.startSubscription")}
                 </Button>
               ) : (
                 <Button onClick={() => openPortal.mutate()} disabled={openPortal.isPending} variant="outline" className="gap-2">
                   {openPortal.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}
-                  Gerenciar pagamento
+                  {t("orgBilling.managePayment")}
                 </Button>
               )}
             </div>

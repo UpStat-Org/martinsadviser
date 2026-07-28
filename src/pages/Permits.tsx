@@ -477,7 +477,7 @@ export default function Permits() {
                         {permit.expiration_date ? (
                           <div className="flex flex-col">
                             <span className="text-sm font-medium">
-                              {format(new Date(permit.expiration_date), "dd/MM/yyyy")}
+                              {format(new Date(permit.expiration_date), "MM/dd/yyyy")}
                             </span>
                             {diff !== null && (
                               <span

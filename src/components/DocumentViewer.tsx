@@ -70,7 +70,7 @@ export function DocumentViewer({ open, onOpenChange, url, title, versions }: Doc
                 <SelectContent>
                   {versions.map((v) => (
                     <SelectItem key={v.id} value={v.id}>
-                      v{v.version} — {format(new Date(v.created_at), "dd/MM/yy")}
+                      v{v.version} — {format(new Date(v.created_at), "MM/dd/yy")}
                       {v.is_current ? ` (${t("documents.current").toLowerCase()})` : ""}
                     </SelectItem>
                   ))}

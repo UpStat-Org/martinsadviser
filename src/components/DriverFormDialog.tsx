@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,12 +53,18 @@ export function DriverFormDialog({ open, onOpenChange, clientId, driver, default
   const { data: clients } = useClients(needsClientPicker ? "" : undefined);
   const [pickedClient, setPickedClient] = useState<string>("");
 
+  // `defaults` is an inline object at the call site, so a new identity every
+  // render. Read it through a ref: the seed must happen when the dialog opens,
+  // not every time the parent re-renders — that would wipe what's being typed.
+  const defaultsRef = useRef(defaults);
+  defaultsRef.current = defaults;
+
   useEffect(() => {
     if (driver) {
       const { id, org_id, created_at, updated_at, client_id, user_id, ...rest } = driver;
       setForm(rest);
     } else {
-      setForm({ ...EMPTY, ...defaults });
+      setForm({ ...EMPTY, ...defaultsRef.current });
       setPickedClient("");
     }
   }, [driver, open]);

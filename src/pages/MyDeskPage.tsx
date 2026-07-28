@@ -24,7 +24,6 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import { format } from "date-fns";
-import { pt, enUS, es } from "date-fns/locale";
 import { useAuth } from "@/hooks/useAuth";
 import { useAssignedPermits, useAssignedTasks } from "@/hooks/useWorkload";
 import { useScheduledMessages } from "@/hooks/useMessages";
@@ -35,8 +34,8 @@ import { useUpdateTask } from "@/hooks/useTasks";
 import { useRiskScores } from "@/hooks/useRiskScores";
 import { factorLabel, isAtRisk, bandLabelKey } from "@/lib/risk";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { formatWeekdayLong, formatDayMonthShort } from "@/lib/dates";
 
-const dateLocales = { pt, en: enUS, es };
 
 const PRIORITY_STYLES: Record<string, string> = {
   high: "bg-secondary text-secondary-foreground border border-border text-foreground border-0",
@@ -164,7 +163,7 @@ export default function MyDeskPage() {
           id: `permit-nodate-${permit.id}`,
           kind: "compliance",
           severity: "medium",
-          title: `${permit.permit_type} sem vencimento`,
+          title: t("mydesk.permitNoExpiration").replace("{type}", permit.permit_type),
           subtitle: permit.clients?.company_name ?? t("mydesk.noClient"),
           meta: t("mydesk.validateDate"),
           route: `/permits/${permit.id}`,
@@ -179,9 +178,14 @@ export default function MyDeskPage() {
           id: `permit-${permit.id}`,
           kind: "compliance",
           severity: diff < 0 ? "critical" : "high",
-          title: diff < 0 ? `${permit.permit_type} vencido` : `${permit.permit_type} vence em ${diff}d`,
+          title:
+            diff < 0
+              ? t("mydesk.permitExpired").replace("{type}", permit.permit_type)
+              : t("mydesk.permitExpiresIn")
+                  .replace("{type}", permit.permit_type)
+                  .replace("{days}", String(diff)),
           subtitle: permit.clients?.company_name ?? t("mydesk.noClient"),
-          meta: format(new Date(permit.expiration_date), "dd/MM/yyyy"),
+          meta: format(new Date(permit.expiration_date), "MM/dd/yyyy"),
           route: `/permits/${permit.id}`,
           icon: AlertTriangle,
         });
@@ -192,7 +196,7 @@ export default function MyDeskPage() {
           id: `permit-doc-${permit.id}`,
           kind: "compliance",
           severity: "low",
-          title: `${permit.permit_type} sem documento`,
+          title: t("mydesk.permitNoDocument").replace("{type}", permit.permit_type),
           subtitle: permit.clients?.company_name ?? t("mydesk.noClient"),
           meta: t("mydesk.attachDocument"),
           route: `/permits/${permit.id}`,
@@ -295,9 +299,7 @@ export default function MyDeskPage() {
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card border border-border mb-3">
                 <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
                 <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  {format(new Date(), "EEEE, dd 'de' MMMM", {
-                    locale: dateLocales[language],
-                  })}
+                  {formatWeekdayLong(new Date(), language)}
                 </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
@@ -547,9 +549,7 @@ export default function MyDeskPage() {
                         <Badge className={s.color}>{s.label}</Badge>
                         <span className="text-[11px] text-muted-foreground">
                           {p.expiration_date
-                            ? format(new Date(p.expiration_date), "dd MMM", {
-                                locale: dateLocales[language],
-                              })
+                            ? formatDayMonthShort(new Date(p.expiration_date), language)
                             : "—"}
                         </span>
                       </div>
@@ -651,9 +651,7 @@ export default function MyDeskPage() {
                                       : "text-muted-foreground"
                                   }
                                 >
-                                  {format(new Date(task.due_date), "dd MMM", {
-                                    locale: dateLocales[language],
-                                  })}
+                                  {formatDayMonthShort(new Date(task.due_date), language)}
                                 </span>
                               </>
                             )}

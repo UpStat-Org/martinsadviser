@@ -104,7 +104,7 @@ export default function SuperAdmin() {
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2">
           <Plus className="w-4 h-4" />
-          Criar org
+          Create org
         </Button>
       </header>
 
@@ -120,7 +120,7 @@ export default function SuperAdmin() {
             </div>
           ) : !listQuery.data?.length ? (
             <div className="p-10 text-sm text-muted-foreground text-center">
-              Nenhuma organização ainda.
+              No organizations yet.
             </div>
           ) : (
             <Table>
@@ -160,7 +160,7 @@ export default function SuperAdmin() {
                     <TableCell className="text-right tabular-nums">{org.permit_count}</TableCell>
                     <TableCell className="text-right tabular-nums">{org.truck_count}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {format(new Date(org.created_at), "dd/MM/yyyy")}
+                      {format(new Date(org.created_at), "MM/dd/yyyy")}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -211,7 +211,7 @@ function CreateOrgDialog({
       onOpenChange(false);
       onCreated();
     },
-    onError: (e: any) => toast({ title: "Falha ao criar", description: e.message, variant: "destructive" }),
+    onError: (e: any) => toast({ title: "Create failed", description: e.message, variant: "destructive" }),
   });
 
   return (
@@ -297,9 +297,9 @@ function OrgDetailsDrawer({
       setOwnerEmail("");
       detailsQuery.refetch();
       onChanged();
-      toast({ title: "Owner definido" });
+      toast({ title: "Owner set" });
     },
-    onError: (e: any) => toast({ title: "Falha", description: e.message, variant: "destructive" }),
+    onError: (e: any) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
   });
 
   const updateStatus = useMutation({
@@ -313,9 +313,9 @@ function OrgDetailsDrawer({
     onSuccess: () => {
       detailsQuery.refetch();
       onChanged();
-      toast({ title: "Status atualizado" });
+      toast({ title: "Status updated" });
     },
-    onError: (e: any) => toast({ title: "Falha", description: e.message, variant: "destructive" }),
+    onError: (e: any) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
   });
 
   const flagEntries = useMemo(() => {
@@ -328,7 +328,7 @@ function OrgDetailsDrawer({
     <Sheet open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <SheetContent className="sm:max-w-xl overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{details?.org.name ?? "Carregando..."}</SheetTitle>
+          <SheetTitle>{details?.org.name ?? "Loading…"}</SheetTitle>
           <SheetDescription className="font-mono text-xs">
             {details?.org.slug}.dotpilot.online
           </SheetDescription>
@@ -364,7 +364,7 @@ function OrgDetailsDrawer({
             {/* Set owner */}
             <section className="space-y-2">
               <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-                Definir owner por email
+                Set owner by email
               </Label>
               <div className="flex gap-2">
                 <Input

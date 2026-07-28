@@ -228,7 +228,7 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-3.5 w-3.5" />
-                        {date ? format(date, "dd/MM/yyyy") : "—"}
+                        {date ? format(date, "MM/dd/yyyy") : "—"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">

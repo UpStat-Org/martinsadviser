@@ -182,7 +182,9 @@ export default function LeadsPage() {
     );
   };
 
-  const all = leads ?? [];
+  // Memoised so the `?? []` fallback doesn't hand a fresh array to the three
+  // useMemos below on every render, defeating them.
+  const all = useMemo(() => leads ?? [], [leads]);
   const pipelineLeads = useMemo(
     () => all.filter((l) => PIPELINE_STAGES.includes(l.stage)),
     [all]

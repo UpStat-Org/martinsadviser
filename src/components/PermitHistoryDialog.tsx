@@ -1,5 +1,4 @@
 import { format } from "date-fns";
-import { pt } from "date-fns/locale";
 import { History, Loader2, FileCheck, RefreshCw, Pencil, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -30,8 +29,8 @@ function formatChanges(values: Record<string, any> | null, t: (key: string) => s
     state: t("permits.state"),
     expiration_date: t("permitDetail.fieldExpiration"),
     status: t("common.status"),
-    notes: t("permits.notes") !== "permits.notes" ? t("permits.notes") : "Notes",
-    document_url: t("permits.document") !== "permits.document" ? t("permits.document") : "Document",
+    notes: t("permits.notes"),
+    document_url: t("permits.document"),
     truck_id: t("permitDetail.fieldTruck"),
   };
   return Object.entries(values)
@@ -84,7 +83,7 @@ export function PermitHistoryDialog({ open, onOpenChange, permitId, permitLabel 
                           {t(config.labelKey)}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
-                          {format(new Date(entry.created_at), "dd/MM/yyyy HH:mm", { locale: pt })}
+                          {format(new Date(entry.created_at), "MM/dd/yyyy HH:mm")}
                         </span>
                       </div>
 

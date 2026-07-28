@@ -14,19 +14,16 @@ import {
 import { usePermits, getExpirationStatus } from "@/hooks/usePermits";
 import { Badge } from "@/components/ui/badge";
 import { format, isSameDay } from "date-fns";
-import { pt, enUS, es } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-
-const dateLocales = { pt, en: enUS, es };
+import { formatDateLong, formatDateMedium } from "@/lib/dates";
 
 export default function CalendarPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { data: permits, isLoading } = usePermits();
   const navigate = useNavigate();
   const { t, language } = useLanguage();
-  const locale = dateLocales[language];
 
   const permitsByDate = useMemo(() => {
     if (!permits) return new Map<string, typeof permits>();
@@ -302,7 +299,7 @@ export default function CalendarPage() {
                 <div>
                   <h2 className="font-bold text-base leading-tight">
                     {date
-                      ? format(date, "dd 'de' MMMM 'de' yyyy", { locale })
+                      ? formatDateLong(date, language)
                       : t("calendar.selectDate")}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -414,7 +411,7 @@ export default function CalendarPage() {
                 {heatmap.map((d) => (
                   <button
                     key={d.date.toISOString()}
-                    title={`${format(d.date, "dd/MM/yyyy")} — ${d.count} permit${d.count === 1 ? "" : "s"}`}
+                    title={`${format(d.date, "MM/dd/yyyy")} — ${d.count} permit${d.count === 1 ? "" : "s"}`}
                     onClick={() => {
                       setDate(d.date);
                       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -517,9 +514,7 @@ export default function CalendarPage() {
                           {p.state ? ` · ${p.state}` : ""}
                         </div>
                         <div className="text-[11px] text-muted-foreground mt-0.5">
-                          {format(new Date(p.expiration_date!), "dd MMM yyyy", {
-                            locale,
-                          })}
+                          {formatDateMedium(new Date(p.expiration_date!), language)}
                         </div>
                       </div>
                     </div>

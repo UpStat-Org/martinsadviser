@@ -117,7 +117,7 @@ export function OrgMembersPanel() {
       qc.invalidateQueries({ queryKey: ["org-invitations", currentOrg?.id] });
       toast({ title: "Convite revogado" });
     },
-    onError: (e: any) => toast({ title: "Falha ao revogar", description: e.message, variant: "destructive" }),
+    onError: (e: any) => toast({ title: t("orgMembers.revokeFailed"), description: e.message, variant: "destructive" }),
   });
 
   // The invite URL the owner copies. Always built off the current host so
@@ -222,7 +222,7 @@ export function OrgMembersPanel() {
                         <Badge variant="destructive">{t("orgMembers.invitedExpired")}</Badge>
                       ) : (
                         <span className="text-[11px] text-muted-foreground">
-                          {t("orgMembers.expiresAt")} {format(new Date(inv.expires_at), "dd/MM")}
+                          {t("orgMembers.expiresAt")} {format(new Date(inv.expires_at), "MM/dd")}
                         </span>
                       )}
                       <Button

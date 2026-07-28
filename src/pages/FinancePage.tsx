@@ -331,13 +331,15 @@ export default function FinancePage() {
 
   const exportFinanceCsv = () => {
     if (!filtered.length) return;
+    // Header labels follow the UI language — the CSV is opened by the same
+    // person who exported it.
     const rows = filtered.map((inv) => ({
-      Cliente: inv.clients?.company_name || "—",
-      Descrição: inv.description || "",
-      Valor: Number(inv.amount).toFixed(2),
-      Vencimento: inv.due_date,
-      Pagamento: inv.paid_date || "",
-      Status: statusLabel(inv.status),
+      [t("finance.csv.client")]: inv.clients?.company_name || "—",
+      [t("finance.csv.description")]: inv.description || "",
+      [t("finance.csv.amount")]: Number(inv.amount).toFixed(2),
+      [t("finance.csv.dueDate")]: inv.due_date,
+      [t("finance.csv.paymentDate")]: inv.paid_date || "",
+      [t("finance.csv.status")]: statusLabel(inv.status),
     }));
     const headers = Object.keys(rows[0]);
     const csv = [
@@ -940,7 +942,7 @@ export default function FinancePage() {
                     {fmt(Number(inv.amount))}
                   </TableCell>}
                   {columns.dueDate !== false && <TableCell className="text-sm">
-                    {format(new Date(inv.due_date), "dd/MM/yyyy")}
+                    {format(new Date(inv.due_date), "MM/dd/yyyy")}
                   </TableCell>}
                   {columns.status !== false && <TableCell>
                     <StatusBadge tone={STATUS_TONES[inv.status] ?? "neutral"}>

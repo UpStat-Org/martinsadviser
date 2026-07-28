@@ -333,7 +333,7 @@ export default function Messages() {
                         {replacePlaceholders(m.body, m.clients)}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {format(new Date(m.scheduled_at), "dd/MM/yyyy HH:mm", { locale })}
+                        {format(new Date(m.scheduled_at), "MM/dd/yyyy HH:mm", { locale })}
                       </TableCell>
                       <TableCell>{statusBadge(m.status)}</TableCell>
                       <TableCell>
@@ -436,7 +436,7 @@ export default function Messages() {
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {m.sent_at
-                          ? format(new Date(m.sent_at), "dd/MM/yyyy HH:mm", { locale })
+                          ? format(new Date(m.sent_at), "MM/dd/yyyy HH:mm", { locale })
                           : "—"}
                       </TableCell>
                       <TableCell>{statusBadge(m.status)}</TableCell>
@@ -702,7 +702,7 @@ export default function Messages() {
                 <Clock className="w-3.5 h-3.5" />
                 {t("messages.scheduledFor")}:{" "}
                 <span className="font-semibold text-foreground">
-                  {format(new Date(previewMsg.scheduled_at), "dd/MM/yyyy HH:mm", { locale })}
+                  {format(new Date(previewMsg.scheduled_at), "MM/dd/yyyy HH:mm", { locale })}
                 </span>
               </div>
             </div>

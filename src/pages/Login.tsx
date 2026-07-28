@@ -101,7 +101,7 @@ export default function Login() {
       const label = slug ?? hostname;
       toast({
         title: t("login.orgNotFound"),
-        description: `Não existe organização para "${label}". Verifique o endereço.`,
+        description: t("login.orgNotFoundDesc").replace("{label}", label),
         variant: "destructive",
       });
     }
