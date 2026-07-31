@@ -11,7 +11,7 @@ import { usePermitDocuments } from "@/hooks/usePermitDocuments";
 import { usePermitHistory } from "@/hooks/usePermitHistory";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import { CommentsSection } from "@/components/CommentsSection";
-import { DocumentLink } from "@/components/DocumentLink";
+import { PermitDocumentsCard } from "@/components/PermitDocumentsCard";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -116,41 +116,13 @@ export default function PermitDetail() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="border-border/50">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              {t("permitDetail.docsTitle")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {documentUrl ? (
-              <>
-                <button
-                  onClick={() => setDocOpen(true)}
-                  className="w-full rounded-md border border-border/50 p-3 text-left hover:bg-muted/40"
-                >
-                  <div className="text-sm font-semibold">{currentDoc?.file_name || `${permit.permit_type} documento`}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {documents?.length ? `${documents.length} versão(ões)` : "Documento atual"}
-                  </div>
-                </button>
-                {documents?.slice(0, 4).map((doc) => (
-                  <DocumentLink
-                    key={doc.id}
-                    path={doc.document_url}
-                    className="flex items-center justify-between rounded-md bg-muted/40 border border-border/50 p-3 hover:bg-muted"
-                  >
-                    <span className="text-sm font-semibold">v{doc.version}</span>
-                    <span className="text-xs text-muted-foreground">{format(new Date(doc.created_at), "MM/dd/yyyy")}</span>
-                  </DocumentLink>
-                ))}
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">{t("permitDetail.noDocs")}</p>
-            )}
-          </CardContent>
-        </Card>
+        <PermitDocumentsCard
+          permitId={permit.id}
+          permitLabel={`${permit.permit_type}${permit.permit_number ? ` ${permit.permit_number}` : ""}`}
+          documents={documents}
+          fallbackUrl={permit.document_url}
+          onView={() => setDocOpen(true)}
+        />
 
         <Card className="border-border/50">
           <CardHeader>

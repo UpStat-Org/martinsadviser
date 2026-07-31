@@ -21,7 +21,7 @@
 -- ============================================================================
 
 ALTER TABLE public.ai_chat_messages
-  ADD COLUMN org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
+  ADD COLUMN IF NOT EXISTS org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
 
 UPDATE public.ai_chat_messages acm
   SET org_id = c.org_id
@@ -32,7 +32,7 @@ ALTER TABLE public.ai_chat_messages
   ALTER COLUMN org_id SET NOT NULL,
   ALTER COLUMN org_id SET DEFAULT public.current_org_id();
 
-CREATE INDEX idx_ai_chat_messages_org_id ON public.ai_chat_messages(org_id);
+CREATE INDEX IF NOT EXISTS idx_ai_chat_messages_org_id ON public.ai_chat_messages(org_id);
 
 -- Drop both legacy policy sets.
 DROP POLICY IF EXISTS "Staff can view ai chat" ON public.ai_chat_messages;
@@ -42,14 +42,17 @@ DROP POLICY IF EXISTS "Authenticated users can view ai chat messages" ON public.
 DROP POLICY IF EXISTS "Authenticated users can create ai chat messages" ON public.ai_chat_messages;
 DROP POLICY IF EXISTS "Authenticated users can delete ai chat messages" ON public.ai_chat_messages;
 
+DROP POLICY IF EXISTS "org members read ai chat" ON public.ai_chat_messages;
 CREATE POLICY "org members read ai chat"
   ON public.ai_chat_messages FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "org members insert ai chat" ON public.ai_chat_messages;
 CREATE POLICY "org members insert ai chat"
   ON public.ai_chat_messages FOR INSERT TO authenticated
   WITH CHECK (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "org members delete ai chat" ON public.ai_chat_messages;
 CREATE POLICY "org members delete ai chat"
   ON public.ai_chat_messages FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));

@@ -12,20 +12,24 @@ CREATE TABLE IF NOT EXISTS permit_documents (
 );
 
 -- Index for fast lookups
-CREATE INDEX idx_permit_documents_permit_id ON permit_documents(permit_id);
-CREATE INDEX idx_permit_documents_is_current ON permit_documents(permit_id, is_current);
+CREATE INDEX IF NOT EXISTS idx_permit_documents_permit_id ON permit_documents(permit_id);
+CREATE INDEX IF NOT EXISTS idx_permit_documents_is_current ON permit_documents(permit_id, is_current);
 
 -- RLS
 ALTER TABLE permit_documents ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Authenticated users can read permit documents" ON permit_documents;
 CREATE POLICY "Authenticated users can read permit documents"
   ON permit_documents FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can insert permit documents" ON permit_documents;
 CREATE POLICY "Authenticated users can insert permit documents"
   ON permit_documents FOR INSERT TO authenticated WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Authenticated users can update permit documents" ON permit_documents;
 CREATE POLICY "Authenticated users can update permit documents"
   ON permit_documents FOR UPDATE TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can delete permit documents" ON permit_documents;
 CREATE POLICY "Authenticated users can delete permit documents"
   ON permit_documents FOR DELETE TO authenticated USING (true);

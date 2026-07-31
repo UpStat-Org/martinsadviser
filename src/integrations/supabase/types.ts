@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -175,11 +175,11 @@ export type Database = {
         }
         Insert: {
           client_id: string
-          content?: string
+          content: string
           created_at?: string
           id?: string
           org_id?: string
-          role?: string
+          role: string
           user_id?: string | null
         }
         Update: {
@@ -327,7 +327,7 @@ export type Database = {
           user_name: string
         }
         Insert: {
-          body?: string
+          body: string
           client_id: string
           created_at?: string
           id?: string
@@ -335,7 +335,7 @@ export type Database = {
           pinned?: boolean
           updated_at?: string
           user_id: string
-          user_name?: string
+          user_name: string
         }
         Update: {
           body?: string
@@ -2486,11 +2486,11 @@ export type Database = {
       }
       permit_documents: {
         Row: {
-          created_at: string
+          created_at: string | null
           document_url: string
           file_name: string | null
           id: string
-          is_current: boolean
+          is_current: boolean | null
           notes: string | null
           org_id: string
           permit_id: string
@@ -2498,11 +2498,11 @@ export type Database = {
           version: number
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           document_url: string
           file_name?: string | null
           id?: string
-          is_current?: boolean
+          is_current?: boolean | null
           notes?: string | null
           org_id?: string
           permit_id: string
@@ -2510,11 +2510,11 @@ export type Database = {
           version?: number
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           document_url?: string
           file_name?: string | null
           id?: string
-          is_current?: boolean
+          is_current?: boolean | null
           notes?: string | null
           org_id?: string
           permit_id?: string
@@ -3663,6 +3663,10 @@ export type Database = {
       }
       update_org_branding: {
         Args: { p_branding: Json; p_org_id: string }
+        Returns: undefined
+      }
+      update_org_hourly_rate: {
+        Args: { p_org_id: string; p_rate: number }
         Returns: undefined
       }
     }

@@ -44,6 +44,7 @@ BEGIN
        AND tablename  = 'permit_documents'
        AND policyname = 'org members read permit documents'
   ) THEN
+    DROP POLICY IF EXISTS "org members read permit documents" ON public.permit_documents;
     CREATE POLICY "org members read permit documents"
       ON public.permit_documents FOR SELECT TO authenticated
       USING (public.is_org_member(org_id));
@@ -55,6 +56,7 @@ BEGIN
        AND tablename  = 'permit_documents'
        AND policyname = 'org members insert permit documents'
   ) THEN
+    DROP POLICY IF EXISTS "org members insert permit documents" ON public.permit_documents;
     CREATE POLICY "org members insert permit documents"
       ON public.permit_documents FOR INSERT TO authenticated
       WITH CHECK (public.is_org_member(org_id));
@@ -66,6 +68,7 @@ BEGIN
        AND tablename  = 'permit_documents'
        AND policyname = 'org members update permit documents'
   ) THEN
+    DROP POLICY IF EXISTS "org members update permit documents" ON public.permit_documents;
     CREATE POLICY "org members update permit documents"
       ON public.permit_documents FOR UPDATE TO authenticated
       USING (public.is_org_member(org_id))
@@ -78,6 +81,7 @@ BEGIN
        AND tablename  = 'permit_documents'
        AND policyname = 'org members delete permit documents'
   ) THEN
+    DROP POLICY IF EXISTS "org members delete permit documents" ON public.permit_documents;
     CREATE POLICY "org members delete permit documents"
       ON public.permit_documents FOR DELETE TO authenticated
       USING (public.is_org_member(org_id));

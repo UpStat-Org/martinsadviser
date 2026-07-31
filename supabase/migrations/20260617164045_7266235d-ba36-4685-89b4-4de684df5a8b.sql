@@ -44,6 +44,7 @@ CREATE POLICY "org members update eld matches"
   USING (public.is_org_member(org_id))
   WITH CHECK (public.is_org_member(org_id));
 
+DROP TRIGGER IF EXISTS update_eld_driver_matches_updated_at ON public.eld_driver_matches;
 CREATE TRIGGER update_eld_driver_matches_updated_at
   BEFORE UPDATE ON public.eld_driver_matches
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();

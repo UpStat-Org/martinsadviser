@@ -23,11 +23,16 @@ CREATE INDEX IF NOT EXISTS idx_client_internal_notes_client_id ON public.client_
 
 ALTER TABLE public.client_internal_notes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Authenticated users can view internal notes" ON public.client_internal_notes;
 CREATE POLICY "Authenticated users can view internal notes" ON public.client_internal_notes FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Authenticated users can create internal notes" ON public.client_internal_notes;
 CREATE POLICY "Authenticated users can create internal notes" ON public.client_internal_notes FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Authenticated users can update internal notes" ON public.client_internal_notes;
 CREATE POLICY "Authenticated users can update internal notes" ON public.client_internal_notes FOR UPDATE TO authenticated USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Authenticated users can delete internal notes" ON public.client_internal_notes;
 CREATE POLICY "Authenticated users can delete internal notes" ON public.client_internal_notes FOR DELETE TO authenticated USING (auth.uid() IS NOT NULL);
 
+DROP TRIGGER IF EXISTS update_client_internal_notes_updated_at ON public.client_internal_notes;
 CREATE TRIGGER update_client_internal_notes_updated_at
   BEFORE UPDATE ON public.client_internal_notes
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -46,6 +51,9 @@ CREATE INDEX IF NOT EXISTS idx_ai_chat_messages_client_id ON public.ai_chat_mess
 
 ALTER TABLE public.ai_chat_messages ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Authenticated users can view ai chat messages" ON public.ai_chat_messages;
 CREATE POLICY "Authenticated users can view ai chat messages" ON public.ai_chat_messages FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Authenticated users can create ai chat messages" ON public.ai_chat_messages;
 CREATE POLICY "Authenticated users can create ai chat messages" ON public.ai_chat_messages FOR INSERT TO authenticated WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Authenticated users can delete ai chat messages" ON public.ai_chat_messages;
 CREATE POLICY "Authenticated users can delete ai chat messages" ON public.ai_chat_messages FOR DELETE TO authenticated USING (auth.uid() IS NOT NULL);

@@ -59,6 +59,7 @@ CREATE POLICY "org admins update compliance automation settings"
   USING (public.is_org_admin(org_id))
   WITH CHECK (public.is_org_admin(org_id));
 
+DROP TRIGGER IF EXISTS update_compliance_automation_settings_updated_at ON public.compliance_automation_settings;
 CREATE TRIGGER update_compliance_automation_settings_updated_at
   BEFORE UPDATE ON public.compliance_automation_settings
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -85,8 +86,8 @@ CREATE TABLE IF NOT EXISTS public.compliance_task_log (
   created_at  timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_compliance_task_log_org_id ON public.compliance_task_log(org_id);
-CREATE INDEX idx_compliance_task_log_client ON public.compliance_task_log(client_id);
+CREATE INDEX IF NOT EXISTS idx_compliance_task_log_org_id ON public.compliance_task_log(org_id);
+CREATE INDEX IF NOT EXISTS idx_compliance_task_log_client ON public.compliance_task_log(client_id);
 
 ALTER TABLE public.compliance_task_log ENABLE ROW LEVEL SECURITY;
 

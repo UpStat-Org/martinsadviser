@@ -20,8 +20,9 @@ export default function ProfitPerClientPage() {
   const { data: expenses } = useExpenses();
   const { data: timeEntries } = useAllTimeEntries();
 
-  // Hourly rate lives on the org row. Default 50 until the user changes it.
-  const hourlyRate = (currentOrg as typeof currentOrg & { default_hourly_rate?: number })?.default_hourly_rate ?? 50;
+  // Hourly rate lives on the org row, editable in Settings → Organization.
+  // The ?? mirrors the column default for orgs loaded before it was set.
+  const hourlyRate = currentOrg?.default_hourly_rate ?? 50;
 
   const rows = useMemo(() => {
     if (!clients) return [];

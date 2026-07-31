@@ -21,12 +21,16 @@ CREATE TABLE IF NOT EXISTS public.client_internal_notes (
 
 ALTER TABLE public.client_internal_notes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Staff can view internal notes" ON public.client_internal_notes;
 CREATE POLICY "Staff can view internal notes" ON public.client_internal_notes
   FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Staff can insert internal notes" ON public.client_internal_notes;
 CREATE POLICY "Staff can insert internal notes" ON public.client_internal_notes
   FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Owner can update internal notes" ON public.client_internal_notes;
 CREATE POLICY "Owner can update internal notes" ON public.client_internal_notes
   FOR UPDATE TO authenticated USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Owner can delete internal notes" ON public.client_internal_notes;
 CREATE POLICY "Owner can delete internal notes" ON public.client_internal_notes
   FOR DELETE TO authenticated USING (auth.uid() = user_id);
 
@@ -43,10 +47,13 @@ CREATE TABLE IF NOT EXISTS public.ai_chat_messages (
 );
 
 ALTER TABLE public.ai_chat_messages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Staff can view ai chat" ON public.ai_chat_messages;
 CREATE POLICY "Staff can view ai chat" ON public.ai_chat_messages
   FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Staff can insert ai chat" ON public.ai_chat_messages;
 CREATE POLICY "Staff can insert ai chat" ON public.ai_chat_messages
   FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Staff can delete ai chat" ON public.ai_chat_messages;
 CREATE POLICY "Staff can delete ai chat" ON public.ai_chat_messages
   FOR DELETE TO authenticated USING (true);
 

@@ -13,7 +13,7 @@
 -- Tables
 -- ---------------------------------------------------------------------------
 
-CREATE TABLE public.organizations (
+CREATE TABLE IF NOT EXISTS public.organizations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   slug text UNIQUE NOT NULL CHECK (slug ~ '^[a-z0-9][a-z0-9-]{1,62}$'),
   name text NOT NULL,
@@ -27,13 +27,14 @@ CREATE TABLE public.organizations (
 
 ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
 
+DROP TRIGGER IF EXISTS update_organizations_updated_at ON public.organizations;
 CREATE TRIGGER update_organizations_updated_at
   BEFORE UPDATE ON public.organizations
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 CREATE TYPE public.org_role AS ENUM ('owner', 'admin', 'member');
 
-CREATE TABLE public.organization_members (
+CREATE TABLE IF NOT EXISTS public.organization_members (
   organization_id uuid NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   role public.org_role NOT NULL DEFAULT 'member',
@@ -45,10 +46,10 @@ CREATE TABLE public.organization_members (
 
 ALTER TABLE public.organization_members ENABLE ROW LEVEL SECURITY;
 
-CREATE INDEX idx_organization_members_user_id ON public.organization_members(user_id);
-CREATE INDEX idx_organization_members_org_id ON public.organization_members(organization_id);
+CREATE INDEX IF NOT EXISTS idx_organization_members_user_id ON public.organization_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_organization_members_org_id ON public.organization_members(organization_id);
 
-CREATE TABLE public.organization_invitations (
+CREATE TABLE IF NOT EXISTS public.organization_invitations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id uuid NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
   email text NOT NULL,
@@ -62,8 +63,8 @@ CREATE TABLE public.organization_invitations (
 
 ALTER TABLE public.organization_invitations ENABLE ROW LEVEL SECURITY;
 
-CREATE INDEX idx_organization_invitations_org_id ON public.organization_invitations(organization_id);
-CREATE INDEX idx_organization_invitations_email ON public.organization_invitations(lower(email));
+CREATE INDEX IF NOT EXISTS idx_organization_invitations_org_id ON public.organization_invitations(organization_id);
+CREATE INDEX IF NOT EXISTS idx_organization_invitations_email ON public.organization_invitations(lower(email));
 
 -- ---------------------------------------------------------------------------
 -- Security-definer helpers
@@ -147,10 +148,12 @@ $$;
 -- ---------------------------------------------------------------------------
 
 -- organizations
+DROP POLICY IF EXISTS "org members read their organization" ON public.organizations;
 CREATE POLICY "org members read their organization"
   ON public.organizations FOR SELECT TO authenticated
   USING (public.is_org_member(id));
 
+DROP POLICY IF EXISTS "org owners update their organization" ON public.organizations;
 CREATE POLICY "org owners update their organization"
   ON public.organizations FOR UPDATE TO authenticated
   USING (public.has_org_role(id, 'owner'))
@@ -160,36 +163,44 @@ CREATE POLICY "org owners update their organization"
 -- are created via signup flow (Week 3) using service_role.
 
 -- organization_members
+DROP POLICY IF EXISTS "members read members of same org" ON public.organization_members;
 CREATE POLICY "members read members of same org"
   ON public.organization_members FOR SELECT TO authenticated
   USING (public.is_org_member(organization_id));
 
+DROP POLICY IF EXISTS "admins insert members" ON public.organization_members;
 CREATE POLICY "admins insert members"
   ON public.organization_members FOR INSERT TO authenticated
   WITH CHECK (public.is_org_admin(organization_id));
 
+DROP POLICY IF EXISTS "admins update members" ON public.organization_members;
 CREATE POLICY "admins update members"
   ON public.organization_members FOR UPDATE TO authenticated
   USING (public.is_org_admin(organization_id))
   WITH CHECK (public.is_org_admin(organization_id));
 
+DROP POLICY IF EXISTS "admins delete members" ON public.organization_members;
 CREATE POLICY "admins delete members"
   ON public.organization_members FOR DELETE TO authenticated
   USING (public.is_org_admin(organization_id));
 
+DROP POLICY IF EXISTS "users read own memberships" ON public.organization_members;
 CREATE POLICY "users read own memberships"
   ON public.organization_members FOR SELECT TO authenticated
   USING (user_id = auth.uid());
 
 -- organization_invitations
+DROP POLICY IF EXISTS "admins read invitations" ON public.organization_invitations;
 CREATE POLICY "admins read invitations"
   ON public.organization_invitations FOR SELECT TO authenticated
   USING (public.is_org_admin(organization_id));
 
+DROP POLICY IF EXISTS "admins create invitations" ON public.organization_invitations;
 CREATE POLICY "admins create invitations"
   ON public.organization_invitations FOR INSERT TO authenticated
   WITH CHECK (public.is_org_admin(organization_id));
 
+DROP POLICY IF EXISTS "admins delete invitations" ON public.organization_invitations;
 CREATE POLICY "admins delete invitations"
   ON public.organization_invitations FOR DELETE TO authenticated
   USING (public.is_org_admin(organization_id));

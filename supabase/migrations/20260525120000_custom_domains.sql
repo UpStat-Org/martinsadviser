@@ -33,6 +33,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS organization_domains_domain_unique
 CREATE INDEX IF NOT EXISTS organization_domains_org_id_idx
   ON public.organization_domains (organization_id);
 
+DROP TRIGGER IF EXISTS update_organization_domains_updated_at ON public.organization_domains;
 CREATE TRIGGER update_organization_domains_updated_at
   BEFORE UPDATE ON public.organization_domains
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();

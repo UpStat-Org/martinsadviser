@@ -40,14 +40,19 @@ CREATE TABLE IF NOT EXISTS public.services (
 CREATE INDEX IF NOT EXISTS idx_services_org ON public.services(org_id);
 
 ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "org members read services" ON public.services;
 CREATE POLICY "org members read services" ON public.services FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members insert services" ON public.services;
 CREATE POLICY "org members insert services" ON public.services FOR INSERT TO authenticated
   WITH CHECK (public.is_org_member(org_id) AND auth.uid() = user_id);
+DROP POLICY IF EXISTS "org members update services" ON public.services;
 CREATE POLICY "org members update services" ON public.services FOR UPDATE TO authenticated
   USING (public.is_org_member(org_id)) WITH CHECK (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members delete services" ON public.services;
 CREATE POLICY "org members delete services" ON public.services FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));
+DROP TRIGGER IF EXISTS update_services_updated_at ON public.services;
 CREATE TRIGGER update_services_updated_at BEFORE UPDATE ON public.services
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -77,14 +82,19 @@ CREATE INDEX IF NOT EXISTS idx_expenses_client ON public.expenses(client_id);
 CREATE INDEX IF NOT EXISTS idx_expenses_incurred ON public.expenses(incurred_on);
 
 ALTER TABLE public.expenses ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "org members read expenses" ON public.expenses;
 CREATE POLICY "org members read expenses" ON public.expenses FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members insert expenses" ON public.expenses;
 CREATE POLICY "org members insert expenses" ON public.expenses FOR INSERT TO authenticated
   WITH CHECK (public.is_org_member(org_id) AND auth.uid() = user_id);
+DROP POLICY IF EXISTS "org members update expenses" ON public.expenses;
 CREATE POLICY "org members update expenses" ON public.expenses FOR UPDATE TO authenticated
   USING (public.is_org_member(org_id)) WITH CHECK (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members delete expenses" ON public.expenses;
 CREATE POLICY "org members delete expenses" ON public.expenses FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));
+DROP TRIGGER IF EXISTS update_expenses_updated_at ON public.expenses;
 CREATE TRIGGER update_expenses_updated_at BEFORE UPDATE ON public.expenses
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -119,14 +129,19 @@ CREATE INDEX IF NOT EXISTS idx_recurring_client ON public.recurring_plans(client
 CREATE INDEX IF NOT EXISTS idx_recurring_due ON public.recurring_plans(status, next_run_on);
 
 ALTER TABLE public.recurring_plans ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "org members read recurring" ON public.recurring_plans;
 CREATE POLICY "org members read recurring" ON public.recurring_plans FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members insert recurring" ON public.recurring_plans;
 CREATE POLICY "org members insert recurring" ON public.recurring_plans FOR INSERT TO authenticated
   WITH CHECK (public.is_org_member(org_id) AND auth.uid() = user_id);
+DROP POLICY IF EXISTS "org members update recurring" ON public.recurring_plans;
 CREATE POLICY "org members update recurring" ON public.recurring_plans FOR UPDATE TO authenticated
   USING (public.is_org_member(org_id)) WITH CHECK (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members delete recurring" ON public.recurring_plans;
 CREATE POLICY "org members delete recurring" ON public.recurring_plans FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));
+DROP TRIGGER IF EXISTS update_recurring_updated_at ON public.recurring_plans;
 CREATE TRIGGER update_recurring_updated_at BEFORE UPDATE ON public.recurring_plans
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -162,14 +177,19 @@ CREATE INDEX IF NOT EXISTS idx_leads_org ON public.leads(org_id);
 CREATE INDEX IF NOT EXISTS idx_leads_stage ON public.leads(org_id, stage);
 
 ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "org members read leads" ON public.leads;
 CREATE POLICY "org members read leads" ON public.leads FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members insert leads" ON public.leads;
 CREATE POLICY "org members insert leads" ON public.leads FOR INSERT TO authenticated
   WITH CHECK (public.is_org_member(org_id) AND auth.uid() = user_id);
+DROP POLICY IF EXISTS "org members update leads" ON public.leads;
 CREATE POLICY "org members update leads" ON public.leads FOR UPDATE TO authenticated
   USING (public.is_org_member(org_id)) WITH CHECK (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members delete leads" ON public.leads;
 CREATE POLICY "org members delete leads" ON public.leads FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));
+DROP TRIGGER IF EXISTS update_leads_updated_at ON public.leads;
 CREATE TRIGGER update_leads_updated_at BEFORE UPDATE ON public.leads
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -206,14 +226,19 @@ CREATE INDEX IF NOT EXISTS idx_quotes_lead ON public.quotes(lead_id);
 CREATE INDEX IF NOT EXISTS idx_quotes_client ON public.quotes(client_id);
 
 ALTER TABLE public.quotes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "org members read quotes" ON public.quotes;
 CREATE POLICY "org members read quotes" ON public.quotes FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members insert quotes" ON public.quotes;
 CREATE POLICY "org members insert quotes" ON public.quotes FOR INSERT TO authenticated
   WITH CHECK (public.is_org_member(org_id) AND auth.uid() = user_id);
+DROP POLICY IF EXISTS "org members update quotes" ON public.quotes;
 CREATE POLICY "org members update quotes" ON public.quotes FOR UPDATE TO authenticated
   USING (public.is_org_member(org_id)) WITH CHECK (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members delete quotes" ON public.quotes;
 CREATE POLICY "org members delete quotes" ON public.quotes FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));
+DROP TRIGGER IF EXISTS update_quotes_updated_at ON public.quotes;
 CREATE TRIGGER update_quotes_updated_at BEFORE UPDATE ON public.quotes
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -236,12 +261,16 @@ CREATE INDEX IF NOT EXISTS idx_quote_items_quote ON public.quote_items(quote_id)
 CREATE INDEX IF NOT EXISTS idx_quote_items_org ON public.quote_items(org_id);
 
 ALTER TABLE public.quote_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "org members read quote_items" ON public.quote_items;
 CREATE POLICY "org members read quote_items" ON public.quote_items FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members insert quote_items" ON public.quote_items;
 CREATE POLICY "org members insert quote_items" ON public.quote_items FOR INSERT TO authenticated
   WITH CHECK (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members update quote_items" ON public.quote_items;
 CREATE POLICY "org members update quote_items" ON public.quote_items FOR UPDATE TO authenticated
   USING (public.is_org_member(org_id)) WITH CHECK (public.is_org_member(org_id));
+DROP POLICY IF EXISTS "org members delete quote_items" ON public.quote_items;
 CREATE POLICY "org members delete quote_items" ON public.quote_items FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));
 

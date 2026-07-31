@@ -1,6 +1,6 @@
 
 -- Automation rules table
-CREATE TABLE public.automation_rules (
+CREATE TABLE IF NOT EXISTS public.automation_rules (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
   name TEXT NOT NULL,
@@ -18,13 +18,17 @@ CREATE TABLE public.automation_rules (
 ALTER TABLE public.automation_rules ENABLE ROW LEVEL SECURITY;
 
 -- RLS policies
+DROP POLICY IF EXISTS "Users can view own rules" ON public.automation_rules;
 CREATE POLICY "Users can view own rules" ON public.automation_rules FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can create own rules" ON public.automation_rules;
 CREATE POLICY "Users can create own rules" ON public.automation_rules FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own rules" ON public.automation_rules;
 CREATE POLICY "Users can update own rules" ON public.automation_rules FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own rules" ON public.automation_rules;
 CREATE POLICY "Users can delete own rules" ON public.automation_rules FOR DELETE USING (auth.uid() = user_id);
 
 -- Track which permits already had messages created to avoid duplicates
-CREATE TABLE public.automation_log (
+CREATE TABLE IF NOT EXISTS public.automation_log (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   rule_id UUID NOT NULL REFERENCES public.automation_rules(id) ON DELETE CASCADE,
   permit_id UUID NOT NULL REFERENCES public.permits(id) ON DELETE CASCADE,
@@ -33,9 +37,11 @@ CREATE TABLE public.automation_log (
 );
 
 ALTER TABLE public.automation_log ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view own logs" ON public.automation_log;
 CREATE POLICY "Users can view own logs" ON public.automation_log FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.automation_rules WHERE id = rule_id AND user_id = auth.uid())
 );
+DROP POLICY IF EXISTS "Service can insert logs" ON public.automation_log;
 CREATE POLICY "Service can insert logs" ON public.automation_log FOR INSERT WITH CHECK (true);
 
 -- Enable pg_cron and pg_net extensions

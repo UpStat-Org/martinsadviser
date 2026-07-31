@@ -38,6 +38,7 @@ UPDATE public.profiles p
   WHERE active_org_id IS NULL;
 
 -- Users can update their own active_org_id (used by switchOrg in frontend)
+DROP POLICY IF EXISTS "users update own active_org_id" ON public.profiles;
 CREATE POLICY "users update own active_org_id"
   ON public.profiles FOR UPDATE TO authenticated
   USING (id = auth.uid())
@@ -102,10 +103,12 @@ GRANT SELECT ON TABLE public.profiles TO supabase_auth_admin;
 REVOKE EXECUTE ON FUNCTION public.custom_access_token_hook(jsonb) FROM authenticated, anon, public;
 
 -- supabase_auth_admin also needs a policy to bypass RLS on the read paths.
+DROP POLICY IF EXISTS "auth_admin read memberships for hook" ON public.organization_members;
 CREATE POLICY "auth_admin read memberships for hook"
   ON public.organization_members FOR SELECT TO supabase_auth_admin
   USING (true);
 
+DROP POLICY IF EXISTS "auth_admin read profiles for hook" ON public.profiles;
 CREATE POLICY "auth_admin read profiles for hook"
   ON public.profiles FOR SELECT TO supabase_auth_admin
   USING (true);

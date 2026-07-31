@@ -72,6 +72,7 @@ BEGIN
 END;
 $function$;
 
+DROP TRIGGER IF EXISTS log_invoice_activity ON public.invoices;
 CREATE TRIGGER log_invoice_activity
   AFTER INSERT OR UPDATE OR DELETE ON public.invoices
   FOR EACH ROW EXECUTE FUNCTION public.log_invoice_activity();
@@ -104,12 +105,13 @@ BEGIN
 END;
 $function$;
 
+DROP TRIGGER IF EXISTS log_task_activity ON public.tasks;
 CREATE TRIGGER log_task_activity
   AFTER INSERT OR UPDATE OR DELETE ON public.tasks
   FOR EACH ROW EXECUTE FUNCTION public.log_task_activity();
 
 -- 4. Document signatures table
-CREATE TABLE public.document_signatures (
+CREATE TABLE IF NOT EXISTS public.document_signatures (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
   client_id UUID REFERENCES public.clients(id) ON DELETE CASCADE NOT NULL,
@@ -125,16 +127,19 @@ CREATE TABLE public.document_signatures (
 
 ALTER TABLE public.document_signatures ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Authenticated users can view signatures" ON public.document_signatures;
 CREATE POLICY "Authenticated users can view signatures"
   ON public.document_signatures FOR SELECT
   TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can create signatures" ON public.document_signatures;
 CREATE POLICY "Authenticated users can create signatures"
   ON public.document_signatures FOR INSERT
   TO authenticated
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Authenticated users can delete signatures" ON public.document_signatures;
 CREATE POLICY "Authenticated users can delete signatures"
   ON public.document_signatures FOR DELETE
   TO authenticated

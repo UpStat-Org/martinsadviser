@@ -1,1 +1,1 @@
-ALTER TABLE public.clients ADD COLUMN registration_responsible text;
+ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS registration_responsible text;

@@ -24,7 +24,7 @@
 -- ---------------------------------------------------------------------------
 
 ALTER TABLE public.automation_rules
-  ADD COLUMN org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
+  ADD COLUMN IF NOT EXISTS org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
 
 UPDATE public.automation_rules
   SET org_id = '00000000-0000-0000-0000-000000000001'
@@ -34,26 +34,30 @@ ALTER TABLE public.automation_rules
   ALTER COLUMN org_id SET NOT NULL,
   ALTER COLUMN org_id SET DEFAULT public.current_org_id();
 
-CREATE INDEX idx_automation_rules_org_id ON public.automation_rules(org_id);
+CREATE INDEX IF NOT EXISTS idx_automation_rules_org_id ON public.automation_rules(org_id);
 
 DROP POLICY IF EXISTS "Users can view own rules" ON public.automation_rules;
 DROP POLICY IF EXISTS "Users can create own rules" ON public.automation_rules;
 DROP POLICY IF EXISTS "Users can update own rules" ON public.automation_rules;
 DROP POLICY IF EXISTS "Users can delete own rules" ON public.automation_rules;
 
+DROP POLICY IF EXISTS "users read own rules in org" ON public.automation_rules;
 CREATE POLICY "users read own rules in org"
   ON public.automation_rules FOR SELECT TO authenticated
   USING (auth.uid() = user_id AND public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "users create own rules in org" ON public.automation_rules;
 CREATE POLICY "users create own rules in org"
   ON public.automation_rules FOR INSERT TO authenticated
   WITH CHECK (auth.uid() = user_id AND public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "users update own rules in org" ON public.automation_rules;
 CREATE POLICY "users update own rules in org"
   ON public.automation_rules FOR UPDATE TO authenticated
   USING (auth.uid() = user_id AND public.is_org_member(org_id))
   WITH CHECK (auth.uid() = user_id AND public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "users delete own rules in org" ON public.automation_rules;
 CREATE POLICY "users delete own rules in org"
   ON public.automation_rules FOR DELETE TO authenticated
   USING (auth.uid() = user_id AND public.is_org_member(org_id));
@@ -63,7 +67,7 @@ CREATE POLICY "users delete own rules in org"
 -- ---------------------------------------------------------------------------
 
 ALTER TABLE public.automation_log
-  ADD COLUMN org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
+  ADD COLUMN IF NOT EXISTS org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
 
 UPDATE public.automation_log al
   SET org_id = ar.org_id
@@ -74,13 +78,14 @@ ALTER TABLE public.automation_log
   ALTER COLUMN org_id SET NOT NULL,
   ALTER COLUMN org_id SET DEFAULT public.current_org_id();
 
-CREATE INDEX idx_automation_log_org_id ON public.automation_log(org_id);
+CREATE INDEX IF NOT EXISTS idx_automation_log_org_id ON public.automation_log(org_id);
 
 DROP POLICY IF EXISTS "Users can view own logs" ON public.automation_log;
 DROP POLICY IF EXISTS "Users can insert own logs" ON public.automation_log;
 DROP POLICY IF EXISTS "Service can insert logs" ON public.automation_log;
 
 -- Preserves per-rule-owner visibility (EXISTS check) and adds org-scope.
+DROP POLICY IF EXISTS "rule owners read logs in org" ON public.automation_log;
 CREATE POLICY "rule owners read logs in org"
   ON public.automation_log FOR SELECT TO authenticated
   USING (
@@ -92,6 +97,7 @@ CREATE POLICY "rule owners read logs in org"
     )
   );
 
+DROP POLICY IF EXISTS "rule owners insert logs in org" ON public.automation_log;
 CREATE POLICY "rule owners insert logs in org"
   ON public.automation_log FOR INSERT TO authenticated
   WITH CHECK (
@@ -108,7 +114,7 @@ CREATE POLICY "rule owners insert logs in org"
 -- ---------------------------------------------------------------------------
 
 ALTER TABLE public.notifications
-  ADD COLUMN org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
+  ADD COLUMN IF NOT EXISTS org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
 
 UPDATE public.notifications
   SET org_id = '00000000-0000-0000-0000-000000000001'
@@ -118,22 +124,25 @@ ALTER TABLE public.notifications
   ALTER COLUMN org_id SET NOT NULL,
   ALTER COLUMN org_id SET DEFAULT public.current_org_id();
 
-CREATE INDEX idx_notifications_org_id ON public.notifications(org_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_org_id ON public.notifications(org_id);
 
 DROP POLICY IF EXISTS "Users can view own notifications" ON public.notifications;
 DROP POLICY IF EXISTS "Users can update own notifications" ON public.notifications;
 DROP POLICY IF EXISTS "Users can delete own notifications" ON public.notifications;
 DROP POLICY IF EXISTS "Service role can insert notifications" ON public.notifications;
 
+DROP POLICY IF EXISTS "users read own notifications in org" ON public.notifications;
 CREATE POLICY "users read own notifications in org"
   ON public.notifications FOR SELECT TO authenticated
   USING (auth.uid() = user_id AND public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "users update own notifications in org" ON public.notifications;
 CREATE POLICY "users update own notifications in org"
   ON public.notifications FOR UPDATE TO authenticated
   USING (auth.uid() = user_id AND public.is_org_member(org_id))
   WITH CHECK (auth.uid() = user_id AND public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "users delete own notifications in org" ON public.notifications;
 CREATE POLICY "users delete own notifications in org"
   ON public.notifications FOR DELETE TO authenticated
   USING (auth.uid() = user_id AND public.is_org_member(org_id));
@@ -141,6 +150,7 @@ CREATE POLICY "users delete own notifications in org"
 -- INSERT policy retained for authenticated paths (e.g., self-created
 -- notifications). The cron-triggered generate-notifications function uses
 -- service_role and bypasses RLS entirely; org_id is passed explicitly there.
+DROP POLICY IF EXISTS "users insert own notifications in org" ON public.notifications;
 CREATE POLICY "users insert own notifications in org"
   ON public.notifications FOR INSERT TO authenticated
   WITH CHECK (auth.uid() = user_id AND public.is_org_member(org_id));
@@ -150,7 +160,7 @@ CREATE POLICY "users insert own notifications in org"
 -- ---------------------------------------------------------------------------
 
 ALTER TABLE public.activity_log
-  ADD COLUMN org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
+  ADD COLUMN IF NOT EXISTS org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
 
 -- Backfill via client_id when present, default org otherwise.
 UPDATE public.activity_log al
@@ -164,15 +174,17 @@ ALTER TABLE public.activity_log
   ALTER COLUMN org_id SET NOT NULL,
   ALTER COLUMN org_id SET DEFAULT public.current_org_id();
 
-CREATE INDEX idx_activity_log_org_id ON public.activity_log(org_id);
+CREATE INDEX IF NOT EXISTS idx_activity_log_org_id ON public.activity_log(org_id);
 
 DROP POLICY IF EXISTS "Authenticated users can view activity logs" ON public.activity_log;
 DROP POLICY IF EXISTS "Users can insert own activity logs" ON public.activity_log;
 
+DROP POLICY IF EXISTS "org members read activity logs" ON public.activity_log;
 CREATE POLICY "org members read activity logs"
   ON public.activity_log FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "org members insert own activity logs" ON public.activity_log;
 CREATE POLICY "org members insert own activity logs"
   ON public.activity_log FOR INSERT TO authenticated
   WITH CHECK (

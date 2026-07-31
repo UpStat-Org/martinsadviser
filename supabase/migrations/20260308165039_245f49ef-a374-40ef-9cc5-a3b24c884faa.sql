@@ -9,7 +9,7 @@ END;
 $$ LANGUAGE plpgsql SET search_path = public;
 
 -- Create clients table
-CREATE TABLE public.clients (
+CREATE TABLE IF NOT EXISTS public.clients (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   company_name TEXT NOT NULL,
@@ -35,9 +35,11 @@ CREATE TABLE public.clients (
 ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
 
 -- Policies: authenticated users can manage all clients (small team, shared access)
+DROP POLICY IF EXISTS "Authenticated users can view all clients" ON public.clients;
 CREATE POLICY "Authenticated users can view all clients"
   ON public.clients FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can create clients" ON public.clients;
 CREATE POLICY "Authenticated users can create clients"
   ON public.clients FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 
@@ -50,12 +52,13 @@ CREATE POLICY "Authenticated users can delete clients"
   ON public.clients FOR DELETE TO authenticated USING (true);
 
 -- Timestamp trigger
+DROP TRIGGER IF EXISTS update_clients_updated_at ON public.clients;
 CREATE TRIGGER update_clients_updated_at
   BEFORE UPDATE ON public.clients
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Indexes
-CREATE INDEX idx_clients_company_name ON public.clients(company_name);
-CREATE INDEX idx_clients_dot ON public.clients(dot);
-CREATE INDEX idx_clients_mc ON public.clients(mc);
-CREATE INDEX idx_clients_status ON public.clients(status);
+CREATE INDEX IF NOT EXISTS idx_clients_company_name ON public.clients(company_name);
+CREATE INDEX IF NOT EXISTS idx_clients_dot ON public.clients(dot);
+CREATE INDEX IF NOT EXISTS idx_clients_mc ON public.clients(mc);
+CREATE INDEX IF NOT EXISTS idx_clients_status ON public.clients(status);

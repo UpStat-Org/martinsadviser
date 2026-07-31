@@ -22,7 +22,7 @@
 -- ---------------------------------------------------------------------------
 
 ALTER TABLE public.client_portal_users
-  ADD COLUMN org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
+  ADD COLUMN IF NOT EXISTS org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
 
 UPDATE public.client_portal_users cpu
   SET org_id = c.org_id
@@ -33,7 +33,7 @@ ALTER TABLE public.client_portal_users
   ALTER COLUMN org_id SET NOT NULL,
   ALTER COLUMN org_id SET DEFAULT public.current_org_id();
 
-CREATE INDEX idx_client_portal_users_org_id ON public.client_portal_users(org_id);
+CREATE INDEX IF NOT EXISTS idx_client_portal_users_org_id ON public.client_portal_users(org_id);
 
 DROP POLICY IF EXISTS "Portal users can view own links" ON public.client_portal_users;
 DROP POLICY IF EXISTS "Admins can manage portal users" ON public.client_portal_users;
@@ -46,6 +46,7 @@ CREATE POLICY "Portal users can view own links"
   USING (auth.uid() = user_id);
 
 -- Org admins manage portal users within their own org.
+DROP POLICY IF EXISTS "Org admins manage portal users" ON public.client_portal_users;
 CREATE POLICY "Org admins manage portal users"
   ON public.client_portal_users FOR ALL TO authenticated
   USING (public.is_org_admin(org_id))
@@ -56,7 +57,7 @@ CREATE POLICY "Org admins manage portal users"
 -- ---------------------------------------------------------------------------
 
 ALTER TABLE public.document_signatures
-  ADD COLUMN org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
+  ADD COLUMN IF NOT EXISTS org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
 
 UPDATE public.document_signatures ds
   SET org_id = c.org_id
@@ -67,16 +68,18 @@ ALTER TABLE public.document_signatures
   ALTER COLUMN org_id SET NOT NULL,
   ALTER COLUMN org_id SET DEFAULT public.current_org_id();
 
-CREATE INDEX idx_document_signatures_org_id ON public.document_signatures(org_id);
+CREATE INDEX IF NOT EXISTS idx_document_signatures_org_id ON public.document_signatures(org_id);
 
 DROP POLICY IF EXISTS "Authenticated users can view signatures" ON public.document_signatures;
 DROP POLICY IF EXISTS "Authenticated users can create signatures" ON public.document_signatures;
 DROP POLICY IF EXISTS "Authenticated users can delete signatures" ON public.document_signatures;
 
+DROP POLICY IF EXISTS "org members read signatures" ON public.document_signatures;
 CREATE POLICY "org members read signatures"
   ON public.document_signatures FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "org members create signatures" ON public.document_signatures;
 CREATE POLICY "org members create signatures"
   ON public.document_signatures FOR INSERT TO authenticated
   WITH CHECK (
@@ -84,6 +87,7 @@ CREATE POLICY "org members create signatures"
     AND auth.uid() = user_id
   );
 
+DROP POLICY IF EXISTS "org members delete signatures" ON public.document_signatures;
 CREATE POLICY "org members delete signatures"
   ON public.document_signatures FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));

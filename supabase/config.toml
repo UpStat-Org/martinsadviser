@@ -1,13 +1,15 @@
-project_id = "zidfrlzgftaqhnvedpnm"
+project_id = "cdryxyocdlnocvwvrtvn"
 
 # Only functions that MUST be reachable without a Supabase JWT belong here.
 # Everything else keeps verify_jwt at its default (true) so the gateway rejects
 # unsigned callers before our code runs.
 #
 # Deliberately NOT listed: generate-notifications, generate-compliance-tasks,
-# generate-dunning. They are cron-only batches that run service-role across
-# every org; pg_cron already sends `Bearer <service_role_key>`, so gateway
-# verification costs nothing and their requireServiceRole() guard relies on it.
+# generate-dunning, sync-netlify-domains. They are cron-only batches that run
+# service-role across every org; pg_cron already sends `Bearer
+# <service_role_key>`, so gateway verification costs nothing and their
+# requireServiceRole() guard relies on it. (sync-netlify-domains is also fired
+# by the AFTER INSERT trigger on organizations, which posts the same header.)
 
 [functions.create-portal-user]
 verify_jwt = false

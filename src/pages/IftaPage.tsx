@@ -26,6 +26,7 @@ import {
   useIftaRates,
   useUpsertIftaFiling,
 } from "@/hooks/useIfta";
+import { IftaFilingsCard } from "@/components/IftaFilingsCard";
 import { summarizeIfta, quarterFromDate } from "@/lib/ifta";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -283,6 +284,10 @@ export default function IftaPage() {
               </CardContent>
             </Card>
           )}
+
+          {/* Saved filings for this quarter — across every client, so a draft
+              saved above doesn't vanish when the client selector changes. */}
+          <IftaFilingsCard quarter={quarter} clients={clients} />
 
           {/* Trips */}
           <Card>

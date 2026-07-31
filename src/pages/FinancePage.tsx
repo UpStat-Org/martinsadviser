@@ -85,6 +85,7 @@ import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { StatusBadge, type StatusTone } from "@/components/StatusBadge";
 import { ArAgingCard } from "@/components/ArAgingCard";
 import { DunningReviewPanel } from "@/components/DunningReviewPanel";
+import { DunningSettingsPanel } from "@/components/DunningSettingsPanel";
 
 const STATUS_TONES: Record<string, StatusTone> = {
   pending: "warning",
@@ -804,8 +805,9 @@ export default function FinancePage() {
       {/* ============ A/R AGING ============ */}
       <ArAgingCard invoices={invoices ?? []} />
 
-      {/* ============ DUNNING REVIEW QUEUE ============ */}
+      {/* ============ DUNNING: REVIEW QUEUE + SETTINGS ============ */}
       {!isViewer && <DunningReviewPanel />}
+      {!isViewer && <DunningSettingsPanel />}
 
       {/* ============ FILTERS ============ */}
       <div className="rounded-md bg-card border border-border/50 p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">

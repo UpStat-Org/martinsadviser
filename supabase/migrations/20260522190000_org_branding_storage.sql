@@ -21,12 +21,14 @@ VALUES ('org-branding', 'org-branding', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Public read: logos are non-sensitive brand assets shown pre-auth.
+DROP POLICY IF EXISTS "Anyone can view org branding" ON storage.objects;
 CREATE POLICY "Anyone can view org branding"
   ON storage.objects FOR SELECT
   TO public
   USING (bucket_id = 'org-branding');
 
 -- Writes restricted to admins of the org named by the first path segment.
+DROP POLICY IF EXISTS "Org admins can upload org branding" ON storage.objects;
 CREATE POLICY "Org admins can upload org branding"
   ON storage.objects FOR INSERT
   TO authenticated
@@ -35,6 +37,7 @@ CREATE POLICY "Org admins can upload org branding"
     AND public.is_org_admin( (storage.foldername(name))[1]::uuid )
   );
 
+DROP POLICY IF EXISTS "Org admins can update org branding" ON storage.objects;
 CREATE POLICY "Org admins can update org branding"
   ON storage.objects FOR UPDATE
   TO authenticated
@@ -47,6 +50,7 @@ CREATE POLICY "Org admins can update org branding"
     AND public.is_org_admin( (storage.foldername(name))[1]::uuid )
   );
 
+DROP POLICY IF EXISTS "Org admins can delete org branding" ON storage.objects;
 CREATE POLICY "Org admins can delete org branding"
   ON storage.objects FOR DELETE
   TO authenticated

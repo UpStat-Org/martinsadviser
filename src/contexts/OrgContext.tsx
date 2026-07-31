@@ -100,6 +100,8 @@ export interface Organization {
   branding: Record<string, unknown>;
   feature_flags: Partial<Record<FeatureFlag, boolean>>;
   subscription_status?: string;
+  /** Labor rate used by /profit-per-client. Column default is 50.00. */
+  default_hourly_rate?: number;
 }
 
 export interface Membership {

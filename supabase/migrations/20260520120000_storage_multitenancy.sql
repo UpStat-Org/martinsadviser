@@ -58,6 +58,7 @@ DROP POLICY IF EXISTS "Anyone can view permit documents" ON storage.objects;
 DROP POLICY IF EXISTS "Authenticated users can delete permit documents" ON storage.objects;
 DROP POLICY IF EXISTS "Authenticated users can update permit documents" ON storage.objects;
 
+DROP POLICY IF EXISTS "Org members can view permit documents" ON storage.objects;
 CREATE POLICY "Org members can view permit documents"
   ON storage.objects FOR SELECT
   TO authenticated
@@ -66,6 +67,7 @@ CREATE POLICY "Org members can view permit documents"
     AND public.is_org_member( (storage.foldername(name))[1]::uuid )
   );
 
+DROP POLICY IF EXISTS "Org members can upload permit documents" ON storage.objects;
 CREATE POLICY "Org members can upload permit documents"
   ON storage.objects FOR INSERT
   TO authenticated
@@ -74,6 +76,7 @@ CREATE POLICY "Org members can upload permit documents"
     AND public.is_org_member( (storage.foldername(name))[1]::uuid )
   );
 
+DROP POLICY IF EXISTS "Org members can update permit documents" ON storage.objects;
 CREATE POLICY "Org members can update permit documents"
   ON storage.objects FOR UPDATE
   TO authenticated
@@ -86,6 +89,7 @@ CREATE POLICY "Org members can update permit documents"
     AND public.is_org_member( (storage.foldername(name))[1]::uuid )
   );
 
+DROP POLICY IF EXISTS "Org members can delete permit documents" ON storage.objects;
 CREATE POLICY "Org members can delete permit documents"
   ON storage.objects FOR DELETE
   TO authenticated

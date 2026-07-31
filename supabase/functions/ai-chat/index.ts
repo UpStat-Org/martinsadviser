@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { chatCompletion, aiErrorResponse } from "../_shared/ai.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,8 +14,6 @@ serve(async (req) => {
     const { client_id, message, language } = await req.json();
     if (!client_id || !message) throw new Error("client_id and message are required");
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -80,29 +79,14 @@ Data de hoje: ${new Date().toISOString().split("T")[0]}`;
       { role: "user", content: message },
     ];
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ model: "google/gemini-2.5-flash", messages }),
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("AI gateway error:", response.status, text);
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Payment required. Add credits to your workspace." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
-      throw new Error("AI gateway error");
+    let reply: string;
+    try {
+      reply = (await chatCompletion(messages)) || "Sem resposta.";
+    } catch (aiErr) {
+      const mapped = aiErrorResponse(aiErr, corsHeaders);
+      if (mapped) return mapped;
+      throw aiErr;
     }
-
-    const result = await response.json();
-    const reply = result.choices?.[0]?.message?.content || "Sem resposta.";
 
     // Persist user msg + assistant reply
     await supabase.from("ai_chat_messages").insert([

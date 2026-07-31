@@ -25,6 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OrgFeatureFlagsPanel } from "@/components/OrgFeatureFlagsPanel";
 import { OrgBrandingPanel } from "@/components/OrgBrandingPanel";
+import { OrgHourlyRatePanel } from "@/components/OrgHourlyRatePanel";
 import { OrgBillingPanel } from "@/components/OrgBillingPanel";
 import { OrgMembersPanel } from "@/components/OrgMembersPanel";
 import { OrgEldPanel } from "@/components/OrgEldPanel";
@@ -487,6 +488,7 @@ export default function SettingsPage() {
             {isOrgOwner && <OrgBillingPanel />}
             {isOrgOwner && <OrgMembersPanel />}
             <OrgBrandingPanel />
+            <OrgHourlyRatePanel />
             <OrgDomainsPanel />
             {isOrgOwner && <OrgFeatureFlagsPanel />}
           </TabsContent>

@@ -12,14 +12,18 @@ CREATE TABLE IF NOT EXISTS public.permit_documents (
 
 ALTER TABLE public.permit_documents ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view permit documents" ON public.permit_documents;
 CREATE POLICY "Users can view permit documents" ON public.permit_documents
   FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Users can insert permit documents" ON public.permit_documents;
 CREATE POLICY "Users can insert permit documents" ON public.permit_documents
   FOR INSERT TO authenticated WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Users can update permit documents" ON public.permit_documents;
 CREATE POLICY "Users can update permit documents" ON public.permit_documents
   FOR UPDATE TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Users can delete permit documents" ON public.permit_documents;
 CREATE POLICY "Users can delete permit documents" ON public.permit_documents
   FOR DELETE TO authenticated USING (true);

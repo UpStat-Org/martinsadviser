@@ -59,6 +59,7 @@ UPDATE storage.buckets
 -- keeping it makes the policy safer if a path is malformed.
 -- ---------------------------------------------------------------------------
 
+DROP POLICY IF EXISTS "Portal users can view their client documents" ON storage.objects;
 CREATE POLICY "Portal users can view their client documents"
   ON storage.objects FOR SELECT
   TO authenticated

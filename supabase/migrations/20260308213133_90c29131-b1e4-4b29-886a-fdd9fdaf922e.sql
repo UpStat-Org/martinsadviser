@@ -1,6 +1,6 @@
 
 -- Table to link auth users to clients for portal access
-CREATE TABLE public.client_portal_users (
+CREATE TABLE IF NOT EXISTS public.client_portal_users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   client_id uuid NOT NULL REFERENCES public.clients(id) ON DELETE CASCADE,
@@ -17,6 +17,7 @@ CREATE POLICY "Portal users can view own links"
   USING (auth.uid() = user_id);
 
 -- Admins can manage portal users (insert/delete)
+DROP POLICY IF EXISTS "Admins can manage portal users" ON public.client_portal_users;
 CREATE POLICY "Admins can manage portal users"
   ON public.client_portal_users FOR ALL
   USING (public.has_role(auth.uid(), 'admin'));

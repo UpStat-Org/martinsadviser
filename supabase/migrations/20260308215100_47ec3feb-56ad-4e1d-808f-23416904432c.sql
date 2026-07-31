@@ -1,6 +1,6 @@
 
 -- Create tasks table for Kanban board
-CREATE TABLE public.tasks (
+CREATE TABLE IF NOT EXISTS public.tasks (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
   client_id UUID REFERENCES public.clients(id) ON DELETE SET NULL,
@@ -17,19 +17,24 @@ CREATE TABLE public.tasks (
 ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
 
 -- RLS policies
+DROP POLICY IF EXISTS "Users can view all tasks" ON public.tasks;
 CREATE POLICY "Users can view all tasks" ON public.tasks
   FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Users can create tasks" ON public.tasks;
 CREATE POLICY "Users can create tasks" ON public.tasks
   FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update tasks" ON public.tasks;
 CREATE POLICY "Users can update tasks" ON public.tasks
   FOR UPDATE TO authenticated USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
 
+DROP POLICY IF EXISTS "Users can delete tasks" ON public.tasks;
 CREATE POLICY "Users can delete tasks" ON public.tasks
   FOR DELETE TO authenticated USING (auth.uid() IS NOT NULL);
 
 -- Updated_at trigger
+DROP TRIGGER IF EXISTS update_tasks_updated_at ON public.tasks;
 CREATE TRIGGER update_tasks_updated_at
   BEFORE UPDATE ON public.tasks
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();

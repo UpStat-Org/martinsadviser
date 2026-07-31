@@ -3,7 +3,7 @@
 CREATE TYPE public.app_role AS ENUM ('admin', 'user');
 
 -- Create user_roles table
-CREATE TABLE public.user_roles (
+CREATE TABLE IF NOT EXISTS public.user_roles (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   role app_role NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE public.user_roles (
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 
 -- Create profiles table with approval status
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name text,
   email text,
@@ -48,29 +48,35 @@ AS $$
 $$;
 
 -- RLS for user_roles: only admins can read
+DROP POLICY IF EXISTS "Admins can read all roles" ON public.user_roles;
 CREATE POLICY "Admins can read all roles"
 ON public.user_roles FOR SELECT TO authenticated
 USING (public.has_role(auth.uid(), 'admin'));
 
 -- RLS for profiles
+DROP POLICY IF EXISTS "Users can read own profile" ON public.profiles;
 CREATE POLICY "Users can read own profile"
 ON public.profiles FOR SELECT TO authenticated
 USING (id = auth.uid());
 
+DROP POLICY IF EXISTS "Admins can read all profiles" ON public.profiles;
 CREATE POLICY "Admins can read all profiles"
 ON public.profiles FOR SELECT TO authenticated
 USING (public.has_role(auth.uid(), 'admin'));
 
+DROP POLICY IF EXISTS "Admins can update all profiles" ON public.profiles;
 CREATE POLICY "Admins can update all profiles"
 ON public.profiles FOR UPDATE TO authenticated
 USING (public.has_role(auth.uid(), 'admin'))
 WITH CHECK (public.has_role(auth.uid(), 'admin'));
 
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 CREATE POLICY "Users can insert own profile"
 ON public.profiles FOR INSERT TO authenticated
 WITH CHECK (id = auth.uid());
 
 -- Trigger for updated_at on profiles
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
 CREATE TRIGGER update_profiles_updated_at
 BEFORE UPDATE ON public.profiles
 FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -89,6 +95,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
 AFTER INSERT ON auth.users
 FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

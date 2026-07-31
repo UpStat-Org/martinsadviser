@@ -1,6 +1,6 @@
 
 -- Create trucks table
-CREATE TABLE public.trucks (
+CREATE TABLE IF NOT EXISTS public.trucks (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid NOT NULL REFERENCES public.clients(id) ON DELETE CASCADE,
   user_id uuid NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE public.trucks (
 );
 
 -- Create permits table
-CREATE TABLE public.permits (
+CREATE TABLE IF NOT EXISTS public.permits (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id uuid NOT NULL REFERENCES public.clients(id) ON DELETE CASCADE,
   truck_id uuid REFERENCES public.trucks(id) ON DELETE SET NULL,
@@ -37,19 +37,29 @@ ALTER TABLE public.trucks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.permits ENABLE ROW LEVEL SECURITY;
 
 -- Trucks RLS policies
+DROP POLICY IF EXISTS "Authenticated users can view all trucks" ON public.trucks;
 CREATE POLICY "Authenticated users can view all trucks" ON public.trucks FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Authenticated users can create trucks" ON public.trucks;
 CREATE POLICY "Authenticated users can create trucks" ON public.trucks FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Authenticated users can update trucks" ON public.trucks;
 CREATE POLICY "Authenticated users can update trucks" ON public.trucks FOR UPDATE TO authenticated USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Authenticated users can delete trucks" ON public.trucks;
 CREATE POLICY "Authenticated users can delete trucks" ON public.trucks FOR DELETE TO authenticated USING (auth.uid() IS NOT NULL);
 
 -- Permits RLS policies
+DROP POLICY IF EXISTS "Authenticated users can view all permits" ON public.permits;
 CREATE POLICY "Authenticated users can view all permits" ON public.permits FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Authenticated users can create permits" ON public.permits;
 CREATE POLICY "Authenticated users can create permits" ON public.permits FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Authenticated users can update permits" ON public.permits;
 CREATE POLICY "Authenticated users can update permits" ON public.permits FOR UPDATE TO authenticated USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Authenticated users can delete permits" ON public.permits;
 CREATE POLICY "Authenticated users can delete permits" ON public.permits FOR DELETE TO authenticated USING (auth.uid() IS NOT NULL);
 
 -- Updated_at triggers
+DROP TRIGGER IF EXISTS update_trucks_updated_at ON public.trucks;
 CREATE TRIGGER update_trucks_updated_at BEFORE UPDATE ON public.trucks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS update_permits_updated_at ON public.permits;
 CREATE TRIGGER update_permits_updated_at BEFORE UPDATE ON public.permits FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Enable realtime for permits (expiration alerts)

@@ -17,7 +17,7 @@
 -- ---------------------------------------------------------------------------
 
 ALTER TABLE public.clients
-  ADD COLUMN org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
+  ADD COLUMN IF NOT EXISTS org_id uuid REFERENCES public.organizations(id) ON DELETE RESTRICT;
 
 UPDATE public.clients
   SET org_id = '00000000-0000-0000-0000-000000000001'
@@ -27,7 +27,7 @@ ALTER TABLE public.clients
   ALTER COLUMN org_id SET NOT NULL,
   ALTER COLUMN org_id SET DEFAULT public.current_org_id();
 
-CREATE INDEX idx_clients_org_id ON public.clients(org_id);
+CREATE INDEX IF NOT EXISTS idx_clients_org_id ON public.clients(org_id);
 
 -- ---------------------------------------------------------------------------
 -- Policy rewrite
@@ -39,10 +39,12 @@ DROP POLICY IF EXISTS "Authenticated users can update clients" ON public.clients
 DROP POLICY IF EXISTS "Authenticated users can delete clients" ON public.clients;
 DROP POLICY IF EXISTS "Portal users can view their client" ON public.clients;
 
+DROP POLICY IF EXISTS "org members read clients" ON public.clients;
 CREATE POLICY "org members read clients"
   ON public.clients FOR SELECT TO authenticated
   USING (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "org members create clients" ON public.clients;
 CREATE POLICY "org members create clients"
   ON public.clients FOR INSERT TO authenticated
   WITH CHECK (
@@ -50,11 +52,13 @@ CREATE POLICY "org members create clients"
     AND auth.uid() = user_id
   );
 
+DROP POLICY IF EXISTS "org members update clients" ON public.clients;
 CREATE POLICY "org members update clients"
   ON public.clients FOR UPDATE TO authenticated
   USING (public.is_org_member(org_id))
   WITH CHECK (public.is_org_member(org_id));
 
+DROP POLICY IF EXISTS "org members delete clients" ON public.clients;
 CREATE POLICY "org members delete clients"
   ON public.clients FOR DELETE TO authenticated
   USING (public.is_org_member(org_id));

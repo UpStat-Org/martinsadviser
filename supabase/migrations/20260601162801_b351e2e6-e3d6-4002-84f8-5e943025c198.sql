@@ -36,6 +36,7 @@ CREATE POLICY "org admins update compliance automation settings"
   USING (public.is_org_admin(org_id))
   WITH CHECK (public.is_org_admin(org_id));
 
+DROP TRIGGER IF EXISTS update_compliance_automation_settings_updated_at ON public.compliance_automation_settings;
 CREATE TRIGGER update_compliance_automation_settings_updated_at
   BEFORE UPDATE ON public.compliance_automation_settings
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -60,8 +61,8 @@ CREATE TABLE IF NOT EXISTS public.compliance_task_log (
 GRANT SELECT ON public.compliance_task_log TO authenticated;
 GRANT ALL ON public.compliance_task_log TO service_role;
 
-CREATE INDEX idx_compliance_task_log_org_id ON public.compliance_task_log(org_id);
-CREATE INDEX idx_compliance_task_log_client ON public.compliance_task_log(client_id);
+CREATE INDEX IF NOT EXISTS idx_compliance_task_log_org_id ON public.compliance_task_log(org_id);
+CREATE INDEX IF NOT EXISTS idx_compliance_task_log_client ON public.compliance_task_log(client_id);
 
 ALTER TABLE public.compliance_task_log ENABLE ROW LEVEL SECURITY;
 
@@ -131,6 +132,7 @@ CREATE POLICY "org admins update dunning settings"
   USING (public.is_org_admin(org_id))
   WITH CHECK (public.is_org_admin(org_id));
 
+DROP TRIGGER IF EXISTS update_dunning_settings_updated_at ON public.dunning_settings;
 CREATE TRIGGER update_dunning_settings_updated_at
   BEFORE UPDATE ON public.dunning_settings
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -153,8 +155,8 @@ CREATE TABLE IF NOT EXISTS public.dunning_log (
 GRANT SELECT ON public.dunning_log TO authenticated;
 GRANT ALL ON public.dunning_log TO service_role;
 
-CREATE INDEX idx_dunning_log_org_id ON public.dunning_log(org_id);
-CREATE INDEX idx_dunning_log_invoice ON public.dunning_log(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_dunning_log_org_id ON public.dunning_log(org_id);
+CREATE INDEX IF NOT EXISTS idx_dunning_log_invoice ON public.dunning_log(invoice_id);
 
 ALTER TABLE public.dunning_log ENABLE ROW LEVEL SECURITY;
 
