@@ -35,6 +35,8 @@ import { useRiskScores } from "@/hooks/useRiskScores";
 import { factorLabel, isAtRisk, bandLabelKey } from "@/lib/risk";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatWeekdayLong, formatDayMonthShort } from "@/lib/dates";
+import { useAiBriefing } from "@/hooks/useAiBriefing";
+import { DailyBriefingCard } from "@/components/DailyBriefingCard";
 
 
 const PRIORITY_STYLES: Record<string, string> = {
@@ -268,6 +270,34 @@ export default function MyDeskPage() {
     ? actionItems
     : actionItems.filter((item) => item.kind === activeKind);
 
+  // Signals for the AI briefing. Derived from the same list the queue renders,
+  // so the two can never disagree — and memoized on the item identities because
+  // the array is part of the briefing's query key.
+  const briefingSignals = useMemo(
+    () =>
+      actionItems.map((item) => ({
+        id: item.id,
+        kind: item.kind,
+        severity: item.severity,
+        title: item.title,
+        subtitle: item.subtitle,
+        meta: item.meta,
+      })),
+    [actionItems],
+  );
+
+  const {
+    data: briefing,
+    isLoading: briefingLoading,
+    error: briefingError,
+    regenerate: regenerateBriefing,
+  } = useAiBriefing(briefingSignals, actionItems.length > 0);
+
+  const openBriefingRef = (refId: string) => {
+    const target = actionItems.find((item) => item.id === refId);
+    if (target) navigate(target.route);
+  };
+
   const actionCounts = {
     all: actionItems.length,
     risk: actionItems.filter((item) => item.kind === "risk").length,
@@ -367,6 +397,17 @@ export default function MyDeskPage() {
           );
         })}
       </div>
+
+      {/* ============ AI BRIEFING ============ */}
+      {actionItems.length > 0 && (
+        <DailyBriefingCard
+          briefing={briefing}
+          isLoading={briefingLoading}
+          error={briefingError as Error | null}
+          onRegenerate={regenerateBriefing}
+          onOpen={openBriefingRef}
+        />
+      )}
 
       {/* ============ ACTION CENTER ============ */}
       <Card className="border-border/50 overflow-hidden">

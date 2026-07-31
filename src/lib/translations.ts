@@ -1675,6 +1675,14 @@ const translations: Record<Language, Record<string, string>> = {
     "docs.welcomeDesc": "Aqui você encontra tutoriais detalhados de todas as páginas e funcionalidades do sistema. Clique em cada seção para expandir e ver o passo a passo.",
 
     // My Desk
+    "briefing.title": "Briefing do dia",
+    "briefing.regenerate": "Regerar",
+    "briefing.error": "Não foi possível gerar o briefing agora. A fila abaixo continua completa.",
+    "briefing.disclaimer": "Resumo gerado por IA a partir da sua fila. Confira antes de agir.",
+    "briefing.severity.critical": "Crítico",
+    "briefing.severity.high": "Alto",
+    "briefing.severity.medium": "Médio",
+    "briefing.severity.low": "Baixo",
     "mydesk.title": "Minha Mesa",
     "mydesk.subtitle": "O que precisa da sua atenção hoje",
     "mydesk.overduePermits": "Permits vencidos",
@@ -4265,6 +4273,14 @@ const translations: Record<Language, Record<string, string>> = {
     "docs.welcomeDesc": "Here you'll find detailed tutorials for all pages and features. Click each section to expand and see the step-by-step guide.",
 
     // My Desk
+    "briefing.title": "Today's briefing",
+    "briefing.regenerate": "Regenerate",
+    "briefing.error": "Couldn't generate the briefing right now. The queue below is still complete.",
+    "briefing.disclaimer": "AI summary of your own queue. Review before acting.",
+    "briefing.severity.critical": "Critical",
+    "briefing.severity.high": "High",
+    "briefing.severity.medium": "Medium",
+    "briefing.severity.low": "Low",
     "mydesk.title": "My Desk",
     "mydesk.subtitle": "What needs your attention today",
     "mydesk.overduePermits": "Overdue permits",
@@ -6844,6 +6860,14 @@ const translations: Record<Language, Record<string, string>> = {
     "docs.welcomeDesc": "Aquí encontrará tutoriales detallados de todas las páginas y funcionalidades del sistema. Haga clic en cada sección para expandir y ver el paso a paso.",
 
     // My Desk
+    "briefing.title": "Briefing del día",
+    "briefing.regenerate": "Regenerar",
+    "briefing.error": "No se pudo generar el briefing ahora. La cola de abajo sigue completa.",
+    "briefing.disclaimer": "Resumen generado por IA a partir de tu cola. Revísalo antes de actuar.",
+    "briefing.severity.critical": "Crítico",
+    "briefing.severity.high": "Alto",
+    "briefing.severity.medium": "Medio",
+    "briefing.severity.low": "Bajo",
     "mydesk.title": "Mi Escritorio",
     "mydesk.subtitle": "Lo que necesita tu atención hoy",
     "mydesk.overduePermits": "Permisos vencidos",
