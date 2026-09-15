@@ -12,12 +12,7 @@ import {
   type PermitForecast,
   type RevenueForecast,
 } from "@/lib/revenueForecast";
-
-const usd = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
+import { useRegion } from "@/hooks/useRegion";
 
 function SourceTag({ source, t }: { source: PermitForecast["source"]; t: (k: string) => string }) {
   if (source === "client_history") {
@@ -31,6 +26,7 @@ function SourceTag({ source, t }: { source: PermitForecast["source"]; t: (k: str
 
 export function RevenueForecastCard() {
   const { t } = useLanguage();
+  const { moneyCompact, currencySymbol } = useRegion();
   const { data: clients } = useClients();
   const { data: permits } = usePermits();
   const { data: invoices } = useInvoices();
@@ -104,7 +100,7 @@ export function RevenueForecastCard() {
                 {b.label}
               </p>
               <p className="relative text-lg font-semibold mt-1 tabular-nums">
-                {usd.format(b.bucket.total)}
+                {moneyCompact(b.bucket.total)}
               </p>
               <p className="relative text-xs text-muted-foreground mt-0.5">
                 {t("forecast.permitsCount").replace("{count}", String(b.bucket.count))}
@@ -128,7 +124,7 @@ export function RevenueForecastCard() {
                     <th className="px-3 py-2">{t("common.client")}</th>
                     <th className="px-3 py-2">{t("nav.permits")}</th>
                     <th className="px-3 py-2">{t("forecast.expiringIn").replace("{days}", "")}</th>
-                    <th className="px-3 py-2 text-right">{usd.format(0).replace("0", "$")}</th>
+                    <th className="px-3 py-2 text-right">{currencySymbol}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -165,7 +161,7 @@ export function RevenueForecastCard() {
                           </Badge>
                         </td>
                         <td className="px-3 py-2 text-right">
-                          <div className="font-semibold tabular-nums">{usd.format(item.estimatedRevenue)}</div>
+                          <div className="font-semibold tabular-nums">{moneyCompact(item.estimatedRevenue)}</div>
                           <SourceTag source={item.source} t={t} />
                         </td>
                       </tr>

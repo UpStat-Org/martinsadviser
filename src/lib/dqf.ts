@@ -36,30 +36,16 @@ export const DQF_KINDS: Array<{ kind: DqfKind; label: string; annual: boolean }>
 // Everything except "other" is part of the regulatory file.
 export const REQUIRED_DQF_KINDS: DqfKind[] = DQF_KINDS.filter((k) => k.kind !== "other").map((k) => k.kind);
 
-export const DAY_MS = 86_400_000;
-export const SOON_DAYS = 30;
+// A classificação de validade é genérica — vive em lib/expiry.ts para que o
+// núcleo regulatório brasileiro use a mesma regra sem importar de um módulo
+// chamado "dqf". Reexportado aqui para não mexer em nenhum call site.
+export { DAY_MS, SOON_DAYS, expiryStatus } from "./expiry";
+export type { ExpiryState, ExpiryInfo } from "./expiry";
+
+import { DAY_MS, expiryStatus } from "./expiry";
+import type { ExpiryInfo } from "./expiry";
 
 const ANNUAL = new Set<DqfKind>(DQF_KINDS.filter((k) => k.annual).map((k) => k.kind));
-
-export type ExpiryState = "missing" | "expired" | "expiring" | "valid";
-
-export interface ExpiryInfo {
-  date: string | null;
-  /** Whole days until expiry; negative when past, null when no date. */
-  daysUntil: number | null;
-  state: ExpiryState;
-}
-
-/** Classify a single expiration date relative to `now`. */
-export function expiryStatus(date: string | null | undefined, now: number = Date.now(), soonDays = SOON_DAYS): ExpiryInfo {
-  if (!date) return { date: null, daysUntil: null, state: "missing" };
-  const daysUntil = Math.ceil((new Date(date).getTime() - now) / DAY_MS);
-  let state: ExpiryState;
-  if (daysUntil < 0) state = "expired";
-  else if (daysUntil <= soonDays) state = "expiring";
-  else state = "valid";
-  return { date, daysUntil, state };
-}
 
 // Minimal structural shapes so this module never imports the data hooks.
 export interface DqfDocLike {

@@ -67,6 +67,7 @@ import {
   MoreHorizontal,
   DollarSign,
 } from "lucide-react";
+import { useRegion } from "@/hooks/useRegion";
 
 const STAGE_TONES: Record<LeadStage, StatusTone> = {
   new: "neutral",
@@ -110,8 +111,7 @@ export default function LeadsPage() {
   const [lostLead, setLostLead] = useState<Lead | null>(null);
   const [lostReason, setLostReason] = useState("");
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  const { money: fmt } = useRegion();
 
   const stageLabel = (s: LeadStage) => t("leads.stage." + s);
 

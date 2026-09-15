@@ -12,6 +12,8 @@ import { AppLayout } from "./components/AppLayout";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { FeatureGate } from "./components/FeatureGate";
+import { CountryGate } from "./components/CountryGate";
+import { OrgAdminRoute } from "./components/OrgAdminRoute";
 import { SuperAdminRoute } from "./components/SuperAdminRoute";
 import { TruckLoadingScreen } from "./components/TruckLoadingScreen";
 import { useAuth } from "./hooks/useAuth";
@@ -64,6 +66,10 @@ const QuotesPage = lazy(() => import("./pages/QuotesPage"));
 const QuoteDetail = lazy(() => import("./pages/QuoteDetail"));
 const ServicesPage = lazy(() => import("./pages/ServicesPage"));
 const MyDeskPage = lazy(() => import("./pages/MyDeskPage"));
+const LoadsPage = lazy(() => import("./pages/LoadsPage"));
+const LoadDetailPage = lazy(() => import("./pages/LoadDetailPage"));
+const BrCompliancePage = lazy(() => import("./pages/BrCompliancePage"));
+const BrFinesPage = lazy(() => import("./pages/BrFinesPage"));
 const SuperAdmin = lazy(() => import("./pages/SuperAdmin"));
 const StartOrg = lazy(() => import("./pages/StartOrg"));
 const InviteAccept = lazy(() => import("./pages/InviteAccept"));
@@ -124,7 +130,7 @@ const App = () => (
             >
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/my" element={<MyDeskPage />} />
-              <Route path="/workload" element={<WorkloadPage />} />
+              <Route path="/workload" element={<OrgAdminRoute><WorkloadPage /></OrgAdminRoute>} />
               <Route path="/clients" element={<Clients />} />
               <Route path="/clients/onboarding" element={<ClientOnboarding />} />
               <Route path="/clients/:id" element={<ClientDetail />} />
@@ -134,6 +140,10 @@ const App = () => (
               <Route path="/drivers/:id" element={<DriverDetailPage />} />
               <Route path="/permits" element={<Permits />} />
               <Route path="/permits/:id" element={<PermitDetail />} />
+              <Route path="/loads" element={<LoadsPage />} />
+              <Route path="/loads/:id" element={<LoadDetailPage />} />
+              <Route path="/br/compliance" element={<CountryGate country="BR"><BrCompliancePage /></CountryGate>} />
+              <Route path="/br/multas" element={<CountryGate country="BR"><BrFinesPage /></CountryGate>} />
               <Route path="/messages" element={<FeatureGate flag="messages"><Messages /></FeatureGate>} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/tasks" element={<KanbanPage />} />
@@ -146,18 +156,18 @@ const App = () => (
               <Route path="/leads" element={<FeatureGate flag="crm"><LeadsPage /></FeatureGate>} />
               <Route path="/quotes" element={<FeatureGate flag="crm"><QuotesPage /></FeatureGate>} />
               <Route path="/quotes/:id" element={<FeatureGate flag="crm"><QuoteDetail /></FeatureGate>} />
-              <Route path="/admin/services" element={<FeatureGate flag="crm"><ServicesPage /></FeatureGate>} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/audit" element={<FeatureGate flag="audit_log"><AuditPage /></FeatureGate>} />
+              <Route path="/admin/services" element={<OrgAdminRoute><FeatureGate flag="crm"><ServicesPage /></FeatureGate></OrgAdminRoute>} />
+              <Route path="/admin/users" element={<OrgAdminRoute><AdminUsers /></OrgAdminRoute>} />
+              <Route path="/audit" element={<OrgAdminRoute><FeatureGate flag="audit_log"><AuditPage /></FeatureGate></OrgAdminRoute>} />
               <Route path="/docs" element={<DocumentationPage />} />
-              <Route path="/compliance-calendar" element={<ComplianceCalendarPage />} />
-              <Route path="/drug-testing" element={<DrugTestingPage />} />
-              <Route path="/hvut" element={<HvutPage />} />
-              <Route path="/ifta" element={<IftaPage />} />
-              <Route path="/admin/ifta-rates" element={<IftaRatesAdminPage />} />
-              <Route path="/irp" element={<IrpPage />} />
-              <Route path="/safer-lookup" element={<SaferLookupPage />} />
-              <Route path="/admin/task-templates" element={<TaskTemplatesPage />} />
+              <Route path="/compliance-calendar" element={<CountryGate country="US"><ComplianceCalendarPage /></CountryGate>} />
+              <Route path="/drug-testing" element={<CountryGate country="US"><DrugTestingPage /></CountryGate>} />
+              <Route path="/hvut" element={<CountryGate country="US"><HvutPage /></CountryGate>} />
+              <Route path="/ifta" element={<CountryGate country="US"><IftaPage /></CountryGate>} />
+              <Route path="/admin/ifta-rates" element={<OrgAdminRoute><CountryGate country="US"><IftaRatesAdminPage /></CountryGate></OrgAdminRoute>} />
+              <Route path="/irp" element={<CountryGate country="US"><IrpPage /></CountryGate>} />
+              <Route path="/safer-lookup" element={<CountryGate country="US"><SaferLookupPage /></CountryGate>} />
+              <Route path="/admin/task-templates" element={<OrgAdminRoute><TaskTemplatesPage /></OrgAdminRoute>} />
               <Route path="/profit-per-client" element={<ProfitPerClientPage />} />
               <Route path="/super-admin" element={<SuperAdminRoute><SuperAdmin /></SuperAdminRoute>} />
             </Route>

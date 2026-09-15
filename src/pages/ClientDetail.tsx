@@ -84,6 +84,7 @@ import { usePermitDocuments } from "@/hooks/usePermitDocuments";
 import { Send, RotateCw, MessageCircle, DollarSign } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { cn } from "@/lib/utils";
+import { useRegion } from "@/hooks/useRegion";
 
 const serviceLabels = [
   { key: "service_ifta", label: "IFTA" },
@@ -202,6 +203,9 @@ export default function ClientDetail() {
   const [aiReport, setAiReport] = useState<string | null>(null);
   const [aiReportOpen, setAiReportOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  // Antes de qualquer early return: abaixo o componente sai cedo quando o
+  // cliente ainda não carregou, e um hook depois disso não rodaria sempre.
+  const { money: currency } = useRegion();
 
   const statusMap: Record<string, { label: string; className: string }> = {
     active: { label: t("common.active"), className: "bg-success text-success-foreground" },
@@ -273,8 +277,6 @@ export default function ClientDetail() {
     ? Math.round((activePermits / permits.length) * 100)
     : 100;
 
-  const currency = (v: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v);
 
   const metricPills: Array<{ label: string; value: string | number; icon: typeof FileCheck }> = [
     { label: t("permits.title"), value: permits?.length ?? 0, icon: FileCheck },

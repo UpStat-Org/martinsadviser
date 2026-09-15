@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useOrg } from "@/contexts/OrgContext";
+import { useOrg, type OrgRole } from "@/contexts/OrgContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Member {
   user_id: string;
-  role: "owner" | "admin" | "member";
+  role: OrgRole;
   approval_status: string;
   joined_at: string;
   email: string | null;
@@ -30,7 +30,7 @@ interface Member {
 interface Invitation {
   id: string;
   email: string;
-  role: "owner" | "admin" | "member";
+  role: OrgRole;
   token: string;
   expires_at: string;
   accepted_at: string | null;
@@ -43,11 +43,11 @@ export function OrgMembersPanel() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"member" | "admin">("member");
+  const [role, setRole] = useState<Exclude<OrgRole, "owner">>("member");
 
   // Members come from the list_org_members RPC because direct SELECT on
   // profiles is locked to your own row by RLS — the RPC is SECURITY DEFINER
-  // and validates is_org_member(p_org_id) inline.
+  // and validates is_org_admin(p_org_id) inline.
   const membersQuery = useQuery({
     queryKey: ["org-members", currentOrg?.id],
     enabled: !!currentOrg && isOrgAdmin,
@@ -79,7 +79,7 @@ export function OrgMembersPanel() {
       const { data, error } = await supabase.rpc("invite_member", {
         p_org_id: currentOrg.id,
         p_email: email,
-        p_role: role,
+        p_role: role as never,
       });
       if (error) throw error;
       const invitation = data as { id: string; token: string; expires_at: string };
@@ -135,7 +135,7 @@ export function OrgMembersPanel() {
   };
 
   const memberSorted = useMemo(() => {
-    const order = { owner: 0, admin: 1, member: 2 } as Record<string, number>;
+    const order = { owner: 0, admin: 1, operator: 2, member: 3, viewer: 4 } as Record<string, number>;
     return [...(membersQuery.data ?? [])].sort((a, b) => (order[a.role] ?? 9) - (order[b.role] ?? 9));
   }, [membersQuery.data]);
 
@@ -184,12 +184,14 @@ export function OrgMembersPanel() {
               />
             </div>
           </div>
-          <Select value={role} onValueChange={(v) => setRole(v as "member" | "admin")}>
+          <Select value={role} onValueChange={(v) => setRole(v as Exclude<OrgRole, "owner">)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="member">{t("orgMembers.roleMember")}</SelectItem>
+              <SelectItem value="operator">{t("admin.operator")}</SelectItem>
+              <SelectItem value="viewer">{t("admin.viewer")}</SelectItem>
               <SelectItem value="admin">{t("orgMembers.roleAdmin")}</SelectItem>
             </SelectContent>
           </Select>

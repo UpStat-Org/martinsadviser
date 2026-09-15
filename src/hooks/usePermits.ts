@@ -39,8 +39,31 @@ export const PERMIT_TYPES = [
   "FAST (US-Canada)",
   "FAST (US-Mexico)",
   "PARS / PAPS",
+
+  // ── Brasil ──────────────────────────────────────────────────────────────
+  // A AET (Autorização Especial de Trânsito) é a contraparte direta dos
+  // permits de excesso de peso e dimensão: mesma natureza, mesma validade,
+  // mesmo fluxo de renovação — só muda o órgão emissor. Por isso entra aqui
+  // em vez de ganhar tabela própria: o que o produto já faz com permits
+  // (histórico, documentos, alerta de vencimento, mapa de cobertura) passa a
+  // valer para o Brasil sem uma linha de código nova.
+  "AET DNIT",
+  "AET DER (estadual)",
+  "AET Municipal",
+
   "Other",
 ] as const;
+
+// Quais tipos aparecem para cada país. Um despachante brasileiro escolhendo
+// entre 20 tipos americanos e 3 brasileiros erraria; e IFTA numa org BR não é
+// uma opção pouco usada, é uma opção inexistente.
+const BR_PERMIT_TYPES = new Set<string>(["AET DNIT", "AET DER (estadual)", "AET Municipal", "Other"]);
+
+export function permitTypesForCountry(country: string): readonly string[] {
+  if (country === "BR") return PERMIT_TYPES.filter((t) => BR_PERMIT_TYPES.has(t));
+  // Fora do Brasil, some com os tipos brasileiros e mantém o resto.
+  return PERMIT_TYPES.filter((t) => !BR_PERMIT_TYPES.has(t) || t === "Other");
+}
 
 /**
  * Categories that need extra metadata fields in the permit form (hazmat

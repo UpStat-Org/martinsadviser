@@ -58,6 +58,7 @@ import {
   Package,
 } from "lucide-react";
 import { format } from "date-fns";
+import { useRegion } from "@/hooks/useRegion";
 
 const STATUS_TONES: Record<QuoteStatus, StatusTone> = {
   draft: "neutral",
@@ -95,8 +96,7 @@ export default function QuoteDetail() {
     setDiscountInput(String(quote.discount ?? 0));
   }, [quote]);
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  const { money: fmt } = useRegion();
 
   const itemList = items ?? [];
   const discount = Number(quote?.discount || 0);

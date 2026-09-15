@@ -29,7 +29,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface PeekResultValid {
   valid: true;
   email: string;
-  role: "owner" | "admin" | "member";
+  role: "owner" | "admin" | "operator" | "viewer" | "member";
   org_name: string;
   org_slug: string;
   expires_at: string;

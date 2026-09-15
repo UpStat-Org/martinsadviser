@@ -64,6 +64,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { format } from "date-fns";
+import { useRegion } from "@/hooks/useRegion";
 
 const STATUS_TONES: Record<PlanStatus, StatusTone> = {
   active: "success",
@@ -104,8 +105,7 @@ export default function RecurringPlansPage() {
     description: "",
   });
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  const { money: fmt } = useRegion();
 
   const openNew = () => {
     setEditing(null);

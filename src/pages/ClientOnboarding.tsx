@@ -51,7 +51,8 @@ import { pt, enUS, es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useCreateClient, useCheckClientDuplicate } from "@/hooks/useClients";
 import { useCreateTruck } from "@/hooks/useTrucks";
-import { useCreatePermit, PERMIT_TYPES } from "@/hooks/usePermits";
+import { useCreatePermit, permitTypesForCountry } from "@/hooks/usePermits";
+import { useOrg } from "@/contexts/OrgContext";
 import { useToast } from "@/hooks/use-toast";
 import { useFmcsaLookup } from "@/hooks/useFmcsaLookup";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -108,6 +109,7 @@ const steps = [
 ];
 
 export default function ClientOnboarding() {
+  const { country } = useOrg();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t, language } = useLanguage();
@@ -973,7 +975,7 @@ export default function ClientOnboarding() {
                     <SelectValue placeholder={`${t("common.type")} *`} />
                   </SelectTrigger>
                   <SelectContent>
-                    {PERMIT_TYPES.map((t) => (
+                    {permitTypesForCountry(country).map((t) => (
                       <SelectItem key={t} value={t}>
                         {t}
                       </SelectItem>

@@ -31,8 +31,8 @@ import { summarizeIfta, quarterFromDate } from "@/lib/ifta";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
+import { useRegion } from "@/hooks/useRegion";
 
-const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
 function parseJurisdictionsString(s: string): Record<string, number> {
   // "TX:250, NM:180" → { TX: 250, NM: 180 }
@@ -65,6 +65,7 @@ const availableQuarters = (() => {
 export default function IftaPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { money } = useRegion();
   const { data: clients } = useClients();
   const [clientId, setClientId] = useState<string>("");
   const [quarter, setQuarter] = useState<string>(quarterFromDate(new Date()));
@@ -225,7 +226,7 @@ export default function IftaPage() {
                 <CardContent className="pt-6">
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("ifta.stats.netTax")}</p>
                   <p className={`text-lg font-semibold tabular-nums ${summary.total_net_tax >= 0 ? "text-destructive" : "text-success"}`}>
-                    {usd.format(summary.total_net_tax)}
+                    {money(summary.total_net_tax)}
                   </p>
                 </CardContent>
               </Card>
@@ -259,10 +260,10 @@ export default function IftaPage() {
                         <TableCell className="font-mono">{b.jurisdiction}</TableCell>
                         <TableCell className="text-right tabular-nums">{b.taxable_miles.toFixed(0)}</TableCell>
                         <TableCell className="text-right tabular-nums">{b.taxable_gallons.toFixed(2)}</TableCell>
-                        <TableCell className="text-right tabular-nums">{usd.format(b.tax_owed)}</TableCell>
-                        <TableCell className="text-right tabular-nums">{usd.format(b.tax_paid)}</TableCell>
+                        <TableCell className="text-right tabular-nums">{money(b.tax_owed)}</TableCell>
+                        <TableCell className="text-right tabular-nums">{money(b.tax_paid)}</TableCell>
                         <TableCell className={`text-right tabular-nums font-semibold ${b.net >= 0 ? "text-destructive" : "text-success"}`}>
-                          {usd.format(b.net)}
+                          {money(b.net)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -369,7 +370,7 @@ export default function IftaPage() {
                         <TableCell className="text-xs">{format(new Date(f.purchase_date), "MMM dd")}</TableCell>
                         <TableCell className="font-mono">{f.jurisdiction}</TableCell>
                         <TableCell className="tabular-nums">{Number(f.gallons).toFixed(2)}</TableCell>
-                        <TableCell className="tabular-nums">{f.gross_price ? usd.format(Number(f.gross_price)) : "—"}</TableCell>
+                        <TableCell className="tabular-nums">{f.gross_price ? money(Number(f.gross_price)) : "—"}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="icon" onClick={() => deleteFuel.mutate(f.id)}>
                             <Trash2 className="w-3.5 h-3.5 text-destructive" />

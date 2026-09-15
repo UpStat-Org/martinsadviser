@@ -49,7 +49,7 @@ interface OrgDetails {
   };
   members: Array<{
     user_id: string;
-    role: "owner" | "admin" | "member";
+    role: "owner" | "admin" | "operator" | "viewer" | "member";
     approval_status: string;
     joined_at: string;
     email: string | null;

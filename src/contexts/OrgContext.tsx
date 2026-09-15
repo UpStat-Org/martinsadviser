@@ -10,8 +10,15 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { getHostnameOrg } from "@/lib/orgHost";
 import { applyBrandingColors } from "@/lib/color";
+import {
+  isCountryCode,
+  isCurrency,
+  defaultCurrencyForCountry,
+  type CountryCode,
+  type Currency,
+} from "@/lib/region";
 
-export type OrgRole = "owner" | "admin" | "member";
+export type OrgRole = "owner" | "admin" | "operator" | "viewer" | "member";
 
 export const FEATURE_FLAGS = [
   "messages",
@@ -102,6 +109,14 @@ export interface Organization {
   subscription_status?: string;
   /** Labor rate used by /profit-per-client. Column default is 50.00. */
   default_hourly_rate?: number;
+  /**
+   * Regional settings — ver 20260824120000_org_country_currency.sql. Opcionais
+   * no tipo porque um bundle antigo em cache pode ler uma linha antes do
+   * deploy propagar; os getters abaixo caem no default US/USD/en.
+   */
+  country?: string;
+  currency?: string;
+  locale?: string;
 }
 
 export interface Membership {
@@ -117,6 +132,10 @@ interface OrgContextValue {
   features: Record<FeatureFlag, boolean>;
   hasFeature: (flag: FeatureFlag) => boolean;
   branding: OrgBranding;
+  /** País regulatório da org. US enquanto ela não carregou — ver useRegion. */
+  country: CountryCode;
+  /** Moeda de faturamento e exibição da org. */
+  currency: Currency;
   loading: boolean;
   switchOrg: (orgId: string) => Promise<void>;
   refresh: () => Promise<void>;
@@ -251,6 +270,18 @@ export function OrgProvider({ children }: { children: ReactNode }) {
 
   const branding = parseBranding(currentOrg?.branding, currentOrg?.name);
 
+  // País e moeda com fallback em cascata. Uma org que ainda não carregou, ou
+  // uma linha gravada antes da migration regional, cai em US/USD — que é
+  // exatamente o comportamento que o sistema tinha antes de existir a coluna,
+  // então nenhuma tela muda de aparência ao aplicar isto.
+  const country: CountryCode = isCountryCode(currentOrg?.country) ? currentOrg.country : "US";
+  // A moeda não deriva do país aqui: a coluna é editável de forma independente
+  // (uma assessoria americana pode faturar cliente brasileiro em USD). Só
+  // quando a coluna está ausente ou inválida é que o país decide.
+  const currency: Currency = isCurrency(currentOrg?.currency)
+    ? currentOrg.currency
+    : defaultCurrencyForCountry(country);
+
   // Mirror the org's app_name into the browser tab. Keeping this in the
   // provider (rather than on every page) means it stays in sync after
   // switchOrg without each consumer remembering to update.
@@ -270,7 +301,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
 
   return (
     <OrgContext.Provider
-      value={{ currentOrg, memberships, isOrgOwner, isOrgAdmin, features, hasFeature, branding, loading, switchOrg, refresh }}
+      value={{ currentOrg, memberships, isOrgOwner, isOrgAdmin, features, hasFeature, branding, country, currency, loading, switchOrg, refresh }}
     >
       {children}
     </OrgContext.Provider>

@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { useCreatePermit, useUpdatePermit, PERMIT_TYPES, permitCategory, type Permit, type PermitInsert } from "@/hooks/usePermits";
+import { useCreatePermit, useUpdatePermit, permitTypesForCountry, permitCategory, type Permit, type PermitInsert } from "@/hooks/usePermits";
 import { useClients } from "@/hooks/useClients";
 import { useTrucks } from "@/hooks/useTrucks";
 import { useEmployees, employeeName } from "@/hooks/useEmployees";
@@ -62,6 +62,8 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
   const { data: employees } = useEmployees();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { country } = useOrg();
+  const permitTypes = permitTypesForCountry(country);
   const { currentOrg } = useOrg();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -337,7 +339,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
                         <SelectTrigger><SelectValue placeholder={t("permits.form.typePlaceholder")} /></SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {PERMIT_TYPES.map((t) => (
+                        {permitTypes.map((t) => (
                           <SelectItem key={t} value={t}>{t}</SelectItem>
                         ))}
                       </SelectContent>

@@ -51,28 +51,7 @@ interface Profile {
   email: string | null;
   approval_status: string;
   created_at: string;
-}
-interface UserRole {
-  id: string;
-  user_id: string;
-  role: string;
-}
-
-const AVATAR_GRADIENTS = [
-  "from-indigo-500 to-violet-500",
-  "from-blue-500 to-cyan-500",
-  "from-emerald-500 to-teal-500",
-  "from-orange-500 to-amber-500",
-  "from-rose-500 to-red-500",
-  "from-fuchsia-500 to-pink-500",
-  "from-sky-500 to-blue-500",
-  "from-purple-500 to-indigo-500",
-];
-
-function gradientFor(id: string) {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  return AVATAR_GRADIENTS[h % AVATAR_GRADIENTS.length];
+  role: "owner" | "admin" | "operator" | "viewer" | "member";
 }
 
 function initials(name: string) {
@@ -84,13 +63,6 @@ function initials(name: string) {
     .join("")
     .padEnd(1, "?");
 }
-
-const ROLE_STYLES: Record<string, { gradient: string; label: string }> = {
-  admin: { gradient: "from-fuchsia-500 to-pink-500", label: "Admin" },
-  operator: { gradient: "from-indigo-500 to-violet-500", label: "Operator" },
-  viewer: { gradient: "from-sky-500 to-blue-500", label: "Viewer" },
-  user: { gradient: "from-slate-500 to-zinc-500", label: "User" },
-};
 
 export default function AdminUsers() {
   const { toast } = useToast();
@@ -127,24 +99,16 @@ export default function AdminUsers() {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("list_org_members", { p_org_id: currentOrg!.id });
       if (error) throw error;
-      return ((data ?? []) as Array<{ user_id: string; approval_status: string; joined_at: string; email: string | null; full_name: string | null }>)
+      return ((data ?? []) as Array<{ user_id: string; role: Profile["role"]; approval_status: string; joined_at: string; email: string | null; full_name: string | null }>)
         .map((m) => ({
           id: m.user_id,
           full_name: m.full_name,
           email: m.email,
           approval_status: m.approval_status,
           created_at: m.joined_at,
+          role: m.role,
         }))
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) as Profile[];
-    },
-  });
-
-  const { data: allRoles } = useQuery({
-    queryKey: ["admin-user-roles"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("*");
-      if (error) throw error;
-      return data as UserRole[];
     },
   });
 
@@ -176,15 +140,20 @@ export default function AdminUsers() {
   });
 
   const setRole = useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      await supabase.from("user_roles").delete().eq("user_id", userId);
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: userId, role } as any);
+    mutationFn: async ({ userId, role }: { userId: string; role: Exclude<Profile["role"], "owner"> }) => {
+      if (!currentOrg) throw new Error("No active organization");
+      const { data, error } = await supabase
+        .from("organization_members")
+        .update({ role: role as never })
+        .eq("organization_id", currentOrg.id)
+        .eq("user_id", userId)
+        .neq("role", "owner")
+        .select("user_id");
       if (error) throw error;
+      if (!data?.length) throw new Error("Member not found or owner role cannot be changed here");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-user-roles"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-profiles", currentOrg?.id] });
       toast({ title: t("admin.roleUpdated") });
     },
     onError: (error: any) => {
@@ -202,7 +171,6 @@ export default function AdminUsers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-profiles"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-user-roles"] });
       toast({ title: t("admin.userDeleted") });
       setDeleteUserId(null);
     },
@@ -211,11 +179,6 @@ export default function AdminUsers() {
       setDeleteUserId(null);
     },
   });
-
-  const getUserRole = (userId: string) => {
-    const role = allRoles?.find((r) => r.user_id === userId);
-    return role?.role || "user";
-  };
 
   const stats = useMemo(() => {
     const total = profiles?.length ?? 0;
@@ -408,8 +371,7 @@ export default function AdminUsers() {
             </TableHeader>
             <TableBody>
               {filtered.map((profile) => {
-                const currentRole = getUserRole(profile.id);
-                const roleStyle = ROLE_STYLES[currentRole] || ROLE_STYLES.user;
+                const currentRole = profile.role;
                 const name = profile.full_name || "—";
                 return (
                   <TableRow
@@ -444,8 +406,12 @@ export default function AdminUsers() {
                     <TableCell>
                       <Select
                         value={currentRole}
+                        disabled={currentRole === "owner" || setRole.isPending}
                         onValueChange={(v) =>
-                          setRole.mutate({ userId: profile.id, role: v })
+                          setRole.mutate({
+                            userId: profile.id,
+                            role: v as "admin" | "operator" | "viewer" | "member",
+                          })
                         }
                       >
                         <SelectTrigger className="w-36 h-8 rounded-lg border-border/60">
@@ -459,6 +425,7 @@ export default function AdminUsers() {
                           </div>
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="owner" disabled>Owner</SelectItem>
                           <SelectItem value="admin">{t("admin.roleAdmin")}</SelectItem>
                           <SelectItem value="operator">
                             {t("admin.operator")}
@@ -466,7 +433,7 @@ export default function AdminUsers() {
                           <SelectItem value="viewer">
                             {t("admin.viewer")}
                           </SelectItem>
-                          <SelectItem value="user">{t("admin.userRole")}</SelectItem>
+                          <SelectItem value="member">{t("admin.userRole")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>

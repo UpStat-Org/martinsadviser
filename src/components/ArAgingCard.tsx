@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Layers } from "lucide-react";
 import { computeAging, type AgingInvoice, type AgingBucket } from "@/lib/aging";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useRegion } from "@/hooks/useRegion";
 
 interface Props {
   invoices: AgingInvoice[];
@@ -18,11 +19,9 @@ const BUCKETS: Array<{ key: AgingBucket; labelKey: string }> = [
   { key: "d90plus", labelKey: "aging.d90plus" },
 ];
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
-
 export function ArAgingCard({ invoices }: Props) {
   const { t } = useLanguage();
+  const { money: fmt } = useRegion();
   const report = useMemo(() => computeAging(invoices), [invoices]);
 
   if (report.totals.total === 0) return null;

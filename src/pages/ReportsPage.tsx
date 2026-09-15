@@ -18,7 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { usePermits, getExpirationStatus, PERMIT_TYPES } from "@/hooks/usePermits";
+import { usePermits, getExpirationStatus, permitTypesForCountry } from "@/hooks/usePermits";
+import { useOrg } from "@/contexts/OrgContext";
 import { useClients } from "@/hooks/useClients";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
@@ -123,6 +124,7 @@ function exportToPdf(rows: Record<string, any>[], title: string, filename: strin
 
 export default function ReportsPage() {
   const { t } = useLanguage();
+  const { country } = useOrg();
   const { toast } = useToast();
   const { data: permits, isLoading: permitsLoading } = usePermits();
   const { data: clients } = useClients();
@@ -461,7 +463,7 @@ export default function ReportsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t("reports.allTypes")}</SelectItem>
-                  {PERMIT_TYPES.map((type) => (
+                  {permitTypesForCountry(country).map((type) => (
                     <SelectItem key={type} value={type}>
                       {type}
                     </SelectItem>

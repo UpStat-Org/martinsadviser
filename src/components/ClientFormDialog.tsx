@@ -28,6 +28,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateClient, useUpdateClient, useCheckClientDuplicate, type Client } from "@/hooks/useClients";
+import { useCnpjLookup } from "@/hooks/useCnpjLookup";
+import { cnpjDigits, formatCnpj } from "@/lib/brCompliance";
 import { useToast } from "@/hooks/use-toast";
 import { useFmcsaLookup } from "@/hooks/useFmcsaLookup";
 import { Loader2, Search } from "lucide-react";
@@ -43,6 +45,8 @@ const formSchema = z.object({
   ein: z.string().optional(),
   dot: z.string().optional(),
   mc: z.string().optional(),
+  cnpj: z.string().optional(),
+  inscricao_estadual: z.string().optional(),
   country: z.enum(["US", "BR", "ES"]).default("US"),
   status: z.string().default("active"),
   service_ifta: z.boolean().default(false),
@@ -80,6 +84,23 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
   const { t } = useLanguage();
   const isEditing = !!client;
 
+  const { lookup: lookupCnpjApi, loading: lookingUpCnpj } = useCnpjLookup();
+
+  // Contraparte brasileira do lookup por USDOT. Preenche os mesmos campos a
+  // partir da Receita, e só sobrescreve o que veio preenchido na resposta —
+  // um campo em branco na base não apaga o que o operador já digitou.
+  const handleCnpjLookup = async () => {
+    const data = await lookupCnpjApi(form.getValues("cnpj") || "");
+    if (!data) return;
+    if (data.company_name) form.setValue("company_name", data.company_name);
+    if (data.phone) form.setValue("phone", data.phone);
+    if (data.email) form.setValue("email", data.email);
+    if (data.cnpj) form.setValue("cnpj", data.cnpj);
+    const address = [data.address, data.city && `${data.city}/${data.state}`, data.postal_code]
+      .filter(Boolean).join(" — ");
+    if (address) form.setValue("address", address);
+  };
+
   const handleDotLookup = async () => {
     const dotValue = form.getValues("dot");
     const data = await lookup(dotValue || "");
@@ -105,6 +126,8 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
           ein: client.ein || "",
           dot: client.dot || "",
           mc: client.mc || "",
+          cnpj: (client as unknown as { cnpj?: string }).cnpj || "",
+          inscricao_estadual: (client as unknown as { inscricao_estadual?: string }).inscricao_estadual || "",
           country: (((client as unknown as { country?: string }).country) ?? "US") as "US" | "BR" | "ES",
           status: client.status,
           service_ifta: client.service_ifta,
@@ -124,6 +147,8 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
           ein: "",
           dot: "",
           mc: "",
+          cnpj: "",
+          inscricao_estadual: "",
           country: "US",
           status: "active",
           service_ifta: false,
@@ -135,6 +160,8 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
           notes: "",
         },
   });
+
+  const watchedCountry = form.watch("country");
 
   useEffect(() => {
     if (open) {
@@ -149,6 +176,8 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
               ein: client.ein || "",
               dot: client.dot || "",
               mc: client.mc || "",
+              cnpj: (client as unknown as { cnpj?: string }).cnpj || "",
+              inscricao_estadual: (client as unknown as { inscricao_estadual?: string }).inscricao_estadual || "",
               country: (((client as unknown as { country?: string }).country) ?? "US") as "US" | "BR" | "ES",
               status: client.status,
               service_ifta: client.service_ifta,
@@ -168,6 +197,8 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
               ein: "",
               dot: "",
               mc: "",
+              cnpj: "",
+              inscricao_estadual: "",
               country: "US",
               status: "active",
               service_ifta: false,
@@ -199,6 +230,10 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
       address: values.address || null,
       ein: values.ein || null,
       dot: values.dot || null,
+      // clients_cnpj_digits_check exige exatamente 14 dígitos ou NULL, então
+      // a máscara digitada some aqui. Formatar é responsabilidade da leitura.
+      cnpj: cnpjDigits(values.cnpj) || null,
+      inscricao_estadual: values.inscricao_estadual || null,
       mc: values.mc || null,
       notes: values.notes || null,
     } as Record<string, unknown>;
@@ -350,6 +385,61 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
                   </FormItem>
                 )}
               />
+
+              {/* CNPJ e inscrição estadual só para cliente brasileiro. Um
+                  formulário que pede DOT, MC, EIN E CNPJ ao mesmo tempo obriga
+                  o operador a descobrir sozinho quais campos valem para ele. */}
+              {watchedCountry === "BR" && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="cnpj"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("br.cnpj.label")}</FormLabel>
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input
+                              placeholder="00.000.000/0000-00"
+                              inputMode="numeric"
+                              {...field}
+                              // Mascara enquanto digita assim que os 14 dígitos
+                              // estão completos; antes disso deixa o texto cru
+                              // para não brigar com o cursor.
+                              onChange={(e) => field.onChange(formatCnpj(e.target.value) || e.target.value)}
+                            />
+                          </FormControl>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={handleCnpjLookup}
+                            disabled={lookingUpCnpj}
+                            title={t("br.cnpj.lookup")}
+                          >
+                            {lookingUpCnpj ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                          </Button>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="inscricao_estadual"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("br.ie.label")}</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
 
               <FormField
                 control={form.control}

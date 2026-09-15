@@ -4,7 +4,7 @@ import {
   Settings, LogOut, ChevronsLeft, ChevronsRight, ShieldCheck, BarChart3,
   ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen, Sun, Moon,
   Briefcase, Activity, MoreHorizontal, Server, Receipt, Beaker, Fuel, MapPin, Search, TrendingUp,
-  IdCard, Target, FileText, Wallet, Repeat, Package,
+  IdCard, Target, FileText, Wallet, Repeat, Package, Gavel,
   type LucideIcon,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { OrgSwitcher } from "@/components/OrgSwitcher";
 import { useOrg, splitWordmark, type FeatureFlag } from "@/contexts/OrgContext";
+import { type CountryCode } from "@/lib/region";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -25,7 +26,15 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type NavItem = { to: string; icon: LucideIcon; label: string; external?: boolean; feature?: FeatureFlag };
+type NavItem = {
+  to: string;
+  icon: LucideIcon;
+  label: string;
+  external?: boolean;
+  feature?: FeatureFlag;
+  /** Países onde o item existe. Ausente = vale para todos. */
+  countries?: CountryCode[];
+};
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useLocalStorageState("dotpilot-sidebar-collapsed", false);
@@ -33,7 +42,7 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, fullName, role } = useAuth();
-  const { hasFeature, branding, isOrgAdmin } = useOrg();
+  const { hasFeature, branding, isOrgAdmin, country } = useOrg();
   const { data: isSuperAdmin } = useSuperAdmin();
   const wordmark = splitWordmark(branding);
   const { t } = useLanguage();
@@ -43,8 +52,14 @@ export function AppSidebar() {
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   const sections = useMemo<{ label: string; items: NavItem[] }[]>(() => {
+    // Duas exclusões diferentes na mesma passada: `feature` é comercial (a org
+    // não contratou o módulo) e `countries` é factual (o módulo não existe no
+    // país dela).
     const filterByFeature = (items: NavItem[]) =>
-      items.filter((it) => !it.feature || hasFeature(it.feature));
+      items.filter((it) =>
+        (!it.feature || hasFeature(it.feature)) &&
+        (!it.countries || it.countries.includes(country))
+      );
 
     const base: { label: string; items: NavItem[] }[] = [
       {
@@ -62,12 +77,15 @@ export function AppSidebar() {
           { to: "/trucks", icon: Truck, label: t("nav.trucks") },
           { to: "/drivers", icon: IdCard, label: t("nav.drivers") },
           { to: "/permits", icon: FileCheck, label: t("nav.permits") },
+          { to: "/loads", icon: Package, label: t("nav.loads") },
           { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
-          { to: "/drug-testing", icon: ShieldCheck, label: t("sidebar.drugTesting") },
-          { to: "/hvut", icon: Receipt, label: t("sidebar.hvut") },
-          { to: "/ifta", icon: Fuel, label: t("sidebar.ifta") },
-          { to: "/irp", icon: MapPin, label: t("sidebar.irp") },
-          { to: "/safer-lookup", icon: Search, label: t("sidebar.saferLookup") },
+          { to: "/drug-testing", icon: ShieldCheck, label: t("sidebar.drugTesting"), countries: ["US"] },
+          { to: "/hvut", icon: Receipt, label: t("sidebar.hvut"), countries: ["US"] },
+          { to: "/ifta", icon: Fuel, label: t("sidebar.ifta"), countries: ["US"] },
+          { to: "/irp", icon: MapPin, label: t("sidebar.irp"), countries: ["US"] },
+          { to: "/safer-lookup", icon: Search, label: t("sidebar.saferLookup"), countries: ["US"] },
+          { to: "/br/compliance", icon: ShieldCheck, label: t("br.compliance.nav"), countries: ["BR"] },
+          { to: "/br/multas", icon: Gavel, label: t("br.fines.nav"), countries: ["BR"] },
         ]),
       },
       {
@@ -82,7 +100,7 @@ export function AppSidebar() {
         items: filterByFeature([
           { to: "/messages", icon: MessageSquare, label: t("nav.messages"), feature: "messages" },
           { to: "/calendar", icon: CalendarDays, label: t("nav.calendar"), feature: "calendar" },
-          { to: "/compliance-calendar", icon: CalendarDays, label: t("sidebar.complianceCal") },
+          { to: "/compliance-calendar", icon: CalendarDays, label: t("sidebar.complianceCal"), countries: ["US"] },
         ]),
       },
       {
@@ -102,7 +120,7 @@ export function AppSidebar() {
         items: filterByFeature([
           { to: "/workload", icon: Activity, label: t("sidebar.workload") },
           { to: "/admin/users", icon: ShieldCheck, label: t("nav.users") },
-          { to: "/admin/ifta-rates", icon: Fuel, label: t("sidebar.iftaRates") },
+          { to: "/admin/ifta-rates", icon: Fuel, label: t("sidebar.iftaRates"), countries: ["US"] },
           { to: "/admin/task-templates", icon: ClipboardList, label: t("sidebar.taskTemplates") },
           { to: "/admin/services", icon: Package, label: t("sidebar.services"), feature: "crm" },
           { to: "/audit", icon: ScrollText, label: t("nav.audit"), feature: "audit_log" },
@@ -121,7 +139,7 @@ export function AppSidebar() {
     }
     // Drop sections that became empty after filtering (e.g. communication off entirely)
     return base.filter((section) => section.items.length > 0);
-  }, [t, isOrgAdmin, isSuperAdmin, hasFeature]);
+  }, [t, isOrgAdmin, isSuperAdmin, hasFeature, country]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

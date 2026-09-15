@@ -20,6 +20,7 @@ import { PermitFormDialog } from "@/components/PermitFormDialog";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useRegion } from "@/hooks/useRegion";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-warning/10 text-warning border-warning/20",
@@ -38,6 +39,7 @@ export default function InvoiceDetail() {
   const { data: permits } = usePermits(undefined, invoice?.client_id);
   const { data: activity } = useActivityLog(invoice?.client_id, 8);
   const updateInvoice = useUpdateInvoice();
+  const { money: fmt } = useRegion();
   const [form, setForm] = useState({
     amount: "",
     due_date: "",
@@ -60,8 +62,6 @@ export default function InvoiceDetail() {
   if (isLoading) return <Skeleton className="h-96 w-full rounded-md" />;
   if (!invoice) return null;
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
   const overdueDays =
     invoice.status === "overdue"
       ? Math.max(0, Math.ceil((Date.now() - new Date(invoice.due_date).getTime()) / 86400000))

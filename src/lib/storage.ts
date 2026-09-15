@@ -78,7 +78,7 @@ export async function getSignedDocumentUrl(
  */
 export async function uploadComplianceDocument(
   orgId: string,
-  prefix: "dqf" | "hvut",
+  prefix: "dqf" | "hvut" | "load",
   entityId: string,
   file: File,
 ): Promise<string | null> {

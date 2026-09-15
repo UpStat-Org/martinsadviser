@@ -7,8 +7,8 @@ import { EmptyState } from "@/components/EmptyState";
 import { FileSpreadsheet, Loader2, Send, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIftaFilings, useUpsertIftaFiling, type IftaFiling } from "@/hooks/useIfta";
+import { useRegion } from "@/hooks/useRegion";
 
-const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 const num = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 
 const STATUS_TONE: Record<IftaFiling["status"], string> = {
@@ -35,6 +35,7 @@ interface Props {
  */
 export function IftaFilingsCard({ quarter, clients, canEdit = true }: Props) {
   const { t } = useLanguage();
+  const { money } = useRegion();
   const { data: filings, isLoading } = useIftaFilings(quarter);
   const upsert = useUpsertIftaFiling();
 
@@ -102,7 +103,7 @@ export function IftaFilingsCard({ quarter, clients, canEdit = true }: Props) {
                       {f.fleet_mpg != null ? f.fleet_mpg.toFixed(2) : "—"}
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
-                      {f.total_tax_due != null ? usd.format(f.total_tax_due) : "—"}
+                      {money(f.total_tax_due)}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className={STATUS_TONE[f.status]}>

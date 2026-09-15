@@ -51,6 +51,7 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { Package, Plus, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useRegion } from "@/hooks/useRegion";
 
 export default function ServicesPage() {
   const { t } = useLanguage();
@@ -72,8 +73,7 @@ export default function ServicesPage() {
     description: "",
   });
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  const { money: fmt } = useRegion();
 
   const openNew = () => {
     setEditing(null);

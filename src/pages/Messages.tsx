@@ -52,6 +52,7 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOrg } from "@/contexts/OrgContext";
 import { StatusBadge, type StatusTone } from "@/components/StatusBadge";
 
 const dateLocales = { pt: ptBR, en: enUS, es };
@@ -98,6 +99,7 @@ export default function Messages() {
   const toggleRule = useUpdateAutomationRule();
   const { toast } = useToast();
   const { t, language } = useLanguage();
+  const { currentOrg } = useOrg();
 
   const locale = dateLocales[language] || ptBR;
   const sentAndFailed =
@@ -125,7 +127,10 @@ export default function Messages() {
   const handleSendNow = async () => {
     setSending(true);
     try {
-      const { data, error } = await supabase.functions.invoke("send-emails");
+      if (!currentOrg) throw new Error("No active organization");
+      const { data, error } = await supabase.functions.invoke("send-org-messages", {
+        body: { org_id: currentOrg.id },
+      });
       if (error) throw error;
       toast({
         title: t("messages.sendComplete"),
@@ -342,11 +347,16 @@ export default function Messages() {
                             title={t("messages.sendNow")}
                             onClick={async () => {
                               try {
-                                await supabase
+                                if (!currentOrg) throw new Error("No active organization");
+                                const { error: updateError } = await supabase
                                   .from("scheduled_messages")
                                   .update({ scheduled_at: new Date().toISOString() })
                                   .eq("id", m.id);
-                                await supabase.functions.invoke("send-emails");
+                                if (updateError) throw updateError;
+                                const { error: sendError } = await supabase.functions.invoke("send-org-messages", {
+                                  body: { org_id: currentOrg.id },
+                                });
+                                if (sendError) throw sendError;
                                 toast({ title: t("messages.sendComplete") });
                               } catch (e: any) {
                                 toast({

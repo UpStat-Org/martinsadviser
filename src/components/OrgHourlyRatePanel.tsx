@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Clock, Loader2, Lock } from "lucide-react";
 import { errorMessage } from "@/lib/utils";
+import { useRegion } from "@/hooks/useRegion";
 
 /**
  * Org-level labor rate, consumed by /profit-per-client to turn logged minutes
@@ -25,6 +26,9 @@ export function OrgHourlyRatePanel() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const qc = useQueryClient();
+  // O prefixo do input era "$" fixo — errado para qualquer org que não fature
+  // em dólar. O rótulo também dizia "(USD)"; ambos vêm da org agora.
+  const { currencySymbol } = useRegion();
 
   const stored = currentOrg?.default_hourly_rate ?? 50;
   const [value, setValue] = useState(String(stored));
@@ -93,7 +97,7 @@ export function OrgHourlyRatePanel() {
               {t("orgHourlyRate.label")}
             </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">{currencySymbol}</span>
               <Input
                 id="org-hourly-rate"
                 type="number"

@@ -37,6 +37,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { formatWeekdayLong, formatDayMonthShort } from "@/lib/dates";
 import { useAiBriefing } from "@/hooks/useAiBriefing";
 import { DailyBriefingCard } from "@/components/DailyBriefingCard";
+import { useRegion } from "@/hooks/useRegion";
 
 
 const PRIORITY_STYLES: Record<string, string> = {
@@ -73,6 +74,7 @@ export default function MyDeskPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t, language } = useLanguage();
+  const { money } = useRegion();
   const { data: permits, isLoading: lp } = useAssignedPermits(user?.id);
   const { data: tasks, isLoading: lt } = useAssignedTasks(user?.id);
   const { data: messages } = useScheduledMessages();
@@ -254,7 +256,7 @@ export default function MyDeskPage() {
           id: `invoice-${invoice.id}`,
           kind: "finance",
           severity: overdueDays > 30 ? "critical" : "high",
-          title: `${t("finance.overdue")} ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(invoice.amount))}`,
+          title: `${t("finance.overdue")} ${money(invoice.amount)}`,
           subtitle: invoice.clients?.company_name ?? t("mydesk.noClient"),
           meta: `${overdueDays} ${t("common.days")}`,
           route: `/finance/${invoice.id}`,
@@ -264,7 +266,7 @@ export default function MyDeskPage() {
 
     const order: Record<ActionSeverity, number> = { critical: 0, high: 1, medium: 2, low: 3 };
     return items.sort((a, b) => order[a.severity] - order[b.severity]);
-  }, [permits, tasks, messages, invoices, riskScores, retryMessage, updateTask, t]);
+  }, [permits, tasks, messages, invoices, riskScores, retryMessage, updateTask, t, money]);
 
   const filteredActions = activeKind === "all"
     ? actionItems

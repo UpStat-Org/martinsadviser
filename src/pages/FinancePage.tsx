@@ -86,6 +86,7 @@ import { StatusBadge, type StatusTone } from "@/components/StatusBadge";
 import { ArAgingCard } from "@/components/ArAgingCard";
 import { DunningReviewPanel } from "@/components/DunningReviewPanel";
 import { DunningSettingsPanel } from "@/components/DunningSettingsPanel";
+import { useRegion } from "@/hooks/useRegion";
 
 const STATUS_TONES: Record<string, StatusTone> = {
   pending: "warning",
@@ -372,8 +373,7 @@ export default function FinancePage() {
     return map[s] || s;
   };
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  const { money: fmt } = useRegion();
 
   return (
     <div className="space-y-6">

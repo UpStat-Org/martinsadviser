@@ -50,6 +50,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { FileText, Plus, Trash2, Eye, Loader2, Check, DollarSign } from "lucide-react";
 import { format } from "date-fns";
+import { useRegion } from "@/hooks/useRegion";
 
 const STATUS_TONES: Record<QuoteStatus, StatusTone> = {
   draft: "neutral",
@@ -80,8 +81,7 @@ export default function QuotesPage() {
     valid_until: "",
   });
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  const { money: fmt } = useRegion();
 
   const openLeads = useMemo(
     () => (leads ?? []).filter((l) => l.stage !== "won"),

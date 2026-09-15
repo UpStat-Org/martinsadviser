@@ -19,8 +19,8 @@ import {
 } from "@/hooks/useIrp";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useRegion } from "@/hooks/useRegion";
 
-const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
 const STATUS_BADGE: Record<IrpRegistration["status"], string> = {
   draft: "bg-muted text-muted-foreground border-border",
@@ -35,6 +35,7 @@ const availableYears = (() => {
 
 export default function IrpPage() {
   const { t } = useLanguage();
+  const { money } = useRegion();
   const { user } = useAuth();
   const { data: clients } = useClients();
   const [clientId, setClientId] = useState("");
@@ -165,7 +166,7 @@ export default function IrpPage() {
             <Card>
               <CardContent className="pt-6">
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("irp.totalFee")}</p>
-                <p className="text-lg font-semibold tabular-nums mt-1">{usd.format(totalFee)}</p>
+                <p className="text-lg font-semibold tabular-nums mt-1">{money(totalFee)}</p>
                 <Badge variant="outline" className={`mt-1 ${STATUS_BADGE[registration.status]}`}>{t(`irp.status.${registration.status}`)}</Badge>
               </CardContent>
             </Card>
@@ -204,7 +205,7 @@ export default function IrpPage() {
                         <TableCell className="font-mono font-semibold">{l.jurisdiction}</TableCell>
                         <TableCell className="text-right tabular-nums">{Number(l.miles).toFixed(0)}</TableCell>
                         <TableCell className="text-right tabular-nums">{l.pct.toFixed(2)}%</TableCell>
-                        <TableCell className="text-right tabular-nums">{l.fee != null ? usd.format(Number(l.fee)) : "—"}</TableCell>
+                        <TableCell className="text-right tabular-nums">{l.fee != null ? money(Number(l.fee)) : "—"}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="icon" onClick={() => deleteLine.mutate(l.id)}>
                             <Trash2 className="w-3.5 h-3.5 text-destructive" />

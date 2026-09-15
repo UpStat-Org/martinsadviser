@@ -9,11 +9,12 @@ import { useInvoices } from "@/hooks/useInvoices";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useOrg } from "@/contexts/OrgContext";
 import { useAllTimeEntries } from "@/hooks/useTimeTracking";
+import { useRegion } from "@/hooks/useRegion";
 
-const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
 export default function ProfitPerClientPage() {
   const { t } = useLanguage();
+  const { moneyCompact } = useRegion();
   const { currentOrg } = useOrg();
   const { data: clients } = useClients();
   const { data: invoices } = useInvoices();
@@ -80,7 +81,7 @@ export default function ProfitPerClientPage() {
               <DollarSign className="w-3.5 h-3.5" />
               {t("profit.col.revenue")}
             </div>
-            <p className="text-lg font-semibold tabular-nums mt-1">{usd.format(totalRevenue)}</p>
+            <p className="text-lg font-semibold tabular-nums mt-1">{moneyCompact(totalRevenue)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -89,7 +90,7 @@ export default function ProfitPerClientPage() {
               <Clock className="w-3.5 h-3.5" />
               {t("profit.col.cost")}
             </div>
-            <p className="text-lg font-semibold tabular-nums mt-1">{usd.format(totalCost)}</p>
+            <p className="text-lg font-semibold tabular-nums mt-1">{moneyCompact(totalCost)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -99,7 +100,7 @@ export default function ProfitPerClientPage() {
               {t("profit.col.profit")}
             </div>
             <p className={`text-lg font-semibold tabular-nums mt-1 ${totalProfit >= 0 ? "text-success" : "text-destructive"}`}>
-              {usd.format(totalProfit)}
+              {moneyCompact(totalProfit)}
             </p>
           </CardContent>
         </Card>
@@ -128,11 +129,11 @@ export default function ProfitPerClientPage() {
                 {rows.map((r) => (
                   <TableRow key={r.client.id}>
                     <TableCell className="font-medium">{r.client.company_name}</TableCell>
-                    <TableCell className="text-right tabular-nums">{usd.format(r.revenue)}</TableCell>
+                    <TableCell className="text-right tabular-nums">{moneyCompact(r.revenue)}</TableCell>
                     <TableCell className="text-right tabular-nums">{r.hours.toFixed(1)}</TableCell>
-                    <TableCell className="text-right tabular-nums">{usd.format(r.cost)}</TableCell>
+                    <TableCell className="text-right tabular-nums">{moneyCompact(r.cost)}</TableCell>
                     <TableCell className={`text-right tabular-nums font-semibold ${r.profit >= 0 ? "text-success" : "text-destructive"}`}>
-                      {usd.format(r.profit)}
+                      {moneyCompact(r.profit)}
                     </TableCell>
                     <TableCell className="text-right">
                       <Badge

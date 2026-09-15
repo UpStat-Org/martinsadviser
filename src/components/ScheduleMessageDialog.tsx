@@ -16,7 +16,7 @@ import { useMessageTemplates, useCreateScheduledMessage } from "@/hooks/useMessa
 import { replacePlaceholders } from "@/lib/placeholders";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useFeatureFlag } from "@/contexts/OrgContext";
+import { useFeatureFlag, useOrg } from "@/contexts/OrgContext";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
@@ -49,6 +49,7 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
   const aiReportsEnabled = useFeatureFlag("ai_reports");
   const aiEnabled = aiChatEnabled || aiReportsEnabled;
   const { toast } = useToast();
+  const { currentOrg } = useOrg();
 
   useEffect(() => {
     if (!open) {
@@ -121,7 +122,11 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
         onSuccess: async () => {
           if (sendNow) {
             try {
-              await supabase.functions.invoke("send-emails");
+              if (!currentOrg) throw new Error("No active organization");
+              const { error } = await supabase.functions.invoke("send-org-messages", {
+                body: { org_id: currentOrg.id },
+              });
+              if (error) throw error;
             } catch {
               toast({ title: t("messages.immediateSendFailed"), variant: "destructive" });
             }

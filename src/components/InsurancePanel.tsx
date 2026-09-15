@@ -18,8 +18,7 @@ import {
   type PolicyType,
 } from "@/hooks/useInsurance";
 import { format } from "date-fns";
-
-const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+import { useRegion } from "@/hooks/useRegion";
 
 function expiryBadge(expiration: string | null, label: { soon: string; expired: string; ok: string }) {
   if (!expiration) return null;
@@ -31,6 +30,7 @@ function expiryBadge(expiration: string | null, label: { soon: string; expired: 
 
 export function InsurancePanel({ clientId }: { clientId: string }) {
   const { t } = useLanguage();
+  const { moneyCompact } = useRegion();
   const { user } = useAuth();
   const { data: policies } = useInsuranceCertificates(clientId);
   const createMut = useCreateInsurance();
@@ -106,7 +106,7 @@ export function InsurancePanel({ clientId }: { clientId: string }) {
                   <TableCell className="font-mono text-xs">{p.policy_number ?? "—"}</TableCell>
                   <TableCell className="text-xs">{p.insurer_name ?? "—"}</TableCell>
                   <TableCell className="text-right tabular-nums text-xs">
-                    {p.coverage_amount != null ? usd.format(Number(p.coverage_amount)) : "—"}
+                    {moneyCompact(p.coverage_amount)}
                   </TableCell>
                   <TableCell className="text-xs">
                     <div className="flex flex-col gap-0.5">

@@ -5,9 +5,8 @@ import type { User } from "@supabase/supabase-js";
 interface AuthState {
   user: User | null;
   loading: boolean;
-  // Legacy fine-grained role from user_roles (admin / operator / viewer / user).
-  // Used for "can mutate?" UI gates (isViewer pattern). Admin-vs-not should
-  // come from useOrg().isOrgAdmin (membership-based, multi-tenant aware).
+  // UI projection of the active organization membership. Authorization is
+  // enforced independently by RLS through can_org_write(org_id).
   role: "admin" | "operator" | "viewer" | "user" | null;
   approvalStatus: string | null;
   fullName: string | null;
@@ -29,20 +28,34 @@ export function useAuth() {
         return;
       }
 
-      // Get approval status
+      // Get approval status and the active organization. Fine-grained roles
+      // are organization-scoped; the legacy global user_roles table is not an
+      // authorization source anymore.
       const { data: profile } = await supabase
         .from("profiles")
-        .select("approval_status, full_name")
+        .select("approval_status, full_name, active_org_id")
         .eq("id", user.id)
         .single();
 
-      // Get role
-      const { data: roles } = await supabase
-        .from("user_roles")
+      const { data: membership } = profile?.active_org_id
+        ? await supabase
+        .from("organization_members")
         .select("role")
-        .eq("user_id", user.id);
+        .eq("organization_id", profile.active_org_id)
+        .eq("user_id", user.id)
+        .eq("approval_status", "approved")
+        .maybeSingle()
+        : { data: null };
 
-      const userRole = roles?.length ? (roles[0].role as AuthState["role"]) : "user";
+      const orgRole = membership?.role as string | undefined;
+      const userRole: AuthState["role"] =
+        orgRole === "owner" || orgRole === "admin"
+          ? "admin"
+          : orgRole === "operator"
+            ? "operator"
+            : orgRole === "viewer"
+              ? "viewer"
+              : "user";
 
       setState({
         user,

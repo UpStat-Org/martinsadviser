@@ -20,9 +20,9 @@ import { useDocumentUrl } from "@/hooks/useDocumentUrl";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
-const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
 import { StatusBadge, type StatusTone } from "@/components/StatusBadge";
+import { useRegion } from "@/hooks/useRegion";
 
 const STATUS_TONE: Record<HvutFiling["status"], StatusTone> = {
   pending: "neutral",
@@ -88,6 +88,7 @@ function Schedule1Cell({ filing }: { filing: HvutFiling }) {
 export default function HvutPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { money } = useRegion();
   const { data: trucks } = useTrucks();
   const taxYear = currentTaxYear();
   const { data: filings } = useHvutFilings({ taxYear });
@@ -187,7 +188,7 @@ export default function HvutPage() {
         <Card>
           <CardContent className="pt-6">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("hvut.totalTax")}</p>
-            <p className="text-xl font-semibold tracking-tight mt-1 tabular-nums">{usd.format(totalTaxThisYear)}</p>
+            <p className="text-xl font-semibold tracking-tight mt-1 tabular-nums">{money(totalTaxThisYear)}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{t("hvut.totalTaxDesc")}</p>
           </CardContent>
         </Card>
@@ -234,7 +235,7 @@ export default function HvutPage() {
                       <TableCell>
                         {f.suspended ? <StatusBadge tone="warning">{t("hvut.suspendedYes")}</StatusBadge> : "—"}
                       </TableCell>
-                      <TableCell className="font-mono text-sm">{usd.format(Number(f.tax_amount ?? 0))}</TableCell>
+                      <TableCell className="font-mono text-sm">{money(Number(f.tax_amount ?? 0))}</TableCell>
                       <TableCell>
                         <StatusBadge tone={STATUS_TONE[f.status]}>{f.status}</StatusBadge>
                       </TableCell>
@@ -334,7 +335,7 @@ export default function HvutPage() {
 
             <div className="rounded-lg bg-primary/5 border border-primary/15 p-3">
               <p className="text-xs text-muted-foreground">{t("hvut.taxEstimate")}</p>
-              <p className="text-lg font-semibold tabular-nums">{usd.format(previewTax)}</p>
+              <p className="text-lg font-semibold tabular-nums">{money(previewTax)}</p>
             </div>
           </div>
           <DialogFooter>

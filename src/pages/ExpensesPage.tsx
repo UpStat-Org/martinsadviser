@@ -64,6 +64,7 @@ import {
 import { EmptyState } from "@/components/EmptyState";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { useRegion } from "@/hooks/useRegion";
 
 const NONE_VALUE = "__none__";
 
@@ -95,8 +96,7 @@ export default function ExpensesPage() {
 
   const isViewer = role === "viewer";
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  const { money: fmt } = useRegion();
 
   const catLabel = (c: ExpenseCategory) => t("expenses.cat." + c);
 

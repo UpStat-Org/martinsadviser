@@ -19,11 +19,11 @@ import {
   type MaintenanceType,
 } from "@/hooks/useMaintenance";
 import { format } from "date-fns";
-
-const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+import { useRegion } from "@/hooks/useRegion";
 
 export function MaintenancePanel({ truckId }: { truckId: string }) {
   const { t } = useLanguage();
+  const { moneyCompact } = useRegion();
   const { user } = useAuth();
   const { data: records } = useMaintenanceRecords(truckId);
   const createMut = useCreateMaintenance();
@@ -129,7 +129,7 @@ export function MaintenancePanel({ truckId }: { truckId: string }) {
                   <TableCell className="text-xs">{t(`maintenance.type.${r.service_type}`)}</TableCell>
                   <TableCell className="text-right tabular-nums text-xs">{r.mileage?.toLocaleString() ?? "—"}</TableCell>
                   <TableCell className="text-xs">{r.vendor ?? "—"}</TableCell>
-                  <TableCell className="text-right tabular-nums text-xs">{r.cost != null ? usd.format(Number(r.cost)) : "—"}</TableCell>
+                  <TableCell className="text-right tabular-nums text-xs">{moneyCompact(r.cost)}</TableCell>
                   <TableCell className="text-xs">{r.next_due_at ? format(new Date(r.next_due_at), "MMM dd, yyyy") : "—"}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => deleteMut.mutate(r.id)}>
