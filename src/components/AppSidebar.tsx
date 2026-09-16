@@ -1,10 +1,11 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
-  Settings, LogOut, ChevronsLeft, ChevronsRight, ShieldCheck, BarChart3,
-  ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen, Sun, Moon,
-  Briefcase, Activity, MoreHorizontal, Receipt, Beaker, Fuel, MapPin, Search, TrendingUp,
-  IdCard, Target, FileText, Wallet, Repeat, Package, Gavel, BriefcaseBusiness,
+  Settings, LogOut, ChevronsLeft, ChevronsRight, ChevronDown, ChevronRight,
+  ShieldCheck, BarChart3, ClipboardList, DollarSign, ScrollText, Menu, X,
+  BookOpen, Sun, Moon, Briefcase, Activity, MoreHorizontal, Receipt,
+  Fuel, MapPin, Search, TrendingUp, IdCard, Target, FileText, Wallet,
+  Repeat, Package, Gavel, BriefcaseBusiness,
   type LucideIcon,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
@@ -36,9 +37,32 @@ type NavItem = {
   countries?: CountryCode[];
 };
 
+/** Grupo expansível: um item-pai que revela sub-itens inline (ou em flyout quando colapsado). */
+type NavGroup = {
+  key: string;
+  icon: LucideIcon;
+  label: string;
+  items: NavItem[];
+};
+
+type NavEntry = NavItem | NavGroup;
+
+type Section = { label: string; entries: NavEntry[] };
+
+const isGroup = (entry: NavEntry): entry is NavGroup => "items" in entry;
+
+const GROUP_DEFAULTS: Record<string, boolean> = {
+  compliance: false,
+  finance: false,
+};
+
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useLocalStorageState("dotpilot-sidebar-collapsed", false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useLocalStorageState<Record<string, boolean>>(
+    "dotpilot-nav-groups",
+    GROUP_DEFAULTS
+  );
   const location = useLocation();
   const navigate = useNavigate();
   const { user, fullName, role } = useAuth();
@@ -51,7 +75,10 @@ export function AppSidebar() {
 
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
-  const sections = useMemo<{ label: string; items: NavItem[] }[]>(() => {
+  const toggleGroup = (key: string) =>
+    setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const sections = useMemo<Section[]>(() => {
     // Duas exclusões diferentes na mesma passada: `feature` é comercial (a org
     // não contratou o módulo) e `countries` é factual (o módulo não existe no
     // país dela).
@@ -61,63 +88,82 @@ export function AppSidebar() {
         (!it.countries || it.countries.includes(country))
       );
 
-    const base: { label: string; items: NavItem[] }[] = [
+    // Itens por país (EUA/BR) agrupados num único menu expansível.
+    const complianceGroup: NavGroup = {
+      key: "compliance",
+      icon: ShieldCheck,
+      label: t("sidebar.compliance"),
+      items: filterByFeature([
+        { to: "/drug-testing", icon: ShieldCheck, label: t("sidebar.drugTesting"), countries: ["US"] },
+        { to: "/hvut", icon: Receipt, label: t("sidebar.hvut"), countries: ["US"] },
+        { to: "/ifta", icon: Fuel, label: t("sidebar.ifta"), countries: ["US"] },
+        { to: "/irp", icon: MapPin, label: t("sidebar.irp"), countries: ["US"] },
+        { to: "/safer-lookup", icon: Search, label: t("sidebar.saferLookup"), countries: ["US"] },
+        { to: "/compliance-calendar", icon: CalendarDays, label: t("sidebar.complianceCal"), countries: ["US"] },
+        { to: "/br/compliance", icon: ShieldCheck, label: t("br.compliance.nav"), countries: ["BR"] },
+        { to: "/br/multas", icon: Gavel, label: t("br.fines.nav"), countries: ["BR"] },
+      ]),
+    };
+
+    // Relatórios e financeiro num único grupo expansível.
+    const financeGroup: NavGroup = {
+      key: "finance",
+      icon: DollarSign,
+      label: t("sidebar.group.finance"),
+      items: filterByFeature([
+        { to: "/reports", icon: BarChart3, label: t("nav.reports") },
+        { to: "/finance", icon: DollarSign, label: t("nav.finance"), feature: "finance" },
+        { to: "/expenses", icon: Wallet, label: t("sidebar.expenses"), feature: "finance" },
+        { to: "/recurring-plans", icon: Repeat, label: t("sidebar.recurring"), feature: "finance" },
+        { to: "/profit-per-client", icon: TrendingUp, label: t("sidebar.profitPerClient") },
+      ]),
+    };
+
+    const base: Section[] = [
       {
         label: t("sidebar.section.overview"),
-        items: filterByFeature([
+        entries: filterByFeature([
           { to: "/dashboard", icon: LayoutDashboard, label: t("nav.dashboard") },
           { to: "/my", icon: Briefcase, label: t("mydesk.title") },
         ]),
       },
       {
         label: t("sidebar.section.operation"),
-        items: filterByFeature([
-          { to: "/clients", icon: Users, label: t("nav.clients") },
-          { to: "/trucks", icon: Truck, label: t("nav.trucks") },
-          { to: "/drivers", icon: IdCard, label: t("nav.drivers") },
-          { to: "/permits", icon: FileCheck, label: t("nav.permits") },
-          { to: "/service-orders", icon: BriefcaseBusiness, label: t("nav.serviceOrders") },
-          { to: "/loads", icon: Package, label: t("nav.loads") },
-          { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
-          { to: "/drug-testing", icon: ShieldCheck, label: t("sidebar.drugTesting"), countries: ["US"] },
-          { to: "/hvut", icon: Receipt, label: t("sidebar.hvut"), countries: ["US"] },
-          { to: "/ifta", icon: Fuel, label: t("sidebar.ifta"), countries: ["US"] },
-          { to: "/irp", icon: MapPin, label: t("sidebar.irp"), countries: ["US"] },
-          { to: "/safer-lookup", icon: Search, label: t("sidebar.saferLookup"), countries: ["US"] },
-          { to: "/br/compliance", icon: ShieldCheck, label: t("br.compliance.nav"), countries: ["BR"] },
-          { to: "/br/multas", icon: Gavel, label: t("br.fines.nav"), countries: ["BR"] },
-        ]),
+        entries: [
+          ...filterByFeature([
+            { to: "/clients", icon: Users, label: t("nav.clients") },
+            { to: "/trucks", icon: Truck, label: t("nav.trucks") },
+            { to: "/drivers", icon: IdCard, label: t("nav.drivers") },
+            { to: "/permits", icon: FileCheck, label: t("nav.permits") },
+            { to: "/service-orders", icon: BriefcaseBusiness, label: t("nav.serviceOrders") },
+            { to: "/loads", icon: Package, label: t("nav.loads") },
+            { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
+          ]),
+          ...(complianceGroup.items.length > 0 ? [complianceGroup] : []),
+        ],
       },
       {
-        label: t("sidebar.section.sales"),
-        items: filterByFeature([
-          { to: "/leads", icon: Target, label: t("nav.leads"), feature: "crm" },
-          { to: "/quotes", icon: FileText, label: t("nav.quotes"), feature: "crm" },
-        ]),
+        label: t("sidebar.section.commercial"),
+        entries: [
+          ...filterByFeature([
+            { to: "/leads", icon: Target, label: t("nav.leads"), feature: "crm" },
+            { to: "/quotes", icon: FileText, label: t("nav.quotes"), feature: "crm" },
+          ]),
+          ...(financeGroup.items.length > 0 ? [financeGroup] : []),
+        ],
       },
       {
         label: t("sidebar.section.communication"),
-        items: filterByFeature([
+        entries: filterByFeature([
           { to: "/messages", icon: MessageSquare, label: t("nav.messages"), feature: "messages" },
           { to: "/calendar", icon: CalendarDays, label: t("nav.calendar"), feature: "calendar" },
-          { to: "/compliance-calendar", icon: CalendarDays, label: t("sidebar.complianceCal"), countries: ["US"] },
-        ]),
-      },
-      {
-        label: t("sidebar.section.analysis"),
-        items: filterByFeature([
-          { to: "/reports", icon: BarChart3, label: t("nav.reports") },
-          { to: "/finance", icon: DollarSign, label: t("nav.finance"), feature: "finance" },
-          { to: "/expenses", icon: Wallet, label: t("sidebar.expenses"), feature: "finance" },
-          { to: "/recurring-plans", icon: Repeat, label: t("sidebar.recurring"), feature: "finance" },
-          { to: "/profit-per-client", icon: TrendingUp, label: t("sidebar.profitPerClient") },
         ]),
       },
     ];
     if (isOrgAdmin) {
       base.push({
         label: t("sidebar.section.administration"),
-        items: filterByFeature([
+        entries: filterByFeature([
           { to: "/workload", icon: Activity, label: t("sidebar.workload") },
           { to: "/admin/users", icon: ShieldCheck, label: t("nav.users") },
           { to: "/admin/ifta-rates", icon: Fuel, label: t("sidebar.iftaRates"), countries: ["US"] },
@@ -132,13 +178,13 @@ export function AppSidebar() {
         // Super-admin section labels stay in English — only platform owners
         // ever see this section and the strings double as the page title.
         label: "Super-admin",
-        items: [
+        entries: [
           { to: "/super-admin", icon: ShieldCheck, label: "Organizations" },
         ],
       });
     }
     // Drop sections that became empty after filtering (e.g. communication off entirely)
-    return base.filter((section) => section.items.length > 0);
+    return base.filter((section) => section.entries.length > 0);
   }, [t, isOrgAdmin, isSuperAdmin, hasFeature, country]);
 
   const handleLogout = async () => {
@@ -156,11 +202,12 @@ export function AppSidebar() {
     .split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("") || "U";
   const roleLabel = role === "admin" ? t("role.admin") : role === "operator" ? t("role.operator") : role === "viewer" ? t("role.viewer") : t("role.user");
 
-  const renderNavItem = (item: NavItem) => {
+  const renderNavItem = (item: NavItem, variant: "root" | "child" = "root") => {
     const active = !item.external && isActive(item.to);
+    const isChild = variant === "child";
     const className = cn(
-      "group relative flex items-center gap-2.5 h-8 rounded-md text-[13px] transition-colors",
-      collapsed && !isMobile ? "justify-center px-0 mx-1" : "px-2.5",
+      "group relative flex items-center gap-2.5 rounded-md text-[13px] transition-colors",
+      collapsed && !isMobile ? "justify-center px-0 mx-1 h-8" : isChild ? "h-7 px-2.5 pl-9" : "h-8 px-2.5",
       active
         ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
         : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
@@ -172,7 +219,8 @@ export function AppSidebar() {
         )}
         <item.icon
           className={cn(
-            "w-4 h-4 shrink-0 transition-colors",
+            "shrink-0 transition-colors",
+            isChild ? "w-3.5 h-3.5" : "w-4 h-4",
             active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground/55 group-hover:text-sidebar-accent-foreground"
           )}
         />
@@ -204,6 +252,96 @@ export function AppSidebar() {
       >
         {content}
       </NavLink>
+    );
+  };
+
+  const renderNavGroup = (group: NavGroup) => {
+    const open = !!openGroups[group.key];
+    const groupActive = group.items.some((it) => !it.external && isActive(it.to));
+
+    // Sidebar colapsada (só ícones): flyout com os sub-itens do grupo.
+    if (!showLabel) {
+      return (
+        <DropdownMenu key={group.key}>
+          <DropdownMenuTrigger asChild>
+            <button
+              title={group.label}
+              className={cn(
+                "group relative flex items-center justify-center h-8 rounded-md text-[13px] transition-colors mx-1",
+                open || groupActive
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+              )}
+            >
+              <group.icon
+                className={cn(
+                  "w-4 h-4 shrink-0 transition-colors",
+                  open || groupActive
+                    ? "text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground/55 group-hover:text-sidebar-accent-foreground"
+                )}
+              />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" side="right" className="w-56">
+            <DropdownMenuLabel className="text-xs">
+              <div className="flex items-center gap-2">
+                <group.icon className="w-3.5 h-3.5" /> {group.label}
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {group.items.map((item) => (
+              <DropdownMenuItem
+                key={item.to}
+                onClick={() => {
+                  if (item.external) window.open(item.to, "_blank", "noopener,noreferrer");
+                  else navigate(item.to);
+                }}
+                className="text-[13px]"
+              >
+                <item.icon className="w-3.5 h-3.5 mr-2" /> {item.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+
+    // Sidebar expandida: disclosure inline com chevron.
+    return (
+      <div key={group.key}>
+        <button
+          onClick={() => toggleGroup(group.key)}
+          aria-expanded={open}
+          className={cn(
+            "group relative flex items-center gap-2.5 h-8 w-full rounded-md text-[13px] transition-colors px-2.5",
+            open || groupActive
+              ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+              : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+          )}
+        >
+          <group.icon
+            className={cn(
+              "w-4 h-4 shrink-0 transition-colors",
+              open || groupActive
+                ? "text-sidebar-accent-foreground"
+                : "text-sidebar-foreground/55 group-hover:text-sidebar-accent-foreground"
+            )}
+          />
+          <span className="truncate flex-1 text-left">{group.label}</span>
+          {open ? (
+            <ChevronDown className="w-3.5 h-3.5 shrink-0 text-sidebar-foreground/40" />
+          ) : (
+            <ChevronRight className="w-3.5 h-3.5 shrink-0 text-sidebar-foreground/40" />
+          )}
+        </button>
+        {open && (
+          <div className="relative mt-0.5 space-y-px">
+            <span aria-hidden className="absolute left-3 top-1.5 bottom-1.5 w-px bg-sidebar-border" />
+            {group.items.map((item) => renderNavItem(item, "child"))}
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -311,7 +449,9 @@ export function AppSidebar() {
               ) : (
                 idx > 0 && <div className="my-2 mx-2 h-px bg-sidebar-border" />
               )}
-              {section.items.map(renderNavItem)}
+              {section.entries.map((entry) =>
+                isGroup(entry) ? renderNavGroup(entry) : renderNavItem(entry)
+              )}
             </div>
           ))}
         </div>
