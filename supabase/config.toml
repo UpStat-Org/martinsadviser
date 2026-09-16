@@ -20,9 +20,6 @@ verify_jwt = false
 [functions.ai-report]
 verify_jwt = false
 
-[functions.health]
-verify_jwt = false
-
 [functions.google-calendar-auth]
 verify_jwt = false
 
