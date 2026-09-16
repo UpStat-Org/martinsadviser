@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const supabase = createClient<Database>(supabaseUrl, serviceKey);
 
-  const results = { permits: 0, invoices: 0, tasks: 0 };
+  const results = { permits: 0, invoices: 0, tasks: 0, serviceOrders: 0 };
 
   // 1. Permits expiring in 30 days or already expired
   const { data: permits } = await supabase
@@ -121,7 +121,37 @@ Deno.serve(async (req) => {
     }
   }
 
-  // ── 4. MCS-150 biennial updates coming due ────────────────────────────────
+  // 4. Service orders past their operational deadline. Prefer the assignee;
+  // fall back to the creator so an unassigned order is never silently missed.
+  const { data: overdueOrders } = await supabase
+    .from("service_orders")
+    .select("id, org_id, title, due_date, assigned_to, created_by, clients(company_name)")
+    .lt("due_date", today)
+    .not("status", "in", "(delivered,cancelled)");
+
+  for (const order of overdueOrders ?? []) {
+    const recipient = order.assigned_to ?? order.created_by;
+    const { data: existing } = await supabase
+      .from("notifications")
+      .select("id")
+      .eq("user_id", recipient)
+      .eq("entity_id", order.id)
+      .eq("type", "service_order_overdue")
+      .limit(1);
+    if (existing?.length) continue;
+
+    await supabase.from("notifications").insert({
+      user_id: recipient,
+      org_id: order.org_id,
+      type: "service_order_overdue",
+      title: "Ordem de serviço atrasada",
+      body: `${order.clients?.company_name ?? "Cliente"} — ${order.title} · prazo ${order.due_date}`,
+      entity_id: order.id,
+    });
+    results.serviceOrders++;
+  }
+
+  // ── 5. MCS-150 biennial updates coming due ────────────────────────────────
   // FMCSA derives the next-due month from the USDOT number:
   //   - last digit  → month (1=Jan ... 9=Sep, 0=Oct)
   //   - 2nd-to-last → odd years (odd digit) or even years (even digit)

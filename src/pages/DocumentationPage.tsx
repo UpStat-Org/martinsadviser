@@ -7,7 +7,7 @@ import {
   BookOpen, LayoutDashboard, Users, Truck, FileCheck, MessageSquare,
   CalendarDays, BarChart3, ClipboardList, DollarSign, Settings, Globe,
   ShieldCheck, Lightbulb, Info, ArrowRight, CheckCircle2, AlertTriangle,
-  type LucideIcon,
+  BriefcaseBusiness, type LucideIcon,
 } from "lucide-react";
 import { type ReactNode } from "react";
 
@@ -270,6 +270,25 @@ function getPtSections(): DocSection[] {
       ],
     },
     {
+      id: "service-orders",
+      icon: BriefcaseBusiness,
+      color: "bg-primary/10 text-primary",
+      title: "Ordens de serviço e renovações",
+      description: "Execução do pedido, documentos, prazos, horas e margem",
+      steps: [
+        "Acesse 'Ordens de serviço' e clique em 'Nova ordem'. Selecione o cliente e, opcionalmente, um serviço do catálogo.",
+        "Defina responsável, prioridade, prazo/SLA, valor cobrado e custo externo. Você também pode vincular permits e montar o checklist inicial.",
+        "Na ordem, avance o fluxo de Solicitado até Entregue e acompanhe documentos recebidos, aprovados ou rejeitados.",
+        "Crie tarefas vinculadas e registre horas. O sistema calcula custo de mão de obra, custo total e margem estimada.",
+        "Use 'Criar renovação' para copiar escopo, checklist e permits para uma nova ordem relacionada.",
+        "Consulte o histórico para ver mudanças de status, prazo, responsável, valores, checklist e vínculos.",
+      ],
+      tips: [
+        { text: "Ordens em atraso geram uma notificação automática para o responsável ou, se não houver, para quem criou a ordem." },
+        { text: "O histórico é protegido contra edição e registra as mudanças críticas da operação." },
+      ],
+    },
+    {
       id: "messages",
       icon: MessageSquare,
       color: "bg-cyan-100 text-cyan-600",
@@ -510,6 +529,25 @@ function getEnSections(): DocSection[] {
       ],
     },
     {
+      id: "service-orders",
+      icon: BriefcaseBusiness,
+      color: "bg-primary/10 text-primary",
+      title: "Service orders and renewals",
+      description: "Request execution, documents, deadlines, hours, and margin",
+      steps: [
+        "Go to 'Service orders' and click 'New order'. Select the client and, optionally, a catalog service.",
+        "Set the assignee, priority, due date/SLA, quoted amount, and external cost. You can also link permits and create the initial checklist.",
+        "Move the order from Requested through Delivered and track documents as received, approved, or rejected.",
+        "Create linked tasks and log hours. The system calculates labor cost, total cost, and estimated margin.",
+        "Use 'Create renewal' to copy the scope, checklist, and permits into a related new order.",
+        "Review History for status, due date, assignee, amount, checklist, and link changes.",
+      ],
+      tips: [
+        { text: "Overdue orders generate an automatic notification for the assignee or, when unassigned, the order creator." },
+        { text: "History is protected from edits and records critical operational changes." },
+      ],
+    },
+    {
       id: "messages",
       icon: MessageSquare,
       color: "bg-cyan-100 text-cyan-600",
@@ -747,6 +785,25 @@ function getEsSections(): DocSection[] {
       tips: [
         { text: "Los permisos vencen automáticamente por fecha. Mantenga siempre la fecha actualizada." },
         { text: "Puede adjuntar el documento PDF/imagen del permiso para referencia rápida." },
+      ],
+    },
+    {
+      id: "service-orders",
+      icon: BriefcaseBusiness,
+      color: "bg-primary/10 text-primary",
+      title: "Órdenes de servicio y renovaciones",
+      description: "Ejecución, documentos, plazos, horas y margen",
+      steps: [
+        "Acceda a 'Órdenes de servicio' y haga clic en 'Nueva orden'. Seleccione el cliente y, opcionalmente, un servicio del catálogo.",
+        "Defina responsable, prioridad, plazo/SLA, valor cobrado y costo externo. También puede vincular permisos y crear el checklist inicial.",
+        "Avance la orden desde Solicitado hasta Entregado y controle documentos recibidos, aprobados o rechazados.",
+        "Cree tareas vinculadas y registre horas. El sistema calcula costo de trabajo, costo total y margen estimado.",
+        "Use 'Crear renovación' para copiar alcance, checklist y permisos a una nueva orden relacionada.",
+        "Consulte el historial de cambios de estado, plazo, responsable, valores, checklist y vínculos.",
+      ],
+      tips: [
+        { text: "Las órdenes atrasadas generan una notificación automática para el responsable o, si no existe, para quien creó la orden." },
+        { text: "El historial está protegido contra ediciones y registra los cambios críticos." },
       ],
     },
     {

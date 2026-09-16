@@ -69,6 +69,8 @@ const ServicesPage = lazy(() => import("./pages/ServicesPage"));
 const MyDeskPage = lazy(() => import("./pages/MyDeskPage"));
 const LoadsPage = lazy(() => import("./pages/LoadsPage"));
 const LoadDetailPage = lazy(() => import("./pages/LoadDetailPage"));
+const ServiceOrdersPage = lazy(() => import("./pages/ServiceOrdersPage"));
+const ServiceOrderDetailPage = lazy(() => import("./pages/ServiceOrderDetailPage"));
 const BrCompliancePage = lazy(() => import("./pages/BrCompliancePage"));
 const BrFinesPage = lazy(() => import("./pages/BrFinesPage"));
 const SuperAdmin = lazy(() => import("./pages/SuperAdmin"));
@@ -144,6 +146,8 @@ const App = () => (
               <Route path="/permits/:id" element={<PermitDetail />} />
               <Route path="/loads" element={<LoadsPage />} />
               <Route path="/loads/:id" element={<LoadDetailPage />} />
+              <Route path="/service-orders" element={<ServiceOrdersPage />} />
+              <Route path="/service-orders/:id" element={<ServiceOrderDetailPage />} />
               <Route path="/br/compliance" element={<CountryGate country="BR"><BrCompliancePage /></CountryGate>} />
               <Route path="/br/multas" element={<CountryGate country="BR"><BrFinesPage /></CountryGate>} />
               <Route path="/messages" element={<FeatureGate flag="messages"><Messages /></FeatureGate>} />

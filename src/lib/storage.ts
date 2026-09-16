@@ -93,3 +93,22 @@ export async function uploadComplianceDocument(
   }
   return path;
 }
+
+/** Uploads a document attached to a service-order checklist item. */
+export async function uploadServiceOrderDocument(
+  orgId: string,
+  orderId: string,
+  itemId: string,
+  file: File,
+): Promise<string | null> {
+  const ext = (file.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "") || "bin";
+  const path = `${orgId}/service-orders/${orderId}/${itemId}/${Date.now()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(PERMIT_DOCUMENTS_BUCKET)
+    .upload(path, file, { upsert: true, contentType: file.type || undefined });
+  if (error) {
+    console.error("uploadServiceOrderDocument failed", { path, error });
+    return null;
+  }
+  return path;
+}

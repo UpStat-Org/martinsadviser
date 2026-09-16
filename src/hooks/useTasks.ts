@@ -7,6 +7,7 @@ export interface Task {
   id: string;
   user_id: string;
   client_id: string | null;
+  service_order_id: string | null;
   name: string;
   notes: string | null;
   status: string;
@@ -20,14 +21,16 @@ export interface Task {
   clients?: { company_name: string } | null;
 }
 
-export function useTasks() {
+export function useTasks(serviceOrderId?: string) {
   return useQuery({
-    queryKey: ["tasks"],
+    queryKey: ["tasks", { serviceOrderId }],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("tasks")
         .select("*, clients(company_name)")
         .order("created_at", { ascending: false });
+      if (serviceOrderId) query = query.eq("service_order_id", serviceOrderId);
+      const { data, error } = await query;
       if (error) throw error;
       return data as unknown as Task[];
     },
@@ -38,7 +41,7 @@ export function useCreateTask() {
   const qc = useQueryClient();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: async (task: { name: string; task_type?: string; client_id?: string; operator?: string; tags?: string[]; notes?: string; status?: string; due_date?: string; priority?: string }) => {
+    mutationFn: async (task: { name: string; task_type?: string; client_id?: string; service_order_id?: string; operator?: string; tags?: string[]; notes?: string; status?: string; due_date?: string; priority?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error(tNow("toast.authRequired"));
       const { error } = await supabase.from("tasks").insert({ ...task, user_id: user.id });
@@ -52,7 +55,7 @@ export function useCreateTask() {
 export function useUpdateTask() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...updates }: { id: string; name?: string; task_type?: string; client_id?: string | null; operator?: string | null; tags?: string[]; notes?: string | null; status?: string; due_date?: string | null; priority?: string | null }) => {
+    mutationFn: async ({ id, ...updates }: { id: string; name?: string; task_type?: string; client_id?: string | null; service_order_id?: string | null; operator?: string | null; tags?: string[]; notes?: string | null; status?: string; due_date?: string | null; priority?: string | null }) => {
       const { error } = await supabase.from("tasks").update(updates).eq("id", id);
       if (error) throw error;
     },

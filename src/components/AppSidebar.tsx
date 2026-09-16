@@ -4,7 +4,7 @@ import {
   Settings, LogOut, ChevronsLeft, ChevronsRight, ShieldCheck, BarChart3,
   ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen, Sun, Moon,
   Briefcase, Activity, MoreHorizontal, Receipt, Beaker, Fuel, MapPin, Search, TrendingUp,
-  IdCard, Target, FileText, Wallet, Repeat, Package, Gavel,
+  IdCard, Target, FileText, Wallet, Repeat, Package, Gavel, BriefcaseBusiness,
   type LucideIcon,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
@@ -76,6 +76,7 @@ export function AppSidebar() {
           { to: "/trucks", icon: Truck, label: t("nav.trucks") },
           { to: "/drivers", icon: IdCard, label: t("nav.drivers") },
           { to: "/permits", icon: FileCheck, label: t("nav.permits") },
+          { to: "/service-orders", icon: BriefcaseBusiness, label: t("nav.serviceOrders") },
           { to: "/loads", icon: Package, label: t("nav.loads") },
           { to: "/tasks", icon: ClipboardList, label: t("nav.tasks") },
           { to: "/drug-testing", icon: ShieldCheck, label: t("sidebar.drugTesting"), countries: ["US"] },

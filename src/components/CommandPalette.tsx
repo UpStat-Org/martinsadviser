@@ -25,6 +25,7 @@ import {
   Settings,
   Plus,
   Search,
+  BriefcaseBusiness,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOrg, type FeatureFlag } from "@/contexts/OrgContext";
@@ -71,6 +72,7 @@ export function CommandPalette() {
       { to: "/clients", labelKey: "cmdk.nav.clients", icon: Users },
       { to: "/trucks", labelKey: "cmdk.nav.trucks", icon: Truck },
       { to: "/permits", labelKey: "cmdk.nav.permits", icon: FileCheck },
+      { to: "/service-orders", labelKey: "cmdk.nav.serviceOrders", icon: BriefcaseBusiness },
       { to: "/tasks", labelKey: "cmdk.nav.tasks", icon: ClipboardList },
       { to: "/calendar", labelKey: "cmdk.nav.calendar", icon: CalendarDays, feature: "calendar" },
       { to: "/compliance-calendar", labelKey: "cmdk.nav.compliance", icon: CalendarDays },
