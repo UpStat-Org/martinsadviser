@@ -52,7 +52,7 @@ export function useApproveDunning() {
       qc.invalidateQueries({ queryKey: ["dunning_queue"] });
       toast({ title: tNow("dunning.approved") });
     },
-    onError: (e: any) => toast({ title: tNow("toast.error"), description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: tNow("toast.error"), description: e.message, variant: "destructive" }),
   });
 }
 
@@ -71,7 +71,7 @@ export function useRejectDunning() {
       qc.invalidateQueries({ queryKey: ["dunning_queue"] });
       toast({ title: tNow("dunning.rejected") });
     },
-    onError: (e: any) => toast({ title: tNow("toast.error"), description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: tNow("toast.error"), description: e.message, variant: "destructive" }),
   });
 }
 
@@ -127,6 +127,6 @@ export function useUpdateDunningSettings() {
       qc.invalidateQueries({ queryKey: ["dunning_settings"] });
       toast({ title: tNow("toast.automationUpdated") });
     },
-    onError: (e: any) => toast({ title: tNow("toast.updateError"), description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: tNow("toast.updateError"), description: e.message, variant: "destructive" }),
   });
 }

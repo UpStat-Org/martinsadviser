@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { errorMessage } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -34,6 +35,7 @@ export default function Login() {
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [recoveryMode, setRecoveryMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -119,6 +121,15 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
+      if (recoveryMode) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast({ title: t("login.recoverySent"), description: t("login.recoverySentDesc") });
+        setRecoveryMode(false);
+        return;
+      }
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast({ title: t("login.error"), description: error.message, variant: "destructive" });
@@ -134,8 +145,8 @@ export default function Login() {
         }
       }
       navigate("/");
-    } catch (err: any) {
-      toast({ title: t("login.error"), description: err.message, variant: "destructive" });
+    } catch (err) {
+      toast({ title: t("login.error"), description: errorMessage(err), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -201,10 +212,10 @@ export default function Login() {
           <div className="rounded-md border border-border bg-card p-6 sm:p-8">
             <div className="mb-6">
               <h1 className="text-xl font-semibold tracking-tight text-foreground">
-                {t("login.welcome")}
+                {t(recoveryMode ? "login.passwordRecovery" : "login.welcome")}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                {t("login.subtitle")}
+                {t(recoveryMode ? "login.recoveryPrompt" : "login.subtitle")}
               </p>
             </div>
 
@@ -227,7 +238,7 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              {!recoveryMode && <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-xs font-medium text-foreground">
                     {t("login.password")}
@@ -235,12 +246,7 @@ export default function Login() {
                   <button
                     type="button"
                     className="text-xs font-medium text-primary hover:underline"
-                    onClick={() =>
-                      toast({
-                        title: t("login.passwordRecovery"),
-                        description: t("login.contactAdmin"),
-                      })
-                    }
+                    onClick={() => setRecoveryMode(true)}
                   >
                     {t("login.forgot")}
                   </button>
@@ -265,14 +271,14 @@ export default function Login() {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-              </div>
+              </div>}
 
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full h-9 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium rounded-md flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:pointer-events-none"
               >
-                {loading ? t("login.submitting") : (
+                {loading ? t("login.submitting") : recoveryMode ? t("login.sendRecovery") : (
                   <>
                     {t("login.submit")}
                     <ArrowRight className="w-4 h-4" />
@@ -280,6 +286,12 @@ export default function Login() {
                 )}
               </button>
             </form>
+
+            {recoveryMode && (
+              <button type="button" className="mt-4 w-full text-xs text-primary hover:underline" onClick={() => setRecoveryMode(false)}>
+                {t("login.backToLogin")}
+              </button>
+            )}
 
             <div className="mt-6 pt-5 border-t border-border space-y-2 text-center">
               <p className="text-sm text-muted-foreground">

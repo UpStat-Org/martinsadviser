@@ -16,6 +16,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireServiceRole } from "../_shared/serviceRoleGuard.ts";
+import type { Database } from "../../../src/integrations/supabase/types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -120,7 +121,7 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, serviceKey);
+  const supabase = createClient<Database>(supabaseUrl, serviceKey);
 
   const runId = crypto.randomUUID();
   const log = (level: "info" | "warn" | "error", msg: string, extra?: unknown) =>
@@ -183,7 +184,19 @@ Deno.serve(async (req) => {
 
       // ── Build the work list: { kind, date, period, client, truck? } ──────────
       const fixed = generateFixedDeadlines(todayMs, windowEndMs);
-      type Job = { kind: Kind; date: string; period: Deadline["period"]; client: any; truck?: any; driver?: any };
+      type ClientData = NonNullable<typeof clients>[number];
+      type TruckData = NonNullable<typeof trucks>[number];
+      type DriverData = Pick<Database["public"]["Tables"]["drivers"]["Row"],
+        "id" | "user_id" | "client_id" | "full_name" | "status" | "cdl_expires_on" | "medical_card_expires_on"
+      > & { _driverName: string | null };
+      type Job = {
+        kind: Kind;
+        date: string;
+        period: Deadline["period"];
+        client?: ClientData | null;
+        truck?: TruckData;
+        driver?: DriverData;
+      };
       const jobs: Job[] = [];
 
       for (const d of fixed) {

@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, Truck, FileCheck, MessageSquare, CalendarDays,
   Settings, LogOut, ChevronsLeft, ChevronsRight, ShieldCheck, BarChart3,
   ClipboardList, DollarSign, ScrollText, Menu, X, BookOpen, Sun, Moon,
-  Briefcase, Activity, MoreHorizontal, Server, Receipt, Beaker, Fuel, MapPin, Search, TrendingUp,
+  Briefcase, Activity, MoreHorizontal, Receipt, Beaker, Fuel, MapPin, Search, TrendingUp,
   IdCard, Target, FileText, Wallet, Repeat, Package, Gavel,
   type LucideIcon,
 } from "lucide-react";
@@ -67,7 +67,6 @@ export function AppSidebar() {
         items: filterByFeature([
           { to: "/dashboard", icon: LayoutDashboard, label: t("nav.dashboard") },
           { to: "/my", icon: Briefcase, label: t("mydesk.title") },
-          { to: "https://status.dotpilot.online", icon: Server, label: t("sidebar.systemStatus"), external: true },
         ]),
       },
       {

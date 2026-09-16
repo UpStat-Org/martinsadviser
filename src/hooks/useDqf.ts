@@ -8,14 +8,7 @@ import { DQF_KINDS, type DqfKind } from "@/lib/dqf";
 export { DQF_KINDS, type DqfKind };
 
 // Same Lovable-types caveat as useDrivers — see comment there.
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-  };
-};
+const db = supabase;
 
 export interface DriverDocument {
   id: string;
@@ -155,7 +148,8 @@ export function useCreateDrugTest() {
   const { toast } = useToast();
   return useMutation({
     mutationFn: async (input: DrugTestEventInsert | DrugTestEventInsert[]) => {
-      const { data, error } = await db.from("drug_test_events").insert(input).select();
+      const { data, error } = await db.from("drug_test_events")
+        .insert(Array.isArray(input) ? input : [input]).select();
       if (error) throw new Error(error.message);
       return data as DrugTestEvent[];
     },

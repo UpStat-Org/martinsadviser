@@ -134,7 +134,7 @@ export default function AdminUsers() {
       queryClient.invalidateQueries({ queryKey: ["admin-profiles"] });
       toast({ title: t("admin.statusUpdated") });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: t("toast.error"), description: error.message, variant: "destructive" });
     },
   });
@@ -156,7 +156,7 @@ export default function AdminUsers() {
       queryClient.invalidateQueries({ queryKey: ["admin-profiles", currentOrg?.id] });
       toast({ title: t("admin.roleUpdated") });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: t("toast.error"), description: error.message, variant: "destructive" });
     },
   });
@@ -174,7 +174,7 @@ export default function AdminUsers() {
       toast({ title: t("admin.userDeleted") });
       setDeleteUserId(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: t("toast.error"), description: error.message, variant: "destructive" });
       setDeleteUserId(null);
     },

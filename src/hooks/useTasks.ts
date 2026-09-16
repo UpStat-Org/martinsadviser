@@ -41,11 +41,11 @@ export function useCreateTask() {
     mutationFn: async (task: { name: string; task_type?: string; client_id?: string; operator?: string; tags?: string[]; notes?: string; status?: string; due_date?: string; priority?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error(tNow("toast.authRequired"));
-      const { error } = await supabase.from("tasks").insert({ ...task, user_id: user.id } as any);
+      const { error } = await supabase.from("tasks").insert({ ...task, user_id: user.id });
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["tasks"] }); toast({ title: tNow("toast.taskCreated") }); },
-    onError: (e: any) => toast({ title: tNow("toast.error"), description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: tNow("toast.error"), description: e.message, variant: "destructive" }),
   });
 }
 
@@ -53,7 +53,7 @@ export function useUpdateTask() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: { id: string; name?: string; task_type?: string; client_id?: string | null; operator?: string | null; tags?: string[]; notes?: string | null; status?: string; due_date?: string | null; priority?: string | null }) => {
-      const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
+      const { error } = await supabase.from("tasks").update(updates).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),

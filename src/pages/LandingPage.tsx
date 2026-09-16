@@ -213,7 +213,7 @@ function Hero() {
           {[
             { v: "100%", l: t("lp2.stat.permits") },
             { v: "24/7", l: t("lp2.stat.alerts") },
-            { v: "99.9%", l: t("lp2.stat.uptime") },
+            { v: "3", l: t("lp2.stat.languages") },
             { v: "14d", l: t("lp2.stat.support") },
           ].map((s) => (
             <div key={s.l} className="text-center sm:text-left">

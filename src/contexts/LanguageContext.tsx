@@ -24,7 +24,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback(
-    (key: string) => getTranslation(language, key as any),
+    (key: string) => getTranslation(language, key),
     [language]
   );
 

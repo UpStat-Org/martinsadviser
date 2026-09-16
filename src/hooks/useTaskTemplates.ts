@@ -2,15 +2,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
+import type { Json } from "@/integrations/supabase/types";
 
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-  };
-};
+const db = supabase;
 
 export interface TaskTemplateItem {
   name: string;
@@ -39,7 +33,7 @@ export function useTaskTemplates() {
     queryFn: async () => {
       const { data, error } = await db.from("task_templates").select("*").order("name");
       if (error) throw new Error(error.message);
-      return (data ?? []) as TaskTemplate[];
+      return (data ?? []) as unknown as TaskTemplate[];
     },
   });
 }
@@ -51,13 +45,17 @@ export function useUpsertTaskTemplate() {
     mutationFn: async (input: TaskTemplateInsert & { id?: string }) => {
       if (input.id) {
         const { id, ...rest } = input;
-        const { data, error } = await db.from("task_templates").update(rest).eq("id", id).select().single();
+        const items: Json = rest.items.map((item) => ({ ...item }));
+        const { data, error } = await db.from("task_templates")
+          .update({ ...rest, items }).eq("id", id).select().single();
         if (error) throw new Error(error.message);
-        return data as TaskTemplate;
+        return data as unknown as TaskTemplate;
       }
-      const { data, error } = await db.from("task_templates").insert(input).select().single();
+      const items: Json = input.items.map((item) => ({ ...item }));
+      const { data, error } = await db.from("task_templates")
+        .insert({ ...input, items }).select().single();
       if (error) throw new Error(error.message);
-      return data as TaskTemplate;
+      return data as unknown as TaskTemplate;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["task_templates"] });

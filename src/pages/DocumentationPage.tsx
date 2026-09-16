@@ -7,6 +7,7 @@ import {
   BookOpen, LayoutDashboard, Users, Truck, FileCheck, MessageSquare,
   CalendarDays, BarChart3, ClipboardList, DollarSign, Settings, Globe,
   ShieldCheck, Lightbulb, Info, ArrowRight, CheckCircle2, AlertTriangle,
+  type LucideIcon,
 } from "lucide-react";
 import { type ReactNode } from "react";
 
@@ -58,7 +59,7 @@ function Steps({ items }: { items: string[] }) {
   );
 }
 
-function SectionIcon({ icon: Icon, color }: { icon: any; color: string }) {
+function SectionIcon({ icon: Icon, color }: { icon: LucideIcon; color: string }) {
   return (
     <div
       className={`flex items-center justify-center w-10 h-10 rounded-md ${color} shrink-0 shadow-sm`}
@@ -70,7 +71,7 @@ function SectionIcon({ icon: Icon, color }: { icon: any; color: string }) {
 
 interface DocSection {
   id: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   title: string;
   description: string;
@@ -160,7 +161,7 @@ export default function DocumentationPage() {
             <AccordionContent className="px-5 pb-5 pt-4">
               <Steps items={section.steps} />
               {section.tips.map((tip, i) => (
-                <Tip key={i} variant={tip.variant as any}>
+                <Tip key={i} variant={tip.variant}>
                   {tip.text}
                 </Tip>
               ))}
@@ -362,11 +363,10 @@ function getPtSections(): DocSection[] {
       icon: Settings,
       color: "bg-slate-100 text-slate-600",
       title: "Configurações",
-      description: "Integrações com WhatsApp, SMS, Email e Calendar",
+      description: "Integrações com WhatsApp, Email e Calendar",
       steps: [
         "Acesse 'Configurações' na barra lateral.",
         "Configure a integração com WhatsApp API para enviar mensagens diretamente pelo sistema.",
-        "Configure o provedor de SMS para alertas por mensagem de texto.",
         "Configure o provedor de Email para envios automáticos e agendados.",
         "Conecte o Google Calendar para sincronizar vencimentos automaticamente.",
       ],
@@ -603,11 +603,10 @@ function getEnSections(): DocSection[] {
       icon: Settings,
       color: "bg-slate-100 text-slate-600",
       title: "Settings",
-      description: "WhatsApp, SMS, Email and Calendar integrations",
+      description: "WhatsApp, Email and Calendar integrations",
       steps: [
         "Go to 'Settings' in the sidebar.",
         "Configure WhatsApp API integration to send messages directly from the system.",
-        "Configure the SMS provider for text message alerts.",
         "Configure the Email provider for automatic and scheduled sends.",
         "Connect Google Calendar to sync expirations automatically.",
       ],
@@ -844,11 +843,10 @@ function getEsSections(): DocSection[] {
       icon: Settings,
       color: "bg-slate-100 text-slate-600",
       title: "Configuración",
-      description: "Integraciones con WhatsApp, SMS, Email y Calendar",
+      description: "Integraciones con WhatsApp, Email y Calendar",
       steps: [
         "Acceda a 'Configuración' en la barra lateral.",
         "Configure la integración con WhatsApp API.",
-        "Configure el proveedor de SMS.",
         "Configure el proveedor de Email.",
         "Conecte Google Calendar para sincronizar vencimientos automáticamente.",
       ],

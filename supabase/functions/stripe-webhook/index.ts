@@ -1,5 +1,6 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=denonext";
+import type { Database } from "../../../src/integrations/supabase/types.ts";
 
 // Public endpoint — Stripe calls it from the outside, no JWT. The signature
 // header is what authenticates the request, validated below. Make sure
@@ -33,7 +34,7 @@ function mapSubscriptionStatus(stripeStatus: string): string {
 // if the resolved org is a master org — in that case the caller skips the
 // update entirely, preserving the master org's permanent 'active' state.
 async function resolveOrgForSubscription(
-  admin: ReturnType<typeof createClient>,
+  admin: SupabaseClient<Database>,
   subscription: Stripe.Subscription,
 ): Promise<{ id: string; is_master_org: boolean } | null> {
   const orgId = (subscription.metadata?.org_id as string | undefined) ?? null;
@@ -51,7 +52,7 @@ async function resolveOrgForSubscription(
 }
 
 async function applySubscription(
-  admin: ReturnType<typeof createClient>,
+  admin: SupabaseClient<Database>,
   subscription: Stripe.Subscription,
 ) {
   const org = await resolveOrgForSubscription(admin, subscription);
@@ -72,7 +73,7 @@ async function applySubscription(
     trial_ends_at: subscription.trial_end
       ? new Date(subscription.trial_end * 1000).toISOString()
       : null,
-  } as any).eq("id", org.id);
+  }).eq("id", org.id);
   if (error) console.error("Failed to apply subscription update:", error.message);
 }
 
@@ -104,7 +105,7 @@ Deno.serve(async (req) => {
     return new Response("Bad signature", { status: 400 });
   }
 
-  const admin = createClient(
+  const admin = createClient<Database>(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
@@ -135,7 +136,7 @@ Deno.serve(async (req) => {
         await admin.from("organizations").update({
           subscription_status: "canceled",
           stripe_subscription_id: null,
-        } as any).eq("id", org.id);
+        }).eq("id", org.id);
         break;
       }
       case "invoice.payment_failed": {
@@ -152,7 +153,7 @@ Deno.serve(async (req) => {
         if (!row || row.is_master_org) break;
         await admin
           .from("organizations")
-          .update({ subscription_status: "past_due" } as any)
+          .update({ subscription_status: "past_due" })
           .eq("id", row.id);
         break;
       }

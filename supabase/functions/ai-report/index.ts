@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { chatCompletion, aiErrorResponse } from "../_shared/ai.ts";
+import type { Database } from "../../../src/integrations/supabase/types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,7 +23,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
     // Verify caller
-    const callerClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+    const callerClient = createClient<Database>(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
       global: { headers: { Authorization: authHeader } },
     });
     const token = authHeader.replace("Bearer ", "");
@@ -30,7 +31,7 @@ serve(async (req) => {
     if (claimsErr || !claimsData?.claims) throw new Error("Not authenticated");
     const callerId = claimsData.claims.sub as string;
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient<Database>(supabaseUrl, supabaseKey);
 
     // Fetch client data (includes org_id for isolation check)
     const { data: client } = await supabase.from("clients").select("*").eq("id", client_id).single();
@@ -74,16 +75,16 @@ Status: ${client.status}
 Services: ${["IFTA", "CT", "NY", "KYU", "NM", "Auto"].filter((_, i) => [client.service_ifta, client.service_ct, client.service_ny, client.service_kyu, client.service_nm, client.service_automatic][i]).join(", ") || "None"}
 
 Trucks (${trucks?.length || 0}):
-${trucks?.map((t: any) => `- ${t.plate} | ${t.make || ""} ${t.model || ""} ${t.year || ""} | Status: ${t.status}`).join("\n") || "None"}
+${trucks?.map((t) => `- ${t.plate} | ${t.make || ""} ${t.model || ""} ${t.year || ""} | Status: ${t.status}`).join("\n") || "None"}
 
 Permits (${permits?.length || 0}):
-${permits?.map((p: any) => `- ${p.permit_type} #${p.permit_number || "N/A"} | State: ${p.state || "N/A"} | Expires: ${p.expiration_date || "N/A"} | Status: ${p.status}`).join("\n") || "None"}
+${permits?.map((p) => `- ${p.permit_type} #${p.permit_number || "N/A"} | State: ${p.state || "N/A"} | Expires: ${p.expiration_date || "N/A"} | Status: ${p.status}`).join("\n") || "None"}
 
 Tasks (${tasks?.length || 0}):
-${tasks?.map((t: any) => `- ${t.name} | Type: ${t.task_type || "N/A"} | Status: ${t.status}`).join("\n") || "None"}
+${tasks?.map((t) => `- ${t.name} | Type: ${t.task_type || "N/A"} | Status: ${t.status}`).join("\n") || "None"}
 
 Invoices (${invoices?.length || 0}):
-${invoices?.map((i: any) => `- $${i.amount} | Due: ${i.due_date} | Status: ${i.status}`).join("\n") || "None"}
+${invoices?.map((i) => `- $${i.amount} | Due: ${i.due_date} | Status: ${i.status}`).join("\n") || "None"}
 
 Today's date: ${new Date().toISOString().split("T")[0]}`;
 

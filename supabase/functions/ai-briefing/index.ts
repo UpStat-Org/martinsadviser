@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { chatCompletion, aiErrorResponse } from "../_shared/ai.ts";
+import { getErrorMessage } from "../_shared/errorMessage.ts";
 
 // ---------------------------------------------------------------------------
 // Daily briefing: turns MyDesk's flat ActionItem list into "do this first, and
@@ -179,15 +180,19 @@ ${trimmed
       summary: String(parsed.summary ?? "").slice(0, 600),
       priorities: (Array.isArray(parsed.priorities) ? parsed.priorities : [])
         .slice(0, 4)
-        .map((p: any) => ({
-          // Drop hallucinated ids so the UI never renders a dead link.
-          ref_id: validIds.has(p?.ref_id) ? p.ref_id : null,
-          title: String(p?.title ?? "").slice(0, 160),
-          why: String(p?.why ?? "").slice(0, 400),
-          severity: ["critical", "high", "medium", "low"].includes(p?.severity)
-            ? p.severity
-            : "medium",
-        }))
+        .map((candidate: unknown) => {
+          const p = candidate && typeof candidate === "object" && !Array.isArray(candidate)
+            ? candidate as Record<string, unknown> : {};
+          return {
+            // Drop hallucinated ids so the UI never renders a dead link.
+            ref_id: typeof p.ref_id === "string" && validIds.has(p.ref_id) ? p.ref_id : null,
+            title: String(p.title ?? "").slice(0, 160),
+            why: String(p.why ?? "").slice(0, 400),
+            severity: typeof p.severity === "string"
+              && ["critical", "high", "medium", "low"].includes(p.severity)
+              ? p.severity : "medium",
+          };
+        })
         .filter((p: { title: string }) => p.title),
     };
 
@@ -209,9 +214,10 @@ ${trimmed
     return new Response(JSON.stringify({ ...payload, cached: false }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (e: any) {
-    console.error("ai-briefing error:", e.message);
-    return new Response(JSON.stringify({ error: e.message }), {
+  } catch (e) {
+    const message = getErrorMessage(e);
+    console.error("ai-briefing error:", message);
+    return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

@@ -17,6 +17,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireServiceRole } from "../_shared/serviceRoleGuard.ts";
+import type { Database } from "../../../src/integrations/supabase/types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -160,7 +161,7 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, serviceKey);
+  const supabase = createClient<Database>(supabaseUrl, serviceKey);
 
   const runId = crypto.randomUUID();
   const log = (level: string, msg: string, extra?: unknown) =>
@@ -172,10 +173,11 @@ Deno.serve(async (req) => {
     // Manual mode: a user JWT + org_id restricts the run to one org and
     // requires admin membership.
     const authHeader = req.headers.get("Authorization") ?? "";
-    let body: any = {};
-    try { body = await req.json(); } catch { /* cron sends empty body */ }
-    if (body?.org_id) {
-      const caller = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+    const body: unknown = await req.json().catch(() => ({}));
+    const orgId = body && typeof body === "object" && !Array.isArray(body)
+      ? (body as Record<string, unknown>).org_id : undefined;
+    if (typeof orgId === "string" && orgId) {
+      const caller = createClient<Database>(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
         global: { headers: { Authorization: authHeader } },
       });
       const { data: claims } = await caller.auth.getClaims(authHeader.replace("Bearer ", ""));
@@ -184,12 +186,12 @@ Deno.serve(async (req) => {
       const { data: membership } = await supabase
         .from("organization_members")
         .select("role")
-        .eq("organization_id", body.org_id)
+        .eq("organization_id", orgId)
         .eq("user_id", callerId)
         .eq("approval_status", "approved")
         .maybeSingle();
       if (!membership || !["owner", "admin"].includes(membership.role)) throw new Error("Forbidden");
-      orgFilter = body.org_id;
+      orgFilter = orgId;
     } else {
       // No org_id means the global cron run across every connection. Only the
       // scheduler may ask for that — otherwise any signed-in user could sync
@@ -243,13 +245,14 @@ Deno.serve(async (req) => {
             .from("drivers")
             .select("id, user_id, full_name, email")
             .eq("org_id", conn.org_id);
-          const byEmail = new Map<string, any>();
-          const byName = new Map<string, any>();
+          type DriverRow = NonNullable<typeof drivers>[number];
+          const byEmail = new Map<string, DriverRow>();
+          const byName = new Map<string, DriverRow>();
           for (const d of drivers ?? []) {
             if (d.email) byEmail.set(String(d.email).toLowerCase(), d);
             if (d.full_name) byName.set(String(d.full_name).toLowerCase(), d);
           }
-          const driverById = new Map<string, any>();
+          const driverById = new Map<string, DriverRow>();
           for (const d of drivers ?? []) driverById.set(d.id, d);
 
           // Existing match decisions (link / ignore / known-unmatched) keyed by

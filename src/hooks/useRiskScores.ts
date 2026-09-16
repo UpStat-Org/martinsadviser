@@ -2,14 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { RiskBand, RiskFactor } from "@/lib/risk";
 
-// compliance_risk_scores / latest_risk_scores aren't in the generated Supabase
-// types yet, so we go through a loose cast like the other recent hooks
-// (useCsa, useHos) do.
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-  };
-};
+// Both risk tables are typed by the generated Supabase schema. The factors
+// payload remains a JSON value and is narrowed at this boundary.
+const db = supabase;
 
 export interface RiskScore {
   id: string;
@@ -40,7 +35,7 @@ export function useRiskScores() {
         .select("*, clients(company_name)")
         .order("score", { ascending: false });
       if (error) throw new Error(error.message);
-      return (data ?? []) as RiskScoreWithClient[];
+      return (data ?? []) as unknown as RiskScoreWithClient[];
     },
   });
 }
@@ -57,7 +52,7 @@ export function useClientRiskScore(clientId: string | undefined) {
         .eq("client_id", clientId!)
         .maybeSingle();
       if (error) throw new Error(error.message);
-      return (data ?? null) as RiskScore | null;
+      return (data ?? null) as unknown as RiskScore | null;
     },
   });
 }

@@ -111,7 +111,7 @@ export default function IftaPage() {
       total_miles: summary.total_miles,
       total_gallons: summary.total_gallons,
       fleet_mpg: summary.fleet_mpg,
-      breakdown_by_jurisdiction: summary.by_jurisdiction as unknown,
+      breakdown_by_jurisdiction: summary.by_jurisdiction.map((row) => ({ ...row })),
       total_tax_due: summary.total_net_tax,
       status: "draft",
     });

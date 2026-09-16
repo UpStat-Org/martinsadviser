@@ -66,7 +66,7 @@ export function useMarkNotificationRead() {
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("notifications")
-        .update({ read: true } as any)
+        .update({ read: true })
         .eq("id", id);
       if (error) throw error;
     },
@@ -82,7 +82,7 @@ export function useMarkAllNotificationsRead() {
       if (!user) throw new Error(tNow("toast.authRequired"));
       const { error } = await supabase
         .from("notifications")
-        .update({ read: true } as any)
+        .update({ read: true })
         .eq("user_id", user.id)
         .eq("read", false);
       if (error) throw error;

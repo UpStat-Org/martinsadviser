@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireServiceRole } from "../_shared/serviceRoleGuard.ts";
+import { getErrorMessage } from "../_shared/errorMessage.ts";
 
 // ---------------------------------------------------------------------------
 // Netlify domain-alias reconciler.
@@ -141,9 +142,10 @@ Deno.serve(async (req) => {
       JSON.stringify({ changed: true, total: merged.length, added, pruned }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
-  } catch (e: any) {
-    log("error", "sync-netlify-domains failed", e.message);
-    return new Response(JSON.stringify({ error: e.message }), {
+  } catch (e) {
+    const message = getErrorMessage(e);
+    log("error", "sync-netlify-domains failed", message);
+    return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

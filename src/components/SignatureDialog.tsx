@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { errorMessage } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useQueryClient } from "@tanstack/react-query";
@@ -88,8 +89,8 @@ export function SignatureDialog({ open, onOpenChange, clientId, permitId }: Sign
       setSignerEmail("");
       setDocumentName("");
       clearCanvas();
-    } catch (e: any) {
-      toast({ title: t("signature.error"), description: e.message, variant: "destructive" });
+    } catch (e) {
+      toast({ title: t("signature.error"), description: errorMessage(e), variant: "destructive" });
     } finally {
       setSaving(false);
     }

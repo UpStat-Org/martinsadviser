@@ -213,7 +213,6 @@ export default function ScheduleMessageDialog({ open, onOpenChange }: Props) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="email">{t("channel.email")}</SelectItem>
-                  <SelectItem value="sms">{t("channel.sms")}</SelectItem>
                   <SelectItem value="whatsapp">{t("channel.whatsapp")}</SelectItem>
                 </SelectContent>
               </Select>

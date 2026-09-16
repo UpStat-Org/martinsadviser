@@ -43,7 +43,7 @@ export default function AutomationRuleDialog({ open, onOpenChange, rule }: Props
     if (rule) {
       setName(rule.name);
       setDaysBefore(rule.days_before);
-      setChannel(rule.channel);
+      setChannel(rule.channel === "sms" ? "email" : rule.channel);
       setTemplateId(rule.template_id);
       setSubject(rule.subject || "");
       setBody(rule.body);
@@ -69,7 +69,7 @@ export default function AutomationRuleDialog({ open, onOpenChange, rule }: Props
     if (t) {
       setSubject(t.subject || "");
       setBody(t.body);
-      setChannel(t.channel);
+      setChannel(t.channel === "sms" ? "email" : t.channel);
     }
   };
 
@@ -121,7 +121,6 @@ export default function AutomationRuleDialog({ open, onOpenChange, rule }: Props
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="email">{t("channel.email")}</SelectItem>
-                  <SelectItem value="sms">{t("channel.sms")}</SelectItem>
                   <SelectItem value="whatsapp">{t("channel.whatsapp")}</SelectItem>
                 </SelectContent>
               </Select>

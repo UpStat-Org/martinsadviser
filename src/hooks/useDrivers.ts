@@ -9,14 +9,7 @@ import { tNow } from "@/lib/translations";
 // migration. Until then we use this loose builder so the TS compiler doesn't
 // fight us on a table it doesn't know about. After the type regen, callers
 // can be tightened to Tables<"drivers"> without API changes.
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-  };
-};
+const db = supabase;
 
 export interface Driver {
   id: string;

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { errorMessage } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -125,8 +126,8 @@ export default function StartOrg() {
       // Path B: email confirmation pending. The org already exists — we
       // just need the user to confirm and come back.
       setStep("confirm-email");
-    } catch (e: any) {
-      toast({ title: t("startOrg.createFailed"), description: e.message, variant: "destructive" });
+    } catch (e) {
+      toast({ title: t("startOrg.createFailed"), description: errorMessage(e), variant: "destructive" });
       setStep("form");
       setSubmitting(false);
     }

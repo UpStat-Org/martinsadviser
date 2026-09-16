@@ -375,7 +375,8 @@ export default function AuditPage() {
             <TableBody>
               {filtered.map((log) => {
                 const profile = profiles?.get(log.user_id);
-                const details = log.details as Record<string, any> | null;
+                const details = log.details && typeof log.details === "object" && !Array.isArray(log.details)
+                  ? log.details as Record<string, unknown> : null;
                 const actionCfg =
                   ACTION_CONFIG[log.action] ?? {
                     icon: Activity,

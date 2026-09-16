@@ -15,14 +15,7 @@ import { useOrg } from "@/contexts/OrgContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { quarterFromDate } from "@/lib/ifta";
 
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    upsert: (row: unknown, opts?: unknown) => any;
-    delete: () => any;
-  };
-};
+const db = supabase;
 
 interface IftaRateRow {
   id: string;

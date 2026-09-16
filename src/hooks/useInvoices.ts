@@ -64,7 +64,7 @@ export function useCreateInvoice() {
       if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase
         .from("invoices")
-        .insert({ ...invoice, user_id: user.id } as any)
+        .insert({ ...invoice, user_id: user.id })
         .select()
         .single();
       if (error) throw error;
@@ -74,7 +74,7 @@ export function useCreateInvoice() {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       toast({ title: tNow("toast.invoiceCreated") });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: tNow("toast.invoiceCreateError"), description: error.message, variant: "destructive" });
     },
   });
@@ -88,7 +88,7 @@ export function useUpdateInvoice() {
     mutationFn: async ({ id, ...updates }: Partial<InvoiceInsert> & { id: string }) => {
       const { data, error } = await supabase
         .from("invoices")
-        .update(updates as any)
+        .update(updates)
         .eq("id", id)
         .select()
         .single();
@@ -99,7 +99,7 @@ export function useUpdateInvoice() {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       toast({ title: tNow("toast.invoiceUpdated") });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: tNow("toast.updateError"), description: error.message, variant: "destructive" });
     },
   });
@@ -118,7 +118,7 @@ export function useDeleteInvoice() {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       toast({ title: tNow("toast.invoiceRemoved") });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: tNow("toast.removeError"), description: error.message, variant: "destructive" });
     },
   });

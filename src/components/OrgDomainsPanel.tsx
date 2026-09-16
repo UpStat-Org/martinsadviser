@@ -66,7 +66,7 @@ export function OrgDomainsPanel() {
     queryKey: ["org-domains", currentOrg?.id],
     queryFn: async (): Promise<OrgDomain[]> => {
       if (!currentOrg) return [];
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("organization_domains")
         .select("id, organization_id, domain, verification_token, status, verified_at, last_checked_at, created_at, updated_at")
         .eq("organization_id", currentOrg.id)
@@ -81,7 +81,7 @@ export function OrgDomainsPanel() {
     mutationFn: async () => {
       if (!currentOrg) throw new Error("No active organization");
       if (!normalized || inputError) throw new Error(inputError ?? t("orgDomains.enterValidDomain"));
-      const { error } = await (supabase as any).rpc("request_org_domain", {
+      const { error } = await supabase.rpc("request_org_domain", {
         p_org_id: currentOrg.id,
         p_domain: normalized,
       });
@@ -92,7 +92,7 @@ export function OrgDomainsPanel() {
       await qc.invalidateQueries({ queryKey: ["org-domains", currentOrg?.id] });
       toast({ title: t("orgDomains.added"), description: t("orgDomains.addedDesc") });
     },
-    onError: (e: any) => {
+    onError: (e: Error) => {
       toast({ title: t("orgDomains.addFailed"), description: e.message, variant: "destructive" });
     },
   });
@@ -117,14 +117,14 @@ export function OrgDomainsPanel() {
         variant: data.verified ? "default" : "destructive",
       });
     },
-    onError: (e: any) => {
+    onError: (e: Error) => {
       toast({ title: t("orgDomains.verifyFailed"), description: e.message, variant: "destructive" });
     },
   });
 
   const removeDomain = useMutation({
     mutationFn: async (domain: OrgDomain) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("organization_domains")
         .delete()
         .eq("id", domain.id)
@@ -135,7 +135,7 @@ export function OrgDomainsPanel() {
       await qc.invalidateQueries({ queryKey: ["org-domains", currentOrg?.id] });
       toast({ title: t("orgDomains.removed") });
     },
-    onError: (e: any) => {
+    onError: (e: Error) => {
       toast({ title: t("orgDomains.removeFailed"), description: e.message, variant: "destructive" });
     },
   });

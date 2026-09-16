@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getErrorMessage } from "../_shared/errorMessage.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -85,9 +86,10 @@ Deno.serve(async (req) => {
       JSON.stringify({ email: userData.user.email, password }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
-  } catch (error: any) {
-    console.error("redeem-portal-token error:", error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (error) {
+    const message = getErrorMessage(error);
+    console.error("redeem-portal-token error:", message);
+    return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

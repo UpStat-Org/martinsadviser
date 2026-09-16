@@ -72,7 +72,7 @@ export function useUpdateComplianceAutomation() {
       qc.invalidateQueries({ queryKey: ["compliance_automation_settings"] });
       toast({ title: tNow("toast.automationUpdated") });
     },
-    onError: (e: any) => {
+    onError: (e: Error) => {
       toast({ title: tNow("toast.updateError"), description: e.message, variant: "destructive" });
     },
   });

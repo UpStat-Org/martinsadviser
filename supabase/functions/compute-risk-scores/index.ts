@@ -15,6 +15,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireServiceRole } from "../_shared/serviceRoleGuard.ts";
+import type { Database } from "../../../src/integrations/supabase/types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -54,7 +55,7 @@ function isDqfDocCurrent(doc: { kind: string; expires_on: string | null; created
 // CSA BASIC intervention thresholds (general property carriers) — mirrors
 // src/lib/csa.ts. A score >= threshold is an "alert"; within 15 below is a
 // "watch".
-const CSA_BASICS: Array<{ key: string; threshold: number }> = [
+const CSA_BASICS = [
   { key: "unsafe_driving", threshold: 65 },
   { key: "hours_of_service", threshold: 65 },
   { key: "driver_fitness", threshold: 80 },
@@ -62,7 +63,7 @@ const CSA_BASICS: Array<{ key: string; threshold: number }> = [
   { key: "vehicle_maintenance", threshold: 80 },
   { key: "hazmat_compliance", threshold: 80 },
   { key: "crash_indicator", threshold: 65 },
-];
+] as const;
 
 type Factor = { code: string; count: number; points: number };
 
@@ -132,7 +133,7 @@ Deno.serve(async (req) => {
   const denied = requireServiceRole(req, corsHeaders);
   if (denied) return denied;
 
-  const supabase = createClient(
+  const supabase = createClient<Database>(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
@@ -179,9 +180,9 @@ Deno.serve(async (req) => {
       }
       return m;
     };
-    const permitsBy = byClient(permits as any[]);
-    const insuranceBy = byClient(insurance as any[]);
-    const invoicesBy = byClient(invoices as any[]);
+    const permitsBy = byClient(permits);
+    const insuranceBy = byClient(insurance);
+    const invoicesBy = byClient(invoices);
 
     // Latest CSA / FMCSA per client (rows already sorted desc above).
     const latestBy = <T extends { client_id: string }>(rows: T[] | null) => {
@@ -189,14 +190,14 @@ Deno.serve(async (req) => {
       for (const r of rows ?? []) if (!m.has(r.client_id)) m.set(r.client_id, r);
       return m;
     };
-    const csaBy = latestBy(csa as any[]);
-    const fmcsaBy = latestBy(fmcsa as any[]);
+    const csaBy = latestBy(csa);
+    const fmcsaBy = latestBy(fmcsa);
 
     // HOS violations per client, via driver → client. Only last 90 days count.
     const driverToClient = new Map<string, string>();
-    for (const d of (drivers as any[]) ?? []) driverToClient.set(d.id, d.client_id);
+    for (const d of drivers ?? []) driverToClient.set(d.id, d.client_id);
     const hosBy = new Map<string, { critical: number; serious: number; minor: number }>();
-    for (const v of (hos as any[]) ?? []) {
+    for (const v of hos ?? []) {
       if (daysUntil(v.occurred_at, ref) < -90) continue; // older than 90 days
       const clientId = driverToClient.get(v.driver_id);
       if (!clientId) continue;
@@ -210,7 +211,7 @@ Deno.serve(async (req) => {
     // Driver Qualification File rollup per client. Only active drivers count —
     // terminated/inactive drivers can't incur an active compliance liability.
     const docsByDriver = new Map<string, Array<{ kind: string; expires_on: string | null; created_at: string }>>();
-    for (const d of (driverDocs as any[]) ?? []) {
+    for (const d of driverDocs ?? []) {
       const arr = docsByDriver.get(d.driver_id) ?? [];
       arr.push(d);
       docsByDriver.set(d.driver_id, arr);
@@ -222,7 +223,7 @@ Deno.serve(async (req) => {
       mvrOverdue: number; dqfIncomplete: number;
     };
     const driversBy = new Map<string, DriverAgg>();
-    for (const d of (drivers as any[]) ?? []) {
+    for (const d of drivers ?? []) {
       if (d.status && d.status !== "active") continue;
       const clientId = d.client_id;
       if (!clientId) continue;
@@ -253,7 +254,7 @@ Deno.serve(async (req) => {
     let scored = 0;
     let alerted = 0;
 
-    for (const client of (clients as any[]) ?? []) {
+    for (const client of clients ?? []) {
       const factors: Factor[] = [];
       let total = 0;
 

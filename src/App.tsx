@@ -27,6 +27,7 @@ import NotFound from "./pages/NotFound";
 // needs — the initial bundle no longer drags Recharts, the import dialogs'
 // xlsx parser, the landing-page 3D scene, or 30+ other route modules.
 const Login = lazy(() => import("./pages/Login"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Signup = lazy(() => import("./pages/Signup"));
 const PendingApproval = lazy(() => import("./pages/PendingApproval"));
 const RejectedPage = lazy(() => import("./pages/RejectedPage"));
@@ -112,6 +113,7 @@ const App = () => (
             <Route path="/" element={<HomeIndex />} />
             <Route path="/lp" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/start" element={<StartOrg />} />
             <Route path="/invite/:token" element={<InviteAccept />} />

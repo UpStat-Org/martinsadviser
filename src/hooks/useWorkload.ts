@@ -30,7 +30,7 @@ export function useAssignedPermits(userId: string | undefined) {
     queryKey: ["assigned_permits", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("permits")
         .select("id, permit_type, state, expiration_date, document_url, status, assigned_to, client_id, clients(company_name)")
         .eq("assigned_to", userId!)
@@ -46,7 +46,7 @@ export function useAssignedTasks(userId: string | undefined) {
     queryKey: ["assigned_tasks", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("tasks")
         .select("id, name, status, priority, due_date, assigned_to, client_id, operator, clients(company_name)")
         .eq("assigned_to", userId!)
@@ -65,10 +65,10 @@ export function useAllAssignments() {
     queryKey: ["all_assignments"],
     queryFn: async () => {
       const [permitsRes, tasksRes] = await Promise.all([
-        (supabase as any)
+        supabase
           .from("permits")
           .select("id, expiration_date, status, assigned_to"),
-        (supabase as any)
+        supabase
           .from("tasks")
           .select("id, status, due_date, assigned_to, updated_at, created_at"),
       ]);

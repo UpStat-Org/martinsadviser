@@ -3,14 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
 
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-  };
-};
+const db = supabase;
 
 export type PolicyType =
   | "liability"

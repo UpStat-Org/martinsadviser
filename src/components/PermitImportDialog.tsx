@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { PermitInsert } from "@/hooks/usePermits";
 import { useQueryClient } from "@tanstack/react-query";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -168,7 +169,7 @@ export function PermitImportDialog({ open, onOpenChange }: Props) {
         }
       }
 
-      if (!clientId && (clientDot || clientName)) {
+      if (!clientId) {
         errors.push(`${t("import.line")} ${i + 2}: ${t("import.clientNotFound")} (DOT: ${clientDot || "—"}, ${t("common.name")}: ${clientName || "—"})`);
         setProgress(Math.round(((i + 1) / rows.length) * 100));
         continue;
@@ -188,19 +189,19 @@ export function PermitImportDialog({ open, onOpenChange }: Props) {
         }
       }
 
-      const permit: Record<string, any> = {
+      const permit: PermitInsert = {
         user_id: user.id,
+        client_id: clientId,
         permit_type: permitType,
         status: getValue("status") || "active",
       };
 
-      if (clientId) permit.client_id = clientId;
       if (truckId) permit.truck_id = truckId;
       if (getValue("permit_number")) permit.permit_number = getValue("permit_number");
       if (getValue("state")) permit.state = getValue("state");
       if (getValue("expiration_date")) permit.expiration_date = getValue("expiration_date");
 
-      const { error } = await supabase.from("permits").insert(permit as any);
+      const { error } = await supabase.from("permits").insert(permit);
       if (error) {
         errors.push(`${t("import.line")} ${i + 2}: ${error.message}`);
       } else {

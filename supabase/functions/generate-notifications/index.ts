@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireServiceRole } from "../_shared/serviceRoleGuard.ts";
+import type { Database } from "../../../src/integrations/supabase/types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,7 +18,7 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, serviceKey);
+  const supabase = createClient<Database>(supabaseUrl, serviceKey);
 
   const results = { permits: 0, invoices: 0, tasks: 0 };
 
@@ -31,7 +32,7 @@ Deno.serve(async (req) => {
   for (const p of permits ?? []) {
     const isExpired = new Date(p.expiration_date!) < new Date();
     const type = isExpired ? "permit_expired" : "permit_expiring";
-    const clientName = (p as any).clients?.company_name ?? "";
+    const clientName = p.clients?.company_name ?? "";
     const title = isExpired
       ? `Permit ${p.permit_type} expirado`
       : `Permit ${p.permit_type} expirando`;
@@ -68,7 +69,7 @@ Deno.serve(async (req) => {
     .lt("due_date", today);
 
   for (const inv of invoices ?? []) {
-    const clientName = (inv as any).clients?.company_name ?? "";
+    const clientName = inv.clients?.company_name ?? "";
     const { data: existing } = await supabase
       .from("notifications")
       .select("id")

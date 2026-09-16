@@ -70,7 +70,7 @@ export function OrgBrandingPanel() {
       // Saved through a SECURITY DEFINER RPC (not a direct table UPDATE) so
       // org admins can edit branding without the owner-only RLS policy on
       // organizations blocking them. The RPC writes only the branding column.
-      const { error } = await (supabase as any).rpc("update_org_branding", {
+      const { error } = await supabase.rpc("update_org_branding", {
         p_org_id: currentOrg.id,
         p_branding: next,
       });
@@ -81,7 +81,7 @@ export function OrgBrandingPanel() {
       qc.invalidateQueries();
       toast({ title: t("orgBranding.saved") });
     },
-    onError: (e: any) => {
+    onError: (e: Error) => {
       toast({ title: t("orgBranding.saveFailed"), description: e.message, variant: "destructive" });
     },
   });

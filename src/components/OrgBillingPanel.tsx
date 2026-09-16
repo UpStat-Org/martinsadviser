@@ -84,7 +84,7 @@ export function OrgBillingPanel() {
       if (!data?.url) throw new Error(tNow("orgBilling.stripeNoCheckoutUrl"));
       window.location.href = data.url;
     },
-    onError: (e: any) => toast({ title: tNow("orgBilling.checkoutFailed"), description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: tNow("orgBilling.checkoutFailed"), description: e.message, variant: "destructive" }),
   });
 
   const openPortal = useMutation({
@@ -98,7 +98,7 @@ export function OrgBillingPanel() {
       if (!data?.url) throw new Error(tNow("orgBilling.stripeNoPortalUrl"));
       window.location.href = data.url;
     },
-    onError: (e: any) => toast({ title: tNow("orgBilling.portalFailed"), description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: tNow("orgBilling.portalFailed"), description: e.message, variant: "destructive" }),
   });
 
   if (!currentOrg) return null;

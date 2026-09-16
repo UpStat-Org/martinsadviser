@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { errorMessage } from "@/lib/utils";
 import { useOrg } from "@/contexts/OrgContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -96,8 +97,8 @@ export default function InviteAccept() {
       toast({ title: t("inviteAccept.accepted") });
       // Send the user into the dashboard of the org they just joined.
       navigate("/?welcome=invite");
-    } catch (e: any) {
-      toast({ title: t("inviteAccept.acceptFailed"), description: e.message, variant: "destructive" });
+    } catch (e) {
+      toast({ title: t("inviteAccept.acceptFailed"), description: errorMessage(e), variant: "destructive" });
       setAccepting(false);
     }
   };

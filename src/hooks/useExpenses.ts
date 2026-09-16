@@ -4,14 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
 
 // expenses isn't in the generated types yet — cast the client (see useInsurance).
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-  };
-};
+const db = supabase;
 
 export type ExpenseCategory =
   | "state_fee"

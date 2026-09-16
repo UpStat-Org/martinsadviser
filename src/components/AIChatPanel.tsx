@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+import { errorMessage } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -33,7 +34,7 @@ export function AIChatPanel({ clientId, clientName }: { clientId: string; client
   const { data: messages, isLoading } = useQuery({
     queryKey: ["ai_chat", clientId],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("ai_chat_messages")
         .select("id, role, content, created_at")
         .eq("client_id", clientId)
@@ -59,15 +60,15 @@ export function AIChatPanel({ clientId, clientName }: { clientId: string; client
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       qc.invalidateQueries({ queryKey: ["ai_chat", clientId] });
-    } catch (e: any) {
-      toast({ title: t("aichat.error"), description: e.message, variant: "destructive" });
+    } catch (e) {
+      toast({ title: t("aichat.error"), description: errorMessage(e), variant: "destructive" });
     } finally {
       setSending(false);
     }
   };
 
   const clearHistory = async () => {
-    const { error } = await (supabase as any).from("ai_chat_messages").delete().eq("client_id", clientId);
+    const { error } = await supabase.from("ai_chat_messages").delete().eq("client_id", clientId);
     if (error) {
       toast({ title: t("aichat.errorClear"), description: error.message, variant: "destructive" });
       return;

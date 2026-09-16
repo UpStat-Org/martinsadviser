@@ -83,7 +83,8 @@ export default function MyDeskPage() {
   const retryMessage = useRetryMessage();
   const updateTask = useUpdateTask();
 
-  const userName = (user?.user_metadata as any)?.full_name?.split(" ")[0] ?? "";
+  const fullName = user?.user_metadata?.full_name;
+  const userName = typeof fullName === "string" ? fullName.split(" ")[0] : "";
 
   const stats = useMemo(() => {
     const now = new Date();

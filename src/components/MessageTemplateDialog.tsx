@@ -28,7 +28,7 @@ export default function MessageTemplateDialog({ open, onOpenChange, template }: 
   useEffect(() => {
     if (template) {
       setName(template.name);
-      setChannel(template.channel);
+      setChannel(template.channel === "sms" ? "email" : template.channel);
       setSubject(template.subject || "");
       setBody(template.body);
     } else {
@@ -64,7 +64,6 @@ export default function MessageTemplateDialog({ open, onOpenChange, template }: 
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="email">{t("channel.email")}</SelectItem>
-                <SelectItem value="sms">{t("channel.sms")}</SelectItem>
                 <SelectItem value="whatsapp">{t("channel.whatsapp")}</SelectItem>
               </SelectContent>
             </Select>

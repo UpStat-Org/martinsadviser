@@ -3,17 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
 import type { BrComplianceKind, BrScope, FineSeverity } from "@/lib/brCompliance";
+import type { Json } from "@/integrations/supabase/types";
 
-// br_compliance_items / br_fines vêm de 20260824160000_br_compliance.sql e
-// ainda não estão no `Database` gerado. Mesmo builder solto de useDrivers.
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-  };
-};
+// Os tipos de br_compliance_items / br_fines vêm do schema Supabase gerado.
+const db = supabase;
 
 export interface BrComplianceItem {
   id: string;
@@ -29,7 +22,7 @@ export interface BrComplianceItem {
   expires_on: string | null;
   document_url: string | null;
   notes: string | null;
-  metadata: Record<string, unknown>;
+  metadata: Json;
   created_at: string;
   updated_at: string;
   drivers?: { full_name: string } | null;
@@ -58,7 +51,7 @@ export interface BrFine {
   status: "pending" | "appealed" | "paid" | "cancelled";
   document_url: string | null;
   notes: string | null;
-  metadata: Record<string, unknown>;
+  metadata: Json;
   created_at: string;
   updated_at: string;
   drivers?: { full_name: string } | null;
@@ -106,7 +99,7 @@ export type BrComplianceInsert = {
   expires_on?: string | null;
   document_url?: string | null;
   notes?: string | null;
-  metadata?: Record<string, unknown>;
+  metadata?: Json;
 };
 
 export function useUpsertBrComplianceItem() {

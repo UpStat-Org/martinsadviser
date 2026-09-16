@@ -2,15 +2,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
+import type { Json } from "@/integrations/supabase/types";
 
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-  };
-};
+const db = supabase;
 
 export type SavedViewScope = "clients" | "permits" | "trucks" | "tasks" | "invoices";
 
@@ -48,7 +42,8 @@ export function useCreateSavedView() {
   const { toast } = useToast();
   return useMutation({
     mutationFn: async (input: SavedViewInsert) => {
-      const { data, error } = await db.from("saved_views").insert(input).select().single();
+      const { data, error } = await db.from("saved_views")
+        .insert({ ...input, filters: input.filters as Json }).select().single();
       if (error) throw new Error(error.message);
       return data as SavedView;
     },

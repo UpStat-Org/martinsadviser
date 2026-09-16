@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { tNow } from "@/lib/translations";
 import { supabase } from "@/integrations/supabase/client";
+import { errorMessage } from "@/lib/utils";
 
 export interface FmcsaResult {
   company_name: string;
@@ -61,8 +62,8 @@ export function useFmcsaLookup() {
         description: `${result.company_name} — ${result.totalPowerUnits} ${tNow("toast.vehicles")}, ${result.totalDrivers} ${tNow("toast.drivers")}`,
       });
       return result;
-    } catch (err: any) {
-      toast.error(tNow("toast.dotLookupError"), { description: err.message });
+    } catch (err) {
+      toast.error(tNow("toast.dotLookupError"), { description: errorMessage(err) });
       return null;
     } finally {
       setLoading(false);

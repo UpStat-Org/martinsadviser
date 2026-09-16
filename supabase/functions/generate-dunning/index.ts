@@ -14,6 +14,7 @@
 // has auto_send=true, in which case they go straight to 'pending'.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import type { Database } from "../../../src/integrations/supabase/types.ts";
 import { requireServiceRole } from "../_shared/serviceRoleGuard.ts";
 
 const corsHeaders = {
@@ -44,7 +45,7 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, serviceKey);
+  const supabase = createClient<Database>(supabaseUrl, serviceKey);
 
   const runId = crypto.randomUUID();
   const log = (level: "info" | "warn" | "error", msg: string, extra?: unknown) =>
@@ -125,7 +126,7 @@ Deno.serve(async (req) => {
 
           if (!willEnqueue) continue; // silent: recorded so it never backfills
 
-          const company = (inv as any).clients?.company_name ?? "";
+          const company = inv.clients?.company_name ?? "";
           const replace = makeReplacer({
             "{company_name}": company,
             "{amount}": fmtAmount(Number(inv.amount)),

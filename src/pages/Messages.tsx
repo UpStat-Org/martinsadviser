@@ -18,7 +18,6 @@ import {
   Pencil,
   XCircle,
   Mail,
-  Phone,
   MessageCircle,
   Eye,
   Zap,
@@ -50,6 +49,7 @@ import {
 import type { AutomationRule } from "@/hooks/useAutomationRules";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
+import { errorMessage } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOrg } from "@/contexts/OrgContext";
@@ -60,8 +60,6 @@ const dateLocales = { pt: ptBR, en: enUS, es };
 const channelConfig = (ch: string) => {
   if (ch === "whatsapp")
     return { icon: MessageCircle, gradient: "from-emerald-500 to-green-500", label: "WhatsApp" };
-  if (ch === "sms")
-    return { icon: Phone, gradient: "from-sky-500 to-blue-500", label: "SMS" };
   return { icon: Mail, gradient: "from-indigo-500 to-violet-500", label: "Email" };
 };
 
@@ -136,8 +134,8 @@ export default function Messages() {
         title: t("messages.sendComplete"),
         description: `${data?.sent || 0} ${t("common.sent").toLowerCase()}, ${data?.failed || 0} ${t("common.failed").toLowerCase()}.${data?.errors?.length ? `\n${data.errors.join("\n")}` : ""}`,
       });
-    } catch (e: any) {
-      toast({ title: t("messages.sendError"), description: e.message, variant: "destructive" });
+    } catch (e) {
+      toast({ title: t("messages.sendError"), description: errorMessage(e), variant: "destructive" });
     } finally {
       setSending(false);
     }
@@ -358,10 +356,10 @@ export default function Messages() {
                                 });
                                 if (sendError) throw sendError;
                                 toast({ title: t("messages.sendComplete") });
-                              } catch (e: any) {
+                              } catch (e) {
                                 toast({
                                   title: t("messages.sendError"),
-                                  description: e.message,
+                                  description: errorMessage(e),
                                   variant: "destructive",
                                 });
                               }

@@ -4,14 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
 
 // recurring_plans isn't in the generated types yet — cast (see useInsurance).
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-  };
-};
+const db = supabase;
 
 export type PlanFrequency = "monthly" | "quarterly" | "yearly";
 export type PlanStatus = "active" | "paused" | "cancelled";

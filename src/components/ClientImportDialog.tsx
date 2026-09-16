@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { lookupCarrier, type FmcsaResult } from "@/hooks/useFmcsaLookup";
+import type { ClientInsert } from "@/hooks/useClients";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2, Hash, Search } from "lucide-react";
 import { parseSpreadsheet, UnsupportedLegacyXlsError } from "@/lib/spreadsheet";
 
@@ -117,7 +118,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
     const errors: string[] = [];
     for (let i = 0; i < selected.length; i++) {
       const r = selected[i].result!;
-      const client: Record<string, any> = {
+      const client: ClientInsert = {
         user_id: user.id,
         status: "active",
         company_name: r.company_name || `DOT ${selected[i].dot}`,
@@ -127,7 +128,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
         phone: r.phone || null,
         address: r.address || null,
       };
-      const { error } = await supabase.from("clients").insert(client as any);
+      const { error } = await supabase.from("clients").insert(client);
       if (error) errors.push(`DOT ${selected[i].dot}: ${error.message}`);
       else success++;
       setProgress(Math.round(((i + 1) / selected.length) * 100));
@@ -190,7 +191,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      const client: Record<string, any> = { user_id: user.id, status: "active" };
+      const client: ClientInsert = { user_id: user.id, status: "active", company_name: "" };
       for (const field of OUR_FIELDS) {
         const col = reverseMapping[field];
         if (col && row[col]) {
@@ -204,7 +205,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
         continue;
       }
 
-      const { error } = await supabase.from("clients").insert(client as any);
+      const { error } = await supabase.from("clients").insert(client);
       if (error) {
         errors.push(`${t("import.row")} ${i + 2}: ${error.message}`);
       } else {
@@ -351,7 +352,7 @@ export function ClientImportDialog({ open, onOpenChange }: Props) {
                       {OUR_FIELDS.map((f) => (
                         <SelectItem key={f} value={f} disabled={mappedFields.includes(f) && mapping[header] !== f}>
                           {t(`import.field.${f}`)}
-                          {REQUIRED_FIELDS.includes(f as any) && " *"}
+                          {REQUIRED_FIELDS.some((required) => required === f) && " *"}
                         </SelectItem>
                       ))}
                     </SelectContent>

@@ -236,7 +236,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
       inscricao_estadual: values.inscricao_estadual || null,
       mc: values.mc || null,
       notes: values.notes || null,
-    } as Record<string, unknown>;
+    };
 
     const duplicates = await checkDuplicate(
       values.dot,
@@ -253,9 +253,9 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
     }
 
     if (isEditing) {
-      await updateClient.mutateAsync({ id: client.id, ...payload } as any);
+      await updateClient.mutateAsync({ id: client.id, ...payload });
     } else {
-      await createClient.mutateAsync(payload as any);
+      await createClient.mutateAsync(payload);
     }
     onOpenChange(false);
     form.reset();

@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
+import type { Dispatch, SetStateAction } from "react";
 
 export type Density = "comfortable" | "compact";
 
@@ -17,21 +18,21 @@ interface ColumnOption {
   label: string;
 }
 
-interface TablePreferencesToolbarProps {
+interface TablePreferencesToolbarProps<TColumns extends Record<string, boolean>> {
   density: Density;
   onDensityChange: (density: Density) => void;
-  columns: Record<string, boolean>;
+  columns: TColumns;
   columnOptions: ColumnOption[];
-  onColumnsChange: (columns: any) => void;
+  onColumnsChange: Dispatch<SetStateAction<TColumns>>;
 }
 
-export function TablePreferencesToolbar({
+export function TablePreferencesToolbar<TColumns extends Record<string, boolean>>({
   density,
   onDensityChange,
   columns,
   columnOptions,
   onColumnsChange,
-}: TablePreferencesToolbarProps) {
+}: TablePreferencesToolbarProps<TColumns>) {
   const { t } = useLanguage();
 
   return (
@@ -67,7 +68,10 @@ export function TablePreferencesToolbar({
               key={option.key}
               checked={columns[option.key] !== false}
               onCheckedChange={(checked) =>
-                onColumnsChange({ ...columns, [option.key]: Boolean(checked) })
+                onColumnsChange((previous) => ({
+                  ...previous,
+                  [option.key]: Boolean(checked),
+                } as TColumns))
               }
             >
               {option.label}

@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { usePermitHistory } from "@/hooks/usePermitHistory";
 import { useLanguage } from "@/contexts/LanguageContext";
+import type { Json } from "@/integrations/supabase/types";
 
 interface PermitHistoryDialogProps {
   open: boolean;
@@ -19,8 +20,8 @@ const changeTypeConfig: Record<string, { labelKey: string; icon: typeof History;
   expired: { labelKey: "history.expired", icon: FileCheck, color: "bg-destructive/10 text-destructive" },
 };
 
-function formatChanges(values: Record<string, any> | null, t: (key: string) => string): string[] {
-  if (!values) return [];
+function formatChanges(values: Json | null, t: (key: string) => string): string[] {
+  if (!values || typeof values !== "object" || Array.isArray(values)) return [];
   // The labels come from the i18n bag so the change-log table reads in the
   // user's locale. Falls back to the column name when a key isn't translated.
   const labels: Record<string, string> = {
@@ -67,8 +68,8 @@ export function PermitHistoryDialog({ open, onOpenChange, permitId, permitLabel 
               {history.map((entry) => {
                 const config = changeTypeConfig[entry.change_type] || changeTypeConfig.updated;
                 const Icon = config.icon;
-                const oldLines = formatChanges(entry.old_values as Record<string, any> | null, t);
-                const newLines = formatChanges(entry.new_values as Record<string, any> | null, t);
+                const oldLines = formatChanges(entry.old_values, t);
+                const newLines = formatChanges(entry.new_values, t);
 
                 return (
                   <div key={entry.id} className="relative pl-10">

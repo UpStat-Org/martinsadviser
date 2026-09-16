@@ -59,7 +59,7 @@ export function SubscriptionBanner() {
       if (!data?.url) throw new Error(tNow("orgBilling.stripeNoUrl"));
       window.location.href = data.url;
     },
-    onError: (e: any) => toast({ title: "Falha", description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: "Falha", description: e.message, variant: "destructive" }),
   });
 
   const [dismissed, setDismissed] = useState(() => {

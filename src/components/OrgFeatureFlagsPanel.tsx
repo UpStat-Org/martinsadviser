@@ -44,7 +44,7 @@ export function OrgFeatureFlagsPanel() {
       qc.invalidateQueries();
       toast({ title: t("orgFeatureFlags.flagUpdated") });
     },
-    onError: (e: any) => {
+    onError: (e: Error) => {
       toast({ title: t("orgFeatureFlags.flagFailed"), description: e.message, variant: "destructive" });
     },
     onSettled: () => setPending(null),

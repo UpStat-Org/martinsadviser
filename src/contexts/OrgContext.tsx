@@ -172,8 +172,8 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     ]);
 
     const mlist: Membership[] = (memberRows ?? [])
-      .filter((r: any) => r.organization)
-      .map((r: any) => ({
+      .filter((r) => r.organization)
+      .map((r) => ({
         organization: r.organization as Organization,
         role: r.role as OrgRole,
       }));

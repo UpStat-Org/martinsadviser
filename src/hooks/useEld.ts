@@ -5,14 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
 
 // eld_connections / eld_sync_log aren't in the generated types yet.
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    upsert: (row: unknown, opts?: unknown) => any;
-  };
-};
+const db = supabase;
 
 export type EldProvider = "motive" | "samsara";
 export type EldStatus = "connected" | "disconnected" | "error";

@@ -36,7 +36,9 @@ function getLocale(lang: string) {
 }
 
 function getDescription(entry: ActivityLog, t: (key: string) => string): string {
-  const details = (entry.details || {}) as Record<string, any>;
+  const rawDetails = entry.details;
+  const details: Record<string, unknown> = rawDetails && typeof rawDetails === "object" && !Array.isArray(rawDetails)
+    ? rawDetails as Record<string, unknown> : {};
   const entityLabel = t(`activity.entity.${entry.entity_type}`);
   const actionLabel = t(`activity.action.${entry.action}`);
 

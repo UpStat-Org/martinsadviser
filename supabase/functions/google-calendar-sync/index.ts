@@ -1,11 +1,15 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
+import type { Database } from "../../../src/integrations/supabase/types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function refreshTokenIfNeeded(supabase: any, tokenRow: any) {
+async function refreshTokenIfNeeded(
+  supabase: SupabaseClient<Database>,
+  tokenRow: Database["public"]["Tables"]["google_calendar_tokens"]["Row"],
+) {
   const now = new Date();
   const expiresAt = new Date(tokenRow.expires_at);
 
@@ -49,7 +53,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
     }
 
-    const supabaseAuth = createClient(
+    const supabaseAuth = createClient<Database>(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
       { global: { headers: { Authorization: authHeader } } }
@@ -63,7 +67,7 @@ Deno.serve(async (req) => {
 
     const userId = claimsData.claims.sub;
 
-    const supabase = createClient(
+    const supabase = createClient<Database>(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
@@ -93,6 +97,13 @@ Deno.serve(async (req) => {
       .maybeSingle();
     const activeOrgId = profile?.active_org_id;
     if (!activeOrgId) throw new Error("User has no active organization");
+    const { data: membership } = await supabase.from("organization_members")
+      .select("user_id")
+      .eq("organization_id", activeOrgId)
+      .eq("user_id", userId)
+      .eq("approval_status", "approved")
+      .maybeSingle();
+    if (!membership) throw new Error("Forbidden: not a member of the active organization");
 
     // Get active permits with expiration dates, scoped to the active org
     const { data: permits, error: permitsErr } = await supabase
@@ -108,7 +119,7 @@ Deno.serve(async (req) => {
     const calendarId = tokenRow.calendar_id || "primary";
 
     for (const permit of permits || []) {
-      const client = permit.clients as any;
+      const client = permit.clients;
       const summary = `${permit.permit_type} - ${client?.company_name || "N/A"}`;
       const description = [
         `Permit #: ${permit.permit_number || "N/A"}`,

@@ -9,8 +9,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SavedFiltersBarProps {
   page: string;
-  currentFilters: Record<string, any>;
-  onApply: (filters: Record<string, any>) => void;
+  currentFilters: Record<string, string>;
+  onApply: (filters: Record<string, string>) => void;
 }
 
 export function SavedFiltersBar({ page, currentFilters, onApply }: SavedFiltersBarProps) {
@@ -47,7 +47,13 @@ export function SavedFiltersBar({ page, currentFilters, onApply }: SavedFiltersB
           key={f.id}
           variant="outline"
           className="cursor-pointer hover:bg-accent transition-colors gap-1 pr-1"
-          onClick={() => onApply(f.filters as Record<string, any>)}
+          onClick={() => {
+            const saved = f.filters;
+            if (!saved || typeof saved !== "object" || Array.isArray(saved)) return;
+            onApply(Object.fromEntries(
+              Object.entries(saved).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+            ));
+          }}
         >
           {f.name}
           <button

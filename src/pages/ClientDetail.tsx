@@ -83,7 +83,7 @@ import { useInvoices } from "@/hooks/useInvoices";
 import { usePermitDocuments } from "@/hooks/usePermitDocuments";
 import { Send, RotateCw, MessageCircle, DollarSign } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
-import { cn } from "@/lib/utils";
+import { cn, errorMessage } from "@/lib/utils";
 import { useRegion } from "@/hooks/useRegion";
 
 const serviceLabels = [
@@ -240,9 +240,9 @@ export default function ClientDetail() {
       if (data?.error) throw new Error(data.error);
       setAiReport(data.report);
       setAiReportOpen(true);
-    } catch (e: any) {
+    } catch (e) {
       console.error("AI Report error:", e);
-      toast({ title: t("clientDetail.reportError"), description: e.message, variant: "destructive" });
+      toast({ title: t("clientDetail.reportError"), description: errorMessage(e), variant: "destructive" });
     } finally {
       setAiLoading(false);
     }
@@ -664,7 +664,7 @@ export default function ClientDetail() {
                         <TableRow key={permit.id}>
                           <TableCell className="font-medium">{permit.permit_type}</TableCell>
                           <TableCell className="font-mono text-xs">{permit.permit_number || "—"}</TableCell>
-                          <TableCell>{(permit as any).trucks?.plate || "—"}</TableCell>
+                          <TableCell>{permit.trucks?.plate || "—"}</TableCell>
                           <TableCell>{permit.state || "—"}</TableCell>
                           <TableCell>{permit.expiration_date ? format(new Date(permit.expiration_date), "MM/dd/yyyy") : "—"}</TableCell>
                           <TableCell><Badge className={expStatus.color}>{expStatus.label}</Badge></TableCell>
@@ -733,7 +733,7 @@ export default function ClientDetail() {
                   </TableHeader>
                   <TableBody>
                     {clientMessages.map((msg) => {
-                      const channelIcon: Record<string, string> = { email: "📧", sms: "📱", whatsapp: "💬" };
+                      const channelIcon: Record<string, string> = { email: "📧", whatsapp: "💬" };
                       const statusColors: Record<string, string> = {
                         sent: "bg-success text-success-foreground",
                         pending: "bg-warning text-warning-foreground",

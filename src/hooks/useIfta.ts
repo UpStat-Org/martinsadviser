@@ -2,16 +2,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { tNow } from "@/lib/translations";
+import type { Json } from "@/integrations/supabase/types";
 
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-    upsert: (row: unknown, opts?: unknown) => any;
-  };
-};
+const db = supabase;
 
 export interface IftaTrip {
   id: string;
@@ -67,7 +60,7 @@ export interface IftaFiling {
   total_miles: number | null;
   total_gallons: number | null;
   fleet_mpg: number | null;
-  breakdown_by_jurisdiction: unknown;
+  breakdown_by_jurisdiction: Json;
   total_tax_due: number | null;
   status: "draft" | "filed" | "paid";
   filed_at: string | null;

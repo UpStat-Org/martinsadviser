@@ -19,7 +19,7 @@ export function useInternalNotes(clientId: string | undefined) {
     queryKey: ["internal_notes", clientId],
     enabled: !!clientId,
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("client_internal_notes")
         .select("*")
         .eq("client_id", clientId!)
@@ -44,7 +44,7 @@ export function useCreateInternalNote() {
         .eq("id", user.id)
         .single();
       const user_name = profile?.full_name || profile?.email || user.email || tNow("admin.user");
-      const { error } = await (supabase as any).from("client_internal_notes").insert({
+      const { error } = await supabase.from("client_internal_notes").insert({
         client_id: input.client_id,
         body: input.body,
         pinned: input.pinned ?? false,
@@ -57,7 +57,7 @@ export function useCreateInternalNote() {
       qc.invalidateQueries({ queryKey: ["internal_notes", vars.client_id] });
       toast({ title: tNow("toast.noteSaved") });
     },
-    onError: (e: any) => toast({ title: tNow("toast.noteSaveError"), description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: tNow("toast.noteSaveError"), description: e.message, variant: "destructive" }),
   });
 }
 
@@ -65,10 +65,12 @@ export function useUpdateInternalNote() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { id: string; client_id: string; body?: string; pinned?: boolean }) => {
-      const updates: any = { updated_at: new Date().toISOString() };
+      const updates: { updated_at: string; body?: string; pinned?: boolean } = {
+        updated_at: new Date().toISOString(),
+      };
       if (input.body !== undefined) updates.body = input.body;
       if (input.pinned !== undefined) updates.pinned = input.pinned;
-      const { error } = await (supabase as any).from("client_internal_notes").update(updates).eq("id", input.id);
+      const { error } = await supabase.from("client_internal_notes").update(updates).eq("id", input.id);
       if (error) throw error;
     },
     onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ["internal_notes", vars.client_id] }),
@@ -80,7 +82,7 @@ export function useDeleteInternalNote() {
   const { toast } = useToast();
   return useMutation({
     mutationFn: async (input: { id: string; client_id: string }) => {
-      const { error } = await (supabase as any).from("client_internal_notes").delete().eq("id", input.id);
+      const { error } = await supabase.from("client_internal_notes").delete().eq("id", input.id);
       if (error) throw error;
     },
     onSuccess: (_, vars) => {

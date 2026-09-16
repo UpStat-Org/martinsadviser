@@ -12,6 +12,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { chatCompletion, aiErrorResponse } from "../_shared/ai.ts";
+import type { Database } from "../../../src/integrations/supabase/types.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -45,7 +46,7 @@ serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
     // Verify caller identity.
-    const callerClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+    const callerClient = createClient<Database>(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
       global: { headers: { Authorization: authHeader } },
     });
     const token = authHeader.replace("Bearer ", "");
@@ -53,7 +54,7 @@ serve(async (req) => {
     if (claimsErr || !claimsData?.claims) throw new Error("Not authenticated");
     const callerId = claimsData.claims.sub as string;
 
-    const supabase = createClient(supabaseUrl, serviceKey);
+    const supabase = createClient<Database>(supabaseUrl, serviceKey);
 
     const [{ data: client }, { data: permits }] = await Promise.all([
       supabase.from("clients").select("*").eq("id", client_id).single(),
@@ -72,26 +73,27 @@ serve(async (req) => {
     if (!membership) throw new Error("Forbidden");
 
     const today = new Date();
-    const focusPermit = permit_id ? (permits ?? []).find((p: any) => p.id === permit_id) : null;
-    const expiringSoon = (permits ?? []).filter((p: any) => {
+    const focusPermit = permit_id ? (permits ?? []).find((p) => p.id === permit_id) : null;
+    const expiringSoon = (permits ?? []).filter((p) => {
       if (!p.expiration_date) return false;
       const days = Math.ceil((new Date(p.expiration_date).getTime() - today.getTime()) / 86_400_000);
       return days <= 45;
     });
 
-    const isShort = channel === "sms" || channel === "whatsapp";
+    if (channel !== "email" && channel !== "whatsapp") throw new Error("Unsupported channel");
+    const isShort = channel === "whatsapp";
     const channelGuidance = isShort
       ? `Canal: ${channel}. Mensagem curta (máx ~320 caracteres), sem assunto, sem markdown, direta e cordial. Deixe "subject" vazio.`
       : `Canal: email. Inclua um "subject" curto e específico e um "body" profissional com saudação e despedida. Sem markdown pesado.`;
 
     const permitLines = (permits ?? [])
-      .map((p: any) => `- ${p.permit_type} ${p.permit_number ? `#${p.permit_number}` : ""} ${p.state || ""} | vence: ${p.expiration_date || "N/A"} | status: ${p.status}`)
+      .map((p) => `- ${p.permit_type} ${p.permit_number ? `#${p.permit_number}` : ""} ${p.state || ""} | vence: ${p.expiration_date || "N/A"} | status: ${p.status}`)
       .join("\n");
 
     const focusLine = focusPermit
       ? `O foco da mensagem é a renovação deste permit: ${focusPermit.permit_type} ${focusPermit.permit_number ? `#${focusPermit.permit_number}` : ""} ${focusPermit.state || ""}, vencimento ${focusPermit.expiration_date || "N/A"}.`
       : expiringSoon.length
-      ? `O foco é a renovação dos permits que vencem em breve: ${expiringSoon.map((p: any) => `${p.permit_type} (${p.expiration_date})`).join(", ")}.`
+      ? `O foco é a renovação dos permits que vencem em breve: ${expiringSoon.map((p) => `${p.permit_type} (${p.expiration_date})`).join(", ")}.`
       : `Não há permits vencendo nos próximos 45 dias — escreva uma comunicação de acompanhamento cordial.`;
 
     const systemPrompt = `Você redige comunicações que a equipe de uma consultoria de compliance de transporte (permits IFTA, IRP, UCR, MCS-150 etc.) envia aos seus CLIENTES (transportadoras). ${LANG_INSTRUCTION[language] || LANG_INSTRUCTION.pt}

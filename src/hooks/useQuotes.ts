@@ -5,14 +5,7 @@ import { tNow } from "@/lib/translations";
 import type { BillingType } from "@/hooks/useServices";
 
 // quotes / quote_items aren't in the generated types yet — cast (see useInsurance).
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-  };
-};
+const db = supabase;
 
 export type QuoteStatus = "draft" | "sent" | "accepted" | "rejected" | "expired";
 

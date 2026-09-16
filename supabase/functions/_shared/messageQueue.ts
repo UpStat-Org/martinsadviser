@@ -92,8 +92,6 @@ export async function processMessageQueue(
         const phone = client?.phone ? normalizePhone(client.phone) : null;
         if (!phone) throw new Error("Client has no valid phone number");
         await sendWhatsApp(whatsappKey, phone, message.body);
-      } else if (message.channel === "sms") {
-        throw new Error("SMS channel not configured");
       } else {
         throw new Error(`Unknown channel: ${message.channel}`);
       }
@@ -115,7 +113,8 @@ export async function processMessageQueue(
         }
         : { status: "failed", retry_count: retryCount, last_error: errorMessage, locked_at: null };
       await supabase.from("scheduled_messages").update(patch).eq("id", message.id);
-      shouldRetry ? retried++ : failed++;
+      if (shouldRetry) retried++;
+      else failed++;
       errors.push(`${message.id}: ${errorMessage}`);
       log("error", "send_failed", { id: message.id, retry: shouldRetry, attempt: retryCount, error: errorMessage });
     }

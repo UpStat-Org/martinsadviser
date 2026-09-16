@@ -211,7 +211,7 @@ function CreateOrgDialog({
       onOpenChange(false);
       onCreated();
     },
-    onError: (e: any) => toast({ title: "Create failed", description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: "Create failed", description: e.message, variant: "destructive" }),
   });
 
   return (
@@ -299,7 +299,7 @@ function OrgDetailsDrawer({
       onChanged();
       toast({ title: "Owner set" });
     },
-    onError: (e: any) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
   });
 
   const updateStatus = useMutation({
@@ -315,7 +315,7 @@ function OrgDetailsDrawer({
       onChanged();
       toast({ title: "Status updated" });
     },
-    onError: (e: any) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
   });
 
   const flagEntries = useMemo(() => {

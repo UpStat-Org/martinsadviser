@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
 
 // jsdom's Blob predates the Blob.arrayBuffer()/text() promise API that every
 // browser we target has shipped since 2019. Polyfill it via FileReader so code

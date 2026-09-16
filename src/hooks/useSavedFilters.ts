@@ -32,7 +32,7 @@ export function useCreateSavedFilter() {
   const qc = useQueryClient();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: async (filter: { name: string; page: string; filters: Record<string, any> }) => {
+    mutationFn: async (filter: { name: string; page: string; filters: Record<string, string> }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error(tNow("toast.authRequired"));
       const { data, error } = await supabase

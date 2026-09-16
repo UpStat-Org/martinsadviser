@@ -105,7 +105,7 @@ export function OrgMembersPanel() {
         toast({ title: t("orgMembers.inviteSent") });
       }
     },
-    onError: (e: any) => toast({ title: t("orgMembers.inviteFailed"), description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: t("orgMembers.inviteFailed"), description: e.message, variant: "destructive" }),
   });
 
   const revoke = useMutation({
@@ -117,7 +117,7 @@ export function OrgMembersPanel() {
       qc.invalidateQueries({ queryKey: ["org-invitations", currentOrg?.id] });
       toast({ title: "Convite revogado" });
     },
-    onError: (e: any) => toast({ title: t("orgMembers.revokeFailed"), description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: t("orgMembers.revokeFailed"), description: e.message, variant: "destructive" }),
   });
 
   // The invite URL the owner copies. Always built off the current host so

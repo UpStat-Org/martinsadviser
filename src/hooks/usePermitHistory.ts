@@ -37,8 +37,8 @@ export function useCreatePermitHistory() {
     mutationFn: async (entry: {
       permit_id: string;
       change_type: string;
-      old_values?: Record<string, any> | null;
-      new_values?: Record<string, any> | null;
+      old_values?: Json | null;
+      new_values?: Json | null;
       notes?: string;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();

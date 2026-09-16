@@ -48,7 +48,7 @@ import {
 import { format } from "date-fns";
 import { generateBatchCompliancePdf } from "@/utils/compliancePdf";
 
-function exportToCsv(rows: Record<string, any>[], filename: string) {
+function exportToCsv(rows: Record<string, unknown>[], filename: string) {
   if (!rows.length) return;
   const headers = Object.keys(rows[0]);
   const csvContent = [
@@ -81,7 +81,7 @@ function escapeHtml(str: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function exportToPdf(rows: Record<string, any>[], title: string, filename: string, recordsLabel: string, footerLabel: string) {
+function exportToPdf(rows: Record<string, unknown>[], title: string, filename: string, recordsLabel: string, footerLabel: string) {
   if (!rows.length) return;
   const headers = Object.keys(rows[0]);
   const safeTitle = escapeHtml(title);

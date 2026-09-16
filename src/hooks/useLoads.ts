@@ -7,14 +7,7 @@ import { tNow } from "@/lib/translations";
 // 20260824140000_loads_dispatch.sql e ainda não estão no `Database` gerado —
 // os types só são regerados depois que a migration é aplicada. Mesmo builder
 // solto que useDrivers e useQuotes usam pelo mesmo motivo.
-const db = supabase as unknown as {
-  from: (table: string) => {
-    select: (cols?: string) => any;
-    insert: (row: unknown) => any;
-    update: (patch: unknown) => any;
-    delete: () => any;
-  };
-};
+const db = supabase;
 
 // Ordem do ciclo operacional. A carga NÃO tem estado de cobrança: isso vive em
 // invoices, alcançável por invoice_id. Ver o cabeçalho da migration.

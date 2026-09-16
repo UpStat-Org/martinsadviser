@@ -19,6 +19,7 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOrg } from "@/contexts/OrgContext";
 import { supabase } from "@/integrations/supabase/client";
+import { errorMessage } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,10 +83,10 @@ export default function SettingsPage() {
         setNewPassword("");
       }
       toast({ title: t("settings.profileUpdated") });
-    } catch (e: any) {
+    } catch (e) {
       toast({
         title: t("settings.saveError"),
-        description: e.message,
+        description: errorMessage(e),
         variant: "destructive",
       });
     } finally {
@@ -145,10 +146,10 @@ export default function SettingsPage() {
       const { url, error } = await res.json();
       if (error) throw new Error(error);
       window.location.href = url;
-    } catch (e: any) {
+    } catch (e) {
       toast({
         title: t("settings.connectError"),
-        description: e.message,
+        description: errorMessage(e),
         variant: "destructive",
       });
       setConnecting(false);
@@ -193,10 +194,10 @@ export default function SettingsPage() {
         title: t("settings.syncSuccess"),
         description: `${result.created}/${result.total} eventos criados`,
       });
-    } catch (e: any) {
+    } catch (e) {
       toast({
         title: t("settings.syncError"),
-        description: e.message,
+        description: errorMessage(e),
         variant: "destructive",
       });
     } finally {
