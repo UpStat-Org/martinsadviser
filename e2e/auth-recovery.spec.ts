@@ -16,7 +16,7 @@ test("a sign-in visitor can request a password reset link", async ({ page }) => 
   await page.getByRole("button", { name: "Forgot?" }).click();
   await expect(page.getByRole("heading", { name: "Password recovery" })).toBeVisible();
   await page.getByRole("button", { name: "Send link" }).click();
-  await expect(page.getByText("Check your email")).toBeVisible();
+  await expect(page.getByText("Check your email", { exact: true })).toBeVisible();
 });
 
 test("an expired or missing recovery session is rejected", async ({ page }) => {

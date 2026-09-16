@@ -1,5 +1,10 @@
 project_id = "cdryxyocdlnocvwvrtvn"
 
+[auth.sms]
+# Keep phone signup/sign-in disabled even if a legacy provider credential is
+# still stored in the hosted project.
+enable_signup = false
+
 # Only functions that MUST be reachable without a Supabase JWT belong here.
 # Everything else keeps verify_jwt at its default (true) so the gateway rejects
 # unsigned callers before our code runs.
