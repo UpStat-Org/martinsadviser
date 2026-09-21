@@ -5,10 +5,20 @@ import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { TruckLoadingScreen } from "@/components/TruckLoadingScreen";
 import { PortalSidebar } from "@/components/PortalSidebar";
+import { NotificationCenter } from "@/components/NotificationCenter";
+
+export interface PortalOutletContext {
+  clientId: string;
+  orgId: string;
+  userEmail: string | null;
+  activeSection: string;
+  setActiveSection: (section: string) => void;
+}
 
 export default function PortalLayout() {
   const [loading, setLoading] = useState(true);
   const [clientId, setClientId] = useState<string | null>(null);
+  const [orgId, setOrgId] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState("");
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>("overview");
@@ -22,7 +32,7 @@ export default function PortalLayout() {
 
       const { data: portalLink } = await supabase
         .from("client_portal_users")
-        .select("client_id")
+        .select("client_id, org_id")
         .eq("user_id", user.id)
         .single();
 
@@ -33,6 +43,7 @@ export default function PortalLayout() {
       }
 
       setClientId(portalLink.client_id);
+      setOrgId(portalLink.org_id);
       setUserEmail(user.email ?? null);
 
       const { data: client } = await supabase
@@ -55,7 +66,7 @@ export default function PortalLayout() {
     }
   };
 
-  if (loading) {
+  if (loading || !clientId || !orgId) {
     return <TruckLoadingScreen />;
   }
 
@@ -77,12 +88,13 @@ export default function PortalLayout() {
               </div>
             </div>
             <Badge variant="outline" className="text-[10px] shrink-0">
-              {t("portal.readOnly")}
+              {t("portal2.interactive")}
             </Badge>
+            <NotificationCenter orgId={orgId} portal />
           </div>
         </div>
         <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-screen-2xl mx-auto">
-          <Outlet context={{ clientId, activeSection, setActiveSection }} />
+          <Outlet context={{ clientId, orgId, userEmail, activeSection, setActiveSection } satisfies PortalOutletContext} />
         </div>
       </main>
     </div>

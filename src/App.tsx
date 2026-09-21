@@ -80,6 +80,10 @@ const WorkloadPage = lazy(() => import("./pages/WorkloadPage"));
 const PortalLogin = lazy(() => import("./pages/portal/PortalLogin"));
 const PortalLayout = lazy(() => import("./pages/portal/PortalLayout"));
 const PortalDashboard = lazy(() => import("./pages/portal/PortalDashboard"));
+const PortalOrdersPage = lazy(() => import("./pages/portal/PortalOrdersPage"));
+const PortalOrderDetailPage = lazy(() => import("./pages/portal/PortalOrderDetailPage"));
+const PortalQuotesPage = lazy(() => import("./pages/portal/PortalQuotesPage"));
+const PortalInvoicesPage = lazy(() => import("./pages/portal/PortalInvoicesPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 
 const queryClient = new QueryClient();
@@ -123,6 +127,10 @@ const App = () => (
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route path="/portal" element={<PortalLayout />}>
               <Route index element={<PortalDashboard />} />
+              <Route path="orders" element={<PortalOrdersPage />} />
+              <Route path="orders/:id" element={<PortalOrderDetailPage />} />
+              <Route path="quotes" element={<PortalQuotesPage />} />
+              <Route path="invoices" element={<PortalInvoicesPage />} />
             </Route>
             <Route path="/rejected" element={<RejectedPage />} />
             <Route

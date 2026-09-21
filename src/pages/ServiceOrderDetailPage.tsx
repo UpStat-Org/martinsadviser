@@ -10,22 +10,27 @@ import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/StatusBadge";
 import { DocumentLink } from "@/components/DocumentLink";
 import { TaskTimeLogger } from "@/components/TaskTimeLogger";
+import { SignatureViewer } from "@/components/SignatureViewer";
 import { ServiceOrderFormDialog } from "@/components/ServiceOrderFormDialog";
 import {
   useAddChecklistItem,
   useAddServiceOrderNote,
   useCreateServiceOrder,
+  useCreateServiceOrderQuestion,
+  useDeleteServiceOrderQuestion,
   useDeleteChecklistItem,
   useLinkServiceOrderPermit,
   useServiceOrder,
   useServiceOrderChecklist,
   useServiceOrderEvents,
   useServiceOrderPermits,
+  useServiceOrderQuestions,
   useServiceOrderTime,
   useUnlinkServiceOrderPermit,
   useUpdateChecklistItem,
   useUpdateServiceOrder,
   useUploadChecklistDocument,
+  useResolveServiceOrderQuestion,
 } from "@/hooks/useServiceOrders";
 import { usePermits } from "@/hooks/usePermits";
 import { useCreateTask, useTasks, useUpdateTask } from "@/hooks/useTasks";
@@ -56,11 +61,15 @@ export default function ServiceOrderDetailPage() {
   const { data: checklist } = useServiceOrderChecklist(id);
   const { data: linkedPermits } = useServiceOrderPermits(id);
   const { data: events } = useServiceOrderEvents(id);
+  const { data: questions } = useServiceOrderQuestions(id);
   const { data: time } = useServiceOrderTime(id);
   const { data: tasks } = useTasks(id);
   const { data: clientPermits } = usePermits(undefined, order?.client_id);
   const updateOrder = useUpdateServiceOrder();
   const createOrder = useCreateServiceOrder();
+  const createQuestion = useCreateServiceOrderQuestion();
+  const resolveQuestion = useResolveServiceOrderQuestion();
+  const deleteQuestion = useDeleteServiceOrderQuestion();
   const addChecklist = useAddChecklistItem();
   const updateChecklist = useUpdateChecklistItem();
   const deleteChecklist = useDeleteChecklistItem();
@@ -75,6 +84,8 @@ export default function ServiceOrderDetailPage() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [selectedPermit, setSelectedPermit] = useState("");
   const [note, setNote] = useState("");
+  const [question, setQuestion] = useState("");
+  const [questionDueDate, setQuestionDueDate] = useState("");
   const isViewer = role === "viewer";
 
   const progress = checklistProgress(checklist ?? []);
@@ -103,6 +114,12 @@ export default function ServiceOrderDetailPage() {
   const submitNote = () => {
     if (!note.trim()) return;
     addNote.mutate({ orderId: order.id, note: note.trim() }, { onSuccess: () => setNote("") });
+  };
+  const submitQuestion = () => {
+    if (!question.trim()) return;
+    createQuestion.mutate({ service_order_id: order.id, question: question.trim(), due_date: questionDueDate || null }, {
+      onSuccess: () => { setQuestion(""); setQuestionDueDate(""); },
+    });
   };
   const createRenewal = () => {
     createOrder.mutate({
@@ -190,6 +207,21 @@ export default function ServiceOrderDetailPage() {
               {!isViewer && <div className="flex gap-2 pt-2"><Input value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addTask()} placeholder={t("serviceOrders.newTask")} /><Button onClick={addTask} disabled={!newTaskTitle.trim() || createTask.isPending}><Plus /></Button></div>}
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">{t("serviceOrders.clientRequests")}</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              {!questions?.length && <p className="text-sm text-muted-foreground text-center py-3">{t("serviceOrders.noClientRequests")}</p>}
+              {questions?.map((item) => <div key={item.id} className="rounded-md border p-3 space-y-2">
+                <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-medium">{item.question}</p>{item.due_date && <p className="text-xs text-muted-foreground mt-1">{t("serviceOrders.responseDue")}: {dateNumeric(new Date(`${item.due_date}T12:00:00`))}</p>}</div><StatusBadge tone={item.status === "resolved" ? "success" : item.status === "answered" ? "info" : "warning"}>{t(`portal2.questionStatus.${item.status}`)}</StatusBadge></div>
+                {item.answer && <div className="rounded-md bg-muted p-3"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">{t("serviceOrders.clientAnswer")}</p><p className="text-sm mt-1 whitespace-pre-wrap">{item.answer}</p></div>}
+                {!isViewer && <div className="flex justify-end gap-1">{item.status === "answered" && <Button size="sm" variant="outline" onClick={() => resolveQuestion.mutate({ id: item.id, orderId: order.id })}>{t("serviceOrders.resolveRequest")}</Button>}<Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => deleteQuestion.mutate({ id: item.id, orderId: order.id })}><Trash2 className="text-destructive" /></Button></div>}
+              </div>)}
+              {!isViewer && <div className="space-y-2 border-t pt-3"><Textarea rows={2} value={question} onChange={(event) => setQuestion(event.target.value)} placeholder={t("serviceOrders.questionPlaceholder")} /><div className="flex gap-2"><Input type="date" value={questionDueDate} onChange={(event) => setQuestionDueDate(event.target.value)} /><Button onClick={submitQuestion} disabled={!question.trim() || createQuestion.isPending}><Send />{t("serviceOrders.sendRequest")}</Button></div></div>}
+            </CardContent>
+          </Card>
+
+          <Card><CardHeader><CardTitle className="text-base">{t("serviceOrders.signatures")}</CardTitle></CardHeader><CardContent><SignatureViewer clientId={order.client_id} orderId={order.id} /></CardContent></Card>
         </div>
 
         <div className="space-y-6">

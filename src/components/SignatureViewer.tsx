@@ -9,19 +9,22 @@ import { PenLine } from "lucide-react";
 
 interface SignatureViewerProps {
   clientId: string;
+  orderId?: string;
 }
 
-export function SignatureViewer({ clientId }: SignatureViewerProps) {
+export function SignatureViewer({ clientId, orderId }: SignatureViewerProps) {
   const { t } = useLanguage();
 
   const { data: signatures, isLoading } = useQuery({
-    queryKey: ["signatures", clientId],
+    queryKey: ["signatures", clientId, orderId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("document_signatures")
         .select("*")
         .eq("client_id", clientId)
         .order("signed_at", { ascending: false });
+      if (orderId) query = query.eq("service_order_id", orderId);
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },

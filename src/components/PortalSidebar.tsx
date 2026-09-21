@@ -1,9 +1,9 @@
 import { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Building2, LayoutDashboard, FileCheck, Truck as TruckIcon, LogOut,
   ChevronsLeft, ChevronsRight, Menu, X, Sun, Moon, MoreHorizontal,
-  FolderOpen, Map as MapIcon,
+  FolderOpen, Map as MapIcon, BriefcaseBusiness, FileText, Receipt,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 
-type NavItem = { hash: string; icon: LucideIcon; label: string };
+type NavItem = { key: string; icon: LucideIcon; label: string; to?: string; hash?: string };
 
 interface PortalSidebarProps {
   companyName: string;
@@ -36,6 +36,7 @@ export function PortalSidebar({
   const [collapsed, setCollapsed] = useLocalStorageState("portal-sidebar-collapsed", false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
   const { theme, setTheme } = useTheme();
@@ -46,16 +47,24 @@ export function PortalSidebar({
     {
       label: t("sidebar.section.overview"),
       items: [
-        { hash: "overview", icon: LayoutDashboard, label: t("portal.overview") },
-        { hash: "coverage", icon: MapIcon, label: t("portal.coverage") },
+        { key: "overview", to: "/portal", icon: LayoutDashboard, label: t("portal.overview") },
+        { key: "coverage", hash: "coverage", icon: MapIcon, label: t("portal.coverage") },
       ],
     },
     {
       label: t("sidebar.section.operation"),
       items: [
-        { hash: "permits", icon: FileCheck, label: t("portal.yourPermits") },
-        { hash: "trucks", icon: TruckIcon, label: t("portal.yourTrucks") },
-        { hash: "documents", icon: FolderOpen, label: t("portal.yourDocuments") },
+        { key: "orders", to: "/portal/orders", icon: BriefcaseBusiness, label: t("portal2.orders") },
+        { key: "permits", hash: "permits", icon: FileCheck, label: t("portal.yourPermits") },
+        { key: "trucks", hash: "trucks", icon: TruckIcon, label: t("portal.yourTrucks") },
+        { key: "documents", hash: "documents", icon: FolderOpen, label: t("portal.yourDocuments") },
+      ],
+    },
+    {
+      label: t("sidebar.section.sales"),
+      items: [
+        { key: "quotes", to: "/portal/quotes", icon: FileText, label: t("portal2.quotes") },
+        { key: "invoices", to: "/portal/invoices", icon: Receipt, label: t("portal2.invoices") },
       ],
     },
   ], [t]);
@@ -71,7 +80,9 @@ export function PortalSidebar({
     .split(/\s+/).filter(Boolean).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("") || "C";
 
   const renderNavItem = (item: NavItem) => {
-    const active = activeSection === item.hash;
+    const active = item.to
+      ? (item.to === "/portal" ? location.pathname === "/portal" && activeSection === "overview" : location.pathname.startsWith(item.to))
+      : location.pathname === "/portal" && activeSection === item.hash;
     const className = cn(
       "group relative flex items-center gap-2.5 h-8 rounded-md text-[13px] transition-colors w-full text-left",
       collapsed && !isMobile ? "justify-center px-0 mx-1" : "px-2.5",
@@ -81,9 +92,16 @@ export function PortalSidebar({
     );
     return (
       <button
-        key={item.hash}
+        key={item.key}
         type="button"
-        onClick={() => onSectionChange(item.hash)}
+        onClick={() => {
+          if (item.to) {
+            navigate(item.to);
+          } else if (item.hash) {
+            if (location.pathname !== "/portal") navigate(`/portal#${item.hash}`);
+            window.setTimeout(() => onSectionChange(item.hash!), location.pathname === "/portal" ? 0 : 100);
+          }
+        }}
         title={collapsed && !isMobile ? item.label : undefined}
         className={className}
       >
@@ -185,11 +203,11 @@ export function PortalSidebar({
         </DropdownMenu>
       </div>
 
-      {/* Read-only badge */}
+      {/* Portal access badge */}
       {showLabel && (
         <div className="px-3 pt-3 pb-1 shrink-0">
           <Badge variant="outline" className="text-[10px] font-normal w-full justify-center py-1">
-            {t("portal.readOnly")}
+            {t("portal2.interactive")}
           </Badge>
         </div>
       )}

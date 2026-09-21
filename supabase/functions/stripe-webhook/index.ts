@@ -77,6 +77,29 @@ async function applySubscription(
   if (error) console.error("Failed to apply subscription update:", error.message);
 }
 
+async function applyClientInvoicePayment(
+  admin: SupabaseClient<Database>,
+  session: Stripe.Checkout.Session,
+) {
+  if (session.metadata?.kind !== "client_invoice" || session.payment_status !== "paid") return false;
+  const invoiceId = session.metadata.invoice_id;
+  const orgId = session.metadata.org_id;
+  const clientId = session.metadata.client_id;
+  if (!invoiceId || !orgId || !clientId) throw new Error("Client invoice checkout has incomplete metadata");
+  const paymentIntent = typeof session.payment_intent === "string"
+    ? session.payment_intent
+    : session.payment_intent?.id ?? null;
+  const { error } = await admin.from("invoices").update({
+    status: "paid",
+    paid_date: new Date().toISOString().slice(0, 10),
+    paid_via: "stripe",
+    stripe_checkout_session_id: session.id,
+    stripe_payment_intent_id: paymentIntent,
+  }).eq("id", invoiceId).eq("org_id", orgId).eq("client_id", clientId);
+  if (error) throw new Error(`Failed to mark client invoice paid: ${error.message}`);
+  return true;
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
@@ -114,6 +137,7 @@ Deno.serve(async (req) => {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
+        if (await applyClientInvoicePayment(admin, session)) break;
         // We populate organizations from the subscription update event that
         // follows — but if the user closes the tab before Stripe sends that,
         // hydrate now using whatever the session carries.
@@ -121,6 +145,10 @@ Deno.serve(async (req) => {
           const sub = await stripe.subscriptions.retrieve(session.subscription as string);
           await applySubscription(admin, sub);
         }
+        break;
+      }
+      case "checkout.session.async_payment_succeeded": {
+        await applyClientInvoicePayment(admin, event.data.object as Stripe.Checkout.Session);
         break;
       }
       case "customer.subscription.created":

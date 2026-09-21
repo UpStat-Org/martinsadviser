@@ -15,10 +15,10 @@ export interface Notification {
   created_at: string;
 }
 
-export function useNotifications() {
+export function useNotifications(explicitOrgId?: string) {
   const queryClient = useQueryClient();
   const { currentOrg } = useOrg();
-  const orgId = currentOrg?.id;
+  const orgId = explicitOrgId ?? currentOrg?.id;
 
   const query = useQuery({
     queryKey: ["notifications", orgId],

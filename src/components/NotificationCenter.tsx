@@ -8,63 +8,84 @@ import {
   useMarkAllNotificationsRead,
 } from "@/hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { enUS, es, ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 const typeConfig: Record<
   string,
-  { icon: typeof Bell; gradient: string; label: string; ring: string }
+  { icon: typeof Bell; gradient: string; labelKey: string; ring: string }
 > = {
   permit_expiring: {
     icon: FileWarning,
     gradient: "from-amber-500 to-orange-500",
     ring: "ring-amber-500/20",
-    label: "Permit",
+    labelKey: "notifications.category.permit",
   },
   permit_expired: {
     icon: FileWarning,
     gradient: "from-red-500 to-rose-500",
     ring: "ring-red-500/20",
-    label: "Permit",
+    labelKey: "notifications.category.permit",
   },
   invoice_overdue: {
     icon: Receipt,
     gradient: "from-red-500 to-pink-500",
     ring: "ring-red-500/20",
-    label: "Fatura",
+    labelKey: "notifications.category.invoice",
   },
   task_stale: {
     icon: ListTodo,
     gradient: "from-orange-500 to-amber-500",
     ring: "ring-orange-500/20",
-    label: "Tarefa",
+    labelKey: "notifications.category.task",
   },
   service_order_overdue: {
     icon: BriefcaseBusiness,
     gradient: "from-red-500 to-orange-500",
     ring: "ring-red-500/20",
-    label: "Ordem de serviço",
+    labelKey: "notifications.category.serviceOrder",
   },
   fmcsa_change: {
     icon: ShieldAlert,
     gradient: "from-violet-500 to-fuchsia-500",
     ring: "ring-violet-500/20",
-    label: "FMCSA",
+    labelKey: "notifications.category.fmcsa",
   },
   mcs150_due: {
     icon: CalendarClock,
     gradient: "from-indigo-500 to-violet-500",
     ring: "ring-indigo-500/20",
-    label: "MCS-150",
+    labelKey: "notifications.category.mcs150",
+  },
+  portal_request: {
+    icon: CalendarClock,
+    gradient: "from-amber-500 to-orange-500",
+    ring: "ring-amber-500/20",
+    labelKey: "notifications.category.request",
+  },
+  portal_answer: {
+    icon: BriefcaseBusiness,
+    gradient: "from-emerald-500 to-teal-500",
+    ring: "ring-emerald-500/20",
+    labelKey: "notifications.category.portal",
+  },
+  quote_response: {
+    icon: Receipt,
+    gradient: "from-blue-500 to-indigo-500",
+    ring: "ring-blue-500/20",
+    labelKey: "notifications.category.quote",
   },
 };
 
-export function NotificationCenter() {
-  const { data: notifications, unreadCount, isLoading } = useNotifications();
+export function NotificationCenter({ orgId, portal = false }: { orgId?: string; portal?: boolean } = {}) {
+  const { data: notifications, unreadCount, isLoading } = useNotifications(orgId);
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const navigate = useNavigate();
+  const dateLocale = language === "pt" ? ptBR : language === "es" ? es : enUS;
 
   return (
     <Popover>
@@ -157,7 +178,7 @@ export function NotificationCenter() {
                     icon: Bell,
                     gradient: "from-slate-500 to-zinc-500",
                     ring: "ring-slate-500/20",
-                    label: "Info",
+                    labelKey: "notifications.category.info",
                   };
                 const Icon = config.icon;
                 return (
@@ -167,7 +188,10 @@ export function NotificationCenter() {
                       "group w-full flex items-start gap-3 px-3 py-3 rounded-md text-left transition-all relative",
                       !n.read ? "bg-primary/[0.04] hover:bg-primary/[0.08]" : "hover:bg-muted/60"
                     )}
-                    onClick={() => !n.read && markRead.mutate(n.id)}
+                    onClick={() => {
+                      if (!n.read) markRead.mutate(n.id);
+                      if (portal && n.type === "portal_request" && n.entity_id) navigate(`/portal/orders/${n.entity_id}`);
+                    }}
                   >
                     {!n.read && (
                       <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full bg-secondary text-secondary-foreground border border-border" />
@@ -199,12 +223,12 @@ export function NotificationCenter() {
                       )}
                       <div className="mt-1.5 flex items-center gap-2">
                         <span className="inline-flex items-center h-4 px-1.5 rounded text-[9px] font-bold uppercase tracking-wider bg-muted text-muted-foreground">
-                          {config.label}
+                          {t(config.labelKey)}
                         </span>
                         <span className="text-[11px] text-muted-foreground/80">
                           {formatDistanceToNow(new Date(n.created_at), {
                             addSuffix: true,
-                            locale: ptBR,
+                            locale: dateLocale,
                           })}
                         </span>
                       </div>

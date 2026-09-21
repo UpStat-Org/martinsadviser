@@ -11,6 +11,7 @@ import type { ChecklistStatus } from "@/lib/serviceOrders";
 export type ServiceOrder = Tables<"service_orders">;
 export type ServiceOrderChecklistItem = Tables<"service_order_checklist_items">;
 export type ServiceOrderEvent = Tables<"service_order_events">;
+export type ServiceOrderQuestion = Tables<"service_order_questions">;
 
 export type ServiceOrderListItem = ServiceOrder & {
   clients: { id: string; company_name: string; country: string | null } | null;
@@ -128,6 +129,67 @@ export function useServiceOrderEvents(orderId: string | undefined) {
       if (error) throw error;
       return data;
     },
+  });
+}
+
+export function useServiceOrderQuestions(orderId: string | undefined) {
+  return useQuery({
+    queryKey: ["service-orders", orderId, "questions"],
+    enabled: !!orderId,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("service_order_questions").select("*")
+        .eq("service_order_id", orderId!).order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useCreateServiceOrderQuestion() {
+  const queryClient = useQueryClient();
+  const { currentOrg } = useOrg();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: async (input: { service_order_id: string; question: string; due_date?: string | null }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !currentOrg) throw new Error(tNow("toast.authRequired"));
+      const { data, error } = await supabase.from("service_order_questions").insert({
+        ...input, org_id: currentOrg.id, asked_by: user.id,
+      }).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["service-orders", data.service_order_id, "questions"] });
+      toast({ title: tNow("serviceOrders.questionSent") });
+    },
+    onError: (error: Error) => toast({ title: tNow("common.error"), description: error.message, variant: "destructive" }),
+  });
+}
+
+export function useResolveServiceOrderQuestion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, orderId }: { id: string; orderId: string }) => {
+      const { error } = await supabase.from("service_order_questions").update({
+        status: "resolved", resolved_at: new Date().toISOString(),
+      }).eq("id", id);
+      if (error) throw error;
+      return orderId;
+    },
+    onSuccess: (orderId) => queryClient.invalidateQueries({ queryKey: ["service-orders", orderId, "questions"] }),
+  });
+}
+
+export function useDeleteServiceOrderQuestion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, orderId }: { id: string; orderId: string }) => {
+      const { error } = await supabase.from("service_order_questions").delete().eq("id", id);
+      if (error) throw error;
+      return orderId;
+    },
+    onSuccess: (orderId) => queryClient.invalidateQueries({ queryKey: ["service-orders", orderId, "questions"] }),
   });
 }
 

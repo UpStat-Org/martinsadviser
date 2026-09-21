@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -25,14 +25,11 @@ import { cn } from "@/lib/utils";
 
 const dateLocales = { pt, en: enUS, es };
 
-interface PortalOutletContext {
-  clientId: string;
-  activeSection: string;
-  setActiveSection: (section: string) => void;
-}
+import type { PortalOutletContext } from "./PortalLayout";
 
 export default function PortalDashboard() {
   const { clientId, setActiveSection } = useOutletContext<PortalOutletContext>();
+  const location = useLocation();
   const { data: client, isLoading: clientLoading } = useClient(clientId);
   const { data: permits, isLoading: permitsLoading } = usePermits(undefined, clientId);
   const { data: trucks, isLoading: trucksLoading } = useTrucks(undefined, clientId);
@@ -120,6 +117,15 @@ export default function PortalDashboard() {
     });
     return () => observer.disconnect();
   }, [isLoading, setActiveSection]);
+
+  useEffect(() => {
+    if (isLoading || !location.hash) return;
+    const section = location.hash.slice(1);
+    window.setTimeout(() => {
+      document.getElementById(`portal-section-${section}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setActiveSection(section);
+    }, 50);
+  }, [isLoading, location.hash, setActiveSection]);
 
   if (isLoading) {
     return (

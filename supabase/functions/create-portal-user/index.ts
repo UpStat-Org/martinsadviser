@@ -74,7 +74,7 @@ function renderEmailHtml(opts: {
         <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:${primaryColor};font-weight:700;margin-bottom:8px">Client Portal</div>
         <h1 style="margin:0;font-size:24px;line-height:1.25;color:#0b0d2e">Your portal access is ready</h1>
         <p style="margin:14px 0 0;font-size:15px;line-height:1.55;color:#4a4e6a">
-          <strong>${safeOrg}</strong> has given you portal access to view your permits, trucks, and documents in real time.
+          <strong>${safeOrg}</strong> has given you portal access to track services, send documents, review quotes, and manage invoices in real time.
         </p>
         <p style="margin:14px 0 0;font-size:15px;line-height:1.55;color:#4a4e6a">
           Access linked to the email <strong>${safeEmail}</strong>.
