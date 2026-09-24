@@ -163,47 +163,6 @@ export type Database = {
           },
         ]
       }
-      ai_briefings: {
-        Row: {
-          briefing_date: string
-          created_at: string
-          id: string
-          org_id: string
-          payload: Json
-          signals_hash: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          briefing_date?: string
-          created_at?: string
-          id?: string
-          org_id: string
-          payload: Json
-          signals_hash: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          briefing_date?: string
-          created_at?: string
-          id?: string
-          org_id?: string
-          payload?: Json
-          signals_hash?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ai_briefings_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       ai_chat_messages: {
         Row: {
           client_id: string
@@ -216,11 +175,11 @@ export type Database = {
         }
         Insert: {
           client_id: string
-          content: string
+          content?: string
           created_at?: string
           id?: string
           org_id?: string
-          role: string
+          role?: string
           user_id?: string | null
         }
         Update: {
@@ -355,199 +314,6 @@ export type Database = {
           },
         ]
       }
-      br_compliance_items: {
-        Row: {
-          client_id: string | null
-          created_at: string
-          document_number: string | null
-          document_url: string | null
-          driver_id: string | null
-          expires_on: string | null
-          id: string
-          issued_on: string | null
-          kind: string
-          metadata: Json
-          notes: string | null
-          org_id: string
-          scope: string
-          truck_id: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          client_id?: string | null
-          created_at?: string
-          document_number?: string | null
-          document_url?: string | null
-          driver_id?: string | null
-          expires_on?: string | null
-          id?: string
-          issued_on?: string | null
-          kind: string
-          metadata?: Json
-          notes?: string | null
-          org_id?: string
-          scope: string
-          truck_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Update: {
-          client_id?: string | null
-          created_at?: string
-          document_number?: string | null
-          document_url?: string | null
-          driver_id?: string | null
-          expires_on?: string | null
-          id?: string
-          issued_on?: string | null
-          kind?: string
-          metadata?: Json
-          notes?: string | null
-          org_id?: string
-          scope?: string
-          truck_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "br_compliance_items_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "br_compliance_items_driver_id_fkey"
-            columns: ["driver_id"]
-            isOneToOne: false
-            referencedRelation: "drivers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "br_compliance_items_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "br_compliance_items_truck_id_fkey"
-            columns: ["truck_id"]
-            isOneToOne: false
-            referencedRelation: "trucks"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      br_fines: {
-        Row: {
-          amount: number
-          authority: string | null
-          client_id: string | null
-          created_at: string
-          defense_due_on: string | null
-          description: string | null
-          document_url: string | null
-          driver_id: string | null
-          id: string
-          infraction_code: string | null
-          metadata: Json
-          notes: string | null
-          notice_number: string | null
-          notified_on: string | null
-          occurred_at: string | null
-          org_id: string
-          payment_due_on: string | null
-          points: number
-          severity: string
-          status: string
-          truck_id: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          amount?: number
-          authority?: string | null
-          client_id?: string | null
-          created_at?: string
-          defense_due_on?: string | null
-          description?: string | null
-          document_url?: string | null
-          driver_id?: string | null
-          id?: string
-          infraction_code?: string | null
-          metadata?: Json
-          notes?: string | null
-          notice_number?: string | null
-          notified_on?: string | null
-          occurred_at?: string | null
-          org_id?: string
-          payment_due_on?: string | null
-          points?: number
-          severity?: string
-          status?: string
-          truck_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Update: {
-          amount?: number
-          authority?: string | null
-          client_id?: string | null
-          created_at?: string
-          defense_due_on?: string | null
-          description?: string | null
-          document_url?: string | null
-          driver_id?: string | null
-          id?: string
-          infraction_code?: string | null
-          metadata?: Json
-          notes?: string | null
-          notice_number?: string | null
-          notified_on?: string | null
-          occurred_at?: string | null
-          org_id?: string
-          payment_due_on?: string | null
-          points?: number
-          severity?: string
-          status?: string
-          truck_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "br_fines_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "br_fines_driver_id_fkey"
-            columns: ["driver_id"]
-            isOneToOne: false
-            referencedRelation: "drivers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "br_fines_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "br_fines_truck_id_fkey"
-            columns: ["truck_id"]
-            isOneToOne: false
-            referencedRelation: "trucks"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       client_internal_notes: {
         Row: {
           body: string
@@ -561,7 +327,7 @@ export type Database = {
           user_name: string
         }
         Insert: {
-          body: string
+          body?: string
           client_id: string
           created_at?: string
           id?: string
@@ -569,7 +335,7 @@ export type Database = {
           pinned?: boolean
           updated_at?: string
           user_id: string
-          user_name: string
+          user_name?: string
         }
         Update: {
           body?: string
@@ -650,7 +416,6 @@ export type Database = {
       clients: {
         Row: {
           address: string | null
-          cnpj: string | null
           company_name: string
           country: string
           created_at: string
@@ -658,7 +423,6 @@ export type Database = {
           ein: string | null
           email: string | null
           id: string
-          inscricao_estadual: string | null
           mc: string | null
           mcs_150_last_filed_at: string | null
           new_entrant_start_at: string | null
@@ -680,7 +444,6 @@ export type Database = {
         }
         Insert: {
           address?: string | null
-          cnpj?: string | null
           company_name: string
           country?: string
           created_at?: string
@@ -688,7 +451,6 @@ export type Database = {
           ein?: string | null
           email?: string | null
           id?: string
-          inscricao_estadual?: string | null
           mc?: string | null
           mcs_150_last_filed_at?: string | null
           new_entrant_start_at?: string | null
@@ -710,7 +472,6 @@ export type Database = {
         }
         Update: {
           address?: string | null
-          cnpj?: string | null
           company_name?: string
           country?: string
           created_at?: string
@@ -718,7 +479,6 @@ export type Database = {
           ein?: string | null
           email?: string | null
           id?: string
-          inscricao_estadual?: string | null
           mc?: string | null
           mcs_150_last_filed_at?: string | null
           new_entrant_start_at?: string | null
@@ -1026,7 +786,6 @@ export type Database = {
       }
       document_signatures: {
         Row: {
-          checklist_item_id: string | null
           client_id: string
           created_at: string
           document_name: string
@@ -1034,7 +793,6 @@ export type Database = {
           ip_address: string | null
           org_id: string
           permit_id: string | null
-          service_order_id: string | null
           signature_data: string
           signed_at: string
           signer_email: string | null
@@ -1042,7 +800,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          checklist_item_id?: string | null
           client_id: string
           created_at?: string
           document_name: string
@@ -1050,7 +807,6 @@ export type Database = {
           ip_address?: string | null
           org_id?: string
           permit_id?: string | null
-          service_order_id?: string | null
           signature_data: string
           signed_at?: string
           signer_email?: string | null
@@ -1058,7 +814,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          checklist_item_id?: string | null
           client_id?: string
           created_at?: string
           document_name?: string
@@ -1066,7 +821,6 @@ export type Database = {
           ip_address?: string | null
           org_id?: string
           permit_id?: string | null
-          service_order_id?: string | null
           signature_data?: string
           signed_at?: string
           signer_email?: string | null
@@ -1074,13 +828,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "document_signatures_checklist_item_id_fkey"
-            columns: ["checklist_item_id"]
-            isOneToOne: false
-            referencedRelation: "service_order_checklist_items"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "document_signatures_client_id_fkey"
             columns: ["client_id"]
@@ -1100,13 +847,6 @@ export type Database = {
             columns: ["permit_id"]
             isOneToOne: false
             referencedRelation: "permits"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "document_signatures_service_order_id_fkey"
-            columns: ["service_order_id"]
-            isOneToOne: false
-            referencedRelation: "service_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -2180,10 +1920,7 @@ export type Database = {
           id: string
           org_id: string
           paid_date: string | null
-          paid_via: string | null
           status: string
-          stripe_checkout_session_id: string | null
-          stripe_payment_intent_id: string | null
           updated_at: string
           user_id: string
         }
@@ -2196,10 +1933,7 @@ export type Database = {
           id?: string
           org_id?: string
           paid_date?: string | null
-          paid_via?: string | null
           status?: string
-          stripe_checkout_session_id?: string | null
-          stripe_payment_intent_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -2212,10 +1946,7 @@ export type Database = {
           id?: string
           org_id?: string
           paid_date?: string | null
-          paid_via?: string | null
           status?: string
-          stripe_checkout_session_id?: string | null
-          stripe_payment_intent_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -2427,264 +2158,6 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      load_documents: {
-        Row: {
-          created_at: string
-          document_url: string
-          file_name: string | null
-          id: string
-          kind: string
-          load_id: string
-          notes: string | null
-          org_id: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          document_url: string
-          file_name?: string | null
-          id?: string
-          kind?: string
-          load_id: string
-          notes?: string | null
-          org_id?: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          document_url?: string
-          file_name?: string | null
-          id?: string
-          kind?: string
-          load_id?: string
-          notes?: string | null
-          org_id?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "load_documents_load_id_fkey"
-            columns: ["load_id"]
-            isOneToOne: false
-            referencedRelation: "loads"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "load_documents_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      load_stops: {
-        Row: {
-          address: string | null
-          arrived_at: string | null
-          city: string | null
-          company_name: string | null
-          contact_name: string | null
-          contact_phone: string | null
-          country: string | null
-          created_at: string
-          departed_at: string | null
-          id: string
-          kind: string
-          load_id: string
-          notes: string | null
-          org_id: string
-          position: number
-          postal_code: string | null
-          reference: string | null
-          region: string | null
-          updated_at: string
-          window_end: string | null
-          window_start: string | null
-        }
-        Insert: {
-          address?: string | null
-          arrived_at?: string | null
-          city?: string | null
-          company_name?: string | null
-          contact_name?: string | null
-          contact_phone?: string | null
-          country?: string | null
-          created_at?: string
-          departed_at?: string | null
-          id?: string
-          kind?: string
-          load_id: string
-          notes?: string | null
-          org_id?: string
-          position?: number
-          postal_code?: string | null
-          reference?: string | null
-          region?: string | null
-          updated_at?: string
-          window_end?: string | null
-          window_start?: string | null
-        }
-        Update: {
-          address?: string | null
-          arrived_at?: string | null
-          city?: string | null
-          company_name?: string | null
-          contact_name?: string | null
-          contact_phone?: string | null
-          country?: string | null
-          created_at?: string
-          departed_at?: string | null
-          id?: string
-          kind?: string
-          load_id?: string
-          notes?: string | null
-          org_id?: string
-          position?: number
-          postal_code?: string | null
-          reference?: string | null
-          region?: string | null
-          updated_at?: string
-          window_end?: string | null
-          window_start?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "load_stops_load_id_fkey"
-            columns: ["load_id"]
-            isOneToOne: false
-            referencedRelation: "loads"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "load_stops_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      loads: {
-        Row: {
-          client_id: string
-          commodity: string | null
-          created_at: string
-          delivery_at: string | null
-          destination_city: string | null
-          destination_region: string | null
-          distance: number | null
-          distance_unit: string
-          driver_id: string | null
-          id: string
-          invoice_id: string | null
-          metadata: Json
-          notes: string | null
-          org_id: string
-          origin_city: string | null
-          origin_region: string | null
-          pickup_at: string | null
-          rate: number
-          reference: string | null
-          status: string
-          truck_id: string | null
-          updated_at: string
-          user_id: string
-          weight: number | null
-          weight_unit: string
-        }
-        Insert: {
-          client_id: string
-          commodity?: string | null
-          created_at?: string
-          delivery_at?: string | null
-          destination_city?: string | null
-          destination_region?: string | null
-          distance?: number | null
-          distance_unit?: string
-          driver_id?: string | null
-          id?: string
-          invoice_id?: string | null
-          metadata?: Json
-          notes?: string | null
-          org_id?: string
-          origin_city?: string | null
-          origin_region?: string | null
-          pickup_at?: string | null
-          rate?: number
-          reference?: string | null
-          status?: string
-          truck_id?: string | null
-          updated_at?: string
-          user_id?: string
-          weight?: number | null
-          weight_unit?: string
-        }
-        Update: {
-          client_id?: string
-          commodity?: string | null
-          created_at?: string
-          delivery_at?: string | null
-          destination_city?: string | null
-          destination_region?: string | null
-          distance?: number | null
-          distance_unit?: string
-          driver_id?: string | null
-          id?: string
-          invoice_id?: string | null
-          metadata?: Json
-          notes?: string | null
-          org_id?: string
-          origin_city?: string | null
-          origin_region?: string | null
-          pickup_at?: string | null
-          rate?: number
-          reference?: string | null
-          status?: string
-          truck_id?: string | null
-          updated_at?: string
-          user_id?: string
-          weight?: number | null
-          weight_unit?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "loads_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "loads_driver_id_fkey"
-            columns: ["driver_id"]
-            isOneToOne: false
-            referencedRelation: "drivers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "loads_invoice_id_fkey"
-            columns: ["invoice_id"]
-            isOneToOne: false
-            referencedRelation: "invoices"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "loads_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "loads_truck_id_fkey"
-            columns: ["truck_id"]
-            isOneToOne: false
-            referencedRelation: "trucks"
             referencedColumns: ["id"]
           },
         ]
@@ -2966,14 +2439,11 @@ export type Database = {
       organizations: {
         Row: {
           branding: Json
-          country: string
           created_at: string
-          currency: string
           default_hourly_rate: number
           feature_flags: Json
           id: string
           is_master_org: boolean
-          locale: string
           name: string
           slug: string
           stripe_customer_id: string | null
@@ -2984,14 +2454,11 @@ export type Database = {
         }
         Insert: {
           branding?: Json
-          country?: string
           created_at?: string
-          currency?: string
           default_hourly_rate?: number
           feature_flags?: Json
           id?: string
           is_master_org?: boolean
-          locale?: string
           name: string
           slug: string
           stripe_customer_id?: string | null
@@ -3002,14 +2469,11 @@ export type Database = {
         }
         Update: {
           branding?: Json
-          country?: string
           created_at?: string
-          currency?: string
           default_hourly_rate?: number
           feature_flags?: Json
           id?: string
           is_master_org?: boolean
-          locale?: string
           name?: string
           slug?: string
           stripe_customer_id?: string | null
@@ -3022,11 +2486,11 @@ export type Database = {
       }
       permit_documents: {
         Row: {
-          created_at: string | null
+          created_at: string
           document_url: string
           file_name: string | null
           id: string
-          is_current: boolean | null
+          is_current: boolean
           notes: string | null
           org_id: string
           permit_id: string
@@ -3034,11 +2498,11 @@ export type Database = {
           version: number
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           document_url: string
           file_name?: string | null
           id?: string
-          is_current?: boolean | null
+          is_current?: boolean
           notes?: string | null
           org_id?: string
           permit_id: string
@@ -3046,11 +2510,11 @@ export type Database = {
           version?: number
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           document_url?: string
           file_name?: string | null
           id?: string
-          is_current?: boolean | null
+          is_current?: boolean
           notes?: string | null
           org_id?: string
           permit_id?: string
@@ -3307,9 +2771,6 @@ export type Database = {
         Row: {
           accepted_at: string | null
           client_id: string | null
-          client_responded_at: string | null
-          client_responded_by: string | null
-          client_response_note: string | null
           converted_at: string | null
           created_at: string
           discount: number
@@ -3330,9 +2791,6 @@ export type Database = {
         Insert: {
           accepted_at?: string | null
           client_id?: string | null
-          client_responded_at?: string | null
-          client_responded_by?: string | null
-          client_response_note?: string | null
           converted_at?: string | null
           created_at?: string
           discount?: number
@@ -3353,9 +2811,6 @@ export type Database = {
         Update: {
           accepted_at?: string | null
           client_id?: string | null
-          client_responded_at?: string | null
-          client_responded_by?: string | null
-          client_response_note?: string | null
           converted_at?: string | null
           created_at?: string
           discount?: number
@@ -3732,351 +3187,6 @@ export type Database = {
           },
         ]
       }
-      service_order_checklist_items: {
-        Row: {
-          completed_at: string | null
-          completed_by: string | null
-          created_at: string
-          created_by: string
-          description: string | null
-          document_path: string | null
-          document_type: string | null
-          due_date: string | null
-          file_name: string | null
-          id: string
-          org_id: string
-          rejection_reason: string | null
-          required: boolean
-          service_order_id: string
-          sort_order: number
-          status: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          completed_at?: string | null
-          completed_by?: string | null
-          created_at?: string
-          created_by?: string
-          description?: string | null
-          document_path?: string | null
-          document_type?: string | null
-          due_date?: string | null
-          file_name?: string | null
-          id?: string
-          org_id?: string
-          rejection_reason?: string | null
-          required?: boolean
-          service_order_id: string
-          sort_order?: number
-          status?: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          completed_at?: string | null
-          completed_by?: string | null
-          created_at?: string
-          created_by?: string
-          description?: string | null
-          document_path?: string | null
-          document_type?: string | null
-          due_date?: string | null
-          file_name?: string | null
-          id?: string
-          org_id?: string
-          rejection_reason?: string | null
-          required?: boolean
-          service_order_id?: string
-          sort_order?: number
-          status?: string
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_order_checklist_items_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_order_checklist_items_service_order_id_fkey"
-            columns: ["service_order_id"]
-            isOneToOne: false
-            referencedRelation: "service_orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      service_order_events: {
-        Row: {
-          actor_id: string | null
-          created_at: string
-          event_type: string
-          from_value: string | null
-          id: string
-          metadata: Json
-          note: string | null
-          org_id: string
-          service_order_id: string
-          to_value: string | null
-        }
-        Insert: {
-          actor_id?: string | null
-          created_at?: string
-          event_type: string
-          from_value?: string | null
-          id?: string
-          metadata?: Json
-          note?: string | null
-          org_id: string
-          service_order_id: string
-          to_value?: string | null
-        }
-        Update: {
-          actor_id?: string | null
-          created_at?: string
-          event_type?: string
-          from_value?: string | null
-          id?: string
-          metadata?: Json
-          note?: string | null
-          org_id?: string
-          service_order_id?: string
-          to_value?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_order_events_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_order_events_service_order_id_fkey"
-            columns: ["service_order_id"]
-            isOneToOne: false
-            referencedRelation: "service_orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      service_order_permits: {
-        Row: {
-          created_at: string
-          org_id: string
-          permit_id: string
-          service_order_id: string
-        }
-        Insert: {
-          created_at?: string
-          org_id?: string
-          permit_id: string
-          service_order_id: string
-        }
-        Update: {
-          created_at?: string
-          org_id?: string
-          permit_id?: string
-          service_order_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_order_permits_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_order_permits_permit_id_fkey"
-            columns: ["permit_id"]
-            isOneToOne: false
-            referencedRelation: "permits"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_order_permits_service_order_id_fkey"
-            columns: ["service_order_id"]
-            isOneToOne: false
-            referencedRelation: "service_orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      service_order_questions: {
-        Row: {
-          answer: string | null
-          answered_at: string | null
-          answered_by: string | null
-          asked_by: string
-          created_at: string
-          due_date: string | null
-          id: string
-          org_id: string
-          question: string
-          resolved_at: string | null
-          service_order_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          answer?: string | null
-          answered_at?: string | null
-          answered_by?: string | null
-          asked_by: string
-          created_at?: string
-          due_date?: string | null
-          id?: string
-          org_id: string
-          question: string
-          resolved_at?: string | null
-          service_order_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          answer?: string | null
-          answered_at?: string | null
-          answered_by?: string | null
-          asked_by?: string
-          created_at?: string
-          due_date?: string | null
-          id?: string
-          org_id?: string
-          question?: string
-          resolved_at?: string | null
-          service_order_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_order_questions_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_order_questions_service_order_id_fkey"
-            columns: ["service_order_id"]
-            isOneToOne: false
-            referencedRelation: "service_orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      service_orders: {
-        Row: {
-          approved_at: string | null
-          assigned_to: string | null
-          client_id: string
-          completed_at: string | null
-          created_at: string
-          created_by: string
-          currency: string
-          description: string | null
-          due_date: string | null
-          external_cost: number
-          id: string
-          order_number: number
-          org_id: string
-          priority: string
-          quoted_amount: number
-          renewal_of_id: string | null
-          service_id: string | null
-          sla_hours: number | null
-          started_at: string | null
-          status: string
-          submitted_at: string | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          approved_at?: string | null
-          assigned_to?: string | null
-          client_id: string
-          completed_at?: string | null
-          created_at?: string
-          created_by?: string
-          currency?: string
-          description?: string | null
-          due_date?: string | null
-          external_cost?: number
-          id?: string
-          order_number?: number
-          org_id?: string
-          priority?: string
-          quoted_amount?: number
-          renewal_of_id?: string | null
-          service_id?: string | null
-          sla_hours?: number | null
-          started_at?: string | null
-          status?: string
-          submitted_at?: string | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          approved_at?: string | null
-          assigned_to?: string | null
-          client_id?: string
-          completed_at?: string | null
-          created_at?: string
-          created_by?: string
-          currency?: string
-          description?: string | null
-          due_date?: string | null
-          external_cost?: number
-          id?: string
-          order_number?: number
-          org_id?: string
-          priority?: string
-          quoted_amount?: number
-          renewal_of_id?: string | null
-          service_id?: string | null
-          sla_hours?: number | null
-          started_at?: string | null
-          status?: string
-          submitted_at?: string | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_orders_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_orders_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_orders_renewal_of_id_fkey"
-            columns: ["renewal_of_id"]
-            isOneToOne: false
-            referencedRelation: "service_orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_orders_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       services: {
         Row: {
           active: boolean
@@ -4235,7 +3345,6 @@ export type Database = {
           operator: string | null
           org_id: string
           priority: string | null
-          service_order_id: string | null
           status: string
           tags: string[] | null
           task_type: string
@@ -4253,7 +3362,6 @@ export type Database = {
           operator?: string | null
           org_id?: string
           priority?: string | null
-          service_order_id?: string | null
           status?: string
           tags?: string[] | null
           task_type?: string
@@ -4271,7 +3379,6 @@ export type Database = {
           operator?: string | null
           org_id?: string
           priority?: string | null
-          service_order_id?: string | null
           status?: string
           tags?: string[] | null
           task_type?: string
@@ -4291,13 +3398,6 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tasks_service_order_id_fkey"
-            columns: ["service_order_id"]
-            isOneToOne: false
-            referencedRelation: "service_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -4420,7 +3520,6 @@ export type Database = {
     Functions: {
       accept_invitation: { Args: { p_token: string }; Returns: string }
       can_admin_user: { Args: { _target: string }; Returns: boolean }
-      can_org_write: { Args: { _org_id: string }; Returns: boolean }
       claim_pending_messages: {
         Args: { p_channel?: string; p_limit?: number }
         Returns: {
@@ -4448,43 +3547,8 @@ export type Database = {
           isSetofReturn: true
         }
       }
-      claim_pending_messages_for_org: {
-        Args: { p_channel?: string; p_limit?: number; p_org_id: string }
-        Returns: {
-          body: string
-          channel: string
-          client_id: string
-          created_at: string
-          id: string
-          last_error: string | null
-          locked_at: string | null
-          next_retry_at: string | null
-          org_id: string
-          retry_count: number
-          scheduled_at: string
-          sent_at: string | null
-          status: string
-          subject: string | null
-          template_id: string | null
-          user_id: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "scheduled_messages"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
       current_org_id: { Args: never; Returns: string }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
-      default_currency_for_country: {
-        Args: { p_country: string }
-        Returns: string
-      }
-      default_locale_for_country: {
-        Args: { p_country: string }
-        Returns: string
-      }
       expire_trials: { Args: never; Returns: number }
       get_approval_status: { Args: { _user_id: string }; Returns: string }
       get_org_by_hostname: {
@@ -4530,8 +3594,6 @@ export type Database = {
       }
       is_org_admin: { Args: { _org_id: string }; Returns: boolean }
       is_org_member: { Args: { _org_id: string }; Returns: boolean }
-      is_portal_client: { Args: { p_client_id: string }; Returns: boolean }
-      is_portal_order: { Args: { p_order_id: string }; Returns: boolean }
       is_portal_user: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       list_org_members: {
@@ -4546,60 +3608,7 @@ export type Database = {
         }[]
       }
       normalize_hostname: { Args: { p_hostname: string }; Returns: string }
-      org_distance_unit: { Args: never; Returns: string }
-      org_weight_unit: { Args: never; Returns: string }
       peek_invitation: { Args: { p_token: string }; Returns: Json }
-      portal_answer_service_order_question: {
-        Args: { p_answer: string; p_question_id: string }
-        Returns: undefined
-      }
-      portal_attach_checklist_document: {
-        Args: {
-          p_document_path: string
-          p_file_name: string
-          p_item_id: string
-        }
-        Returns: undefined
-      }
-      portal_can_upload_service_order_document: {
-        Args: { p_path: string }
-        Returns: boolean
-      }
-      portal_can_read_service_order_document: {
-        Args: { p_path: string }
-        Returns: boolean
-      }
-      portal_create_service_order: {
-        Args: {
-          p_description?: string
-          p_permit_ids?: string[]
-          p_renewal_of_id?: string
-          p_service_id?: string
-          p_title: string
-        }
-        Returns: string
-      }
-      portal_get_service_order: { Args: { p_order_id: string }; Returns: Json }
-      portal_list_invoices: { Args: never; Returns: Json }
-      portal_list_quotes: { Args: never; Returns: Json }
-      portal_list_service_orders: { Args: never; Returns: Json }
-      portal_list_services: { Args: never; Returns: Json }
-      portal_respond_quote: {
-        Args: { p_decision: string; p_note?: string; p_quote_id: string }
-        Returns: undefined
-      }
-      portal_sign_service_order_document: {
-        Args: {
-          p_checklist_item_id: string
-          p_document_name: string
-          p_order_id: string
-          p_signature_data: string
-          p_signer_email: string
-          p_signer_name: string
-        }
-        Returns: string
-      }
-      prune_ai_briefings: { Args: never; Returns: undefined }
       public_create_org_with_owner: {
         Args: { p_country?: string; p_name: string; p_slug: string }
         Returns: string
@@ -4624,7 +3633,7 @@ export type Database = {
         Returns: undefined
       }
       super_admin_create_org: {
-        Args: { p_country?: string; p_name: string; p_slug: string }
+        Args: { p_name: string; p_slug: string }
         Returns: string
       }
       super_admin_list_orgs: {
@@ -4656,23 +3665,10 @@ export type Database = {
         Args: { p_branding: Json; p_org_id: string }
         Returns: undefined
       }
-      update_org_hourly_rate: {
-        Args: { p_org_id: string; p_rate: number }
-        Returns: undefined
-      }
-      update_org_regional_settings: {
-        Args: {
-          p_country: string
-          p_currency: string
-          p_locale: string
-          p_org_id: string
-        }
-        Returns: undefined
-      }
     }
     Enums: {
       app_role: "admin" | "user" | "operator" | "viewer"
-      org_role: "owner" | "admin" | "member" | "operator" | "viewer"
+      org_role: "owner" | "admin" | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -4801,7 +3797,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "operator", "viewer"],
-      org_role: ["owner", "admin", "member", "operator", "viewer"],
+      org_role: ["owner", "admin", "member"],
     },
   },
 } as const
