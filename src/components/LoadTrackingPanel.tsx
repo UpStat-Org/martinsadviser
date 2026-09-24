@@ -7,6 +7,8 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { LiveTrackingMap, type TrackingPosition } from "@/components/LiveTrackingMap";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { trackingCopy } from "@/lib/trackingCopy";
 
 type Link = {
   id: string;
@@ -36,16 +38,18 @@ const trackingDb = supabase as unknown as {
   rpc: (name: string, args: Record<string, unknown>) => Promise<DbResult<Record<string, unknown>>>;
 };
 
-function freshness(lastSeen: string | null) {
-  if (!lastSeen) return "Waiting for the driver";
+function freshness(lastSeen: string | null, copy: typeof trackingCopy.en) {
+  if (!lastSeen) return copy.waiting;
   const seconds = Math.max(0, Math.round((Date.now() - new Date(lastSeen).getTime()) / 1000));
-  if (seconds < 60) return "Updated just now";
-  return `Updated ${Math.floor(seconds / 60)} min ago`;
+  if (seconds < 60) return copy.updatedNow;
+  return copy.updatedMinutes(Math.floor(seconds / 60));
 }
 
 export function LoadTrackingPanel({ loadId }: { loadId: string }) {
   const qc = useQueryClient();
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const copy = trackingCopy[language];
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const links = useQuery({
     queryKey: ["load_tracking_links", loadId],
@@ -93,9 +97,9 @@ export function LoadTrackingPanel({ loadId }: { loadId: string }) {
       setShareUrl(url);
       await navigator.clipboard?.writeText(url).catch(() => undefined);
       refresh();
-      toast({ title: "Tracking link created", description: "The link was copied. It expires in 12 hours." });
+      toast({ title: copy.linkCreated, description: copy.linkCreatedDesc });
     },
-    onError: (error: Error) => toast({ title: "Could not create link", description: error.message, variant: "destructive" }),
+    onError: (error: Error) => toast({ title: copy.createFailed, description: error.message, variant: "destructive" }),
   });
   const revoke = useMutation({
     mutationFn: async () => {
@@ -104,34 +108,34 @@ export function LoadTrackingPanel({ loadId }: { loadId: string }) {
         .update({ status: "revoked", stopped_at: new Date().toISOString() }).eq("id", active.id);
       if (error) throw new Error(error.message);
     },
-    onSuccess: () => { setShareUrl(null); refresh(); toast({ title: "Live tracking stopped" }); },
-    onError: (error: Error) => toast({ title: "Could not stop tracking", description: error.message, variant: "destructive" }),
+    onSuccess: () => { setShareUrl(null); refresh(); toast({ title: copy.stopSharing }); },
+    onError: (error: Error) => toast({ title: copy.stopFailed, description: error.message, variant: "destructive" }),
   });
-  const copy = async () => {
+  const copyLink = async () => {
     if (!shareUrl) return;
     await navigator.clipboard?.writeText(shareUrl);
-    toast({ title: "Link copied" });
+    toast({ title: copy.linkCopied });
   };
 
   return <Card className="border-border/50">
     <CardHeader className="pb-3 flex-row items-center justify-between space-y-0">
-      <CardTitle className="text-base flex items-center gap-2"><MapPinned className="w-4 h-4" /> Live tracking</CardTitle>
+      <CardTitle className="text-base flex items-center gap-2"><MapPinned className="w-4 h-4" /> {copy.title}</CardTitle>
       {!active ? <Button size="sm" className="gap-1.5" disabled={create.isPending} onClick={() => create.mutate()}>
-        {create.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Radio className="w-3.5 h-3.5" />} Create driver link
+        {create.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Radio className="w-3.5 h-3.5" />} {copy.createLink}
       </Button> : <Button size="sm" variant="outline" className="gap-1.5" disabled={revoke.isPending} onClick={() => revoke.mutate()}>
-        {revoke.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Square className="w-3.5 h-3.5" />} Stop sharing
+        {revoke.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Square className="w-3.5 h-3.5" />} {copy.stopSharing}
       </Button>}
     </CardHeader>
     <CardContent className="space-y-3">
-      {!active ? <p className="text-sm text-muted-foreground">Create a temporary link for the driver to share their location during this trip.</p> : <>
+      {!active ? <p className="text-sm text-muted-foreground">{copy.description}</p> : <>
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5"><StatusBadge tone={active.started_at && !active.stopped_at ? "success" : "warning"} size="sm">{active.started_at && !active.stopped_at ? "Live" : "Awaiting consent"}</StatusBadge></span>
+          <span className="inline-flex items-center gap-1.5"><StatusBadge tone={active.started_at && !active.stopped_at ? "success" : "warning"} size="sm">{active.started_at && !active.stopped_at ? copy.live : copy.awaitingConsent}</StatusBadge></span>
           {active.driver_name && <span>{active.driver_name}</span>}
-          <span>{freshness(active.last_seen_at)}</span>
-          <span>Expires {new Date(active.expires_at).toLocaleString()}</span>
+          <span>{freshness(active.last_seen_at, copy)}</span>
+          <span>{copy.expires(new Date(active.expires_at).toLocaleString())}</span>
         </div>
-        {shareUrl && <div className="flex gap-2"><input readOnly value={shareUrl} className="h-9 flex-1 min-w-0 rounded-md border bg-muted/30 px-2 text-xs" /><Button size="sm" variant="outline" onClick={copy}><Copy className="w-3.5 h-3.5" /></Button><Button size="sm" variant="outline" asChild><a href={shareUrl} target="_blank" rel="noreferrer"><ExternalLink className="w-3.5 h-3.5" /></a></Button></div>}
-        {(positions.data ?? []).length > 0 ? <LiveTrackingMap positions={positions.data ?? []} className="h-80 w-full rounded-md border" /> : <div className="h-40 rounded-md border border-dashed flex items-center justify-center text-sm text-muted-foreground">The map will appear after the first shared location.</div>}
+        {shareUrl && <div className="flex gap-2"><input readOnly value={shareUrl} className="h-9 flex-1 min-w-0 rounded-md border bg-muted/30 px-2 text-xs" /><Button size="sm" variant="outline" onClick={copyLink}><Copy className="w-3.5 h-3.5" /></Button><Button size="sm" variant="outline" asChild><a href={shareUrl} target="_blank" rel="noreferrer"><ExternalLink className="w-3.5 h-3.5" /></a></Button></div>}
+        {(positions.data ?? []).length > 0 ? <LiveTrackingMap positions={positions.data ?? []} language={language} className="h-80 w-full rounded-md border" /> : <div className="h-40 rounded-md border border-dashed flex items-center justify-center text-sm text-muted-foreground">{copy.mapWaiting}</div>}
       </>}
     </CardContent>
   </Card>;

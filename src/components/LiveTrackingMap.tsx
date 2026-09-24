@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { trackingCopy } from "@/lib/trackingCopy";
+import type { Language } from "@/lib/translations";
 
 export type TrackingPosition = {
   latitude: number;
@@ -10,9 +12,10 @@ export type TrackingPosition = {
 
 /** A small, dependency-light live map. OSM is sufficient for the MVP; the
  * tile provider can later be swapped without touching tracking data. */
-export function LiveTrackingMap({ positions, className }: {
+export function LiveTrackingMap({ positions, className, language }: {
   positions: TrackingPosition[];
   className?: string;
+  language: Language;
 }) {
   const elementRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -50,10 +53,10 @@ export function LiveTrackingMap({ positions, className }: {
     const latest = coordinates.at(-1)!;
     L.circleMarker(latest, {
       radius: 9, color: "#ffffff", weight: 3, fillColor: "#16a34a", fillOpacity: 1,
-    }).bindTooltip("Current location", { permanent: false }).addTo(layer);
+    }).bindTooltip(trackingCopy[language].currentLocation, { permanent: false }).addTo(layer);
     if (coordinates.length === 1) map.setView(latest, 14);
     else map.fitBounds(L.latLngBounds(coordinates), { padding: [28, 28], maxZoom: 15 });
-  }, [positions]);
+  }, [language, positions]);
 
-  return <div ref={elementRef} className={className ?? "h-80 w-full rounded-md"} aria-label="Live trip map" />;
+  return <div ref={elementRef} className={className ?? "h-80 w-full rounded-md"} aria-label={trackingCopy[language].title} />;
 }
