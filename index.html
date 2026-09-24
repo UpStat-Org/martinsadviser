@@ -6,6 +6,10 @@
     <title>DotPilot — CRM for Permit Services & Fleet Management</title>
     <meta name="description" content="Multi-tenant CRM for US, Brazil and Spain transport fleets: permits (IRP, IFTA, UCR), DQF, ELD compliance, invoicing and a client portal." />
     <meta name="author" content="DotPilot" />
+    <!-- The app manages its own pt/en/es strings. Browser translators rewrite
+         text nodes in-place, which can desynchronise React's DOM tree during
+         a route change (for example, a removeChild NotFoundError). -->
+    <meta name="google" content="notranslate" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href="https://dotpilot.lovable.app/" />
@@ -141,7 +145,7 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root" class="notranslate" translate="no"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
