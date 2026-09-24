@@ -57,6 +57,7 @@ export default function StartOrg() {
   const { t } = useLanguage();
 
   const [step, setStep] = useState<"form" | "creating" | "done" | "confirm-email">("form");
+  const [formStep, setFormStep] = useState<1 | 2>(1);
   const [companyName, setCompanyName] = useState("");
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
@@ -86,6 +87,7 @@ export default function StartOrg() {
     email.length > 0 &&
     password.length >= 6 &&
     !submitting;
+  const canContinue = companyName.trim().length > 0 && slug.length >= 2 && !slugError;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,7 +141,7 @@ export default function StartOrg() {
       <StartOrgScene />
 
       {/* Right form */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 lg:overflow-y-auto">
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-[480px]">
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
             <Logo className="w-10 h-10 rounded-md" />
@@ -199,10 +201,14 @@ export default function StartOrg() {
                 <p className="text-muted-foreground mt-1.5 text-[15px]">
                   {t("startOrg.trialBlurb")}
                 </p>
+                <div className="flex items-center gap-2 mt-5" aria-label={`Etapa ${formStep} de 2`}>
+                  {[1, 2].map((item) => <span key={item} className={`h-1.5 rounded-full transition-all ${item <= formStep ? "w-10 bg-primary" : "w-5 bg-muted"}`} />)}
+                  <span className="ml-1 text-[11px] font-medium text-muted-foreground">{formStep}/2</span>
+                </div>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 gap-4">
+                {formStep === 1 ? <div className="grid grid-cols-1 gap-4">
                   <Field label={t("startOrg.companyNameLabel")} required>
                     <Input
                       autoFocus
@@ -238,13 +244,17 @@ export default function StartOrg() {
                       </SelectContent>
                     </Select>
                   </Field>
-
-                  <div className="pt-2 mt-2 border-t border-border/40">
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-3">{t("startOrg.yourAccess")}</p>
+                  <Button type="button" disabled={!canContinue} className="w-full gap-2 h-11 mt-2" onClick={() => setFormStep(2)}>
+                    {t("common.next")} <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </div> : <div className="grid grid-cols-1 gap-4">
+                  <div className="pb-2 border-b border-border/40">
+                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("startOrg.yourAccess")}</p>
                   </div>
 
                   <Field label={t("common.name")}>
                     <Input
+                      autoFocus
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder={t("startOrg.fullNamePlaceholder")}
@@ -268,15 +278,18 @@ export default function StartOrg() {
                       placeholder="••••••••"
                     />
                   </Field>
-                </div>
+                </div>}
 
-                <Button type="submit" disabled={!canSubmit} className="w-full gap-2 h-11 mt-2">
-                  {step === "creating" ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> {t("startOrg.creating")}</>
-                  ) : (
-                    <>{t("startOrg.cta")} <ArrowRight className="w-4 h-4" /></>
-                  )}
-                </Button>
+                {formStep === 2 && <div className="flex gap-3 pt-2">
+                  <Button type="button" variant="outline" className="h-11 px-4" onClick={() => setFormStep(1)}>{t("common.back")}</Button>
+                  <Button type="submit" disabled={!canSubmit} className="flex-1 gap-2 h-11">
+                    {step === "creating" ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> {t("startOrg.creating")}</>
+                    ) : (
+                      <>{t("startOrg.cta")} <ArrowRight className="w-4 h-4" /></>
+                    )}
+                  </Button>
+                </div>}
 
                 <p className="text-center text-xs text-muted-foreground">
                   {t("startOrg.haveAccount")} <Link to="/login" className="text-primary hover:underline">{t("common.signIn")}</Link>
