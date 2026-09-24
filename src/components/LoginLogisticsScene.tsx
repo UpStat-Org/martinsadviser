@@ -4,9 +4,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import "@/styles/login-scene.css";
 
 const copy = {
-  pt: { label: "UMA OPERAÇÃO CONECTADA", title: "Cada rota. Cada detalhe.", subtitle: "Tudo na mesma direção.", caption: "Frota, documentos e viagens em um só lugar.", pause: "Pausar animação", play: "Reproduzir animação", route: "Rotas conectadas", hub: "Centro de operações" },
-  en: { label: "ONE CONNECTED OPERATION", title: "Every route. Every detail.", subtitle: "Moving in one direction.", caption: "Fleet, documents and trips in one place.", pause: "Pause animation", play: "Play animation", route: "Connected routes", hub: "Operations center" },
-  es: { label: "UNA OPERACIÓN CONECTADA", title: "Cada ruta. Cada detalle.", subtitle: "Todo en la misma dirección.", caption: "Flota, documentos y viajes en un solo lugar.", pause: "Pausar animación", play: "Reproducir animación", route: "Rutas conectadas", hub: "Centro de operaciones" },
+  pt: { label: "UMA OPERAÇÃO CONECTADA", title: "Cada rota. Cada detalhe.", subtitle: "Tudo na mesma direção.", pause: "Pausar animação", play: "Reproduzir animação", route: "Rotas conectadas", hub: "Centro de operações" },
+  en: { label: "ONE CONNECTED OPERATION", title: "Every route. Every detail.", subtitle: "Moving in one direction.", pause: "Pause animation", play: "Play animation", route: "Connected routes", hub: "Operations center" },
+  es: { label: "UNA OPERACIÓN CONECTADA", title: "Cada ruta. Cada detalle.", subtitle: "Todo en la misma dirección.", pause: "Pausar animación", play: "Reproducir animación", route: "Rutas conectadas", hub: "Centro de operaciones" },
 };
 
 /** Local vector artwork: no map service, API key or WebGL context required. */
@@ -20,6 +20,7 @@ export function LoginLogisticsScene() {
       <div className="login-scene-heading">
         <span className="login-scene-eyebrow"><span />{text.label}</span>
         <h2>{text.title}<br /><span>{text.subtitle}</span></h2>
+        <button className="login-scene-toggle" type="button" onClick={() => setPaused(!paused)} aria-label={paused ? text.play : text.pause} title={paused ? text.play : text.pause}>{paused ? <Play size={16} /> : <Pause size={16} />}</button>
       </div>
 
       <div className="login-scene-art" aria-hidden="true">
@@ -89,8 +90,6 @@ export function LoginLogisticsScene() {
         <div className="login-scene-tag login-scene-tag-hub"><span className="login-status-dot" />{text.hub}</div>
         <div className="login-scene-tag login-scene-tag-route"><Route size={15} />{text.route}<span className="login-signal"><i /><i /><i /></span></div>
       </div>
-
-      <div className="login-scene-footer"><p>{text.caption}</p><button type="button" onClick={() => setPaused(!paused)} aria-label={paused ? text.play : text.pause} title={paused ? text.play : text.pause}>{paused ? <Play size={16} /> : <Pause size={16} />}</button></div>
     </aside>
   );
 }

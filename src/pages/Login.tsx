@@ -147,11 +147,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-background lg:h-screen lg:overflow-hidden">
       <LoginLogisticsScene />
 
       {/* Form side */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 lg:overflow-y-auto">
         <div className="w-full max-w-[400px]">
           <div className="flex items-center justify-center gap-2.5 mb-8">
             <Logo src={brandingLogo} title={brandingApp} className="w-8 h-8 rounded" />

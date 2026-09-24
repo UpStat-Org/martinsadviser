@@ -1,13 +1,13 @@
-.login-scene { position: relative; isolation: isolate; display: none; flex-direction: column; justify-content: space-between; overflow: hidden; background: #091a25; color: #edf7f6; min-height: 100vh; }
-@media (min-width: 1024px) { .login-scene { display: flex; width: 54%; order: 2; } }
+.login-scene { position: relative; isolation: isolate; display: none; flex-direction: column; overflow: hidden; background: #091a25; color: #edf7f6; height: 100vh; min-height: 0; }
+@media (min-width: 1024px) { .login-scene { display: flex; width: 54%; order: 2; height: 100dvh; } }
 .login-scene::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 65% 45%, #17453980, transparent 65%); }
-.login-scene-heading { padding: clamp(36px, 5vw, 76px) clamp(32px, 4vw, 64px) 0; z-index: 1; }
+.login-scene-heading { position: relative; padding: clamp(36px, 5vw, 76px) clamp(32px, 4vw, 64px) 0; z-index: 1; }
 .login-scene-eyebrow { display: flex; align-items: center; gap: 9px; color: #9bccc1; font-size: 10px; font-weight: 600; letter-spacing: .2em; }
 .login-scene-eyebrow > span, .login-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #6bedb8; box-shadow: 0 0 12px #6bedb855; flex-shrink: 0; }
 .login-scene h2 { margin-top: 25px; font-size: clamp(26px, 2.8vw, 44px); line-height: 1.2; font-weight: 500; letter-spacing: -.045em; }
 .login-scene h2 > span { color: #8aa7ad; }
-.login-scene-art { position: relative; width: 100%; margin: auto 0; }
-.login-scene-map { position: relative; width: 100%; overflow: visible; filter: drop-shadow(0 28px 22px #00000045); animation: login-island-float 9s ease-in-out infinite; }
+.login-scene-art { position: relative; display: flex; flex: 1; align-items: center; width: 100%; min-height: 0; }
+.login-scene-map { position: relative; width: 100%; max-height: min(62vh, 600px); overflow: visible; filter: drop-shadow(0 28px 22px #00000045); animation: login-island-float 9s ease-in-out infinite; }
 .login-scene-halo { position: absolute; inset: 25% 15%; border-radius: 50%; background: #53ceaa0c; filter: blur(35px); }
 .login-scene-tag { position: absolute; display: flex; align-items: center; gap: 9px; border: 1px solid #93ceb42b; background: #102a35ed; border-radius: 10px; padding: 12px 15px; font-size: 11px; box-shadow: 0 12px 30px #0003; color: #c1dcd8; }
 .login-scene-tag-hub { top: 10%; right: 12%; animation: login-tag-float 7s ease-in-out infinite; }
@@ -15,9 +15,8 @@
 .login-signal { display: flex; align-items: end; gap: 2px; height: 12px; margin-left: 8px; }
 .login-signal i { width: 3px; height: 5px; background: #6bedb8; animation: login-signal 2s ease-in-out infinite; }
 .login-signal i:nth-child(2) { height: 8px; animation-delay: .3s; }.login-signal i:nth-child(3) { height: 12px; animation-delay: .6s; }
-.login-scene-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 clamp(32px, 4vw, 64px) 80px; color: #90abb2; font-size: 12px; }
-.login-scene-footer button { display: grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; border: 1px solid #90abb240; border-radius: 50%; color: #c1dcd8; transition: background .2s; }
-.login-scene-footer button:hover { background: #ffffff12; }.login-scene-footer button:focus-visible { outline: 2px solid #6bedb8; outline-offset: 4px; }
+.login-scene-toggle { position: absolute; top: clamp(36px, 5vw, 76px); right: clamp(32px, 4vw, 64px); display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid #90abb240; border-radius: 50%; color: #c1dcd8; transition: background .2s; }
+.login-scene-toggle:hover { background: #ffffff12; }.login-scene-toggle:focus-visible { outline: 2px solid #6bedb8; outline-offset: 4px; }
 .login-route-flow { animation: login-route-flow 3s linear infinite; }
 .login-beacon-ring { transform-origin: 366px 86px; animation: login-beacon 3s ease-out infinite; }
 .login-truck-one { animation: login-truck-one 14s ease-in-out infinite; }
@@ -30,5 +29,5 @@
 @keyframes login-truck-one { 0%,100% { transform: translate(160px, 290px); } 45%,55% { transform: translate(285px, 352px); } }
 @keyframes login-truck-two { 0%,100% { transform: translate(430px, 165px); } 45%,55% { transform: translate(558px, 229px); } }
 .login-scene[data-paused="true"] * { animation-play-state: paused !important; }
-@media (prefers-reduced-motion: reduce) { .login-scene * { animation: none !important; }.login-truck-one { transform: translate(220px, 320px); }.login-truck-two { transform: translate(480px, 190px); }.login-scene-footer button { display: none; } }
+@media (prefers-reduced-motion: reduce) { .login-scene * { animation: none !important; }.login-truck-one { transform: translate(220px, 320px); }.login-truck-two { transform: translate(480px, 190px); }.login-scene-toggle { display: none; } }
 @media (max-height: 760px) and (min-width: 1024px) { .login-scene-map { max-height: 440px; }.login-scene-heading { padding-top: 32px; } }
