@@ -3694,6 +3694,278 @@ export type Database = {
           },
         ]
       }
+      service_order_checklist_items: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          document_path: string | null
+          document_type: string | null
+          due_date: string | null
+          file_name: string | null
+          id: string
+          org_id: string
+          rejection_reason: string | null
+          required: boolean
+          service_order_id: string
+          sort_order: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          document_path?: string | null
+          document_type?: string | null
+          due_date?: string | null
+          file_name?: string | null
+          id?: string
+          org_id?: string
+          rejection_reason?: string | null
+          required?: boolean
+          service_order_id: string
+          sort_order?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          document_path?: string | null
+          document_type?: string | null
+          due_date?: string | null
+          file_name?: string | null
+          id?: string
+          org_id?: string
+          rejection_reason?: string | null
+          required?: boolean
+          service_order_id?: string
+          sort_order?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_order_checklist_items_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_order_checklist_items_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_order_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          event_type: string
+          from_value: string | null
+          id: string
+          metadata: Json
+          note: string | null
+          org_id: string
+          service_order_id: string
+          to_value: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          event_type: string
+          from_value?: string | null
+          id?: string
+          metadata?: Json
+          note?: string | null
+          org_id: string
+          service_order_id: string
+          to_value?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          event_type?: string
+          from_value?: string | null
+          id?: string
+          metadata?: Json
+          note?: string | null
+          org_id?: string
+          service_order_id?: string
+          to_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_order_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_order_events_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_order_permits: {
+        Row: {
+          created_at: string
+          org_id: string
+          permit_id: string
+          service_order_id: string
+        }
+        Insert: {
+          created_at?: string
+          org_id?: string
+          permit_id: string
+          service_order_id: string
+        }
+        Update: {
+          created_at?: string
+          org_id?: string
+          permit_id?: string
+          service_order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_order_permits_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_order_permits_permit_id_fkey"
+            columns: ["permit_id"]
+            isOneToOne: false
+            referencedRelation: "permits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_order_permits_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_orders: {
+        Row: {
+          approved_at: string | null
+          assigned_to: string | null
+          client_id: string
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          description: string | null
+          due_date: string | null
+          external_cost: number
+          id: string
+          order_number: number
+          org_id: string
+          priority: string
+          quoted_amount: number
+          service_id: string | null
+          sla_hours: number | null
+          started_at: string | null
+          status: string
+          submitted_at: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          assigned_to?: string | null
+          client_id: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          description?: string | null
+          due_date?: string | null
+          external_cost?: number
+          id?: string
+          order_number?: number
+          org_id?: string
+          priority?: string
+          quoted_amount?: number
+          service_id?: string | null
+          sla_hours?: number | null
+          started_at?: string | null
+          status?: string
+          submitted_at?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          assigned_to?: string | null
+          client_id?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          description?: string | null
+          due_date?: string | null
+          external_cost?: number
+          id?: string
+          order_number?: number
+          org_id?: string
+          priority?: string
+          quoted_amount?: number
+          service_id?: string | null
+          sla_hours?: number | null
+          started_at?: string | null
+          status?: string
+          submitted_at?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_orders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_orders_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_orders_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       services: {
         Row: {
           active: boolean
@@ -3852,6 +4124,7 @@ export type Database = {
           operator: string | null
           org_id: string
           priority: string | null
+          service_order_id: string | null
           status: string
           tags: string[] | null
           task_type: string
@@ -3869,6 +4142,7 @@ export type Database = {
           operator?: string | null
           org_id?: string
           priority?: string | null
+          service_order_id?: string | null
           status?: string
           tags?: string[] | null
           task_type?: string
@@ -3886,6 +4160,7 @@ export type Database = {
           operator?: string | null
           org_id?: string
           priority?: string | null
+          service_order_id?: string | null
           status?: string
           tags?: string[] | null
           task_type?: string
@@ -3905,6 +4180,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
             referencedColumns: ["id"]
           },
         ]
