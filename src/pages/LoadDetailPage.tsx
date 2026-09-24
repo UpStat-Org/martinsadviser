@@ -19,6 +19,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge, type StatusTone } from "@/components/StatusBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { DocumentLink } from "@/components/DocumentLink";
+import { LoadTrackingPanel } from "@/components/LoadTrackingPanel";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOrg } from "@/contexts/OrgContext";
 import { useRegion } from "@/hooks/useRegion";
@@ -342,6 +343,8 @@ export default function LoadDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      <LoadTrackingPanel loadId={load.id} />
 
       {/* Paradas: opcional por design. Trajeto simples vive nas colunas da
           carga; esta tabela só existe quando a rota tem mais de duas pontas. */}

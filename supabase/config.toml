@@ -42,3 +42,9 @@ verify_jwt = false
 # Public by design: exchanges a one-time portal token for credentials.
 [functions.redeem-portal-token]
 verify_jwt = false
+
+# The driver opens a short-lived opaque link rather than signing in. The
+# handler validates that token on every request and does not expose database
+# access to anonymous clients.
+[functions.load-tracking]
+verify_jwt = false

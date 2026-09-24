@@ -69,6 +69,7 @@ const ServicesPage = lazy(() => import("./pages/ServicesPage"));
 const MyDeskPage = lazy(() => import("./pages/MyDeskPage"));
 const LoadsPage = lazy(() => import("./pages/LoadsPage"));
 const LoadDetailPage = lazy(() => import("./pages/LoadDetailPage"));
+const LiveTracking = lazy(() => import("./pages/LiveTracking"));
 const ServiceOrdersPage = lazy(() => import("./pages/ServiceOrdersPage"));
 const ServiceOrderDetailPage = lazy(() => import("./pages/ServiceOrderDetailPage"));
 const BrCompliancePage = lazy(() => import("./pages/BrCompliancePage"));
@@ -125,6 +126,9 @@ const App = () => (
             <Route path="/invite/:token" element={<InviteAccept />} />
             <Route path="/pending" element={<PendingApproval />} />
             <Route path="/portal/login" element={<PortalLogin />} />
+            {/* Public, short-lived driver link. It deliberately remains outside
+                ProtectedRoute: the token itself is the scoped credential. */}
+            <Route path="/track/:token" element={<LiveTracking />} />
             <Route path="/portal" element={<PortalLayout />}>
               <Route index element={<PortalDashboard />} />
               <Route path="orders" element={<PortalOrdersPage />} />
