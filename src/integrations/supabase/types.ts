@@ -2203,6 +2203,264 @@ export type Database = {
           },
         ]
       }
+      load_documents: {
+        Row: {
+          created_at: string
+          document_url: string
+          file_name: string | null
+          id: string
+          kind: string
+          load_id: string
+          notes: string | null
+          org_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_url: string
+          file_name?: string | null
+          id?: string
+          kind?: string
+          load_id: string
+          notes?: string | null
+          org_id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_url?: string
+          file_name?: string | null
+          id?: string
+          kind?: string
+          load_id?: string
+          notes?: string | null
+          org_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "load_documents_load_id_fkey"
+            columns: ["load_id"]
+            isOneToOne: false
+            referencedRelation: "loads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "load_documents_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      load_stops: {
+        Row: {
+          address: string | null
+          arrived_at: string | null
+          city: string | null
+          company_name: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          country: string | null
+          created_at: string
+          departed_at: string | null
+          id: string
+          kind: string
+          load_id: string
+          notes: string | null
+          org_id: string
+          position: number
+          postal_code: string | null
+          reference: string | null
+          region: string | null
+          updated_at: string
+          window_end: string | null
+          window_start: string | null
+        }
+        Insert: {
+          address?: string | null
+          arrived_at?: string | null
+          city?: string | null
+          company_name?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          departed_at?: string | null
+          id?: string
+          kind?: string
+          load_id: string
+          notes?: string | null
+          org_id?: string
+          position?: number
+          postal_code?: string | null
+          reference?: string | null
+          region?: string | null
+          updated_at?: string
+          window_end?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          address?: string | null
+          arrived_at?: string | null
+          city?: string | null
+          company_name?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          departed_at?: string | null
+          id?: string
+          kind?: string
+          load_id?: string
+          notes?: string | null
+          org_id?: string
+          position?: number
+          postal_code?: string | null
+          reference?: string | null
+          region?: string | null
+          updated_at?: string
+          window_end?: string | null
+          window_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "load_stops_load_id_fkey"
+            columns: ["load_id"]
+            isOneToOne: false
+            referencedRelation: "loads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "load_stops_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loads: {
+        Row: {
+          client_id: string
+          commodity: string | null
+          created_at: string
+          delivery_at: string | null
+          destination_city: string | null
+          destination_region: string | null
+          distance: number | null
+          distance_unit: string
+          driver_id: string | null
+          id: string
+          invoice_id: string | null
+          metadata: Json
+          notes: string | null
+          org_id: string
+          origin_city: string | null
+          origin_region: string | null
+          pickup_at: string | null
+          rate: number
+          reference: string | null
+          status: string
+          truck_id: string | null
+          updated_at: string
+          user_id: string
+          weight: number | null
+          weight_unit: string
+        }
+        Insert: {
+          client_id: string
+          commodity?: string | null
+          created_at?: string
+          delivery_at?: string | null
+          destination_city?: string | null
+          destination_region?: string | null
+          distance?: number | null
+          distance_unit?: string
+          driver_id?: string | null
+          id?: string
+          invoice_id?: string | null
+          metadata?: Json
+          notes?: string | null
+          org_id?: string
+          origin_city?: string | null
+          origin_region?: string | null
+          pickup_at?: string | null
+          rate?: number
+          reference?: string | null
+          status?: string
+          truck_id?: string | null
+          updated_at?: string
+          user_id?: string
+          weight?: number | null
+          weight_unit?: string
+        }
+        Update: {
+          client_id?: string
+          commodity?: string | null
+          created_at?: string
+          delivery_at?: string | null
+          destination_city?: string | null
+          destination_region?: string | null
+          distance?: number | null
+          distance_unit?: string
+          driver_id?: string | null
+          id?: string
+          invoice_id?: string | null
+          metadata?: Json
+          notes?: string | null
+          org_id?: string
+          origin_city?: string | null
+          origin_region?: string | null
+          pickup_at?: string | null
+          rate?: number
+          reference?: string | null
+          status?: string
+          truck_id?: string | null
+          updated_at?: string
+          user_id?: string
+          weight?: number | null
+          weight_unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loads_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loads_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loads_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loads_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loads_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maintenance_records: {
         Row: {
           cost: number | null
@@ -2480,11 +2738,14 @@ export type Database = {
       organizations: {
         Row: {
           branding: Json
+          country: string
           created_at: string
+          currency: string
           default_hourly_rate: number
           feature_flags: Json
           id: string
           is_master_org: boolean
+          locale: string
           name: string
           slug: string
           stripe_customer_id: string | null
@@ -2495,11 +2756,14 @@ export type Database = {
         }
         Insert: {
           branding?: Json
+          country?: string
           created_at?: string
+          currency?: string
           default_hourly_rate?: number
           feature_flags?: Json
           id?: string
           is_master_org?: boolean
+          locale?: string
           name: string
           slug: string
           stripe_customer_id?: string | null
@@ -2510,11 +2774,14 @@ export type Database = {
         }
         Update: {
           branding?: Json
+          country?: string
           created_at?: string
+          currency?: string
           default_hourly_rate?: number
           feature_flags?: Json
           id?: string
           is_master_org?: boolean
+          locale?: string
           name?: string
           slug?: string
           stripe_customer_id?: string | null
@@ -3590,6 +3857,14 @@ export type Database = {
       }
       current_org_id: { Args: never; Returns: string }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      default_currency_for_country: {
+        Args: { p_country: string }
+        Returns: string
+      }
+      default_locale_for_country: {
+        Args: { p_country: string }
+        Returns: string
+      }
       expire_trials: { Args: never; Returns: number }
       get_approval_status: { Args: { _user_id: string }; Returns: string }
       get_org_by_hostname: {
@@ -3649,6 +3924,8 @@ export type Database = {
         }[]
       }
       normalize_hostname: { Args: { p_hostname: string }; Returns: string }
+      org_distance_unit: { Args: never; Returns: string }
+      org_weight_unit: { Args: never; Returns: string }
       peek_invitation: { Args: { p_token: string }; Returns: Json }
       prune_ai_briefings: { Args: never; Returns: undefined }
       public_create_org_with_owner: {
@@ -3675,7 +3952,7 @@ export type Database = {
         Returns: undefined
       }
       super_admin_create_org: {
-        Args: { p_name: string; p_slug: string }
+        Args: { p_country?: string; p_name: string; p_slug: string }
         Returns: string
       }
       super_admin_list_orgs: {
@@ -3709,6 +3986,15 @@ export type Database = {
       }
       update_org_hourly_rate: {
         Args: { p_org_id: string; p_rate: number }
+        Returns: undefined
+      }
+      update_org_regional_settings: {
+        Args: {
+          p_country: string
+          p_currency: string
+          p_locale: string
+          p_org_id: string
+        }
         Returns: undefined
       }
     }
