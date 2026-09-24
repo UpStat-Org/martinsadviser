@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -7,9 +7,9 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { COUNTRY_MAPS, SUPPORTED_COUNTRIES } from "@/lib/maps";
+import { COUNTRY_MAPS, SUPPORTED_COUNTRIES, normalizeMapCountry, normalizeMapRegion, type MapCountryCode } from "@/lib/maps";
 
-type CountryCode = "US" | "BR" | "ES";
+type CountryCode = MapCountryCode;
 
 type StatusVariant = "active" | "expiring" | "expired" | "empty";
 
@@ -45,8 +45,8 @@ export interface PermitForMap {
   clients?: { country?: string | null } | null;
 }
 
-function permitCountry(p: PermitForMap): string {
-  return (p.client_country ?? p.clients?.country ?? "US") as string;
+function permitCountry(p: PermitForMap): CountryCode {
+  return normalizeMapCountry(p.client_country ?? p.clients?.country) ?? "US";
 }
 
 interface PermitCoverageMapProps {
@@ -74,10 +74,18 @@ export function PermitCoverageMap({ permits, compact = false, defaultCountry }: 
   }, [permits, defaultCountry]);
 
   const [country, setCountry] = useState<CountryCode>(initialCountry);
+  const [countryChosenByUser, setCountryChosenByUser] = useState(false);
   const [hoveredState, setHoveredState] = useState<string | null>(null);
   const [selectedState, setSelectedState] = useState<string | null>(null);
 
   const map = COUNTRY_MAPS[country];
+
+  // useState only reads its initial value on the first render. Permit data
+  // arrives afterwards, so without this sync a Brazilian or Spanish account
+  // kept seeing the US map until someone changed the selector manually.
+  useEffect(() => {
+    if (!countryChosenByUser) setCountry(initialCountry);
+  }, [countryChosenByUser, initialCountry]);
 
   // Permits filtered to the active country. Falls back to "US" for legacy
   // rows where client_country is missing.
@@ -91,7 +99,8 @@ export function PermitCoverageMap({ permits, compact = false, defaultCountry }: 
     const now = new Date();
     for (const p of countryPermits) {
       if (!p.state) continue;
-      const st = p.state.toUpperCase().trim();
+      const st = normalizeMapRegion(country, p.state);
+      if (!st) continue;
       if (!acc[st]) acc[st] = { active: 0, expiring: 0, expired: 0, permits: [] };
       acc[st].permits.push(p);
       if (!p.expiration_date) { acc[st].active++; continue; }
@@ -101,7 +110,7 @@ export function PermitCoverageMap({ permits, compact = false, defaultCountry }: 
       else acc[st].active++;
     }
     return acc;
-  }, [countryPermits]);
+  }, [country, countryPermits]);
 
   const totals = useMemo(() => {
     let active = 0, expiring = 0, expired = 0;
@@ -131,7 +140,7 @@ export function PermitCoverageMap({ permits, compact = false, defaultCountry }: 
       {!compact && (
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2">
-            <Select value={country} onValueChange={(v) => { setCountry(v as CountryCode); setHoveredState(null); }}>
+            <Select value={country} onValueChange={(v) => { setCountry(v as CountryCode); setCountryChosenByUser(true); setHoveredState(null); }}>
               <SelectTrigger className="h-8 w-[170px] text-xs">
                 <SelectValue />
               </SelectTrigger>

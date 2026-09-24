@@ -23,6 +23,7 @@ import { Upload, FileText, X, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useOrg } from "@/contexts/OrgContext";
+import { normalizeMapRegion } from "@/lib/maps";
 
 const formSchema = z.object({
   client_id: z.string().min(1),
@@ -116,6 +117,7 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
   });
 
   const selectedClientId = form.watch("client_id");
+  const selectedClientCountry = clients?.find((client) => client.id === selectedClientId)?.country ?? country;
   const { data: trucks } = useTrucks(undefined, selectedClientId || undefined);
 
   useEffect(() => {
@@ -212,7 +214,9 @@ export function PermitFormDialog({ open, onOpenChange, permit, defaultClientId, 
         truck_id: values.truck_id && values.truck_id !== "none" ? values.truck_id : null,
         permit_type: values.permit_type,
         permit_number: values.permit_number || null,
-        state: values.state || null,
+        // Save a canonical map code when possible (e.g. "São Paulo" and
+        // "BR-SP" both become "SP"). The map also normalizes older rows.
+        state: (normalizeMapRegion(selectedClientCountry as "US" | "BR" | "ES", values.state) ?? values.state?.trim()) || null,
         expiration_date: values.expiration_date || null,
         status: values.status,
         notes: values.notes || null,
