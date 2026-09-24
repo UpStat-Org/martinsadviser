@@ -3886,6 +3886,7 @@ export type Database = {
           org_id: string
           priority: string
           quoted_amount: number
+          renewal_of_id: string | null
           service_id: string | null
           sla_hours: number | null
           started_at: string | null
@@ -3910,6 +3911,7 @@ export type Database = {
           org_id?: string
           priority?: string
           quoted_amount?: number
+          renewal_of_id?: string | null
           service_id?: string | null
           sla_hours?: number | null
           started_at?: string | null
@@ -3934,6 +3936,7 @@ export type Database = {
           org_id?: string
           priority?: string
           quoted_amount?: number
+          renewal_of_id?: string | null
           service_id?: string | null
           sla_hours?: number | null
           started_at?: string | null
@@ -3955,6 +3958,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_orders_renewal_of_id_fkey"
+            columns: ["renewal_of_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
             referencedColumns: ["id"]
           },
           {
