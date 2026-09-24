@@ -81,7 +81,36 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "accidents_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "accidents_driver_id_fkey"
+          columns: ["{", "d", "r", "i", "v", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "drivers"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "accidents_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "accidents_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       activity_log: {
       Row: {
@@ -117,7 +146,22 @@ export type Database = {
         created_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "activity_log_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "activity_log_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       ai_briefings: {
       Row: {
@@ -150,7 +194,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "ai_briefings_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "ai_briefings_user_id_fkey"
+          columns: ["{", "u", "s", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       ai_chat_messages: {
       Row: {
@@ -180,7 +239,22 @@ export type Database = {
         created_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "ai_chat_messages_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "ai_chat_messages_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       automation_log: {
       Row: {
@@ -204,7 +278,29 @@ export type Database = {
         created_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "automation_log_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "automation_log_permit_id_fkey"
+          columns: ["{", "p", "e", "r", "m", "i", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "permits"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "automation_log_rule_id_fkey"
+          columns: ["{", "r", "u", "l", "e", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "automation_rules"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       automation_rules: {
       Row: {
@@ -249,7 +345,22 @@ export type Database = {
         updated_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "automation_rules_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "automation_rules_template_id_fkey"
+          columns: ["{", "t", "e", "m", "p", "l", "a", "t", "e", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "message_templates"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       br_compliance_items: {
       Row: {
@@ -306,7 +417,36 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "br_compliance_items_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "br_compliance_items_driver_id_fkey"
+          columns: ["{", "d", "r", "i", "v", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "drivers"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "br_compliance_items_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "br_compliance_items_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       br_fines: {
       Row: {
@@ -384,7 +524,36 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "br_fines_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "br_fines_driver_id_fkey"
+          columns: ["{", "d", "r", "i", "v", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "drivers"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "br_fines_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "br_fines_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       client_internal_notes: {
       Row: {
@@ -420,7 +589,22 @@ export type Database = {
         updated_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "client_internal_notes_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "client_internal_notes_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       client_portal_users: {
       Row: {
@@ -453,7 +637,29 @@ export type Database = {
         access_token?: string | null
         access_token_expires_at?: string | null
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "client_portal_users_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "client_portal_users_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "client_portal_users_user_id_fkey"
+          columns: ["{", "u", "s", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       clients: {
       Row: {
@@ -546,7 +752,22 @@ export type Database = {
         cnpj?: string | null
         inscricao_estadual?: string | null
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "clients_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "clients_user_id_fkey"
+          columns: ["{", "u", "s", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       comments: {
       Row: {
@@ -579,7 +800,15 @@ export type Database = {
         created_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "comments_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       compliance_automation_settings: {
       Row: {
@@ -627,7 +856,15 @@ export type Database = {
         updated_at?: string
         driver_enabled?: boolean
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "compliance_automation_settings_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       compliance_risk_scores: {
       Row: {
@@ -660,7 +897,22 @@ export type Database = {
         factors?: Json
         computed_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "compliance_risk_scores_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "compliance_risk_scores_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       compliance_task_log: {
       Row: {
@@ -696,7 +948,36 @@ export type Database = {
         dedupe_key?: string
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "compliance_task_log_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "compliance_task_log_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "compliance_task_log_task_id_fkey"
+          columns: ["{", "t", "a", "s", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "tasks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "compliance_task_log_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       csa_snapshots: {
       Row: {
@@ -747,7 +1028,22 @@ export type Database = {
         notes?: string | null
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "csa_snapshots_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "csa_snapshots_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       document_signatures: {
       Row: {
@@ -798,7 +1094,43 @@ export type Database = {
         service_order_id?: string | null
         checklist_item_id?: string | null
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "document_signatures_checklist_item_id_fkey"
+          columns: ["{", "c", "h", "e", "c", "k", "l", "i", "s", "t", "_", "i", "t", "e", "m", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "service_order_checklist_items"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "document_signatures_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "document_signatures_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "document_signatures_permit_id_fkey"
+          columns: ["{", "p", "e", "r", "m", "i", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "permits"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "document_signatures_service_order_id_fkey"
+          columns: ["{", "s", "e", "r", "v", "i", "c", "e", "_", "o", "r", "d", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "service_orders"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       driver_documents: {
       Row: {
@@ -840,7 +1172,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "driver_documents_driver_id_fkey"
+          columns: ["{", "d", "r", "i", "v", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "drivers"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "driver_documents_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       drivers: {
       Row: {
@@ -918,7 +1265,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "drivers_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "drivers_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       drug_test_events: {
       Row: {
@@ -969,7 +1331,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "drug_test_events_driver_id_fkey"
+          columns: ["{", "d", "r", "i", "v", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "drivers"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "drug_test_events_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       dunning_log: {
       Row: {
@@ -996,7 +1373,22 @@ export type Database = {
         enqueued?: boolean
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "dunning_log_invoice_id_fkey"
+          columns: ["{", "i", "n", "v", "o", "i", "c", "e", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "invoices"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "dunning_log_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       dunning_settings: {
       Row: {
@@ -1032,7 +1424,15 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "dunning_settings_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       eld_connections: {
       Row: {
@@ -1071,7 +1471,15 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "eld_connections_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       eld_driver_matches: {
       Row: {
@@ -1116,7 +1524,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "eld_driver_matches_driver_id_fkey"
+          columns: ["{", "d", "r", "i", "v", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "drivers"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "eld_driver_matches_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       eld_sync_log: {
       Row: {
@@ -1149,7 +1572,15 @@ export type Database = {
         status?: string
         message?: string | null
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "eld_sync_log_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       expenses: {
       Row: {
@@ -1194,7 +1625,29 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "expenses_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "expenses_invoice_id_fkey"
+          columns: ["{", "i", "n", "v", "o", "i", "c", "e", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "invoices"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "expenses_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       fmcsa_snapshots: {
       Row: {
@@ -1236,7 +1689,22 @@ export type Database = {
         raw?: Json | null
         fetched_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "fmcsa_snapshots_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "fmcsa_snapshots_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       google_calendar_tokens: {
       Row: {
@@ -1314,7 +1782,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "hos_violations_driver_id_fkey"
+          columns: ["{", "d", "r", "i", "v", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "drivers"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "hos_violations_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       hvut_filings: {
       Row: {
@@ -1374,7 +1857,29 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "hvut_filings_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "hvut_filings_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "hvut_filings_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       ifta_filings: {
       Row: {
@@ -1428,7 +1933,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "ifta_filings_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "ifta_filings_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       ifta_fuel_purchases: {
       Row: {
@@ -1479,7 +1999,29 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "ifta_fuel_purchases_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "ifta_fuel_purchases_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "ifta_fuel_purchases_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       ifta_tax_rates: {
       Row: {
@@ -1506,7 +2048,15 @@ export type Database = {
         rate_per_gallon?: number
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "ifta_tax_rates_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       ifta_trips: {
       Row: {
@@ -1551,7 +2101,29 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "ifta_trips_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "ifta_trips_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "ifta_trips_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       insurance_certificates: {
       Row: {
@@ -1602,7 +2174,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "insurance_certificates_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "insurance_certificates_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       invoices: {
       Row: {
@@ -1653,7 +2240,22 @@ export type Database = {
         stripe_payment_intent_id?: string | null
         paid_via?: string | null
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "invoices_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "invoices_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       irp_jurisdiction_lines: {
       Row: {
@@ -1686,7 +2288,22 @@ export type Database = {
         fee?: number | null
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "irp_jurisdiction_lines_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "irp_jurisdiction_lines_registration_id_fkey"
+          columns: ["{", "r", "e", "g", "i", "s", "t", "r", "a", "t", "i", "o", "n", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "irp_registrations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       irp_registrations: {
       Row: {
@@ -1737,7 +2354,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "irp_registrations_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "irp_registrations_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       leads: {
       Row: {
@@ -1803,7 +2435,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "leads_converted_client_id_fkey"
+          columns: ["{", "c", "o", "n", "v", "e", "r", "t", "e", "d", "_", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "leads_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       load_documents: {
       Row: {
@@ -1839,7 +2486,29 @@ export type Database = {
         notes?: string | null
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "load_documents_load_id_fkey"
+          columns: ["{", "l", "o", "a", "d", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "loads"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "load_documents_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "load_documents_user_id_fkey"
+          columns: ["{", "u", "s", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       load_stops: {
       Row: {
@@ -1911,7 +2580,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "load_stops_load_id_fkey"
+          columns: ["{", "l", "o", "a", "d", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "loads"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "load_stops_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       loads: {
       Row: {
@@ -1995,7 +2679,43 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "loads_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "loads_driver_id_fkey"
+          columns: ["{", "d", "r", "i", "v", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "drivers"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "loads_invoice_id_fkey"
+          columns: ["{", "i", "n", "v", "o", "i", "c", "e", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "invoices"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "loads_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "loads_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       maintenance_records: {
       Row: {
@@ -2046,7 +2766,22 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "maintenance_records_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "maintenance_records_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       message_templates: {
       Row: {
@@ -2082,7 +2817,15 @@ export type Database = {
         updated_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "message_templates_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       notifications: {
       Row: {
@@ -2118,7 +2861,15 @@ export type Database = {
         created_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "notifications_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       organization_domains: {
       Row: {
@@ -2154,7 +2905,15 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "organization_domains_organization_id_fkey"
+          columns: ["{", "o", "r", "g", "a", "n", "i", "z", "a", "t", "i", "o", "n", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       organization_invitations: {
       Row: {
@@ -2190,7 +2949,22 @@ export type Database = {
         accepted_at?: string | null
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "organization_invitations_invited_by_fkey"
+          columns: ["{", "i", "n", "v", "i", "t", "e", "d", "_", "b", "y", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "organization_invitations_organization_id_fkey"
+          columns: ["{", "o", "r", "g", "a", "n", "i", "z", "a", "t", "i", "o", "n", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       organization_members: {
       Row: {
@@ -2214,7 +2988,22 @@ export type Database = {
         approval_status?: string
         joined_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "organization_members_organization_id_fkey"
+          columns: ["{", "o", "r", "g", "a", "n", "i", "z", "a", "t", "i", "o", "n", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "organization_members_user_id_fkey"
+          columns: ["{", "u", "s", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       organizations: {
       Row: {
@@ -2310,7 +3099,29 @@ export type Database = {
         created_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "permit_documents_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "permit_documents_permit_id_fkey"
+          columns: ["{", "p", "e", "r", "m", "i", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "permits"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "permit_documents_user_id_fkey"
+          columns: ["{", "u", "s", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       permit_history: {
       Row: {
@@ -2346,7 +3157,22 @@ export type Database = {
         created_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "permit_history_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "permit_history_permit_id_fkey"
+          columns: ["{", "p", "e", "r", "m", "i", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "permits"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       permits: {
       Row: {
@@ -2403,7 +3229,36 @@ export type Database = {
         org_id?: string
         metadata?: Json
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "permits_assigned_to_fkey"
+          columns: ["{", "a", "s", "s", "i", "g", "n", "e", "d", "_", "t", "o", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "permits_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "permits_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "permits_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       profiles: {
       Row: {
@@ -2433,7 +3288,22 @@ export type Database = {
         updated_at?: string
         active_org_id?: string | null
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "profiles_active_org_id_fkey"
+          columns: ["{", "a", "c", "t", "i", "v", "e", "_", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "profiles_id_fkey"
+          columns: ["{", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       quote_items: {
       Row: {
@@ -2472,7 +3342,29 @@ export type Database = {
         position?: number
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "quote_items_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "quote_items_quote_id_fkey"
+          columns: ["{", "q", "u", "o", "t", "e", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "quotes"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "quote_items_service_id_fkey"
+          columns: ["{", "s", "e", "r", "v", "i", "c", "e", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "services"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       quotes: {
       Row: {
@@ -2544,7 +3436,36 @@ export type Database = {
         client_responded_at?: string | null
         client_responded_by?: string | null
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "quotes_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "quotes_client_responded_by_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "r", "e", "s", "p", "o", "n", "d", "e", "d", "_", "b", "y", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "quotes_lead_id_fkey"
+          columns: ["{", "l", "e", "a", "d", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "leads"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "quotes_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       recurring_plans: {
       Row: {
@@ -2601,7 +3522,29 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "recurring_plans_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "recurring_plans_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "recurring_plans_service_id_fkey"
+          columns: ["{", "s", "e", "r", "v", "i", "c", "e", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "services"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       roadside_inspections: {
       Row: {
@@ -2667,7 +3610,36 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "roadside_inspections_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "roadside_inspections_driver_id_fkey"
+          columns: ["{", "d", "r", "i", "v", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "drivers"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "roadside_inspections_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "roadside_inspections_truck_id_fkey"
+          columns: ["{", "t", "r", "u", "c", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "trucks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       saved_filters: {
       Row: {
@@ -2697,7 +3669,15 @@ export type Database = {
         created_at?: string
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "saved_filters_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       saved_views: {
       Row: {
@@ -2733,7 +3713,15 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "saved_views_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       scheduled_messages: {
       Row: {
@@ -2790,7 +3778,29 @@ export type Database = {
         locked_at?: string | null
         org_id?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "scheduled_messages_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "scheduled_messages_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "scheduled_messages_template_id_fkey"
+          columns: ["{", "t", "e", "m", "p", "l", "a", "t", "e", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "message_templates"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       service_order_checklist_items: {
       Row: {
@@ -2853,7 +3863,36 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "service_order_checklist_items_completed_by_fkey"
+          columns: ["{", "c", "o", "m", "p", "l", "e", "t", "e", "d", "_", "b", "y", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_order_checklist_items_created_by_fkey"
+          columns: ["{", "c", "r", "e", "a", "t", "e", "d", "_", "b", "y", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_order_checklist_items_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_order_checklist_items_service_order_id_fkey"
+          columns: ["{", "s", "e", "r", "v", "i", "c", "e", "_", "o", "r", "d", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "service_orders"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       service_order_events: {
       Row: {
@@ -2892,7 +3931,29 @@ export type Database = {
         actor_id?: string | null
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "service_order_events_actor_id_fkey"
+          columns: ["{", "a", "c", "t", "o", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_order_events_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_order_events_service_order_id_fkey"
+          columns: ["{", "s", "e", "r", "v", "i", "c", "e", "_", "o", "r", "d", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "service_orders"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       service_order_permits: {
       Row: {
@@ -2913,7 +3974,29 @@ export type Database = {
         org_id?: string
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "service_order_permits_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_order_permits_permit_id_fkey"
+          columns: ["{", "p", "e", "r", "m", "i", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "permits"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_order_permits_service_order_id_fkey"
+          columns: ["{", "s", "e", "r", "v", "i", "c", "e", "_", "o", "r", "d", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "service_orders"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       service_order_questions: {
       Row: {
@@ -2961,7 +4044,36 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "service_order_questions_answered_by_fkey"
+          columns: ["{", "a", "n", "s", "w", "e", "r", "e", "d", "_", "b", "y", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_order_questions_asked_by_fkey"
+          columns: ["{", "a", "s", "k", "e", "d", "_", "b", "y", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_order_questions_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_order_questions_service_order_id_fkey"
+          columns: ["{", "s", "e", "r", "v", "i", "c", "e", "_", "o", "r", "d", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "service_orders"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       service_orders: {
       Row: {
@@ -3039,7 +4151,50 @@ export type Database = {
         updated_at?: string
         renewal_of_id?: string | null
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "service_orders_assigned_to_fkey"
+          columns: ["{", "a", "s", "s", "i", "g", "n", "e", "d", "_", "t", "o", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_orders_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_orders_created_by_fkey"
+          columns: ["{", "c", "r", "e", "a", "t", "e", "d", "_", "b", "y", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_orders_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_orders_renewal_of_id_fkey"
+          columns: ["{", "r", "e", "n", "e", "w", "a", "l", "_", "o", "f", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "service_orders"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "service_orders_service_id_fkey"
+          columns: ["{", "s", "e", "r", "v", "i", "c", "e", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "services"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       services: {
       Row: {
@@ -3078,7 +4233,15 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "services_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       task_templates: {
       Row: {
@@ -3111,7 +4274,15 @@ export type Database = {
         created_at?: string
         updated_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "task_templates_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       task_time_entries: {
       Row: {
@@ -3147,7 +4318,29 @@ export type Database = {
         logged_at?: string
         created_at?: string
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "task_time_entries_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "task_time_entries_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "task_time_entries_task_id_fkey"
+          columns: ["{", "t", "a", "s", "k", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "tasks"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       tasks: {
       Row: {
@@ -3204,7 +4397,36 @@ export type Database = {
         org_id?: string
         service_order_id?: string | null
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "tasks_assigned_to_fkey"
+          columns: ["{", "a", "s", "s", "i", "g", "n", "e", "d", "_", "t", "o", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "tasks_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "tasks_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "tasks_service_order_id_fkey"
+          columns: ["{", "s", "e", "r", "v", "i", "c", "e", "_", "o", "r", "d", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "service_orders"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       trucks: {
       Row: {
@@ -3255,7 +4477,22 @@ export type Database = {
         org_id?: string
         taxable_gross_weight_lbs?: number | null
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "trucks_client_id_fkey"
+          columns: ["{", "c", "l", "i", "e", "n", "t", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "clients"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+        {
+          foreignKeyName: "trucks_org_id_fkey"
+          columns: ["{", "o", "r", "g", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "organizations"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
       user_roles: {
       Row: {
@@ -3273,7 +4510,15 @@ export type Database = {
         user_id?: string
         role?: Database["public"]["Enums"]["app_role"]
       }
-      Relationships: []
+      Relationships: [
+        {
+          foreignKeyName: "user_roles_user_id_fkey"
+          columns: ["{", "u", "s", "e", "r", "_", "i", "d", "}"]
+          isOneToOne: false
+          referencedRelation: "users"
+          referencedColumns: ["{", "i", "d", "}"]
+        },
+      ]
       }
     }
     Views: {
@@ -3297,10 +4542,10 @@ export type Database = {
     }
     Functions: {
       accept_invitation: { Args: { p_token: string }; Returns: string }
-      can_admin_user: { Args: { _target: string }; Returns: string }
-      can_org_write: { Args: { _org_id: string }; Returns: string }
+      can_admin_user: { Args: { _target: string }; Returns: boolean }
+      can_org_write: { Args: { _org_id: string }; Returns: boolean }
       claim_pending_messages: {
-        Args: { p_channel?: string; p_limit?: string }
+        Args: { p_channel?: string; p_limit?: number }
         Returns: {
           id: string
           user_id: string
@@ -3327,7 +4572,7 @@ export type Database = {
         }
       }
       claim_pending_messages_for_org: {
-        Args: { p_channel?: string; p_limit?: string; p_org_id: string }
+        Args: { p_channel?: string; p_limit?: number; p_org_id: string }
         Returns: {
           id: string
           user_id: string
@@ -3357,7 +4602,7 @@ export type Database = {
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       default_currency_for_country: { Args: { p_country: string }; Returns: string }
       default_locale_for_country: { Args: { p_country: string }; Returns: string }
-      expire_trials: { Args: {  }; Returns: string }
+      expire_trials: { Args: {  }; Returns: number }
       get_approval_status: { Args: { _user_id: string }; Returns: string }
       get_org_by_hostname: {
         Args: { p_hostname: string }
@@ -3378,18 +4623,18 @@ export type Database = {
         }[]
       }
       get_portal_client_id: { Args: { _user_id: string }; Returns: string }
-      has_org_role: { Args: { _org_id: string; _role: Database["public"]["Enums"]["org_role"] }; Returns: string }
-      has_role: { Args: { _role: Database["public"]["Enums"]["app_role"]; _user_id: string }; Returns: string }
+      has_org_role: { Args: { _org_id: string; _role: Database["public"]["Enums"]["org_role"] }; Returns: boolean }
+      has_role: { Args: { _role: Database["public"]["Enums"]["app_role"]; _user_id: string }; Returns: boolean }
       invite_member: {
         Args: { p_email: string; p_org_id: string; p_role?: Database["public"]["Enums"]["org_role"] }
         Returns: Json
       }
-      is_org_admin: { Args: { _org_id: string }; Returns: string }
-      is_org_member: { Args: { _org_id: string }; Returns: string }
-      is_portal_client: { Args: { p_client_id: string }; Returns: string }
-      is_portal_order: { Args: { p_order_id: string }; Returns: string }
-      is_portal_user: { Args: { _user_id: string }; Returns: string }
-      is_super_admin: { Args: {  }; Returns: string }
+      is_org_admin: { Args: { _org_id: string }; Returns: boolean }
+      is_org_member: { Args: { _org_id: string }; Returns: boolean }
+      is_portal_client: { Args: { p_client_id: string }; Returns: boolean }
+      is_portal_order: { Args: { p_order_id: string }; Returns: boolean }
+      is_portal_user: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: {  }; Returns: boolean }
       list_org_members: {
         Args: { p_org_id: string }
         Returns: {
@@ -3407,8 +4652,8 @@ export type Database = {
       peek_invitation: { Args: { p_token: string }; Returns: Json }
       portal_answer_service_order_question: { Args: { p_answer: string; p_question_id: string }; Returns: undefined }
       portal_attach_checklist_document: { Args: { p_document_path: string; p_file_name: string; p_item_id: string }; Returns: undefined }
-      portal_can_read_service_order_document: { Args: { p_path: string }; Returns: string }
-      portal_can_upload_service_order_document: { Args: { p_path: string }; Returns: string }
+      portal_can_read_service_order_document: { Args: { p_path: string }; Returns: boolean }
+      portal_can_upload_service_order_document: { Args: { p_path: string }; Returns: boolean }
       portal_create_service_order: {
         Args: { p_description?: string; p_permit_ids?: string[]; p_renewal_of_id?: string; p_service_id?: string; p_title: string }
         Returns: string
@@ -3425,7 +4670,7 @@ export type Database = {
       }
       prune_ai_briefings: { Args: {  }; Returns: undefined }
       public_create_org_with_owner: { Args: { p_country?: string; p_name: string; p_slug: string }; Returns: string }
-      recover_stuck_sending: { Args: {  }; Returns: string }
+      recover_stuck_sending: { Args: {  }; Returns: number }
       request_org_domain: {
         Args: { p_domain: string; p_org_id: string }
         Returns: {
@@ -3452,10 +4697,10 @@ export type Database = {
           branding: Json
           feature_flags: Json
           created_at: string
-          member_count: string
-          client_count: string
-          permit_count: string
-          truck_count: string
+          member_count: number
+          client_count: number
+          permit_count: number
+          truck_count: number
         }[]
       }
       super_admin_org_details: { Args: { p_org_id: string }; Returns: Json }
