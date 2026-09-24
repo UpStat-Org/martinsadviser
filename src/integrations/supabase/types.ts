@@ -4565,6 +4565,10 @@ export type Database = {
         Args: { p_path: string }
         Returns: boolean
       }
+      portal_can_upload_service_order_document: {
+        Args: { p_path: string }
+        Returns: boolean
+      }
       portal_create_service_order: {
         Args: {
           p_description?: string
