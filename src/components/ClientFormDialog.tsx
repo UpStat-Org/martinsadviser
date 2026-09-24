@@ -34,6 +34,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFmcsaLookup } from "@/hooks/useFmcsaLookup";
 import { Loader2, Search } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOrg } from "@/contexts/OrgContext";
 import { tNow } from "@/lib/translations";
 
 const formSchema = z.object({
@@ -82,6 +83,8 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
   const { lookup, loading: lookingUp } = useFmcsaLookup();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { country: orgCountry } = useOrg();
+  const defaultCountry = orgCountry as "US" | "BR" | "ES";
   const isEditing = !!client;
 
   const { lookup: lookupCnpjApi, loading: lookingUpCnpj } = useCnpjLookup();
@@ -128,7 +131,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
           mc: client.mc || "",
           cnpj: (client as unknown as { cnpj?: string }).cnpj || "",
           inscricao_estadual: (client as unknown as { inscricao_estadual?: string }).inscricao_estadual || "",
-          country: (((client as unknown as { country?: string }).country) ?? "US") as "US" | "BR" | "ES",
+          country: (((client as unknown as { country?: string }).country) ?? defaultCountry) as "US" | "BR" | "ES",
           status: client.status,
           service_ifta: client.service_ifta,
           service_ct: client.service_ct,
@@ -149,7 +152,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
           mc: "",
           cnpj: "",
           inscricao_estadual: "",
-          country: "US",
+          country: defaultCountry,
           status: "active",
           service_ifta: false,
           service_ct: false,
@@ -178,7 +181,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
               mc: client.mc || "",
               cnpj: (client as unknown as { cnpj?: string }).cnpj || "",
               inscricao_estadual: (client as unknown as { inscricao_estadual?: string }).inscricao_estadual || "",
-              country: (((client as unknown as { country?: string }).country) ?? "US") as "US" | "BR" | "ES",
+              country: (((client as unknown as { country?: string }).country) ?? defaultCountry) as "US" | "BR" | "ES",
               status: client.status,
               service_ifta: client.service_ifta,
               service_ct: client.service_ct,
@@ -199,7 +202,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
               mc: "",
               cnpj: "",
               inscricao_estadual: "",
-              country: "US",
+              country: defaultCountry,
               status: "active",
               service_ifta: false,
               service_ct: false,
@@ -211,7 +214,7 @@ export function ClientFormDialog({ open, onOpenChange, client }: ClientFormDialo
             }
       );
     }
-  }, [open, client, form]);
+  }, [open, client, defaultCountry, form]);
 
   const onSubmit = async (values: FormValues) => {
     const payload = {
