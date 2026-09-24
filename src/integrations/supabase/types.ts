@@ -355,6 +355,199 @@ export type Database = {
           },
         ]
       }
+      br_compliance_items: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          document_number: string | null
+          document_url: string | null
+          driver_id: string | null
+          expires_on: string | null
+          id: string
+          issued_on: string | null
+          kind: string
+          metadata: Json
+          notes: string | null
+          org_id: string
+          scope: string
+          truck_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          document_number?: string | null
+          document_url?: string | null
+          driver_id?: string | null
+          expires_on?: string | null
+          id?: string
+          issued_on?: string | null
+          kind: string
+          metadata?: Json
+          notes?: string | null
+          org_id?: string
+          scope: string
+          truck_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          document_number?: string | null
+          document_url?: string | null
+          driver_id?: string | null
+          expires_on?: string | null
+          id?: string
+          issued_on?: string | null
+          kind?: string
+          metadata?: Json
+          notes?: string | null
+          org_id?: string
+          scope?: string
+          truck_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "br_compliance_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "br_compliance_items_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "br_compliance_items_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "br_compliance_items_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      br_fines: {
+        Row: {
+          amount: number
+          authority: string | null
+          client_id: string | null
+          created_at: string
+          defense_due_on: string | null
+          description: string | null
+          document_url: string | null
+          driver_id: string | null
+          id: string
+          infraction_code: string | null
+          metadata: Json
+          notes: string | null
+          notice_number: string | null
+          notified_on: string | null
+          occurred_at: string | null
+          org_id: string
+          payment_due_on: string | null
+          points: number
+          severity: string
+          status: string
+          truck_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          authority?: string | null
+          client_id?: string | null
+          created_at?: string
+          defense_due_on?: string | null
+          description?: string | null
+          document_url?: string | null
+          driver_id?: string | null
+          id?: string
+          infraction_code?: string | null
+          metadata?: Json
+          notes?: string | null
+          notice_number?: string | null
+          notified_on?: string | null
+          occurred_at?: string | null
+          org_id?: string
+          payment_due_on?: string | null
+          points?: number
+          severity?: string
+          status?: string
+          truck_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          authority?: string | null
+          client_id?: string | null
+          created_at?: string
+          defense_due_on?: string | null
+          description?: string | null
+          document_url?: string | null
+          driver_id?: string | null
+          id?: string
+          infraction_code?: string | null
+          metadata?: Json
+          notes?: string | null
+          notice_number?: string | null
+          notified_on?: string | null
+          occurred_at?: string | null
+          org_id?: string
+          payment_due_on?: string | null
+          points?: number
+          severity?: string
+          status?: string
+          truck_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "br_fines_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "br_fines_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "br_fines_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "br_fines_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_internal_notes: {
         Row: {
           body: string
@@ -457,6 +650,7 @@ export type Database = {
       clients: {
         Row: {
           address: string | null
+          cnpj: string | null
           company_name: string
           country: string
           created_at: string
@@ -464,6 +658,7 @@ export type Database = {
           ein: string | null
           email: string | null
           id: string
+          inscricao_estadual: string | null
           mc: string | null
           mcs_150_last_filed_at: string | null
           new_entrant_start_at: string | null
@@ -485,6 +680,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          cnpj?: string | null
           company_name: string
           country?: string
           created_at?: string
@@ -492,6 +688,7 @@ export type Database = {
           ein?: string | null
           email?: string | null
           id?: string
+          inscricao_estadual?: string | null
           mc?: string | null
           mcs_150_last_filed_at?: string | null
           new_entrant_start_at?: string | null
@@ -513,6 +710,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          cnpj?: string | null
           company_name?: string
           country?: string
           created_at?: string
@@ -520,6 +718,7 @@ export type Database = {
           ein?: string | null
           email?: string | null
           id?: string
+          inscricao_estadual?: string | null
           mc?: string | null
           mcs_150_last_filed_at?: string | null
           new_entrant_start_at?: string | null

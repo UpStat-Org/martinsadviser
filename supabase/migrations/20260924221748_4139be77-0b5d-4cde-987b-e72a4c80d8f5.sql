@@ -1,0 +1,15 @@
+REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.org_distance_unit() FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.org_weight_unit() FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.default_currency_for_country(text) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.default_locale_for_country(text) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.public_create_org_with_owner(text, text, text) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.super_admin_create_org(text, text, text) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.update_org_regional_settings(uuid, text, text, text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.org_distance_unit() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.org_weight_unit() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.default_currency_for_country(text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.default_locale_for_country(text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.public_create_org_with_owner(text, text, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.super_admin_create_org(text, text, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_org_regional_settings(uuid, text, text, text) TO authenticated;
