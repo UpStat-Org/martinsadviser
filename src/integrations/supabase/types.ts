@@ -4027,8 +4027,36 @@ export type Database = {
     Functions: {
       accept_invitation: { Args: { p_token: string }; Returns: string }
       can_admin_user: { Args: { _target: string }; Returns: boolean }
+      can_org_write: { Args: { _org_id: string }; Returns: boolean }
       claim_pending_messages: {
         Args: { p_channel?: string; p_limit?: number }
+        Returns: {
+          body: string
+          channel: string
+          client_id: string
+          created_at: string
+          id: string
+          last_error: string | null
+          locked_at: string | null
+          next_retry_at: string | null
+          org_id: string
+          retry_count: number
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+          subject: string | null
+          template_id: string | null
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "scheduled_messages"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      claim_pending_messages_for_org: {
+        Args: { p_channel?: string; p_limit?: number; p_org_id: string }
         Returns: {
           body: string
           channel: string
