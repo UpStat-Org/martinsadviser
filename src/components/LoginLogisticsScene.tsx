@@ -58,6 +58,9 @@ export function LoginLogisticsScene() {
           <path d="M100 260 360 130 620 260 360 390Z M230 195 490 325 M230 325 490 195" fill="none" stroke="#77969f" strokeOpacity=".45" strokeDasharray="5 9" />
           <path className="login-route-flow" d="M100 260 360 390 620 260 360 130" fill="none" stroke="#64efc4" strokeWidth="2" strokeDasharray="6 14" />
 
+          {/* This truck is deliberately behind the hub, so the building occludes it on this route. */}
+          <g className="login-truck-two"><use href="#login-truck" /></g>
+
           {/* Central distribution hub, drawn in isometric perspective. */}
           <ellipse cx="360" cy="262" rx="145" ry="90" fill="url(#login-beacon)" />
           <path d="M284 225 360 187 442 228 366 267Z" fill="#06151e" opacity=".5" transform="translate(0 20)" />
@@ -82,7 +85,6 @@ export function LoginLogisticsScene() {
             </g>
           ))}
           <g className="login-truck-one"><use href="#login-truck" /></g>
-          <g className="login-truck-two"><use href="#login-truck" /></g>
           {[{ x: 100, y: 260 }, { x: 620, y: 260 }, { x: 360, y: 390 }].map(({ x, y }) => <g key={x}><ellipse cx={x} cy={y} rx="9" ry="4.5" fill="#7cf2c9" opacity=".2" /><circle cx={x} cy={y} r="3" fill="#a5ffdd" /></g>)}
           <path d="M48 304 360 460 672 304" fill="none" stroke="#64efc4" strokeOpacity=".12" />
           <path d="M100 347 360 477 620 347" fill="none" stroke="#64efc4" strokeOpacity=".06" />

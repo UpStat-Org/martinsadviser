@@ -15,6 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
 import { ArrowRight, Building2, CheckCircle2, Loader2 } from "lucide-react";
+import { StartOrgScene } from "@/components/StartOrgScene";
 
 // Derives a URL-safe slug from the company name as the user types.
 // Idempotent: applying twice gives the same result.
@@ -134,42 +135,11 @@ export default function StartOrg() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left visual panel */}
-      <div className="hidden lg:flex lg:w-[45%] bg-card border border-border relative overflow-hidden">
-        <div className="relative z-10 flex flex-col justify-between px-16 py-14 w-full">
-          <div className="flex items-center gap-3">
-            <Logo className="w-12 h-12 rounded-md ring-1 ring-white/20" />
-            <Wordmark size="xl" tone="light" />
-          </div>
-          <div className="space-y-5">
-            <h2 className="text-5xl font-bold text-foreground leading-tight">
-              {t("startOrg.welcomeNewOp")}
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-md leading-relaxed">
-              {t("startOrg.trialBlurb")}
-            </p>
-            <ul className="space-y-2.5 mt-6">
-              {[
-                t("startOrg.benefit1"),
-                t("startOrg.benefit2"),
-                t("startOrg.benefit3"),
-              ].map((feature) => (
-                <li key={feature} className="flex items-center gap-2.5 text-foreground/75 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="text-muted-foreground text-xs">
-            <Link to="/login" className="hover:text-muted-foreground transition-colors">← {t("startOrg.haveAccount")}</Link>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background flex lg:h-screen lg:overflow-hidden">
+      <StartOrgScene />
 
       {/* Right form */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 lg:overflow-y-auto">
         <div className="w-full max-w-[480px]">
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
             <Logo className="w-10 h-10 rounded-md" />

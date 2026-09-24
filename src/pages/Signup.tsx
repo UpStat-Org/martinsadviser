@@ -6,24 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Truck,
   Mail,
   Lock,
   User,
-  Shield,
-  BarChart3,
-  Users,
-  Clock,
   ArrowRight,
   CheckCircle,
-  Sparkles,
   Eye,
   EyeOff,
-  Check,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
+import { SignupAccessScene } from "@/components/SignupAccessScene";
 
 export default function Signup() {
   // When arriving from /invite/<token>, pre-fill the email and remember
@@ -130,47 +124,12 @@ export default function Signup() {
     );
   }
 
-  const benefits = [
-    t("signup.benefit.permits"),
-    t("signup.benefit.compliance"),
-    t("signup.benefit.portal"),
-    t("signup.benefit.reports"),
-  ];
-
   return (
-    <div className="min-h-screen flex bg-background">
-      {/* Branding side — calm and informative */}
-      <div className="hidden lg:flex lg:w-[42%] bg-muted/40 border-r border-border">
-        <div className="flex flex-col justify-between px-12 xl:px-16 py-12 w-full max-w-xl">
-          <div className="flex items-center gap-2.5">
-            <Logo className="w-9 h-9 rounded" />
-            <Wordmark size="lg" tone="dark" />
-          </div>
-
-          <div>
-            <h2 className="text-3xl xl:text-4xl font-semibold tracking-tight text-foreground leading-tight">
-              {t("signup.brandingHeadline")}
-            </h2>
-            <p className="text-muted-foreground text-base mt-4 max-w-md">
-              {t("signup.brandingSubtitle")}
-            </p>
-          </div>
-
-          <ul className="space-y-2.5 text-sm text-foreground/80 max-w-md">
-            {benefits.map((b) => (
-              <li key={b} className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded bg-card border border-border flex items-center justify-center mt-0.5 shrink-0">
-                  <Check className="w-3 h-3 text-success" strokeWidth={3} />
-                </span>
-                {b}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+    <div className="min-h-screen flex bg-background lg:h-screen lg:overflow-hidden">
+      <SignupAccessScene />
 
       {/* Form side */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 lg:overflow-y-auto">
         <div className="w-full max-w-[400px]">
           <div className="flex items-center justify-center gap-2.5 mb-8 lg:hidden">
             <Logo className="w-8 h-8 rounded" />
