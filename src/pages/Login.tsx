@@ -9,22 +9,16 @@ import { useHostnameOrg } from "@/hooks/useHostnameOrg";
 import { splitWordmark } from "@/contexts/OrgContext";
 import { applyBrandingColors } from "@/lib/color";
 import {
-  Truck,
   Mail,
   Lock,
-  Shield,
-  BarChart3,
-  Users,
-  Clock,
   ArrowRight,
   Eye,
   EyeOff,
-  Sparkles,
-  CheckCircle2,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Logo } from "@/components/Logo";
 import { Wordmark } from "@/components/Wordmark";
+import { LoginLogisticsScene } from "@/components/LoginLogisticsScene";
 
 export default function Login() {
   // Pre-fill the email when arriving from an invite link so the user doesn't
@@ -154,51 +148,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex bg-background">
-      {/* Branding side — calm and informative, no glow */}
-      <div className="hidden lg:flex lg:w-[42%] bg-muted/40 border-r border-border">
-        <div className="flex flex-col justify-between px-12 xl:px-16 py-12 w-full max-w-xl">
-          <div className="flex items-center gap-2.5">
-            <Logo src={brandingLogo} title={brandingApp} className="w-9 h-9 rounded" />
-            <Wordmark
-              size="lg"
-              tone="dark"
-              primary={wordmark.primary}
-              secondary={wordmark.secondary}
-              accentColor={brandingAccent}
-            />
-          </div>
-
-          <div>
-            <h2 className="text-3xl xl:text-4xl font-semibold tracking-tight text-foreground leading-tight">
-              {t("login.brandingHeadline")}
-            </h2>
-            <p className="text-muted-foreground text-base mt-4 max-w-md">
-              {t("login.brandingSubtitle")}
-            </p>
-          </div>
-
-          <ul className="space-y-2.5 text-sm text-foreground/80 max-w-md">
-            {[
-              { icon: Shield, label: t("login.feature.compliance") },
-              { icon: BarChart3, label: t("login.feature.aiReports") },
-              { icon: Users, label: t("login.feature.portal") },
-              { icon: Clock, label: t("login.feature.automations") },
-            ].map(({ icon: Icon, label }) => (
-              <li key={label} className="flex items-center gap-2.5">
-                <span className="w-7 h-7 rounded bg-card border border-border flex items-center justify-center text-muted-foreground">
-                  <Icon className="w-3.5 h-3.5" />
-                </span>
-                {label}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      <LoginLogisticsScene />
 
       {/* Form side */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-[400px]">
-          <div className="flex items-center justify-center gap-2.5 mb-8 lg:hidden">
+          <div className="flex items-center justify-center gap-2.5 mb-8">
             <Logo src={brandingLogo} title={brandingApp} className="w-8 h-8 rounded" />
             <Wordmark
               size="md"
