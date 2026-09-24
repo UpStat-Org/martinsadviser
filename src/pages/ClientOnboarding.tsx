@@ -70,6 +70,7 @@ const clientSchema = z.object({
   ein: z.string().optional(),
   dot: z.string().optional(),
   mc: z.string().optional(),
+  country: z.enum(["US", "BR", "ES"]),
   notes: z.string().optional(),
 });
 
@@ -148,9 +149,12 @@ export default function ClientOnboarding() {
       ein: "",
       dot: "",
       mc: "",
+      country,
       notes: "",
     },
   });
+
+  const selectedCountry = form.watch("country");
 
   const [selectedServices, setSelectedServices] = useState<Record<string, boolean>>({
     service_ifta: false,
@@ -318,6 +322,7 @@ export default function ClientOnboarding() {
         ein: vals.ein || null,
         dot: vals.dot || null,
         mc: vals.mc || null,
+        country: vals.country,
         notes: vals.notes || null,
         status: "active",
         ...selectedServices,
@@ -662,6 +667,31 @@ export default function ClientOnboarding() {
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {t("common.country")}
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-12 rounded-md bg-muted/40 border-border/60 focus:bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="US">🇺🇸 {t("country.us")}</SelectItem>
+                        <SelectItem value="BR">🇧🇷 {t("country.br")}</SelectItem>
+                        <SelectItem value="ES">🇪🇸 {t("country.es")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* DOT lookup highlight card */}
               <div className="rounded-md bg-secondary text-secondary-foreground border border-border border border-primary/15 p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -975,7 +1005,7 @@ export default function ClientOnboarding() {
                     <SelectValue placeholder={`${t("common.type")} *`} />
                   </SelectTrigger>
                   <SelectContent>
-                    {permitTypesForCountry(country).map((t) => (
+                    {permitTypesForCountry(selectedCountry).map((t) => (
                       <SelectItem key={t} value={t}>
                         {t}
                       </SelectItem>
