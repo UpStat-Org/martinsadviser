@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
+import { History } from "lucide-react";
 import { AppSidebar } from "./AppSidebar";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationCenter } from "./NotificationCenter";
@@ -49,6 +50,14 @@ export function AppLayout() {
               <GlobalSearch />
             </div>
             <div className="flex-1" />
+            <Link
+              to="/changelog"
+              className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              title="Changelog"
+            >
+              <History className="h-4 w-4" />
+              <span className="hidden sm:inline">Changelog</span>
+            </Link>
             <NotificationCenter />
           </div>
         </div>

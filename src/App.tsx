@@ -70,6 +70,7 @@ const MyDeskPage = lazy(() => import("./pages/MyDeskPage"));
 const LoadsPage = lazy(() => import("./pages/LoadsPage"));
 const LoadDetailPage = lazy(() => import("./pages/LoadDetailPage"));
 const LiveTracking = lazy(() => import("./pages/LiveTracking"));
+const ChangelogPage = lazy(() => import("./pages/ChangelogPage"));
 const ServiceOrdersPage = lazy(() => import("./pages/ServiceOrdersPage"));
 const ServiceOrderDetailPage = lazy(() => import("./pages/ServiceOrderDetailPage"));
 const BrCompliancePage = lazy(() => import("./pages/BrCompliancePage"));
@@ -145,6 +146,7 @@ const App = () => (
               }
             >
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/changelog" element={<ChangelogPage />} />
               <Route path="/my" element={<MyDeskPage />} />
               <Route path="/workload" element={<OrgAdminRoute><WorkloadPage /></OrgAdminRoute>} />
               <Route path="/clients" element={<Clients />} />
