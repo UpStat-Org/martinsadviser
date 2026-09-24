@@ -1,12 +1,17 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { ErrorBoundary } from "../ErrorBoundary";
+import { ErrorBoundary, isDynamicImportFailure } from "../ErrorBoundary";
 
 function Boom(): JSX.Element {
   throw new Error("kaboom");
 }
 
 describe("ErrorBoundary", () => {
+  it("recognizes a stale lazy-route bundle", () => {
+    expect(isDynamicImportFailure(new TypeError("Failed to fetch dynamically imported module"))).toBe(true);
+    expect(isDynamicImportFailure(new Error("kaboom"))).toBe(false);
+  });
+
   it("renders children when nothing throws", () => {
     render(
       <ErrorBoundary>

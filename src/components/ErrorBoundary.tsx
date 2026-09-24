@@ -11,6 +11,32 @@ interface State {
   error: Error | null;
 }
 
+/**
+ * A route bundle has a content hash in its filename. When a new deploy removes
+ * the old file while the app is open in a browser tab, the next `lazy()` route
+ * navigation can only be fixed by loading the new entry bundle.
+ */
+export function isDynamicImportFailure(error: Error): boolean {
+  return /failed to fetch dynamically imported module|error loading dynamically imported module|importing a module script failed|failed to load module script/i.test(error.message);
+}
+
+function reloadAfterDeploy(error: Error): boolean {
+  const key = "dotpilot:failed-dynamic-import";
+
+  try {
+    // Reload only once for this exact failed import. This prevents a loop when
+    // the failure is caused by an outage rather than an obsolete deploy.
+    if (sessionStorage.getItem(key) === error.message) return false;
+    sessionStorage.setItem(key, error.message);
+    window.location.reload();
+    return true;
+  } catch {
+    // Storage can be unavailable in privacy-restricted browser contexts. The
+    // regular error UI remains available in that case.
+    return false;
+  }
+}
+
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -25,6 +51,8 @@ export class ErrorBoundary extends Component<Props, State> {
     // Surface the stack to the console so issues caught by the boundary
     // aren't silently swallowed — the user only sees the friendly message.
     console.error("[ErrorBoundary] uncaught render error", error, info.componentStack);
+
+    if (isDynamicImportFailure(error)) reloadAfterDeploy(error);
   }
 
   render() {
