@@ -50,7 +50,7 @@ export function LiveTrackingMap({ positions, className, language }: {
     if (coordinates.length > 1) {
       L.polyline(coordinates, { color: "#2563eb", weight: 4, opacity: 0.8 }).addTo(layer);
     }
-    const latest = coordinates.at(-1)!;
+    const latest = coordinates[coordinates.length - 1]!;
     L.circleMarker(latest, {
       radius: 9, color: "#ffffff", weight: 3, fillColor: "#16a34a", fillOpacity: 1,
     }).bindTooltip(trackingCopy[language].currentLocation, { permanent: false }).addTo(layer);
