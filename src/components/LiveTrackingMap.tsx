@@ -10,8 +10,9 @@ export type TrackingPosition = {
   recorded_at: string;
 };
 
-/** A small, dependency-light live map. OSM is sufficient for the MVP; the
- * tile provider can later be swapped without touching tracking data. */
+/** A small, dependency-light live map. CARTO's public basemap avoids sending
+ * operational traffic to OpenStreetMap's volunteer-run tile servers; the
+ * provider can later be swapped without touching tracking data. */
 export function LiveTrackingMap({ positions, className, language }: {
   positions: TrackingPosition[];
   className?: string;
@@ -24,8 +25,8 @@ export function LiveTrackingMap({ positions, className, language }: {
   useEffect(() => {
     if (!elementRef.current || mapRef.current) return;
     const map = L.map(elementRef.current, { zoomControl: true, scrollWheelZoom: false });
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       maxZoom: 19,
       referrerPolicy: "no-referrer",
     }).addTo(map);
