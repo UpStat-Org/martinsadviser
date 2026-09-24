@@ -1026,6 +1026,7 @@ export type Database = {
       }
       document_signatures: {
         Row: {
+          checklist_item_id: string | null
           client_id: string
           created_at: string
           document_name: string
@@ -1033,6 +1034,7 @@ export type Database = {
           ip_address: string | null
           org_id: string
           permit_id: string | null
+          service_order_id: string | null
           signature_data: string
           signed_at: string
           signer_email: string | null
@@ -1040,6 +1042,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          checklist_item_id?: string | null
           client_id: string
           created_at?: string
           document_name: string
@@ -1047,6 +1050,7 @@ export type Database = {
           ip_address?: string | null
           org_id?: string
           permit_id?: string | null
+          service_order_id?: string | null
           signature_data: string
           signed_at?: string
           signer_email?: string | null
@@ -1054,6 +1058,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          checklist_item_id?: string | null
           client_id?: string
           created_at?: string
           document_name?: string
@@ -1061,6 +1066,7 @@ export type Database = {
           ip_address?: string | null
           org_id?: string
           permit_id?: string | null
+          service_order_id?: string | null
           signature_data?: string
           signed_at?: string
           signer_email?: string | null
@@ -1068,6 +1074,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "document_signatures_checklist_item_id_fkey"
+            columns: ["checklist_item_id"]
+            isOneToOne: false
+            referencedRelation: "service_order_checklist_items"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "document_signatures_client_id_fkey"
             columns: ["client_id"]
@@ -1087,6 +1100,13 @@ export type Database = {
             columns: ["permit_id"]
             isOneToOne: false
             referencedRelation: "permits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_signatures_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -2160,7 +2180,10 @@ export type Database = {
           id: string
           org_id: string
           paid_date: string | null
+          paid_via: string | null
           status: string
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
           updated_at: string
           user_id: string
         }
@@ -2173,7 +2196,10 @@ export type Database = {
           id?: string
           org_id?: string
           paid_date?: string | null
+          paid_via?: string | null
           status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -2186,7 +2212,10 @@ export type Database = {
           id?: string
           org_id?: string
           paid_date?: string | null
+          paid_via?: string | null
           status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -3278,6 +3307,9 @@ export type Database = {
         Row: {
           accepted_at: string | null
           client_id: string | null
+          client_responded_at: string | null
+          client_responded_by: string | null
+          client_response_note: string | null
           converted_at: string | null
           created_at: string
           discount: number
@@ -3298,6 +3330,9 @@ export type Database = {
         Insert: {
           accepted_at?: string | null
           client_id?: string | null
+          client_responded_at?: string | null
+          client_responded_by?: string | null
+          client_response_note?: string | null
           converted_at?: string | null
           created_at?: string
           discount?: number
@@ -3318,6 +3353,9 @@ export type Database = {
         Update: {
           accepted_at?: string | null
           client_id?: string | null
+          client_responded_at?: string | null
+          client_responded_by?: string | null
+          client_response_note?: string | null
           converted_at?: string | null
           created_at?: string
           discount?: number
@@ -3862,6 +3900,69 @@ export type Database = {
           },
           {
             foreignKeyName: "service_order_permits_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_order_questions: {
+        Row: {
+          answer: string | null
+          answered_at: string | null
+          answered_by: string | null
+          asked_by: string
+          created_at: string
+          due_date: string | null
+          id: string
+          org_id: string
+          question: string
+          resolved_at: string | null
+          service_order_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answer?: string | null
+          answered_at?: string | null
+          answered_by?: string | null
+          asked_by: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          org_id: string
+          question: string
+          resolved_at?: string | null
+          service_order_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: string | null
+          answered_at?: string | null
+          answered_by?: string | null
+          asked_by?: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          org_id?: string
+          question?: string
+          resolved_at?: string | null
+          service_order_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_order_questions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_order_questions_service_order_id_fkey"
             columns: ["service_order_id"]
             isOneToOne: false
             referencedRelation: "service_orders"
@@ -4429,6 +4530,8 @@ export type Database = {
       }
       is_org_admin: { Args: { _org_id: string }; Returns: boolean }
       is_org_member: { Args: { _org_id: string }; Returns: boolean }
+      is_portal_client: { Args: { p_client_id: string }; Returns: boolean }
+      is_portal_order: { Args: { p_order_id: string }; Returns: boolean }
       is_portal_user: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       list_org_members: {
@@ -4446,6 +4549,52 @@ export type Database = {
       org_distance_unit: { Args: never; Returns: string }
       org_weight_unit: { Args: never; Returns: string }
       peek_invitation: { Args: { p_token: string }; Returns: Json }
+      portal_answer_service_order_question: {
+        Args: { p_answer: string; p_question_id: string }
+        Returns: undefined
+      }
+      portal_attach_checklist_document: {
+        Args: {
+          p_document_path: string
+          p_file_name: string
+          p_item_id: string
+        }
+        Returns: undefined
+      }
+      portal_can_read_service_order_document: {
+        Args: { p_path: string }
+        Returns: boolean
+      }
+      portal_create_service_order: {
+        Args: {
+          p_description?: string
+          p_permit_ids?: string[]
+          p_renewal_of_id?: string
+          p_service_id?: string
+          p_title: string
+        }
+        Returns: string
+      }
+      portal_get_service_order: { Args: { p_order_id: string }; Returns: Json }
+      portal_list_invoices: { Args: never; Returns: Json }
+      portal_list_quotes: { Args: never; Returns: Json }
+      portal_list_service_orders: { Args: never; Returns: Json }
+      portal_list_services: { Args: never; Returns: Json }
+      portal_respond_quote: {
+        Args: { p_decision: string; p_note?: string; p_quote_id: string }
+        Returns: undefined
+      }
+      portal_sign_service_order_document: {
+        Args: {
+          p_checklist_item_id: string
+          p_document_name: string
+          p_order_id: string
+          p_signature_data: string
+          p_signer_email: string
+          p_signer_name: string
+        }
+        Returns: string
+      }
       prune_ai_briefings: { Args: never; Returns: undefined }
       public_create_org_with_owner: {
         Args: { p_country?: string; p_name: string; p_slug: string }
