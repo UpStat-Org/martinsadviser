@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeMapCountry, normalizeMapRegion } from "../index";
+import { inferMapCountryFromRegion, normalizeMapCountry, normalizeMapRegion, permitMapCountry } from "../index";
 
 describe("map normalization", () => {
   it("recognizes countries from codes and names", () => {
@@ -19,5 +19,15 @@ describe("map normalization", () => {
     expect(normalizeMapRegion("ES", "ES-MD")).toBe("MD");
     expect(normalizeMapRegion("ES", "Madrid")).toBe("MD");
     expect(normalizeMapRegion("ES", "Andalucía")).toBe("AN");
+  });
+
+  it("recovers legacy permits whose client has the wrong default country", () => {
+    expect(permitMapCountry("US", "SP")).toBe("BR");
+    expect(permitMapCountry("US", "São Paulo")).toBe("BR");
+    expect(permitMapCountry("US", "ES-MD")).toBe("ES");
+    // MD is valid for both Maryland and Madrid. Without an ES prefix or a
+    // Spanish client, preserving the stored country is safer than guessing.
+    expect(permitMapCountry("US", "MD")).toBe("US");
+    expect(inferMapCountryFromRegion("ES-MD")).toBe("ES");
   });
 });

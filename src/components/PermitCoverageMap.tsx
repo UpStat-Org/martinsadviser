@@ -7,7 +7,7 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { COUNTRY_MAPS, SUPPORTED_COUNTRIES, normalizeMapCountry, normalizeMapRegion, type MapCountryCode } from "@/lib/maps";
+import { COUNTRY_MAPS, SUPPORTED_COUNTRIES, normalizeMapRegion, permitMapCountry, type MapCountryCode } from "@/lib/maps";
 
 type CountryCode = MapCountryCode;
 
@@ -46,7 +46,7 @@ export interface PermitForMap {
 }
 
 function permitCountry(p: PermitForMap): CountryCode {
-  return normalizeMapCountry(p.client_country ?? p.clients?.country) ?? "US";
+  return permitMapCountry(p.client_country ?? p.clients?.country, p.state);
 }
 
 interface PermitCoverageMapProps {

@@ -59,3 +59,32 @@ export function normalizeMapRegion(country: MapCountryCode, value: string | null
 
   return null;
 }
+
+/**
+ * Determines the map country from a region value when it is unambiguous.
+ * An ISO-3166-2 prefix is treated as explicit, so ES-MD is Madrid rather
+ * than Maryland even when a legacy client was accidentally marked as US.
+ */
+export function inferMapCountryFromRegion(value: string | null | undefined): MapCountryCode | null {
+  const prefix = value?.trim().match(/^([A-Za-z]{2})[-_]/)?.[1];
+  const prefixedCountry = normalizeMapCountry(prefix);
+  if (prefixedCountry && normalizeMapRegion(prefixedCountry, value)) return prefixedCountry;
+
+  const candidates = SUPPORTED_COUNTRIES.filter((country) => normalizeMapRegion(country, value));
+  return candidates.length === 1 ? candidates[0] : null;
+}
+
+/**
+ * Uses the client country when its region makes sense. Legacy records often
+ * have a US default even with a Brazilian-only code such as SP; in that case
+ * the unambiguous state code wins so the permit remains visible on the map.
+ */
+export function permitMapCountry(clientCountry: string | null | undefined, state: string | null | undefined): MapCountryCode {
+  const savedCountry = normalizeMapCountry(clientCountry);
+  const inferredCountry = inferMapCountryFromRegion(state);
+  const hasExplicitIsoPrefix = /^\s*(?:US|BR|ES)[-_]/i.test(state ?? "");
+
+  if (hasExplicitIsoPrefix && inferredCountry) return inferredCountry;
+  if (savedCountry && normalizeMapRegion(savedCountry, state)) return savedCountry;
+  return inferredCountry ?? savedCountry ?? "US";
+}
