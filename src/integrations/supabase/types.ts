@@ -163,6 +163,47 @@ export type Database = {
           },
         ]
       }
+      ai_briefings: {
+        Row: {
+          briefing_date: string
+          created_at: string
+          id: string
+          org_id: string
+          payload: Json
+          signals_hash: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          briefing_date?: string
+          created_at?: string
+          id?: string
+          org_id: string
+          payload: Json
+          signals_hash: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          briefing_date?: string
+          created_at?: string
+          id?: string
+          org_id?: string
+          payload?: Json
+          signals_hash?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_briefings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_chat_messages: {
         Row: {
           client_id: string
@@ -3609,6 +3650,7 @@ export type Database = {
       }
       normalize_hostname: { Args: { p_hostname: string }; Returns: string }
       peek_invitation: { Args: { p_token: string }; Returns: Json }
+      prune_ai_briefings: { Args: never; Returns: undefined }
       public_create_org_with_owner: {
         Args: { p_country?: string; p_name: string; p_slug: string }
         Returns: string
@@ -3663,6 +3705,10 @@ export type Database = {
       }
       update_org_branding: {
         Args: { p_branding: Json; p_org_id: string }
+        Returns: undefined
+      }
+      update_org_hourly_rate: {
+        Args: { p_org_id: string; p_rate: number }
         Returns: undefined
       }
     }
