@@ -14,7 +14,7 @@ import {
   Mail,
   DollarSign,
   ArrowUpRight,
-  Sparkles,
+  CalendarDays,
   CheckCircle2,
   Target,
   Flame,
@@ -330,13 +330,13 @@ export default function MyDeskPage() {
             </div>
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card border border-border mb-3">
-                <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
+                <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
                 <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                   {formatWeekdayLong(new Date(), language)}
                 </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
-                {greeting}{userName ? `, ${userName}` : ""} 👋
+                {greeting}{userName ? `, ${userName}` : ""}
               </h1>
               <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">
                 {t("mydesk.subtitle")} — {totalAttention} {totalAttention === 1 ? t("myDesk.attention.one") : t("myDesk.attention.other")}
@@ -347,14 +347,14 @@ export default function MyDeskPage() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => navigate("/tasks")}
-              className="h-10 px-4 rounded-md bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
+              className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-primary/90 transition-colors"
             >
               <ClipboardList className="w-4 h-4" />
               Kanban
             </button>
             <button
               onClick={() => navigate("/permits")}
-              className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all"
+              className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-muted transition-all"
             >
               <FileCheck className="w-4 h-4" />
               Permits
@@ -370,11 +370,8 @@ export default function MyDeskPage() {
           return (
             <div
               key={c.label}
-              className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
+              className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-5 hover:border-border transition-all duration-300"
             >
-              <div
-                className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
-              />
               <div className="relative flex items-start justify-between mb-4">
                 <div
                   className={`w-11 h-11 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
@@ -384,7 +381,7 @@ export default function MyDeskPage() {
                 {isZero ? (
                   <CheckCircle2 className="w-5 h-5 text-success/70" />
                 ) : (
-                  <Flame className="w-5 h-5 text-orange-500 animate-pulse" />
+                  <Flame className="w-5 h-5 text-warning" />
                 )}
               </div>
               <div className="relative">

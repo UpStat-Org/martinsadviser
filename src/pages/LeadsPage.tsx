@@ -249,7 +249,7 @@ export default function LeadsPage() {
         {summary.map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:border-border transition-all"
           >
             <div className="relative flex items-start justify-between mb-3">
               <div className="w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center">
@@ -324,7 +324,7 @@ export default function LeadsPage() {
                     {colLeads.map((lead) => (
                       <Card
                         key={lead.id}
-                        className="relative overflow-hidden transition-all hover:shadow-lg border-border/60"
+                        className="relative overflow-hidden transition-all hover:border-border border-border/60"
                       >
                         <CardContent className="p-3 space-y-2">
                           <div className="flex items-start justify-between gap-1.5">

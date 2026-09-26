@@ -128,10 +128,10 @@ export default function DriverDetailPage() {
           className={cn(
             "absolute top-0 left-0 right-0 h-1",
             compliance.level === "critical"
-              ? "bg-gradient-to-r from-destructive to-destructive/30"
+              ? "bg-destructive"
               : compliance.level === "attention"
-              ? "bg-gradient-to-r from-warning to-warning/30"
-              : "bg-gradient-to-r from-success to-success/30",
+              ? "bg-warning"
+              : "bg-success",
           )}
         />
         <CardContent className="p-5">

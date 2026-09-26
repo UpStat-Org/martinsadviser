@@ -173,7 +173,7 @@ export default function LoadsPage() {
         onClick={() => navigate(`/loads/${load.id}`)}
         className={cn(
           "relative overflow-hidden cursor-grab active:cursor-grabbing border-border/60",
-          "transition-all hover:shadow-md hover:-translate-y-0.5",
+          "transition-all hover:shadow-md ",
           draggedId === load.id && "opacity-40",
         )}
       >

@@ -6,17 +6,9 @@
 
 @layer base {
   :root {
-    /* Brand hue drives the primary color (buttons, focus rings, active nav
-       state). It still flows through the CRM theme — but only as a focused
-       highlight, not as the dominant surface paint. Sidebar / page chrome
-       stay neutral so the working area looks like a tool, not a hero.
-       232 is a saturated indigo — sits clearly apart from the neutral grays
-       so the eye reads "brand" instead of "more UI chrome". */
-    --brand-h: 232;
+    --brand-h: 202;
 
-    /* Surfaces — neutral, near-white. Background is a hair below pure white
-       so cards (pure white) lift cleanly with a 1px border. */
-    --background: 220 20% 99%;
+    --background: 210 17% 96%;
     --foreground: 222 30% 12%;
 
     --card: 0 0% 100%;
@@ -25,61 +17,50 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 30% 12%;
 
-    --primary: var(--brand-h) 73% 56%;
+    --primary: var(--brand-h) 48% 30%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14% 96%;
     --secondary-foreground: 222 24% 20%;
 
     --muted: 220 14% 96%;
-    /* Bumped from 44% → 38% to lift muted text contrast against muted
-       (96%) and card (100%) surfaces. WCAG AA for normal text needs ≥4.5:1;
-       at 38% we land around 5.4:1 over white. */
     --muted-foreground: 220 14% 38%;
 
-    /* Accent stays amber but used sparingly — for highlights, never for big
-       backgrounds. */
-    --accent: 38 90% 50%;
-    --accent-foreground: 38 92% 12%;
+    --accent: 205 22% 92%;
+    --accent-foreground: 215 25% 22%;
 
-    --destructive: 0 72% 50%;
+    --destructive: 4 62% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 158 60% 38%;
+    --success: 160 42% 32%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 32 92% 48%;
-    --warning-foreground: 32 92% 12%;
+    --warning: 33 82% 35%;
+    --warning-foreground: 0 0% 100%;
 
-    --border: 220 14% 90%;
-    --input: 220 14% 90%;
-    --ring: var(--brand-h) 73% 56%;
+    --border: 214 17% 87%;
+    --input: 214 17% 80%;
+    --ring: var(--brand-h) 48% 38%;
 
-    /* Tighter radius — 0.375rem (6px). Buttons/inputs feel like a tool.
-       Cards inherit `lg` (= radius). Badges use `sm` (radius - 4px = 2px). */
-    --radius: 0.375rem;
+    --radius: 0.5rem;
 
-    --chart-1: var(--brand-h) 73% 56%;
-    --chart-2: 158 60% 38%;
-    --chart-3: 32 92% 48%;
-    --chart-4: 0 72% 50%;
-    --chart-5: 262 60% 56%;
+    --chart-1: var(--brand-h) 40% 38%;
+    --chart-2: 164 28% 42%;
+    --chart-3: 35 48% 49%;
+    --chart-4: 5 43% 51%;
+    --chart-5: 218 17% 59%;
 
-    /* Sidebar: neutral white, hairline border. No brand tint on the surface
-       — only the active-item indicator/text picks up `--sidebar-primary`. */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 18% 28%;
-    --sidebar-primary: var(--brand-h) 73% 56%;
+    --sidebar-background: 215 24% 15%;
+    --sidebar-foreground: 212 19% 90%;
+    --sidebar-primary: 199 43% 70%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 95%;
-    --sidebar-accent-foreground: 222 28% 16%;
-    --sidebar-border: 220 14% 90%;
-    --sidebar-ring: var(--brand-h) 73% 56%;
+    --sidebar-accent: 213 22% 24%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 215 19% 25%;
+    --sidebar-ring: 199 43% 70%;
   }
 
   .dark {
-    /* Dark mode is a darker working surface, not a "night" theme. Charcoal
-       grays with the brand hue only on accents. */
     --background: 222 24% 8%;
     --foreground: 220 14% 94%;
 
@@ -89,47 +70,45 @@
     --popover: 222 22% 11%;
     --popover-foreground: 220 14% 94%;
 
-    --primary: var(--brand-h) 78% 64%;
-    --primary-foreground: 0 0% 100%;
+    --primary: var(--brand-h) 42% 68%;
+    --primary-foreground: 215 25% 12%;
 
     --secondary: 222 18% 16%;
     --secondary-foreground: 220 14% 85%;
 
     --muted: 222 18% 14%;
-    /* Bumped 60% → 68% so muted text reads cleanly over dark backgrounds
-       without becoming pure-white. */
     --muted-foreground: 220 12% 68%;
 
-    --accent: 38 88% 56%;
+    --accent: 210 19% 24%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 4 66% 65%;
+    --destructive-foreground: 215 25% 12%;
 
-    --success: 158 60% 48%;
-    --success-foreground: 0 0% 100%;
+    --success: 160 39% 61%;
+    --success-foreground: 215 25% 12%;
 
-    --warning: 32 90% 56%;
+    --warning: 35 72% 63%;
     --warning-foreground: 32 90% 10%;
 
     --border: 222 18% 18%;
     --input: 222 18% 18%;
-    --ring: var(--brand-h) 78% 64%;
+    --ring: var(--brand-h) 42% 68%;
 
-    --chart-1: var(--brand-h) 78% 64%;
-    --chart-2: 158 60% 48%;
-    --chart-3: 32 90% 56%;
-    --chart-4: 0 70% 50%;
-    --chart-5: 262 65% 68%;
+    --chart-1: var(--brand-h) 42% 68%;
+    --chart-2: 164 32% 61%;
+    --chart-3: 35 48% 65%;
+    --chart-4: 5 50% 65%;
+    --chart-5: 218 20% 68%;
 
     --sidebar-background: 222 24% 9%;
     --sidebar-foreground: 220 14% 78%;
-    --sidebar-primary: var(--brand-h) 78% 64%;
+    --sidebar-primary: 199 43% 70%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 222 20% 14%;
     --sidebar-accent-foreground: 220 14% 94%;
     --sidebar-border: 222 18% 16%;
-    --sidebar-ring: var(--brand-h) 78% 64%;
+    --sidebar-ring: 199 43% 70%;
   }
 }
 
@@ -145,50 +124,31 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    /* Match the body font — a single sans for the entire CRM. The old
-       Space Grotesk heading rule made every page header feel like a hero. */
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     letter-spacing: -0.01em;
   }
 
-  /* Tabular numerics on numeric data — KPI strips, tables, badges. */
-  .tabular {
+  .tabular, table {
     font-variant-numeric: tabular-nums;
   }
 }
 
 @layer utilities {
-  /* `.glass-card` is referenced from a few internal surfaces. In the CRM
-     look it degrades to a flat card with a hairline border — no blur, no
-     translucency — so internal pages stop looking glassy. */
   .glass-card {
     @apply bg-card border border-border;
   }
 
-  /* Subtle elevation card used by ClientOnboarding hero. Despite the
-     "premium" name, this stays a flat card with a soft shadow — no real
-     backdrop blur in the CRM theme. */
   .glass-card-premium {
-    @apply bg-card border border-border;
-    box-shadow:
-      0 1px 0 0 hsl(0 0% 100% / 0.6) inset,
-      0 20px 60px -20px hsl(var(--brand-h) 75% 20% / 0.25),
-      0 0 0 1px hsl(0 0% 100% / 0.02);
-  }
-  .dark .glass-card-premium {
-    box-shadow:
-      0 1px 0 0 hsl(0 0% 100% / 0.05) inset,
-      0 30px 80px -20px hsl(var(--brand-h) 75% 5% / 0.5);
+    @apply bg-card border border-border shadow-soft;
   }
 
   .input-glow:focus-within {
-    /* Tight focus ring, no halo. Matches the rest of the form controls. */
     box-shadow: 0 0 0 2px hsl(var(--ring) / 0.25);
   }
 
   .sidebar-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--sidebar-primary) / 0.55) transparent;
+    scrollbar-color: hsl(var(--sidebar-foreground) / 0.25) transparent;
     scrollbar-gutter: stable;
   }
 
@@ -204,22 +164,23 @@
   .sidebar-scrollbar::-webkit-scrollbar-thumb {
     border-radius: 9999px;
     border: 3px solid transparent;
-    background: linear-gradient(
-      180deg,
-      hsl(var(--sidebar-primary) / 0.72) 0%,
-      hsl(var(--sidebar-primary) / 0.42) 100%
-    );
+    background: hsl(var(--sidebar-foreground) / 0.25);
     background-clip: padding-box;
     min-height: 40px;
     box-shadow: inset 0 0 0 1px hsl(0 0% 100% / 0.12);
   }
 
   .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(
-      180deg,
-      hsl(var(--sidebar-primary) / 0.9) 0%,
-      hsl(var(--sidebar-primary) / 0.58) 100%
-    );
+    background: hsl(var(--sidebar-foreground) / 0.25);
     box-shadow: inset 0 0 0 1px hsl(0 0% 100% / 0.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

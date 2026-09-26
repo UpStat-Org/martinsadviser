@@ -137,7 +137,7 @@ export function NotificationCenter({ orgId, portal = false }: { orgId?: string; 
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 px-2.5 text-xs text-foreground hover:text-foreground hover:bg-white/15 rounded-lg font-semibold"
+                className="h-8 px-2.5 text-xs text-foreground hover:text-foreground hover:bg-muted rounded-lg font-semibold"
                 onClick={() => markAllRead.mutate()}
               >
                 <CheckCheck className="mr-1 h-3.5 w-3.5" />

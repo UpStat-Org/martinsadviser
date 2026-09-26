@@ -24,7 +24,7 @@ const TONE_BAR: Record<KpiTone, string | null> = {
 };
 
 const BASE_CARD =
-  "relative rounded-md border border-border bg-card p-3.5 overflow-hidden transition-colors";
+  "relative rounded-lg border border-border bg-card p-4 overflow-hidden transition-colors shadow-soft";
 
 export function KpiCard({
   label,
@@ -45,7 +45,7 @@ export function KpiCard({
         <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1", toneBar)} />
       )}
       <div className="flex items-start justify-between gap-2">
-        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        <span className="text-xs font-medium leading-5 text-muted-foreground">
           {label}
         </span>
         <Icon
@@ -58,7 +58,7 @@ export function KpiCard({
       {loading ? (
         <Skeleton className="h-7 w-16 mt-2" />
       ) : (
-        <div className="text-2xl font-semibold tracking-tight tabular mt-1.5">
+        <div className="text-[28px] leading-9 font-semibold tracking-tight tabular mt-3">
           {value}
         </div>
       )}

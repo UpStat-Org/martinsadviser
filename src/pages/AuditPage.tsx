@@ -200,11 +200,8 @@ export default function AuditPage() {
           <button
             key={s.action}
             onClick={() => setActionFilter(s.action)}
-            className="group relative text-left overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative text-left overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:border-border transition-all"
           >
-            <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
-            />
             <div className="relative flex items-start justify-between mb-3">
               <div
                 className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}

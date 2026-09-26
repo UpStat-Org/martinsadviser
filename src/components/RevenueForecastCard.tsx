@@ -95,7 +95,6 @@ export function RevenueForecastCard() {
               key={b.key}
               className="relative overflow-hidden rounded-md border border-border/50 p-4 bg-card"
             >
-              <div className={`absolute -top-8 -right-8 w-24 h-24 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-xl`} />
               <p className="relative text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 {b.label}
               </p>

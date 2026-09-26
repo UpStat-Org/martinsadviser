@@ -78,10 +78,10 @@ export default function PortalLayout() {
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
       />
-      <main className="flex-1 overflow-auto">
+      <main className="min-w-0 flex-1 overflow-auto">
         {/* Top bar mirrors AppLayout: flat, hairline border, no blur. */}
-        <div className="sticky top-0 z-10 bg-background border-b border-border">
-          <div className="max-w-screen-2xl mx-auto pl-14 pr-4 lg:px-8 h-12 flex items-center gap-3">
+        <div className="sticky top-0 z-10 bg-card border-b border-border">
+          <div className="max-w-screen-2xl mx-auto pl-16 pr-4 lg:px-8 h-16 flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <div className="text-sm font-medium text-foreground truncate">
                 {companyName}
@@ -93,7 +93,7 @@ export default function PortalLayout() {
             <NotificationCenter orgId={orgId} portal />
           </div>
         </div>
-        <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-screen-2xl mx-auto">
+        <div className="px-4 py-6 lg:px-8 lg:py-8 max-w-screen-2xl mx-auto">
           <Outlet context={{ clientId, orgId, userEmail, activeSection, setActiveSection } satisfies PortalOutletContext} />
         </div>
       </main>

@@ -70,7 +70,7 @@ export function AppSidebar() {
   const { data: isSuperAdmin } = useSuperAdmin();
   const wordmark = splitWordmark(branding);
   const { t } = useLanguage();
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile(1024);
   const { theme, setTheme } = useTheme();
 
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
@@ -207,7 +207,7 @@ export function AppSidebar() {
     const isChild = variant === "child";
     const className = cn(
       "group relative flex items-center gap-2.5 rounded-md text-[13px] transition-colors",
-      collapsed && !isMobile ? "justify-center px-0 mx-1 h-8" : isChild ? "h-7 px-2.5 pl-9" : "h-8 px-2.5",
+      collapsed && !isMobile ? "justify-center px-0 mx-1 h-9" : isChild ? "h-8 px-2.5 pl-9" : "h-9 px-2.5",
       active
         ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
         : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
@@ -221,7 +221,7 @@ export function AppSidebar() {
           className={cn(
             "shrink-0 transition-colors",
             isChild ? "w-3.5 h-3.5" : "w-4 h-4",
-            active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground/55 group-hover:text-sidebar-accent-foreground"
+            active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground/65 group-hover:text-sidebar-accent-foreground"
           )}
         />
         {showLabel && <span className="truncate">{item.label}</span>}
@@ -278,7 +278,7 @@ export function AppSidebar() {
                   "w-4 h-4 shrink-0 transition-colors",
                   open || groupActive
                     ? "text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/55 group-hover:text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground/65 group-hover:text-sidebar-accent-foreground"
                 )}
               />
             </button>
@@ -314,7 +314,7 @@ export function AppSidebar() {
           onClick={() => toggleGroup(group.key)}
           aria-expanded={open}
           className={cn(
-            "group relative flex items-center gap-2.5 h-8 w-full rounded-md text-[13px] transition-colors px-2.5",
+            "group relative flex items-center gap-2.5 h-9 w-full rounded-md text-[13px] transition-colors px-2.5",
             open || groupActive
               ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
               : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
@@ -325,7 +325,7 @@ export function AppSidebar() {
               "w-4 h-4 shrink-0 transition-colors",
               open || groupActive
                 ? "text-sidebar-accent-foreground"
-                : "text-sidebar-foreground/55 group-hover:text-sidebar-accent-foreground"
+                : "text-sidebar-foreground/65 group-hover:text-sidebar-accent-foreground"
             )}
           />
           <span className="truncate flex-1 text-left">{group.label}</span>
@@ -349,7 +349,7 @@ export function AppSidebar() {
     <div className="flex flex-col h-full">
       {/* Logo + wordmark — neutral, no status dot, no halo. */}
       <div className={cn(
-        "flex items-center gap-2.5 h-14 border-b border-sidebar-border shrink-0",
+        "flex items-center gap-2.5 h-16 border-b border-sidebar-border shrink-0",
         collapsed && !isMobile ? "justify-center px-2" : "px-4"
       )}>
         <Logo
@@ -360,7 +360,7 @@ export function AppSidebar() {
         {showLabel && (
           <Wordmark
             size="md"
-            tone="dark"
+            tone="light"
             className="min-w-0"
             primary={wordmark.primary}
             secondary={wordmark.secondary}
@@ -394,14 +394,14 @@ export function AppSidebar() {
                 title={collapsed && !isMobile ? displayName : undefined}
               >
                 {/* Flat avatar — square with subtle radius, no gradient. */}
-                <div className="shrink-0 w-7 h-7 rounded bg-secondary text-secondary-foreground flex items-center justify-center text-[11px] font-semibold border border-sidebar-border">
+                <div className="shrink-0 w-7 h-7 rounded bg-sidebar-accent text-sidebar-foreground flex items-center justify-center text-[11px] font-semibold border border-sidebar-border">
                   {initials}
                 </div>
                 {showLabel && (
                   <>
                     <div className="flex-1 min-w-0 text-left">
                       <div className="text-[12px] font-medium text-sidebar-foreground truncate">{displayName}</div>
-                      <div className="text-[10px] text-sidebar-foreground/55 truncate">{roleLabel}</div>
+                      <div className="text-[10px] text-sidebar-foreground/65 truncate">{roleLabel}</div>
                     </div>
                     <MoreHorizontal className="w-3.5 h-3.5 text-sidebar-foreground/40 group-hover:text-sidebar-foreground/70" />
                   </>
@@ -438,12 +438,12 @@ export function AppSidebar() {
       <OrgSwitcher collapsed={collapsed && !isMobile} />
 
       {/* Navigation */}
-      <nav className="flex-1 py-2 overflow-y-auto sidebar-scrollbar">
+      <nav className="flex-1 py-4 overflow-y-auto sidebar-scrollbar">
         <div className={cn("space-y-4", collapsed && !isMobile ? "px-1" : "px-2")}>
           {sections.map((section, idx) => (
             <div key={section.label} className="space-y-px">
               {showLabel ? (
-                <p className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
+                <p className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/65">
                   {section.label}
                 </p>
               ) : (
@@ -465,21 +465,21 @@ export function AppSidebar() {
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 title={theme === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode")}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
               <button
                 onClick={() => navigate("/settings")}
                 title={t("nav.settings")}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               >
                 <Settings className="w-4 h-4" />
               </button>
               <button
                 onClick={handleLogout}
                 title={t("nav.logout")}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-destructive/10 hover:text-destructive transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/65 hover:bg-destructive/10 hover:text-destructive transition-colors"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -499,14 +499,14 @@ export function AppSidebar() {
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               title={theme === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode")}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <button
               onClick={handleLogout}
               title={t("nav.logout")}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-destructive/10 hover:text-destructive transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/65 hover:bg-destructive/10 hover:text-destructive transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -554,8 +554,8 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "hidden lg:flex flex-col h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-[width] duration-200 relative",
-        collapsed ? "w-[60px]" : "w-[224px]"
+        "hidden lg:flex shrink-0 flex-col h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-[width] duration-200 relative",
+        collapsed ? "w-[60px]" : "w-[240px]"
       )}
     >
       {sidebarContent}

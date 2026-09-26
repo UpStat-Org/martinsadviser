@@ -396,7 +396,7 @@ export default function KanbanPage() {
                       key={task.id}
                       draggable
                       onDragStart={() => handleDragStart(task.id)}
-                      className={`relative overflow-hidden cursor-grab active:cursor-grabbing transition-all hover:shadow-lg hover:-translate-y-0.5 border-border/60 ${
+                      className={`relative overflow-hidden cursor-grab active:cursor-grabbing transition-all hover:border-border border-border/60 ${
                         draggedTaskId === task.id ? "opacity-40 rotate-2" : ""
                       }`}
                     >

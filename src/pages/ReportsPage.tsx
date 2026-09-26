@@ -322,7 +322,7 @@ export default function ReportsPage() {
                 setSelectedClients(new Set());
                 setBatchOpen(true);
               }}
-              className="h-10 px-4 rounded-md bg-secondary text-secondary-foreground border border-border text-sm font-semibold inline-flex items-center gap-1.5 hover:shadow-lg transition-all"
+              className="h-10 px-4 rounded-md bg-secondary text-secondary-foreground border border-border text-sm font-semibold inline-flex items-center gap-1.5 hover:border-border transition-all"
             >
               <ShieldCheck className="w-4 h-4" />
               {t("reports.bulkCompliance")}
@@ -330,7 +330,7 @@ export default function ReportsPage() {
             <button
               onClick={handleCsv}
               disabled={!filtered.length}
-              className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all disabled:opacity-40"
+              className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-muted transition-all disabled:opacity-40"
             >
               <Download className="w-4 h-4" />
               {t("reports.exportCsv")}
@@ -338,7 +338,7 @@ export default function ReportsPage() {
             <button
               onClick={handlePdf}
               disabled={!filtered.length}
-              className="h-10 px-4 rounded-md bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg disabled:opacity-60"
+              className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-primary/90 transition-colors disabled:opacity-60"
             >
               <FileText className="w-4 h-4" />
               {t("reports.exportPdf")}
@@ -377,11 +377,8 @@ export default function ReportsPage() {
         ].map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:border-border transition-all"
           >
-            <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
-            />
             <div className="relative flex items-start justify-between mb-3">
               <div
                 className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}

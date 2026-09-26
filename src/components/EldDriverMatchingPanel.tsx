@@ -105,7 +105,7 @@ export function EldDriverMatchingPanel() {
 
   return (
     <Card className="border-warning/40 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning to-warning/30" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-warning" />
       <CardContent className="p-4 sm:p-5 space-y-4">
         <div className="flex items-center gap-2.5">
           <div className="w-10 h-10 rounded-md bg-warning/10 border border-warning/20 flex items-center justify-center">

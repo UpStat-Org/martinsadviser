@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sparkles, RefreshCw, ArrowRight, AlertCircle } from "lucide-react";
+import { ClipboardList, RefreshCw, ArrowRight, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Briefing, BriefingPriority } from "@/hooks/useAiBriefing";
@@ -43,12 +43,12 @@ export function DailyBriefingCard({ briefing, isLoading, error, onRegenerate, on
   if (briefing?.empty) return null;
 
   return (
-    <Card className="border-primary/20 bg-gradient-to-br from-primary/[0.04] to-transparent">
+    <Card className="border-border">
       <CardContent className="p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-              <Sparkles className="w-4 h-4 text-primary" />
+              <ClipboardList className="w-4 h-4 text-primary" />
             </div>
             <div className="min-w-0">
               <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">

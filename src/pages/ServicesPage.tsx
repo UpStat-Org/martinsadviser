@@ -141,7 +141,7 @@ export default function ServicesPage() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={openNew}
-                className="h-10 px-4 rounded-md bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
+                className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-primary/90 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 {t("services.new")}

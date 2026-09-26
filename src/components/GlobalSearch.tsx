@@ -241,7 +241,7 @@ export function GlobalSearch() {
         className="group flex items-center gap-2.5 h-9 px-3 rounded-md border border-border bg-card hover:bg-muted text-muted-foreground text-sm transition-colors w-full max-w-md"
       >
         <Search className="w-4 h-4 text-muted-foreground/70 shrink-0" />
-        <span className="flex-1 text-left">{t("search.placeholder")}</span>
+        <span className="min-w-0 flex-1 truncate text-left">{t("search.placeholder")}</span>
         <kbd className="hidden sm:inline-flex h-5 items-center rounded border border-border bg-muted/60 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
           Ctrl K
         </kbd>

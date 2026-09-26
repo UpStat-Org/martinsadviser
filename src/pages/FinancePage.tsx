@@ -96,10 +96,10 @@ const STATUS_TONES: Record<string, StatusTone> = {
 };
 
 const PIE_COLORS = [
-  "hsl(38, 92%, 50%)",
-  "hsl(152, 60%, 40%)",
-  "hsl(0, 72%, 51%)",
-  "hsl(220, 16%, 60%)",
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
 ];
 
 const defaultInvoiceColumns = {
@@ -399,7 +399,7 @@ export default function FinancePage() {
             <button
               onClick={exportFinanceCsv}
               disabled={!filtered.length}
-              className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/15 transition-all disabled:opacity-40"
+              className="h-10 px-4 rounded-md bg-card border border-border text-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-muted transition-all disabled:opacity-40"
             >
               <Download className="w-4 h-4" />
               {t("reports.exportCsv")}
@@ -407,7 +407,7 @@ export default function FinancePage() {
             {!isViewer && (
               <button
                 onClick={openNew}
-                className="h-10 px-4 rounded-md bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
+                className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-primary/90 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 {t("finance.newInvoice")}
@@ -451,11 +451,8 @@ export default function FinancePage() {
         ].map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:border-border transition-all"
           >
-            <div
-              className={`absolute -top-10 -right-10 w-32 h-32 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
-            />
             <div className="relative flex items-start justify-between mb-3">
               <div
                 className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
@@ -501,8 +498,8 @@ export default function FinancePage() {
                 >
                   <defs>
                     <linearGradient id="barRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(158 55% 42%)" stopOpacity={1} />
-                      <stop offset="100%" stopColor="hsl(180 60% 45%)" stopOpacity={0.7} />
+                      <stop offset="0%" stopColor="hsl(var(--chart-1))" stopOpacity={1} />
+                      <stop offset="100%" stopColor="hsl(var(--chart-1))" stopOpacity={0.85} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
@@ -636,13 +633,13 @@ export default function FinancePage() {
                   <Bar
                     dataKey="paid"
                     stackId="a"
-                    fill="hsl(158 55% 42%)"
+                    fill="hsl(var(--chart-2))"
                     name={t("finance.paid")}
                   />
                   <Bar
                     dataKey="pending"
                     stackId="a"
-                    fill="hsl(38 92% 50%)"
+                    fill="hsl(var(--chart-3))"
                     name={t("common.pending")}
                     radius={[0, 6, 6, 0]}
                   />

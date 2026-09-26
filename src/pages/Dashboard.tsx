@@ -55,6 +55,7 @@ const TOOLTIP_STYLE = {
   border: "1px solid hsl(var(--border))",
   background: "hsl(var(--popover))",
   fontSize: 12,
+  color: "hsl(var(--popover-foreground))",
 };
 
 export default function Dashboard() {
@@ -131,7 +132,7 @@ export default function Dashboard() {
     () => [
       { name: t("dashboard.expired"), count: metrics.expired, fill: "hsl(var(--destructive))" },
       { name: "≤30d", count: metrics.in30, fill: "hsl(var(--warning))" },
-      { name: "≤60d", count: metrics.in60, fill: "hsl(32 92% 62%)" },
+      { name: "≤60d", count: metrics.in60, fill: "hsl(var(--chart-3) / 0.7)" },
       { name: "≤90d", count: metrics.in90, fill: "hsl(var(--primary) / 0.7)" },
       { name: ">90d", count: metrics.active, fill: "hsl(var(--success))" },
     ],
@@ -216,7 +217,7 @@ export default function Dashboard() {
       />
 
       {/* KPI strip */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2.5">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
         <KpiCard
           label={t("dashboard.clients")}
           value={clients?.length ?? 0}
@@ -298,7 +299,7 @@ export default function Dashboard() {
                 <AreaChart data={trendData} margin={{ top: 10, right: 5, bottom: 0, left: -20 }}>
                   <defs>
                     <linearGradient id="complianceGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity={0.25} />
+                      <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity={0.10} />
                       <stop offset="100%" stopColor="hsl(var(--chart-2))" stopOpacity={0} />
                     </linearGradient>
                   </defs>

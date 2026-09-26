@@ -40,16 +40,16 @@ export function AppLayout() {
         <CommandPalette />
       </Suspense>
       <AppSidebar />
-      <main className="flex-1 overflow-auto">
+      <main className="min-w-0 flex-1 overflow-auto">
         <SubscriptionBanner />
         {/* Top bar: flat surface, hairline border, no blur. Mobile leaves
             room for the hamburger button (positioned by AppSidebar). */}
-        <div className="sticky top-0 z-10 bg-background border-b border-border">
-          <div className="max-w-screen-2xl mx-auto pl-14 pr-4 lg:px-8 h-12 flex items-center gap-3">
-            <div className="flex-1 max-w-md">
+        <div className="sticky top-0 z-10 bg-card border-b border-border">
+          <div className="max-w-screen-2xl mx-auto pl-16 pr-4 lg:px-8 h-16 flex items-center gap-3">
+            <div className="min-w-0 flex-1 max-w-md">
               <GlobalSearch />
             </div>
-            <div className="flex-1" />
+            <div className="hidden sm:block sm:flex-1" />
             <Link
               to="/changelog"
               className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
@@ -61,7 +61,7 @@ export function AppLayout() {
             <NotificationCenter />
           </div>
         </div>
-        <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-screen-2xl mx-auto">
+        <div className="px-4 py-6 lg:px-8 lg:py-8 max-w-screen-2xl mx-auto">
           <Outlet />
         </div>
       </main>

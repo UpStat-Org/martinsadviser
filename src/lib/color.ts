@@ -149,13 +149,10 @@ export function applyBrandingColors(colors: BrandingColors) {
       root.style.setProperty("--primary-foreground", readableForegroundTriplet(colors.primary));
       root.style.setProperty("--sidebar-primary-foreground", readableForegroundTriplet(colors.primary));
 
-      // Sidebar accent (hover bg) = very light tint of the brand hue.
-      // Sidebar accent foreground = darker, saturated version for legibility.
-      const tintL = Math.max(88, Math.min(96, hsl.l + 32));
-      const onTintL = Math.max(20, Math.min(32, hsl.l - 24));
-      const tintS = Math.max(20, Math.min(hsl.s, 60));
-      root.style.setProperty("--sidebar-accent", `${hsl.h} ${tintS}% ${tintL}%`);
-      root.style.setProperty("--sidebar-accent-foreground", `${hsl.h} ${Math.min(70, hsl.s + 10)}% ${onTintL}%`);
+      // Navigation keeps its graphite surfaces in both themes. Only the
+      // active indicator follows tenant branding, with enough lightness
+      // to remain visible against the dark sidebar.
+      root.style.setProperty("--sidebar-primary", `${hsl.h} ${Math.min(hsl.s, 50)}% 70%`);
     }
   }
 

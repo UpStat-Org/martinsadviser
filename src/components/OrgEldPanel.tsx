@@ -105,7 +105,7 @@ export function OrgEldPanel() {
 
   return (
     <Card className="border-border/60 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-primary/30" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
       <CardContent className="p-5 space-y-4">
         <div>
           <h3 className="font-bold text-sm">{t("eld.title")}</h3>

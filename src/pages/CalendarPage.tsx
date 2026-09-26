@@ -138,7 +138,6 @@ export default function CalendarPage() {
     <div className="space-y-6">
       {/* ============ HERO ============ */}
       <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
-        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
         <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
@@ -210,12 +209,9 @@ export default function CalendarPage() {
         ].map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-md bg-card border border-border/60 p-4 hover:-translate-y-0.5 hover:shadow-lg hover:border-border transition-all duration-200"
+            className="group relative overflow-hidden rounded-md bg-card border border-border/60 p-4 hover:border-border hover:border-border transition-all duration-200"
           >
             <div className={`absolute left-0 top-0 bottom-0 w-1 ${s.accent} ${s.active ? "opacity-100" : "opacity-25"} transition-opacity`} />
-            <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full ${s.glow} blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
-            />
             <div className="relative flex items-start justify-between mb-3">
               <div
                 className={`w-10 h-10 rounded-md border flex items-center justify-center ${s.iconWrap}`}
@@ -238,7 +234,7 @@ export default function CalendarPage() {
       {/* ============ CALENDAR + DAY DETAIL ============ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-1 border-border/60 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-primary/30" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
           <CardContent className="p-4 flex flex-col items-center">
             <Calendar
               mode="single"
@@ -289,7 +285,7 @@ export default function CalendarPage() {
         </Card>
 
         <Card className="lg:col-span-2 border-border/60 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-primary/30" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
@@ -375,7 +371,7 @@ export default function CalendarPage() {
 
       {/* ============ HEATMAP ============ */}
       <Card className="border-border/60 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning to-warning/30" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-warning" />
         <CardContent className="p-5">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="w-10 h-10 rounded-md bg-warning/10 border border-warning/20 flex items-center justify-center">
@@ -441,7 +437,7 @@ export default function CalendarPage() {
 
       {/* ============ UPCOMING ============ */}
       <Card className="border-border/60 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-destructive to-destructive/30" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-destructive" />
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">

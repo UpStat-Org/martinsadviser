@@ -166,7 +166,7 @@ export default function Messages() {
               <button
                 onClick={handleSendNow}
                 disabled={sending}
-                className="h-10 px-4 rounded-md bg-secondary text-secondary-foreground border border-border text-sm font-semibold inline-flex items-center gap-1.5 hover:shadow-lg transition-all disabled:opacity-60"
+                className="h-10 px-4 rounded-md bg-secondary text-secondary-foreground border border-border text-sm font-semibold inline-flex items-center gap-1.5 hover:border-border transition-all disabled:opacity-60"
               >
                 {sending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -178,7 +178,7 @@ export default function Messages() {
             )}
             <button
               onClick={() => setScheduleOpen(true)}
-              className="h-10 px-4 rounded-md bg-white text-[#0b0d2e] text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-white/90 transition-all shadow-lg"
+              className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold inline-flex items-center gap-1.5 hover:bg-primary/90 transition-colors"
             >
               <Plus className="w-4 h-4" />
               {t("messages.new")}
@@ -217,11 +217,8 @@ export default function Messages() {
         ].map((s) => (
           <div
             key={s.label}
-            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="group relative overflow-hidden rounded-md bg-card border border-border/50 p-4 hover:border-border transition-all"
           >
-            <div
-              className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
-            />
             <div className="relative flex items-start justify-between mb-3">
               <div
                 className={`w-10 h-10 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
@@ -503,7 +500,7 @@ export default function Messages() {
               {rules.map((r) => (
                 <Card
                   key={r.id}
-                  className={`relative overflow-hidden border-border/50 hover:-translate-y-0.5 hover:shadow-lg transition-all ${
+                  className={`relative overflow-hidden border-border/50 hover:border-border transition-all ${
                     !r.enabled ? "opacity-60" : ""
                   }`}
                 >
@@ -597,7 +594,7 @@ export default function Messages() {
                 return (
                   <Card
                     key={tmpl.id}
-                    className="relative overflow-hidden border-border/50 hover:-translate-y-0.5 hover:shadow-lg transition-all"
+                    className="relative overflow-hidden border-border/50 hover:border-border transition-all"
                   >
                     <div
                       className={`absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border`}

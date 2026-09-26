@@ -381,7 +381,7 @@ export default function ClientOnboarding() {
           <div className="relative text-center">
             <button
               onClick={() => navigate("/clients")}
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-card border border-border text-foreground text-xs font-semibold hover:bg-white/15 transition-all mb-6"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-card border border-border text-foreground text-xs font-semibold hover:bg-muted transition-all mb-6"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               {t("common.back")}
@@ -406,11 +406,8 @@ export default function ClientOnboarding() {
             <button
               key={tmpl.name}
               onClick={() => applyTemplate(tmpl.services)}
-              className="group relative text-left overflow-hidden rounded-md bg-card border border-border/50 p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+              className="group relative text-left overflow-hidden rounded-md bg-card border border-border/50 p-6 hover:shadow-xl transition-all duration-300"
             >
-              <div
-                className={`absolute -top-12 -right-12 w-40 h-40 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl group-hover:opacity-25 transition-opacity`}
-              />
               <div className="relative flex items-start justify-between mb-5">
                 <div
                   className={`w-14 h-14 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center`}
@@ -452,7 +449,7 @@ export default function ClientOnboarding() {
         <div className="relative">
           <button
             onClick={() => navigate("/clients")}
-            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-card border border-border text-foreground text-xs font-semibold hover:bg-white/15 transition-all mb-5"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-card border border-border text-foreground text-xs font-semibold hover:bg-muted transition-all mb-5"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             {t("common.back")}

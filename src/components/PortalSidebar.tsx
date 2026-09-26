@@ -38,7 +38,7 @@ export function PortalSidebar({
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile(1024);
   const { theme, setTheme } = useTheme();
 
   useEffect(() => { setMobileOpen(false); }, [activeSection]);
@@ -84,7 +84,7 @@ export function PortalSidebar({
       ? (item.to === "/portal" ? location.pathname === "/portal" && activeSection === "overview" : location.pathname.startsWith(item.to))
       : location.pathname === "/portal" && activeSection === item.hash;
     const className = cn(
-      "group relative flex items-center gap-2.5 h-8 rounded-md text-[13px] transition-colors w-full text-left",
+      "group relative flex items-center gap-2.5 h-9 rounded-md text-[13px] transition-colors w-full text-left",
       collapsed && !isMobile ? "justify-center px-0 mx-1" : "px-2.5",
       active
         ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
@@ -111,7 +111,7 @@ export function PortalSidebar({
         <item.icon
           className={cn(
             "w-4 h-4 shrink-0 transition-colors",
-            active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground/55 group-hover:text-sidebar-accent-foreground"
+            active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground/65 group-hover:text-sidebar-accent-foreground"
           )}
         />
         {showLabel && <span className="truncate">{item.label}</span>}
@@ -123,7 +123,7 @@ export function PortalSidebar({
     <div className="flex flex-col h-full">
       {/* Brand block — client company name + portal badge */}
       <div className={cn(
-        "flex items-center gap-2.5 h-14 border-b border-sidebar-border shrink-0",
+        "flex items-center gap-2.5 h-16 border-b border-sidebar-border shrink-0",
         collapsed && !isMobile ? "justify-center px-2" : "px-4"
       )}>
         <div className="w-7 h-7 rounded bg-primary flex items-center justify-center shrink-0">
@@ -134,7 +134,7 @@ export function PortalSidebar({
             <div className="text-[13px] font-semibold text-sidebar-foreground truncate leading-tight">
               {companyName}
             </div>
-            <div className="text-[10px] text-sidebar-foreground/55 truncate mt-0.5">
+            <div className="text-[10px] text-sidebar-foreground/65 truncate mt-0.5">
               {t("portal.login")}
             </div>
           </div>
@@ -164,7 +164,7 @@ export function PortalSidebar({
               )}
               title={collapsed && !isMobile ? companyName : undefined}
             >
-              <div className="shrink-0 w-7 h-7 rounded bg-secondary text-secondary-foreground flex items-center justify-center text-[11px] font-semibold border border-sidebar-border">
+              <div className="shrink-0 w-7 h-7 rounded bg-sidebar-accent text-sidebar-foreground flex items-center justify-center text-[11px] font-semibold border border-sidebar-border">
                 {initials}
               </div>
               {showLabel && (
@@ -173,7 +173,7 @@ export function PortalSidebar({
                     <div className="text-[12px] font-medium text-sidebar-foreground truncate">
                       {companyName}
                     </div>
-                    <div className="text-[10px] text-sidebar-foreground/55 truncate">
+                    <div className="text-[10px] text-sidebar-foreground/65 truncate">
                       {userEmail ?? t("portal.readOnly")}
                     </div>
                   </div>
@@ -218,7 +218,7 @@ export function PortalSidebar({
           {sections.map((section, idx) => (
             <div key={section.label} className="space-y-px">
               {showLabel ? (
-                <p className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
+                <p className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/65">
                   {section.label}
                 </p>
               ) : (
@@ -238,14 +238,14 @@ export function PortalSidebar({
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 title={theme === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode")}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
               <button
                 onClick={handleLogout}
                 title={t("portal.logout")}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-destructive/10 hover:text-destructive transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/65 hover:bg-destructive/10 hover:text-destructive transition-colors"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -265,14 +265,14 @@ export function PortalSidebar({
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               title={theme === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode")}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <button
               onClick={handleLogout}
               title={t("portal.logout")}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/50 hover:bg-destructive/10 hover:text-destructive transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-sidebar-foreground/65 hover:bg-destructive/10 hover:text-destructive transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -319,8 +319,8 @@ export function PortalSidebar({
   return (
     <aside
       className={cn(
-        "hidden lg:flex flex-col h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-[width] duration-200 relative",
-        collapsed ? "w-[60px]" : "w-[224px]"
+        "hidden lg:flex shrink-0 flex-col h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-[width] duration-200 relative",
+        collapsed ? "w-[60px]" : "w-[240px]"
       )}
     >
       {sidebarContent}

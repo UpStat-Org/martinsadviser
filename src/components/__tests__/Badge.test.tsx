@@ -11,7 +11,7 @@ describe("Badge", () => {
   it("applies default variant classes", () => {
     render(<Badge>Test</Badge>);
     const badge = screen.getByText("Test");
-    expect(badge).toHaveClass("bg-primary");
+    expect(badge).toHaveClass("bg-primary/10", "text-primary", "border-primary/20");
   });
 
   it("applies destructive variant", () => {

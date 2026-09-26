@@ -107,7 +107,6 @@ export default function DocumentationPage() {
       {/* ============ WELCOME ============ */}
       <Card className="border-border/50 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-secondary text-secondary-foreground border border-border" />
-        <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-secondary text-secondary-foreground border border-border opacity-10 blur-2xl pointer-events-none" />
         <CardContent className="relative flex gap-4 items-start p-6">
           <div className="w-12 h-12 rounded-md bg-secondary text-secondary-foreground border border-border flex items-center justify-center flex-shrink-0">
             <BookOpen className="w-5 h-5 text-secondary-foreground" />
