@@ -85,6 +85,20 @@ npm install
 npm run dev
 ```
 
+### Com backend local e dados de demo
+
+Requer Docker e a [Supabase CLI](https://supabase.com/docs/guides/cli).
+
+```bash
+supabase start    # sobe Postgres/Auth/Storage e aplica todas as migrations
+psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" \
+  -v ON_ERROR_STOP=1 -f supabase/seed.demo.sql
+```
+
+Aponte o `.env` para o stack local (`VITE_SUPABASE_URL=http://127.0.0.1:54321` e a
+anon key exibida pelo `supabase start`), rode `npm run dev` e entre com
+`demo@dotpilot.test` / `DemoPass123!`. Todos os dados do seed são fictícios.
+
 ## Variáveis de ambiente
 
 Crie um arquivo `.env` na raiz do projeto com:
