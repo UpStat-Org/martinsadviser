@@ -23,3 +23,21 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+
+  migrations:
+    # Applies every migration to an empty database, so a fresh install can
+    # never silently break again, then runs the SQL isolation suites.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase db start
+      - name: Cross-tenant isolation and portal checks
+        run: |
+          for f in supabase/tests/*.sql; do
+            psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f "$f"
+          done
+      - name: Demo seed loads
+        run: psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f supabase/seed.demo.sql
