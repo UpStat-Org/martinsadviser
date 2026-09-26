@@ -37,3 +37,6 @@ playwright-report/
 
 # Local Netlify folder
 .netlify
+
+# Supabase CLI local state (linked project id, CLI version)
+supabase/.temp/
