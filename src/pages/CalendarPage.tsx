@@ -137,14 +137,14 @@ export default function CalendarPage() {
   return (
     <div className="space-y-6">
       {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
+      <div className="workspace-page-header">
         <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
               <CalendarDays className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
+              <h1 className="text-[26px] sm:text-[30px] font-semibold tracking-tight text-foreground leading-tight">
                 {t("calendar.title")}
               </h1>
               <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">

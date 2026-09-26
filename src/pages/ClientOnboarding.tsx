@@ -444,7 +444,7 @@ export default function ClientOnboarding() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Hero + Stepper */}
-      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
+      <div className="workspace-page-header">
 
         <div className="relative">
           <button
@@ -460,7 +460,7 @@ export default function ClientOnboarding() {
               <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-1">
                 {t("onboarding.step")} {step + 1} {t("common.of")} {steps.length}
               </p>
-              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
+              <h1 className="text-[26px] sm:text-[30px] font-semibold tracking-tight text-foreground leading-tight">
                 {t(currentStep.labelKey)}
               </h1>
             </div>

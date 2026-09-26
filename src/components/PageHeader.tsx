@@ -32,7 +32,7 @@ export function PageHeader({
   className,
 }: PageHeaderProps) {
   return (
-    <header className={cn("mb-6 border-b border-border pb-5", className)}>
+    <header className={cn("mb-6 border-b border-border pb-6", className)}>
       <div className="flex flex-col sm:flex-row sm:flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="min-w-0 w-full sm:w-auto sm:flex-1">
           {eyebrow && (
@@ -41,7 +41,7 @@ export function PageHeader({
             </div>
           )}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground leading-tight">
+            <h1 className="text-[26px] sm:text-[30px] font-semibold tracking-tight text-foreground leading-tight">
               {title}
             </h1>
             {meta && (

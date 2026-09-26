@@ -7,7 +7,6 @@ import {
   Clock,
   ShieldAlert,
   Mail,
-  Send,
   Map,
   Plus,
   TrendingUp,
@@ -195,6 +194,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow={t("sidebar.section.overview")}
         title={t("dashboard.title") !== "dashboard.title" ? t("dashboard.title") : "Dashboard"}
         description={`${metrics.total} ${t("common.monitoredPermits")} · ${clients?.length ?? 0} ${t("common.activeClients")}`}
         meta={
@@ -216,8 +216,8 @@ export default function Dashboard() {
         }
       />
 
-      {/* KPI strip */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+      {/* Consolidated operating ledger. */}
+      <div className="grid grid-cols-2 xl:grid-cols-4 overflow-hidden rounded-lg border border-border bg-card [&>*]:rounded-none [&>*]:border-0 [&>*]:border-r [&>*]:border-border [&>*]:shadow-none">
         <KpiCard
           label={t("dashboard.clients")}
           value={clients?.length ?? 0}
@@ -246,21 +246,6 @@ export default function Dashboard() {
           icon={AlertTriangle}
           tone={metrics.in30 > 0 ? "warning" : "neutral"}
           onClick={() => navigate("/permits")}
-        />
-        <KpiCard
-          label={t("dashboard.emailsSent")}
-          value={msgStats.sent}
-          loading={loadingMsgs}
-          icon={Send}
-          onClick={() => navigate("/messages")}
-        />
-        <KpiCard
-          label={t("dashboard.pendingMsgs")}
-          value={msgStats.pending}
-          loading={loadingMsgs}
-          icon={Mail}
-          tone={msgStats.pending > 0 ? "warning" : "neutral"}
-          onClick={() => navigate("/messages")}
         />
       </div>
 
@@ -325,34 +310,34 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dashboard-revenue border-transparent">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-muted-foreground" />
+              <TrendingUp className="w-4 h-4 text-current opacity-70" />
               {t("dashboard.monthlyRevenue")}
             </CardTitle>
             <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.thisMonth")}</p>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold tracking-tight tabular">
+            <div className="text-4xl font-medium tracking-tight tabular">
               ${revenueNow.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </div>
             <div
               className={cn(
                 "inline-flex items-center gap-1 text-xs font-medium tabular mt-0.5",
-                revenueDelta >= 0 ? "text-success" : "text-destructive",
+                revenueDelta >= 0 ? "text-current" : "text-current",
               )}
             >
               {revenueDelta >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
               {revenueDelta >= 0 ? "+" : ""}
               {revenueDelta.toFixed(1)}% vs {t("common.previousMonth")}
             </div>
-            <div className="mt-4 h-[110px]">
+            <div className="mt-6 h-[110px]">
               <Sparkline
                 data={revenueTrend}
                 value={(p) => p.revenue}
                 tooltip={(p) => `${p.month}: $${p.revenue.toFixed(2)}`}
-                color="hsl(var(--primary))"
+                color="currentColor"
                 strokeWidth={2}
                 aria-label={t("dashboard.revenue")}
               />
@@ -360,109 +345,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <Clock className="w-4 h-4 text-muted-foreground" />
-              {t("dashboard.expirations")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-[220px] w-full" />
-            ) : metrics.total === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-12">{t("dashboard.noPermits")}</p>
-            ) : (
-              <ExpirationBars data={expirationChartData} total={metrics.total} />
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-muted-foreground" />
-              {t("dashboard.permitsByType")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-[220px] w-full" />
-            ) : permitsByType.length === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-12">{t("dashboard.noPermits")}</p>
-            ) : (
-              <PermitsByTypeChart data={permitsByType} />
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <Mail className="w-4 h-4 text-muted-foreground" />
-              {t("dashboard.messages")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loadingMsgs ? (
-              <Skeleton className="h-[220px] w-full" />
-            ) : msgChartData.length === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-12">{t("dashboard.noMessages")}</p>
-            ) : (
-              <PermitsByTypeChart
-                data={msgChartData.map((d) => ({ name: d.name, value: d.value }))}
-                colors={msgChartData.map((d) => d.fill)}
-              />
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Expiration breakdown */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <Clock className="w-4 h-4 text-muted-foreground" />
-            {t("dashboard.expirationSummary")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-20 w-full" />)}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-              {[
-                { label: t("dashboard.expired"), count: metrics.expired, accent: "bg-destructive", text: "text-destructive" },
-                { label: "30d", count: metrics.in30, accent: "bg-warning", text: "text-warning" },
-                { label: "60d", count: metrics.in60, accent: "bg-warning/70", text: "text-warning" },
-                { label: "90d", count: metrics.in90, accent: "bg-primary/70", text: "text-primary" },
-                { label: t("dashboard.valid90"), count: metrics.active, accent: "bg-success", text: "text-success" },
-              ].map((row) => {
-                const pct = metrics.total ? (row.count / metrics.total) * 100 : 0;
-                return (
-                  <div key={row.label} className="rounded-md border border-border p-3">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{row.label}</span>
-                      <span className={cn("text-xs font-semibold tabular", row.text)}>{pct.toFixed(0)}%</span>
-                    </div>
-                    <div className="text-xl font-semibold tabular mb-2">{row.count}</div>
-                    <div className="h-1 rounded-sm bg-muted overflow-hidden">
-                      <div className={cn("h-full transition-all", row.accent)} style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <PortfolioRiskCard />
 
       {/* Urgent permits + recent clients — table-style rows, no avatar gradients */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -578,6 +460,109 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Charts row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <Clock className="w-4 h-4 text-muted-foreground" />
+              {t("dashboard.expirations")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-[220px] w-full" />
+            ) : metrics.total === 0 ? (
+              <p className="text-muted-foreground text-sm text-center py-12">{t("dashboard.noPermits")}</p>
+            ) : (
+              <ExpirationBars data={expirationChartData} total={metrics.total} />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <FileCheck className="w-4 h-4 text-muted-foreground" />
+              {t("dashboard.permitsByType")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-[220px] w-full" />
+            ) : permitsByType.length === 0 ? (
+              <p className="text-muted-foreground text-sm text-center py-12">{t("dashboard.noPermits")}</p>
+            ) : (
+              <PermitsByTypeChart data={permitsByType} />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <Mail className="w-4 h-4 text-muted-foreground" />
+              {t("dashboard.messages")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loadingMsgs ? (
+              <Skeleton className="h-[220px] w-full" />
+            ) : msgChartData.length === 0 ? (
+              <p className="text-muted-foreground text-sm text-center py-12">{t("dashboard.noMessages")}</p>
+            ) : (
+              <PermitsByTypeChart
+                data={msgChartData.map((d) => ({ name: d.name, value: d.value }))}
+                colors={msgChartData.map((d) => d.fill)}
+              />
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Expiration breakdown */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Clock className="w-4 h-4 text-muted-foreground" />
+            {t("dashboard.expirationSummary")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-20 w-full" />)}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+              {[
+                { label: t("dashboard.expired"), count: metrics.expired, accent: "bg-destructive", text: "text-destructive" },
+                { label: "30d", count: metrics.in30, accent: "bg-warning", text: "text-warning" },
+                { label: "60d", count: metrics.in60, accent: "bg-warning/70", text: "text-warning" },
+                { label: "90d", count: metrics.in90, accent: "bg-primary/70", text: "text-primary" },
+                { label: t("dashboard.valid90"), count: metrics.active, accent: "bg-success", text: "text-success" },
+              ].map((row) => {
+                const pct = metrics.total ? (row.count / metrics.total) * 100 : 0;
+                return (
+                  <div key={row.label} className="rounded-md border border-border p-3">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{row.label}</span>
+                      <span className={cn("text-xs font-semibold tabular", row.text)}>{pct.toFixed(0)}%</span>
+                    </div>
+                    <div className="text-xl font-semibold tabular mb-2">{row.count}</div>
+                    <div className="h-1 rounded-sm bg-muted overflow-hidden">
+                      <div className={cn("h-full transition-all", row.accent)} style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <PortfolioRiskCard />
 
       <RevenueForecastCard />
 

@@ -24,7 +24,7 @@ const TONE_BAR: Record<KpiTone, string | null> = {
 };
 
 const BASE_CARD =
-  "relative rounded-lg border border-border bg-card p-4 overflow-hidden transition-colors shadow-soft";
+  "relative rounded-lg border border-border bg-card p-5 overflow-hidden transition-colors";
 
 export function KpiCard({
   label,
@@ -58,7 +58,7 @@ export function KpiCard({
       {loading ? (
         <Skeleton className="h-7 w-16 mt-2" />
       ) : (
-        <div className="text-[28px] leading-9 font-semibold tracking-tight tabular mt-3">
+        <div className="text-[34px] leading-10 font-medium tracking-tight tabular mt-4">
           {value}
         </div>
       )}

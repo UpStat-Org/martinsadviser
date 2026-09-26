@@ -150,13 +150,13 @@ export default function HvutPage() {
 
   return (
     <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
+      <div className="workspace-page-header">
         <div className="relative flex items-end justify-between gap-4">
           <div>
             <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-2">
               {t("hvut.section").replace("{year}", String(taxYear))}
             </p>
-            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
+            <h1 className="text-[26px] sm:text-[30px] font-semibold tracking-tight text-foreground leading-tight">
               {t("hvut.title")}
             </h1>
             <p className="text-muted-foreground mt-2 text-sm max-w-xl">

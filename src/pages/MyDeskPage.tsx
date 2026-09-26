@@ -321,11 +321,11 @@ export default function MyDeskPage() {
   return (
     <div className="space-y-6">
       {/* ============ HERO ============ */}
-      <div className="relative overflow-hidden rounded-md bg-card border border-border p-4 sm:p-5">
+      <div className="workspace-page-header">
 
         <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-md bg-card border border-border flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center flex-shrink-0">
               <Briefcase className="w-6 h-6 text-secondary-foreground" />
             </div>
             <div>
@@ -335,7 +335,7 @@ export default function MyDeskPage() {
                   {formatWeekdayLong(new Date(), language)}
                 </span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
+              <h1 className="text-[26px] sm:text-[30px] font-semibold tracking-tight text-foreground leading-tight">
                 {greeting}{userName ? `, ${userName}` : ""}
               </h1>
               <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-xl">

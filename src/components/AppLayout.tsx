@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Link, Outlet } from "react-router-dom";
-import { History } from "lucide-react";
+import { Building2, History } from "lucide-react";
 import { AppSidebar } from "./AppSidebar";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationCenter } from "./NotificationCenter";
@@ -46,6 +46,10 @@ export function AppLayout() {
             room for the hamburger button (positioned by AppSidebar). */}
         <div className="sticky top-0 z-10 bg-card border-b border-border">
           <div className="max-w-screen-2xl mx-auto pl-16 pr-4 lg:px-8 h-16 flex items-center gap-3">
+            <div className="hidden xl:flex items-center gap-2.5 min-w-0 mr-6 text-sm font-medium">
+              <Building2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <span className="max-w-48 truncate">{currentOrg?.name}</span>
+            </div>
             <div className="min-w-0 flex-1 max-w-md">
               <GlobalSearch />
             </div>
@@ -61,7 +65,7 @@ export function AppLayout() {
             <NotificationCenter />
           </div>
         </div>
-        <div className="px-4 py-6 lg:px-8 lg:py-8 max-w-screen-2xl mx-auto">
+        <div className="workspace-content px-4 py-6 lg:px-8 lg:py-8 max-w-screen-2xl mx-auto">
           <Outlet />
         </div>
       </main>
