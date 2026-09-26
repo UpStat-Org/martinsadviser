@@ -8,7 +8,7 @@ const corsHeaders = {
 
 const DEFAULT_FROM = Deno.env.get("INVITATION_EMAIL_FROM")
   ?? Deno.env.get("EMAIL_FROM")
-  ?? "DotPilot <noreply@upstat.online>";
+  ?? "DotPilot <noreply@dotpilot.online>";
 
 const ACCESS_TOKEN_TTL_DAYS = 7;
 

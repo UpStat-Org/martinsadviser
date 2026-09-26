@@ -18,7 +18,7 @@ const corsHeaders = {
 
 const DEFAULT_FROM = Deno.env.get("INVITATION_EMAIL_FROM")
   ?? Deno.env.get("EMAIL_FROM")
-  ?? "DotPilot <noreply@upstat.online>";
+  ?? "DotPilot <noreply@dotpilot.online>";
 
 function htmlEscape(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));

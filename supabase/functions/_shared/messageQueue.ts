@@ -2,6 +2,7 @@ import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const MAX_RETRIES = 3;
 const DEFAULT_FROM = Deno.env.get("EMAIL_FROM") ?? "DotPilot <noreply@dotpilot.online>";
+const PILOTSTATUS_API_URL = Deno.env.get("PILOTSTATUS_API_URL") ?? "https://pilotstatus.online/api/v1";
 
 type Log = (level: "info" | "warn" | "error", message: string, extra?: unknown) => void;
 type QueueOptions = { channel?: string; orgId?: string; log: Log };
@@ -39,7 +40,7 @@ async function sendEmail(apiKey: string, to: string, subject: string, body: stri
 }
 
 async function sendWhatsApp(apiKey: string, phone: string, body: string) {
-  const response = await fetch("https://pilotstatus.online/api/v1/messages/send", {
+  const response = await fetch(`${PILOTSTATUS_API_URL}/messages/send`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": apiKey },
     body: JSON.stringify({
